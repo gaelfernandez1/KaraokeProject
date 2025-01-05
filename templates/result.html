@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados</title>
+</head>
+<body>
+    <h1>Resultados</h1>
+    <h2>Letra Transcrita</h2>
+    <pre>{{ result.text | nl2br }}</pre>
+    
+    <h2>Descargar Archivos Separados</h2>
+    <ul>
+        <li><a href="{{ url_for('download_file', filename=result.vocals_file) }}">Voz</a></li>
+        <li><a href="{{ url_for('download_file', filename=result.instrumental_file) }}">Instrumental</a></li>
+    </ul>
+    
+    <a href="/">Volver</a>
+</body>
+</html>
