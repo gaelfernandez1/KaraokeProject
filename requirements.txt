@@ -41,7 +41,7 @@ six==1.17.0
 submitit==1.5.2
 sympy==1.13.3
 tiktoken==0.7.0
-torch==2.4.1+cu118
+torch==2.4.1
 torchaudio==2.4.1
 torchvision==0.19.1+cu118
 tqdm==4.67.1
