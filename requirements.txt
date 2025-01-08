@@ -43,7 +43,7 @@ sympy==1.13.3
 tiktoken==0.7.0
 torch==2.4.1
 torchaudio==2.4.1
-torchvision==0.19.1+cu118
+torchvision==0.19.1
 tqdm==4.67.1
 treetable==0.2.5
 typing_extensions==4.12.2
