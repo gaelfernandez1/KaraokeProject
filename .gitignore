@@ -1,5 +1,6 @@
 # Ignorar entornos virtuales
-# KaraokeProject_env/
+ KaraokeProject_env/
+ KaraokeProject2_env/
 
 # Archivos de configuración del sistema
 .DS_Store
@@ -10,7 +11,7 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Archivos de salida
-# salida_demucs/
-# *.mp3
-# *.wav
+pretrained_models/
+
+
+
