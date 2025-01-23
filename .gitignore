@@ -1,6 +1,5 @@
 # Ignorar entornos virtuales
  KaraokeProject_env/
- KaraokeProject2_env/
 
 # Archivos de configuración del sistema
 .DS_Store
