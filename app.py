@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, send_from_directory
 import os
-from spleeter.separator import Separator
 
 app = Flask(__name__)
 
@@ -28,10 +27,13 @@ def encontrar_archivos(output_dir):
 
     return vocals_path, instrumental_path
 
-def separar_pistas(filepath, separator):
+def separar_pistas(filepath):
     """
     Separa las pistas de audio de una canción usando Spleeter.
     """
+    from spleeter.separator import Separator
+    separator = Separator('spleeter:2stems')  # Inicializar el separador solo cuando se necesite
+
     output_dir = os.path.join(OUTPUT_FOLDER, os.path.splitext(os.path.basename(filepath))[0])
     os.makedirs(output_dir, exist_ok=True)
 
@@ -52,7 +54,7 @@ def index():
 
             try:
                 # Procesar el archivo con Spleeter
-                vocals_path, instrumental_path = separar_pistas(filepath, app.config["separator"])
+                vocals_path, instrumental_path = separar_pistas(filepath)
                 
                 # Mostrar resultados
                 return render_template(
@@ -76,6 +78,6 @@ def download_file(filename):
     return send_from_directory(directory, file_name, as_attachment=True)
 
 if __name__ == "__main__":
-    # Inicializar el separador aquí para evitar problemas con multiprocessing
-    app.config["separator"] = Separator('spleeter:2stems')
-    app.run(debug=True)
+    # Usar el puerto dinámico proporcionado por Heroku
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
