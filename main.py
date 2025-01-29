@@ -163,7 +163,7 @@ def transcribe(audiofile_path: str, num_passes: int = 1) -> str:
         for i in range(num_passes):
             print(f"Transcripción pasada {i + 1} de {num_passes}...")
             current_result = model.transcribe(
-                audiofile_path, verbose=True, language="en", word_timestamps=True)
+                audiofile_path, verbose=True, word_timestamps=True)
             last_result = current_result
 
         if last_result is None:
