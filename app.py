@@ -1,19 +1,16 @@
 from flask import Flask, request, send_file
 import os
-import uuid
 
-from main import create, create_with_manual_lyrics
 import yt_dlp
+
+# Importamos la lógica principal (demucs, moviepy) desde main.py:
+from main import create, create_with_manual_lyrics
 
 app = Flask(__name__)
 
 def normalize_query(text: str) -> str:
     """
-    Limpia y normaliza la cadena para mejorar la búsqueda de letras.
-    - Quita espacios en extremos
-    - Elimina paréntesis [..] y (..)
-    - Sustituye múltiples espacios por uno
-    - Pasa a minúsculas (opcional)
+    Limpia y normaliza la cadena para búsqueda.
     """
     import re
     text = text.strip()
@@ -24,37 +21,39 @@ def normalize_query(text: str) -> str:
     return text
 
 def download_youtube_video(url, output_dir="input"):
+    """
+    Descarga con yt-dlp.
+    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
     ydl_opts = {
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'format': 'mp4/bestaudio/bestvideo',
-        'noplaylist': True  # Para que no descargue playlists accidentalmente
+        'noplaylist': True
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
         downloaded_filename = ydl.prepare_filename(info)
         return downloaded_filename
 
-
 @app.route("/", methods=["GET"])
 def index():
     """
-    Muestra la página principal con dos opciones:
-    1) Generar karaoke con transcripción de Whisper
-    2) Generar karaoke con letra manual
+    Página principal con 2 opciones:
+      - Karaoke con transcripción (WhisperX)
+      - Letra Manual
     """
     return """
     <html>
       <body>
-        <h1>Karaoke Multilenguaje</h1>
+        <h1>Karaoke Multilenguaje (Contenedor A)</h1>
         
-        <h2>Opción A: Karaoke con Transcripción Automática (Whisper)</h2>
+        <h2>Opción A: Karaoke con Transcripción Automática (WhisperX)</h2>
         <form action="/generate" method="post">
           <label>URL de YouTube:</label>
           <input type="text" name="youtube_url" required>
-          <button type="submit">Procesar con Whisper</button>
+          <button type="submit">Procesar con WhisperX</button>
         </form>
 
         <hr>
@@ -71,45 +70,38 @@ def index():
     </html>
     """
 
-
 @app.route("/generate", methods=["POST"])
 def generate():
     """
-    Endpoint que recibe 'youtube_url', descarga el video,
-    genera el karaoke con Whisper y devuelve el archivo resultante.
+    Recibe 'youtube_url', descarga el video,
+    llama create(...) que internamente invoca WhisperX a través del endpoint.
     """
     youtube_url = request.form.get("youtube_url")
     if not youtube_url:
         return "Falta parámetro 'youtube_url'", 400
 
-    # 1) Descargar el video
     try:
         video_path = download_youtube_video(youtube_url)
     except Exception as e:
         return f"Error descargando el video: {e}", 500
 
-    # 2) Crear el karaoke con Whisper
     try:
+        # Llamamos create(...) => separa con demucs => vocals.wav => 
+        # llama al endpoint whisperx => compone karaoke final
         output_filename = create(video_path)
         if not output_filename:
             return "Error generando karaoke", 500
     except Exception as e:
         return f"Error procesando karaoke: {e}", 500
 
-    # 3) Devolver el archivo resultante
     result_path = os.path.join("output", output_filename)
     if not os.path.exists(result_path):
         return "No se encontró el archivo de salida", 500
 
     return send_file(result_path, as_attachment=True)
 
-
 @app.route("/manual_lyrics_form", methods=["GET"])
 def manual_lyrics_form():
-    """
-    Formulario para que el usuario introduzca manualmente la letra
-    y la URL de YouTube.
-    """
     return """
     <html>
       <body>
@@ -127,7 +119,6 @@ def manual_lyrics_form():
     </html>
     """
 
-
 @app.route("/process_manual_lyrics", methods=["POST"])
 def process_manual_lyrics():
     youtube_url = request.form.get("youtube_url", "").strip()
@@ -139,18 +130,14 @@ def process_manual_lyrics():
     try:
         video_path = download_youtube_video(youtube_url)
     except Exception as e:
-        import traceback
-        traceback.print_exc()  # mostrará más info en la consola
         return f"Error descargando el video: {e}", 500
 
     try:
+        # Usa la versión manual (no llama whisperx).
         output_filename = create_with_manual_lyrics(video_path, lyrics_text)
         if not output_filename:
             return "Error generando karaoke con letra manual", 500
     except Exception as e:
-        import traceback
-        print("=== ERROR DETECTADO ===")
-        traceback.print_exc()  # imprime traceback COMPLETO en la consola
         return f"Error procesando karaoke: {e}", 500
 
     result_path = os.path.join("output", output_filename)
@@ -159,13 +146,8 @@ def process_manual_lyrics():
 
     return send_file(result_path, as_attachment=True)
 
-
-
 @app.route("/lyrics_form", methods=["GET"])
 def lyrics_form():
-    """
-    (En desarrollo) Búsqueda de la letra por título y artista
-    """
     return """
     <html>
       <body>
@@ -183,12 +165,8 @@ def lyrics_form():
     </html>
     """
 
-
 @app.route("/search_lyrics", methods=["POST"])
 def search_lyrics():
-    """
-    Pendiente de implementación de la lógica de búsqueda de letras en portales.
-    """
     song_title = request.form.get("song_title", "").strip()
     artist = request.form.get("artist", "").strip()
 
@@ -206,4 +184,5 @@ def search_lyrics():
     """
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Importante: host="0.0.0.0" para que Docker redirija
+    app.run(debug=True, host="0.0.0.0", port=5000)

@@ -1,0 +1,15 @@
+# requirements_whisperx.txt
+
+numpy<2.0
+
+# PyTorch 2.0 con CUDA 11.8 (para GPU)
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch==2.0.0+cu118
+torchaudio==2.0.0+cu118
+
+# Versión estable de WhisperX
+whisperx
+
+
+
+Flask
