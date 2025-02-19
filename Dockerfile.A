@@ -1,0 +1,29 @@
+# Dockerfile.demucs
+
+FROM python:3.10-slim
+
+# Instalar paquetes del sistema. Si usas ffmpeg o algo más
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg git imagemagick \
+    libpangocairo-1.0-0 \
+    libpangoft2-1.0-0 \
+    libmagickwand-dev \
+    # (según sea necesario)
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Crear directorio de trabajo
+WORKDIR /KaraokeProject
+
+# Copiar e instalar requirements de demucs
+COPY requirementsA.txt /KaraokeProject
+RUN pip install --no-cache-dir -r requirementsA.txt
+
+# Copiar todo tu proyecto (app.py, main.py, fonts/, etc.) al contenedor
+COPY . /KaraokeProject
+
+# Exponer el puerto 5000 (Flask)
+EXPOSE 5000
+
+# Comando por defecto al arrancar el contenedor
+CMD ["python", "app.py"]
