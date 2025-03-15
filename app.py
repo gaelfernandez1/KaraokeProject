@@ -1,17 +1,12 @@
 from flask import Flask, request, send_file
 import os
-
 import yt_dlp
 
-# Importamos la lógica principal (demucs, moviepy) desde main.py:
 from main import create, create_with_manual_lyrics
 
 app = Flask(__name__)
 
 def normalize_query(text: str) -> str:
-    """
-    Limpia y normaliza la cadena para búsqueda.
-    """
     import re
     text = text.strip()
     text = re.sub(r"\(.*?\)", "", text)
@@ -21,9 +16,6 @@ def normalize_query(text: str) -> str:
     return text
 
 def download_youtube_video(url, output_dir="input"):
-    """
-    Descarga con yt-dlp.
-    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -39,11 +31,6 @@ def download_youtube_video(url, output_dir="input"):
 
 @app.route("/", methods=["GET"])
 def index():
-    """
-    Página principal con 2 opciones:
-      - Karaoke con transcripción (WhisperX)
-      - Letra Manual
-    """
     return """
     <html>
       <body>
@@ -72,10 +59,6 @@ def index():
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    """
-    Recibe 'youtube_url', descarga el video,
-    llama create(...) que internamente invoca WhisperX a través del endpoint.
-    """
     youtube_url = request.form.get("youtube_url")
     if not youtube_url:
         return "Falta parámetro 'youtube_url'", 400
@@ -86,8 +69,6 @@ def generate():
         return f"Error descargando el video: {e}", 500
 
     try:
-        # Llamamos create(...) => separa con demucs => vocals.wav => 
-        # llama al endpoint whisperx => compone karaoke final
         output_filename = create(video_path)
         if not output_filename:
             return "Error generando karaoke", 500
@@ -113,7 +94,7 @@ def manual_lyrics_form():
           <label>Letra (texto plano):</label><br>
           <textarea name="manual_lyrics" rows="10" cols="60"></textarea><br><br>
 
-          <button type="submit">Procesar con Letra Manual</button>
+          <button type="submit">Procesar con Letra Manual (Forced Alignment)</button>
         </form>
       </body>
     </html>
@@ -133,8 +114,9 @@ def process_manual_lyrics():
         return f"Error descargando el video: {e}", 500
 
     try:
-        # Usa la versión manual (no llama whisperx).
-        output_filename = create_with_manual_lyrics(video_path, lyrics_text)
+        # Llamamos a la nueva función con forced alignment
+        # Nota: si quieres, puedes pasar "en", "es"... o autodetect
+        output_filename = create_with_manual_lyrics(video_path, lyrics_text, language="es")
         if not output_filename:
             return "Error generando karaoke con letra manual", 500
     except Exception as e:
@@ -184,5 +166,4 @@ def search_lyrics():
     """
 
 if __name__ == "__main__":
-    # Importante: host="0.0.0.0" para que Docker redirija
     app.run(debug=True, host="0.0.0.0", port=5000)

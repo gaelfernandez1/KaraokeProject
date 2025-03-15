@@ -3,13 +3,16 @@
 numpy<2.0
 
 # PyTorch 2.0 con CUDA 11.8 (para GPU)
---extra-index-url https://download.pytorch.org/whl/cu118
-torch==2.0.0+cu118
-torchaudio==2.0.0+cu118
+--extra-index-url https://download.pytorch.org/whl/cu117
+torch==2.0.0+cu117
+torchaudio==2.0.0+cu117
 
 # Versión estable de WhisperX
 whisperx
 
-
-
 Flask
+
+# Librerías que faltaban para get_duration con librosa
+librosa
+soundfile
+
