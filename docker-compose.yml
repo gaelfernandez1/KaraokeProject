@@ -1,5 +1,3 @@
-
-
 services:
 
   demucs:
@@ -7,10 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile.A
     container_name: demucs_container
-    # Mapeamos el puerto 5000 donde corre tu Flask
     ports:
       - "5000:5000"
-    # Volumen compartido para intercambiar /data
     volumes:
       - shared_data:/data
 
@@ -19,7 +15,15 @@ services:
       context: .
       dockerfile: Dockerfile.B
     container_name: whisperx_container
-    # Mapeamos el puerto 5001 donde corre el servidor WhisperX
+    # IMPORTANTE: para GPU
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: ["gpu"]
     ports:
       - "5001:5001"
     volumes:

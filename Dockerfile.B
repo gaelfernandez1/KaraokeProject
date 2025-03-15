@@ -1,22 +1,19 @@
 # Dockerfile.whisperx
 
-FROM python:3.10-slim
+FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
 
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg git
+# ffmpeg, git, etc.
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg git \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /KaraokeProject
 
-# Copiar el requirements de whisperx
+# Instalar requirements B
 COPY requirementsB.txt /KaraokeProject
-
-# Instalar dependencias con pip
 RUN pip install --no-cache-dir -r requirementsB.txt
 
-# Copiar el archivo que monta el servidor whisperx (whisperx_service_api.py)
+# Copiar whisperx_service_api.py
 COPY whisperx_service_api.py /KaraokeProject
 
-# Exponer el puerto 5001 (donde correrá el servidor Flask)
 EXPOSE 5001
-
-# Comando por defecto: lanzar la API
 CMD ["python", "whisperx_service_api.py"]
