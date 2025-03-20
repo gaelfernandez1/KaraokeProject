@@ -1,7 +1,9 @@
-from flask import Flask, request, send_file
+# app.py
+from flask import Flask, request, send_file, render_template
 import os
 import yt_dlp
 
+# Importamos las funciones de main.py
 from main import create, create_with_manual_lyrics
 
 app = Flask(__name__)
@@ -16,6 +18,7 @@ def normalize_query(text: str) -> str:
     return text
 
 def download_youtube_video(url, output_dir="input"):
+    """Descarga un video de YouTube como mp4 usando yt_dlp."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -31,31 +34,8 @@ def download_youtube_video(url, output_dir="input"):
 
 @app.route("/", methods=["GET"])
 def index():
-    return """
-    <html>
-      <body>
-        <h1>Karaoke Multilenguaje (Contenedor A)</h1>
-        
-        <h2>Opción A: Karaoke con Transcripción Automática (WhisperX)</h2>
-        <form action="/generate" method="post">
-          <label>URL de YouTube:</label>
-          <input type="text" name="youtube_url" required>
-          <button type="submit">Procesar con WhisperX</button>
-        </form>
-
-        <hr>
-
-        <h2>Opción B: Letra Manual</h2>
-        <p>Introduce la URL de YouTube y la letra manualmente.</p>
-        <a href="/manual_lyrics_form">Usar Letra Manual</a>
-        
-        <hr>
-
-        <h2>(Opcional) Búsqueda de Letra por Título/Artista</h2>
-        <p>(En desarrollo) <a href="/lyrics_form">Buscar Letra</a></p>
-      </body>
-    </html>
-    """
+    # Renderiza la plantilla 'index.html'
+    return render_template("index.html")
 
 @app.route("/generate", methods=["POST"])
 def generate():
@@ -83,22 +63,8 @@ def generate():
 
 @app.route("/manual_lyrics_form", methods=["GET"])
 def manual_lyrics_form():
-    return """
-    <html>
-      <body>
-        <h1>Karaoke con Letra Manual</h1>
-        <form action="/process_manual_lyrics" method="post">
-          <label>URL de YouTube:</label><br>
-          <input type="text" name="youtube_url" required><br><br>
-
-          <label>Letra (texto plano):</label><br>
-          <textarea name="manual_lyrics" rows="10" cols="60"></textarea><br><br>
-
-          <button type="submit">Procesar con Letra Manual (Forced Alignment)</button>
-        </form>
-      </body>
-    </html>
-    """
+    # Renderiza la plantilla 'manual_lyrics_form.html'
+    return render_template("manual_lyrics_form.html")
 
 @app.route("/process_manual_lyrics", methods=["POST"])
 def process_manual_lyrics():
@@ -114,8 +80,7 @@ def process_manual_lyrics():
         return f"Error descargando el video: {e}", 500
 
     try:
-        # Llamamos a la nueva función con forced alignment
-        # Nota: si quieres, puedes pasar "en", "es"... o autodetect
+        # Llamamos a la función con forced alignment
         output_filename = create_with_manual_lyrics(video_path, lyrics_text, language="es")
         if not output_filename:
             return "Error generando karaoke con letra manual", 500
@@ -130,22 +95,8 @@ def process_manual_lyrics():
 
 @app.route("/lyrics_form", methods=["GET"])
 def lyrics_form():
-    return """
-    <html>
-      <body>
-        <h1>Búsqueda de Letra (futuro)</h1>
-        <form action="/search_lyrics" method="post">
-          <label>Título de la canción:</label>
-          <input type="text" name="song_title" required>
-          <br><br>
-          <label>Artista (opcional):</label>
-          <input type="text" name="artist">
-          <br><br>
-          <button type="submit">Buscar Letra</button>
-        </form>
-      </body>
-    </html>
-    """
+    # Renderiza la plantilla 'lyrics_form.html'
+    return render_template("lyrics_form.html")
 
 @app.route("/search_lyrics", methods=["POST"])
 def search_lyrics():
@@ -166,4 +117,5 @@ def search_lyrics():
     """
 
 if __name__ == "__main__":
+    # Puedes usar debug=True en desarrollo
     app.run(debug=True, host="0.0.0.0", port=5000)

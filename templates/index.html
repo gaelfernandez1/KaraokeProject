@@ -1,0 +1,39 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+{% block content %}
+
+  <h1 class="mb-4">Karaoke Multilenguaje (Contenedor A)</h1>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Opción A: Karaoke con Transcripción Automática (WhisperX)</h2>
+      <form action="/generate" method="post" class="mb-4">
+        <div class="mb-3">
+          <label for="youtube_url" class="form-label">URL de YouTube</label>
+          <input
+            type="text"
+            class="form-control"
+            id="youtube_url"
+            name="youtube_url"
+            placeholder="https://www.youtube.com/watch?v=..."
+            required
+          >
+        </div>
+        <button type="submit" class="btn btn-primary">Procesar con WhisperX</button>
+      </form>
+    </div>
+
+    <div class="col-md-6">
+      <h2>Opción B: Letra Manual</h2>
+      <p>Introduce la URL de YouTube y la letra manualmente.</p>
+      <a href="/manual_lyrics_form" class="btn btn-secondary">Usar Letra Manual</a>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>(Opcional) Búsqueda de Letra por Título/Artista</h2>
+  <p>(En desarrollo)</p>
+  <a href="/lyrics_form" class="btn btn-info">Buscar Letra</a>
+
+{% endblock %}
