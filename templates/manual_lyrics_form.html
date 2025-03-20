@@ -1,0 +1,37 @@
+<!-- templates/manual_lyrics_form.html -->
+{% extends "base.html" %}
+{% block content %}
+
+  <h1>Karaoke con Letra Manual</h1>
+
+  <form action="/process_manual_lyrics" method="post" class="mb-4">
+    <div class="mb-3">
+      <label for="youtube_url" class="form-label">URL de YouTube</label>
+      <input
+        type="text"
+        class="form-control"
+        id="youtube_url"
+        name="youtube_url"
+        placeholder="https://www.youtube.com/watch?v=..."
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="manual_lyrics" class="form-label">Letra (texto plano)</label>
+      <textarea
+        class="form-control"
+        id="manual_lyrics"
+        name="manual_lyrics"
+        rows="8"
+        placeholder="Introduce aquí la letra completa..."
+        required
+      ></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+      Procesar con Letra Manual (Forced Alignment)
+    </button>
+  </form>
+
+{% endblock %}

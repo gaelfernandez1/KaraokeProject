@@ -42,9 +42,8 @@ def align_endpoint():
     manual_lyrics = data.get("manual_lyrics", None)
     lang_code = data.get("language", None)  # si no envían nada, autodetect
 
-    # FORZAMOS CPU
-    device = "cpu"
-    print(f"[WhisperX API] Forzando device=CPU => {device}, audio={audio_path}")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"[WhisperX API] device={device}, audio={audio_path}")
 
     if manual_lyrics:
         # === FORCED ALIGNMENT CON LETRA MANUAL ===
@@ -83,7 +82,7 @@ def align_endpoint():
 
     else:
         # === TRANSCRIPCIÓN AUTOMÁTICA (como antes) ===
-        model = whisperx.load_model("medium", device=device, compute_type="float32")
+        model = whisperx.load_model("tiny", device=device, compute_type="float32")
         result = model.transcribe(audio_path, language=None)  # autodetect
         lang_code = result["language"]
         print(f"[WhisperX API] Automatic transcription, detected lang={lang_code}")

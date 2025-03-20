@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import requests
 import math
+import glob
 
 from moviepy.editor import (
     AudioFileClip, VideoFileClip, CompositeAudioClip,
@@ -76,7 +77,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
     print(f"[separate_stems_cli] Llamando demucs CLI para {audio_file_path} ...")
     try:
-        subprocess.run(["demucs", audio_file_path], check=True)
+        subprocess.run(["demucs", "--device", "cuda", audio_file_path], check=True)
     except subprocess.CalledProcessError as e:
         print(f"[separate_stems_cli] Error al ejecutar Demucs: {e}")
         return "", ""
@@ -180,6 +181,24 @@ def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language
         print(f"[call_whisperx_endpoint_manual] EXCEPTION: {e}")
 
 
+def remove_previous_srt():
+    """
+    Elimina cualquier archivo *_whisperx.srt que haya quedado en /data
+    de ejecuciones anteriores, para evitar reusar SRT antiguos.
+    """
+    srt_files = glob.glob("/data/*")
+    if srt_files:
+        print(f"[remove_previous_srt] Borrando SRT anteriores => {srt_files}")
+        for path in srt_files:
+            try:
+                os.remove(path)
+                print(f"   [remove_previous_srt] Eliminado: {path}")
+            except Exception as e:
+                print(f"   [remove_previous_srt] Error al eliminar {path}: {e}")
+    else:
+        print("[remove_previous_srt] No había SRT previos en /data.")
+
+
 def create(video_path: str):
     """
     Crea un karaoke con transcripción automática (WhisperX):
@@ -187,6 +206,10 @@ def create(video_path: str):
       2) Llama al endpoint contenedor B => genera .srt
       3) Compone el video final con moviepy
     """
+
+    # 0) Borramos antiguos SRT para no reusar
+    remove_previous_srt()
+
     print(f"[create] Recibimos video_path={video_path}")
     audio_path = video_to_mp3(video_path)
     print(f"[create] audio_path => {audio_path}")
@@ -248,6 +271,10 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
       2) Llamada a WhisperX indicando la letra manual => genera srt
       3) Creamos el video con la letra forzada
     """
+
+    # 0) Borramos antiguos SRT para no reusar
+    remove_previous_srt()
+
     print(f"[create_with_manual_lyrics] video={video_path}, language={language}")
     audio_path = video_to_mp3(video_path)
     print(f"[create_with_manual_lyrics] audio_path => {audio_path}")
@@ -271,11 +298,6 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
 
     # (AQUI) Llamamos a la función para unificar las líneas del SRT en una sola por bloque
     unify_srt_lines(srt_file)
-
-    # (Opcional) Imprimir el contenido unificado para debug
-    print("[DEBUG] SRT unificado =>")
-    with open(srt_file, "r", encoding="utf-8") as dbg:
-        print(dbg.read())
 
     # 3) Componer con moviepy
     print("[create_with_manual_lyrics] Componiendo audio+video con forced alignment")

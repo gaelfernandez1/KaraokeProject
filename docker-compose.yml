@@ -1,10 +1,20 @@
 services:
-
   demucs:
     build:
       context: .
       dockerfile: Dockerfile.A
     container_name: demucs_container
+    
+    # IMPORTANTE: para GPU en demucs
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: ["gpu"]
+
     ports:
       - "5000:5000"
     volumes:
@@ -15,7 +25,8 @@ services:
       context: .
       dockerfile: Dockerfile.B
     container_name: whisperx_container
-    # IMPORTANTE: para GPU
+
+    # IMPORTANTE: para GPU en whisperx
     runtime: nvidia
     deploy:
       resources:
@@ -24,6 +35,7 @@ services:
             - driver: nvidia
               count: 1
               capabilities: ["gpu"]
+
     ports:
       - "5001:5001"
     volumes:
