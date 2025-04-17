@@ -5,15 +5,18 @@ import shutil
 import requests
 import math
 import glob
+import platform
+import numpy as np
+import re
 
 from moviepy.editor import (
     AudioFileClip, VideoFileClip, CompositeAudioClip,
-    TextClip, CompositeVideoClip
+    CompositeVideoClip, VideoClip
 )
-from moviepy.video.tools.subtitles import SubtitlesClip
-
 from moviepy.config import change_settings
-import platform
+
+# IMPORTANTE: Asegúrate de tener instalada la librería Pillow
+from PIL import Image, ImageDraw, ImageFont
 
 # ------------------------------------------------------------------------------------
 # CONFIGURACIONES
@@ -25,10 +28,13 @@ VIDEO_WIDTH = 1280
 VIDEO_HEIGHT = 720
 TEXT_WIDTH = 1200
 TEXT_COLOR = "#FFFFFF"
+HIGHLIGHT_COLOR = "#FFFF00"  # por ejemplo amarillo para resaltar
 TEXT_STROKE_COLOR = "#000000"
-TEXT_STROKE_WIDTH = 0.5
+TEXT_STROKE_WIDTH = 1
 FONT_SIZE = 40
 FONT = "./fonts/kg.ttf"
+MARGIN = 40
+TEXT_CLIP_WIDTH = VIDEO_WIDTH - 2 * MARGIN  # Esto te da 1200
 
 if platform.system() == "Darwin":
     imagemagick_path = "/opt/homebrew/bin/magick"
@@ -38,14 +44,11 @@ elif platform.system() == "Linux":
     imagemagick_path = "/usr/bin/convert"
 else:
     raise NotImplementedError("Unsupported operating system")
-
 change_settings({"IMAGEMAGICK_BINARY": imagemagick_path})
 
-
 # ------------------------------------------------------------------------------------
-# FUNCIONES
+# FUNCIONES EXISTENTES (video_to_mp3, separate_stems_cli, call_whisperx_endpoint, etc.)
 # ------------------------------------------------------------------------------------
-
 def video_to_mp3(video_path: str) -> str:
     print(f"[video_to_mp3] Convirtiendo video a mp3 => {video_path}")
     audio_path = video_path.replace(".mp4", ".mp3")
@@ -64,9 +67,6 @@ def video_to_mp3(video_path: str) -> str:
     return audio_path
 
 def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
-    """
-    Separa las pistas con Demucs CLI y retorna (vocals, instrumental).
-    """
     print(f"[separate_stems_cli] Iniciando demucs para: {audio_file_path}")
     demucs_output_dir = "./separated"
     if not os.path.exists("./stems"):
@@ -91,7 +91,6 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     instrumental_wav = os.path.join(separated_folder, "no_vocals.wav")
 
     if not os.path.exists(instrumental_wav):
-        # Buscamos drums, bass, other
         drums_wav = os.path.join(separated_folder, "drums.wav")
         bass_wav = os.path.join(separated_folder, "bass.wav")
         other_wav = os.path.join(separated_folder, "other.wav")
@@ -132,7 +131,6 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     print(f"[separate_stems_cli] Pistas separadas => VOCALS: {final_vocals_path}, INSTR: {final_music_path}")
     return final_vocals_path, final_music_path
 
-
 def seconds_to_timecode(sec):
     total_ms = int(math.floor(sec*1000))
     hh = total_ms // 3600000
@@ -142,10 +140,6 @@ def seconds_to_timecode(sec):
     return f"{hh:02}:{mm:02}:{ss:02},{ms:03}"
 
 def call_whisperx_endpoint(vocals_path: str):
-    """
-    Llama al endpoint del contenedor B (whisperx) enviando JSON: {audio_path: vocals_path}
-    => Transcripción automática.
-    """
     url = "http://whisperx:5001/align"  # dentro de la red docker
     payload = {"audio_path": vocals_path}
     print(f"[call_whisperx_endpoint] Haciendo POST a {url} con audio_path={vocals_path}")
@@ -160,9 +154,6 @@ def call_whisperx_endpoint(vocals_path: str):
         print(f"[call_whisperx_endpoint] EXCEPTION al llamar endpoint: {e}")
 
 def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language="es"):
-    """
-    Llama al endpoint del contenedor B para forced alignment con 'manual_lyrics'.
-    """
     url = "http://whisperx:5001/align"
     payload = {
         "audio_path": vocals_path,
@@ -180,12 +171,7 @@ def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language
     except Exception as e:
         print(f"[call_whisperx_endpoint_manual] EXCEPTION: {e}")
 
-
 def remove_previous_srt():
-    """
-    Elimina cualquier archivo *_whisperx.srt que haya quedado en /data
-    de ejecuciones anteriores, para evitar reusar SRT antiguos.
-    """
     srt_files = glob.glob("/data/*")
     if srt_files:
         print(f"[remove_previous_srt] Borrando SRT anteriores => {srt_files}")
@@ -198,145 +184,362 @@ def remove_previous_srt():
     else:
         print("[remove_previous_srt] No había SRT previos en /data.")
 
+# ------------------------------------------------------------------------------------
+# NUEVAS FUNCIONES PARA KARAOKE DINÁMICO
+# ------------------------------------------------------------------------------------
+
+def parse_word_srt(srt_path: str) -> list:
+    """
+    Parsea el archivo SRT y para cada bloque, si aparecen varias líneas
+    (varias palabras), las distribuye equitativamente en el intervalo.
+    Devuelve una lista de diccionarios: { "start": float, "end": float, "word": str }.
+    """
+    segments = []
+    if not os.path.exists(srt_path):
+        print(f"[parse_word_srt] SRT no encontrado: {srt_path}")
+        return segments
+    with open(srt_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    idx = 0
+    while idx < len(lines):
+        line = lines[idx].strip()
+        if line.isdigit():
+            idx += 1  # índice del bloque
+            if idx < len(lines):
+                time_line = lines[idx].strip()
+                try:
+                    start_str, end_str = time_line.split(" --> ")
+                    block_start = time_str_to_sec(start_str)
+                    block_end = time_str_to_sec(end_str)
+                except Exception as e:
+                    print(f"[parse_word_srt] Error parseando tiempos: {e}")
+                    idx += 1
+                    continue
+                idx += 1
+                text_lines = []
+                while idx < len(lines) and lines[idx].strip() != "":
+                    text_lines.append(lines[idx].strip())
+                    idx += 1
+                full_text = " ".join(text_lines)
+                tokens = full_text.split()
+                n_tokens = len(tokens)
+                duration = block_end - block_start
+                if n_tokens > 0:
+                    token_duration = duration / n_tokens
+                    for i, token in enumerate(tokens):
+                        token_start = block_start + i * token_duration
+                        token_end = token_start + token_duration
+                        segments.append({"start": token_start, "end": token_end, "word": token})
+                idx += 1  # Salta la línea vacía
+            else:
+                idx += 1
+        else:
+            idx += 1
+    return segments
+
+
+
+def time_str_to_sec(time_str: str) -> float:
+    # time_str en formato "hh:mm:ss,ms"
+    parts = time_str.split(":")
+    hh = int(parts[0])
+    mm = int(parts[1])
+    ss, ms = parts[2].split(",")
+    total = hh*3600 + mm*60 + int(ss) + int(ms)/1000
+    return total
+
+def normalize_manual_lyrics(lyrics: str) -> str:
+    """
+    Elimina todas las líneas vacías de la letra, de modo que si había
+    uno o más saltos de línea consecutivos, todos ellos desaparecen,
+    dejando sólo las líneas con texto.
+    """
+    # 1) Separa en líneas y filtra las vacías
+    lines = [line.strip() for line in lyrics.splitlines() if line.strip()]
+    # 2) Vuelve a unir con un único '\n'
+    return "\n".join(lines)
+
+
+def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
+    """
+    Agrupa los segmentos de palabra en líneas, asignando de forma proporcional
+    los tokens disponibles respecto a la cantidad esperada en la letra manual,
+    y asegurando que cada línea obtenga al menos 1 token si contiene al menos
+    una palabra en la letra.
+
+    Devuelve una lista de diccionarios con:
+      - line_text: la línea completa (como en la letra manual)
+      - start: tiempo de inicio (del primer token asignado)
+      - end: tiempo de fin (del último token asignado)
+      - words: lista de tokens con sus tiempos
+    """
+
+    # 1) Normalizamos saltos de línea para colapsar dobles o más en uno solo
+    normalized = re.sub(r'\n+', '\n', manual_lyrics)
+
+    # 2) Separamos las líneas (ignorando líneas vacías)
+    lines = [line.strip() for line in normalized.splitlines() if line.strip()]
+
+    # 3) Contamos cuántas palabras “esperamos” por línea
+    manual_tokens_counts = [len(line.split()) for line in lines]
+    expected_total = sum(manual_tokens_counts)
+    actual_total   = len(word_segments)
+
+    if expected_total == 0 or actual_total == 0:
+        return []
+
+    # 4) Cálculo proporcional inicial
+    proportional = [ (cnt/expected_total) * actual_total for cnt in manual_tokens_counts ]
+
+    # 5) Redondeo y forzar mínimo 1 token por línea
+    assigned = []
+    for cnt_exp, prop in zip(manual_tokens_counts, proportional):
+        raw = int(round(prop))
+        if cnt_exp > 0:
+            # Si la línea tiene al menos una palabra, forzamos al menos 1 token
+            assigned.append(max(1, raw))
+        else:
+            assigned.append(0)
+
+    # 6) Ajuste fino para que la suma coincida con actual_total
+    diff = actual_total - sum(assigned)
+    # Precomputamos decimales para saber dónde ajustar
+    decimals = [(p - round(p)) for p in proportional]
+
+    while diff != 0:
+        if diff > 0:
+            # Aumentamos 1 token donde el decimal sea mayor
+            idx = max(range(len(decimals)), key=lambda i: decimals[i])
+            assigned[idx] += 1
+            decimals[idx] = 0
+            diff -= 1
+        else:  # diff < 0
+            # Disminuimos 1 token donde el decimal sea más pequeño,
+            # pero sin caer por debajo de 1 (si la línea tenía palabras)
+            idx = min(range(len(decimals)), key=lambda i: decimals[i])
+            if assigned[idx] > 1:
+                assigned[idx] -= 1
+                decimals[idx] = 0
+                diff += 1
+            else:
+                # Si no podemos quitar más sin romper la regla de mínimo 1, salimos
+                break
+
+    # 7) Finalmente, cortamos los segmentos según assigned y construimos el resultado
+    grouped = []
+    cur = 0
+    for line, cnt in zip(lines, assigned):
+        segs = word_segments[cur: cur+cnt]
+        cur += cnt
+        if segs:
+            grouped.append({
+                "line_text": line,
+                "start": segs[0]["start"],
+                "end": segs[-1]["end"],
+                "words": segs
+            })
+
+    return grouped
+
+
+def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_CLIP_WIDTH, 
+                      font_path: str = FONT, font_size: int = FONT_SIZE, 
+                      normal_color: str = TEXT_COLOR, highlight_color: str = HIGHLIGHT_COLOR) -> np.ndarray:
+    """
+    Renderiza una imagen de la línea de texto para el karaoke.
+    Se centra horizontalmente y se pinta en highlight las palabras ya "cantadas".
+    """
+    # Creamos una imagen con fondo transparente usando el ancho definido
+    img = Image.new("RGBA", (clip_width, font_size + 20), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    try:
+        font = ImageFont.truetype(font_path, font_size)
+    except Exception as e:
+        print(f"[render_line_image] Error al cargar la fuente: {e}")
+        font = ImageFont.load_default()
+
+    # Concatenamos todas las palabras para medir el ancho total
+    full_text = " ".join([seg["word"] for seg in line_info["words"]])
+    total_text_width, _ = draw.textsize(full_text, font=font)
+    # Calculamos el margen horizontal para centrar el texto
+    x_start = max((clip_width - total_text_width) // 2, 0)
+    x = x_start
+    y = 10
+
+    # Iteramos sobre cada palabra para renderizarlas con el color adecuado
+    for seg in line_info["words"]:
+        word_relative_time = seg["start"] - line_info["start"]
+        word_text = seg["word"]
+        color = highlight_color if t_offset >= word_relative_time else normal_color
+        # Convertimos stroke_width a entero
+        draw.text((x, y), word_text + " ", font=font, fill=color,
+                  stroke_width=int(TEXT_STROKE_WIDTH), stroke_fill=TEXT_STROKE_COLOR)
+        word_width, _ = draw.textsize(word_text + " ", font=font)
+        x += word_width
+    frame = np.array(img.convert("RGB"))
+    return frame
+
+
+def create_karaoke_text_clip(line_info: dict, advance: float=0.5, duration_padding: float=0.0):
+    """
+    Crea un VideoClip para la línea de karaoke.
+    - Se inicia 'advance' segundos antes del tiempo real (no negativo).
+    - Dura hasta (line_info["end"] - line_info["start"] + advance + duration_padding)
+    """
+    line_duration = line_info["end"] - line_info["start"]
+    clip_duration = line_duration + advance + duration_padding
+    # Tiempo en que se considera que la línea empieza a mostrarse (dentro del clip)
+    display_offset = advance  # es el retraso interno del clip
+
+    def make_frame(t):
+        # t es el tiempo transcurrido en el clip
+        # Se renderiza la imagen de la línea con t - display_offset (si ya es positivo)
+        effective_t = max(t - display_offset, 0)
+        frame = render_line_image(line_info, effective_t)
+        return frame
+
+    txt_clip = VideoClip(make_frame, duration=clip_duration)
+    return txt_clip
+
+# ------------------------------------------------------------------------------------
+# FUNCIONES DE CREACIÓN DE VIDEO
+# ------------------------------------------------------------------------------------
 
 def create(video_path: str):
     """
-    Crea un karaoke con transcripción automática (WhisperX):
-      1) Separa con demucs => vocals.wav
-      2) Llama al endpoint contenedor B => genera .srt
-      3) Compone el video final con moviepy
+    Versión automática: transcribe con WhisperX, parsea el SRT en tokens,
+    agrupa en frases cada N palabras, y renderiza karaoke dinámico.
     """
-
-    # 0) Borramos antiguos SRT para no reusar
     remove_previous_srt()
 
+    # 1) Convertir vídeo a mp3 y separar stems
     print(f"[create] Recibimos video_path={video_path}")
     audio_path = video_to_mp3(video_path)
-    print(f"[create] audio_path => {audio_path}")
     if not audio_path:
-        print("[create] audio_path está vacío => devolviendo ''")
+        print("[create] audio_path vacío")
         return ""
-
     vocals_path, music_path = separate_stems_cli(audio_path)
-    print(f"[create] separate_stems_cli => vocals={vocals_path}, instrumental={music_path}")
     if not vocals_path or not music_path:
-        print("[create] No hay vocals o music => devolviendo ''")
+        print("[create] No hay vocals o music")
         return ""
 
-    # 2) Llamamos a WhisperX => produce srt
+    # 2) Transcripción automática con WhisperX
     call_whisperx_endpoint(vocals_path)
-    srt_file = vocals_path.replace(".wav","_whisperx.srt")
-    print(f"[create] Esperamos SRT => {srt_file}")
+    srt_file = vocals_path.replace(".wav", "_whisperx.srt")
     if not os.path.exists(srt_file):
-        print("[create] SRT no existe => devolviendo ''")
+        print("[create] SRT no existe")
         return ""
 
-    # 3) Componer con moviepy
-    print("[create] Componemos audio+video final ...")
-    music = AudioFileClip(music_path).set_fps(44100)
+    # 3) Parsear SRT en segmentos de palabra
+    word_segments = parse_word_srt(srt_file)
+    if not word_segments:
+        print("[create] No hay segmentos de palabra")
+        return ""
+
+    # 4) Agrupar cada N tokens en una frase
+    N = 10  # número de palabras por frase
+    groups = []
+    for i in range(0, len(word_segments), N):
+        segs = word_segments[i:i+N]
+        # construye la línea uniendo las palabras de estos segmentos
+        line_text = " ".join([w["word"] for w in segs])
+        groups.append({
+            "line_text": line_text,
+            "start": segs[0]["start"],
+            "end":   segs[-1]["end"],
+            "words": segs
+        })
+
+    # 5) Preparar audio y vídeo de fondo
+    music  = AudioFileClip(music_path).set_fps(44100)
     vocals = AudioFileClip(vocals_path).volumex(VOCAL_VOLUME).set_fps(44100)
     combined = CompositeAudioClip([music, vocals])
-
-    background = VideoFileClip(video_path, target_resolution=(VIDEO_WIDTH, VIDEO_HEIGHT)
-                   ).set_duration(combined.duration).set_fps(30)
+    background = VideoFileClip(video_path).set_duration(combined.duration).set_fps(30)
     dimmed = background.fl_image(lambda img: (img*0.3).astype("uint8"))
 
-    def generator(txt):
-        return TextClip(txt, font=FONT, fontsize=FONT_SIZE,
-                        color=TEXT_COLOR, stroke_color=TEXT_STROKE_COLOR,
-                        stroke_width=TEXT_STROKE_WIDTH, size=(TEXT_WIDTH, None),
-                        method='pango')
+    # 6) Crear y posicionar los clips de karaoke
+    karaoke_clips = []
+    for grp in groups:
+        start    = max(grp["start"] - 0.5, 0)
+        duration = grp["end"] - grp["start"] + 0.5
+        clip     = create_karaoke_text_clip(grp, advance=0.5)
+        clip     = clip.set_start(start).set_duration(duration)
+        clip     = clip.set_position(("center","bottom"))
+        karaoke_clips.append(clip)
 
-    subtitles = SubtitlesClip(srt_file, generator)
-    final = CompositeVideoClip([
-        dimmed,
-        subtitles.set_position(('center','center'), relative=True)
-    ]).set_audio(combined)
-
-    filename = f"karaoke_{os.path.basename(video_path)}"
+    # 7) Componer y exportar
+    final = CompositeVideoClip([dimmed] + karaoke_clips).set_audio(combined)
+    out_name = f"karaoke_{os.path.basename(video_path)}"
     if not os.path.exists("./output"):
         os.makedirs("./output")
-
-    out_path = os.path.join("./output", filename)
-    print(f"[create] Escribiendo videofile => {out_path}")
+    out_path = os.path.join("./output", out_name)
+    print(f"[create] Generando vídeo => {out_path}")
     final.write_videofile(out_path, fps=30, threads=4)
-    print(f"[create] Terminamos => {filename}")
-    return filename
+    print(f"[create] Terminado => {out_name}")
+    return out_name
+
 
 
 def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es") -> str:
     """
-    Variante MANUAL que usa WhisperX en modo forced alignment:
-      1) Separa con demucs => vocals.wav
-      2) Llamada a WhisperX indicando la letra manual => genera srt
-      3) Creamos el video con la letra forzada
+    Variante MANUAL que usa WhisperX en modo forced alignment
+    con letra proporcionada manualmente, y genera karaoke con subtítulos
+    por línea y animación dinámica de highlight.
     """
-
-    # 0) Borramos antiguos SRT para no reusar
     remove_previous_srt()
-
+    manual_lyrics = normalize_manual_lyrics(manual_lyrics)
     print(f"[create_with_manual_lyrics] video={video_path}, language={language}")
     audio_path = video_to_mp3(video_path)
     print(f"[create_with_manual_lyrics] audio_path => {audio_path}")
     if not audio_path:
         print("[create_with_manual_lyrics] audio_path vacío => return ''")
         return ""
-
     vocals_path, music_path = separate_stems_cli(audio_path)
     print(f"[create_with_manual_lyrics] => vocals={vocals_path}, music={music_path}")
     if not vocals_path or not music_path:
         print("[create_with_manual_lyrics] Falta vocals o music => return ''")
         return ""
-
-    # 2) Llamar a WhisperX contenedor B, pero con 'manual_lyrics'
+    # Llamada a WhisperX con letra manual
     call_whisperx_endpoint_manual(vocals_path, manual_lyrics, language)
     srt_file = vocals_path.replace(".wav","_whisperx.srt")
     print(f"[create_with_manual_lyrics] srt esperado => {srt_file}")
     if not os.path.exists(srt_file):
         print("[create_with_manual_lyrics] SRT no encontrado => return ''")
         return ""
-
-    # (AQUI) Llamamos a la función para unificar las líneas del SRT en una sola por bloque
-    unify_srt_lines(srt_file)
-
-    # 3) Componer con moviepy
-    print("[create_with_manual_lyrics] Componiendo audio+video con forced alignment")
-    combined = CompositeAudioClip([
-        AudioFileClip(music_path).set_fps(44100),
-        AudioFileClip(vocals_path).volumex(VOCAL_VOLUME).set_fps(44100)
-    ])
-
-    # (Opcional) Si quieres envolver la creación de VideoFileClip en try/except también:
-    # try:
-    background = VideoFileClip(video_path, target_resolution=(VIDEO_WIDTH, VIDEO_HEIGHT)
-                  ).set_duration(combined.duration).set_fps(30)
-    # except Exception as ee:
-    #     print(f"[create_with_manual_lyrics] VideoFileClip error => {ee}")
-    #     return ""
-
-    dimmed = background.fl_image(lambda img: (img*0.3).astype("uint8"))
-
-    def generator(txt):
-        return TextClip(txt, font=FONT, fontsize=FONT_SIZE,
-                        color=TEXT_COLOR, stroke_color=TEXT_STROKE_COLOR,
-                        stroke_width=TEXT_STROKE_WIDTH,
-                        size=(TEXT_WIDTH, None), method='pango')
-
-    try:
-        subtitles = SubtitlesClip(srt_file, generator)
-    except Exception as e:
-        print(f"[create_with_manual_lyrics] SubtitlesClip error => {e}")
+    # PARTE NUEVA: Procesar el SRT para agrupar palabras según la letra manual
+    word_segments = parse_word_srt(srt_file)
+    groups = group_word_segments(manual_lyrics, word_segments)
+    if not groups:
+        print("[create_with_manual_lyrics] No se pudieron agrupar las palabras => return ''")
         return ""
+    print(f"[create_with_manual_lyrics] Se han generado {len(groups)} líneas para karaoke")
+    # Componer con moviepy
+    music = AudioFileClip(music_path).set_fps(44100)
+    vocals = AudioFileClip(vocals_path).volumex(VOCAL_VOLUME).set_fps(44100)
+    combined = CompositeAudioClip([music, vocals])
+    try:
+        background = VideoFileClip(video_path).set_duration(combined.duration).set_fps(30)
 
-    final = CompositeVideoClip([
-        dimmed,
-        subtitles.set_position(("center","center"), relative=True)
-    ]).set_audio(combined)
-
+    except Exception as ee:
+        print(f"[create_with_manual_lyrics] VideoFileClip error => {ee}")
+        return ""
+    dimmed = background.fl_image(lambda img: (img*0.3).astype("uint8"))
+    # Crear clips de karaoke para cada línea
+    karaoke_clips = []
+    for group in groups:
+        # Se mostrará la línea empezando 0.5 seg antes de la palabra inicial
+        start_offset = max(group["start"] - 0.5, 0)
+        duration = group["end"] - group["start"] + 0.5
+        clip = create_karaoke_text_clip(group, advance=0.5, duration_padding=0.0)
+        # Posicionamos el clip (por ejemplo, centrado en la parte inferior)
+        clip = clip.set_start(start_offset).set_duration(duration)
+        clip = clip.set_position(("center", "bottom"))
+        karaoke_clips.append(clip)
+    # Componer el video final superponiendo los clips de karaoke sobre el background
+    final = CompositeVideoClip([dimmed] + karaoke_clips).set_audio(combined)
     filename = f"karaoke_manual_{os.path.basename(video_path)}"
     if not os.path.exists("./output"):
         os.makedirs("./output")
-
     out_path = os.path.join("./output", filename)
     print(f"[create_with_manual_lyrics] Generando videofile => {out_path}")
     try:
@@ -346,77 +549,6 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
         return ""
     print(f"[create_with_manual_lyrics] Final => {filename}")
     return filename
-
-
-
-
-def unify_srt_lines(srt_file: str):
-    """
-    Lee el archivo SRT y para cada bloque:
-      - Índice
-      - Línea de tiempo
-      - Varias líneas de texto
-      - Línea en blanco (fin de bloque)
-
-    Combina todas las líneas de texto en una sola.
-
-    Sobrescribe el archivo SRT final con el texto unificado por bloque.
-    """
-    import os
-
-    if not os.path.exists(srt_file):
-        print(f"[unify_srt_lines] No existe {srt_file}, no se hace post-procesado.")
-        return
-
-    with open(srt_file, "r", encoding="utf-8") as f:
-        lines = f.readlines()
-
-    new_lines = []
-    i = 0
-    n = len(lines)
-
-    while i < n:
-        line = lines[i].rstrip("\n")
-        # 1) Bloque: índice (ej. "10")
-        if line.isdigit():
-            # Copiamos el índice tal cual y saltamos
-            new_lines.append(line + "\n")
-            i += 1
-
-            # 2) Esperamos la línea de tiempo (ej. "00:00:17,982 --> 00:00:18,742")
-            if i < n and "-->" in lines[i]:
-                new_lines.append(lines[i])  # copiamos la línea tal cual
-                i += 1
-
-                # 3) Acumulamos todas las líneas de texto hasta la línea en blanco o EOF
-                text_accumulator = []
-                while i < n and lines[i].strip() != "":
-                    text_accumulator.append(lines[i].strip("\n"))
-                    i += 1
-
-                # Unificamos en una sola línea
-                full_text = " ".join(text_accumulator)
-                # escribimos la línea de texto unificada
-                new_lines.append(full_text + "\n\n")
-
-                # saltamos la línea en blanco (si existe)
-                i += 1
-
-            else:
-                # si no hay línea de tiempo, simplemente avanzamos
-                i += 1
-
-        else:
-            # no es un dígito => puede ser ruido, avanzamos
-            i += 1
-
-    # Sobrescribimos el archivo resultante
-    with open(srt_file, "w", encoding="utf-8") as f:
-        f.writelines(new_lines)
-
-    print(f"[unify_srt_lines] Se ha reescrito el SRT unificando líneas: {srt_file}")
-
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
