@@ -2,6 +2,7 @@
 from flask import Flask, request, send_file, render_template
 import os
 import yt_dlp
+import json
 
 # Importamos las funciones de main.py
 from main import create, create_with_manual_lyrics
@@ -24,13 +25,24 @@ def download_youtube_video(url, output_dir="input"):
 
     ydl_opts = {
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
-        'format': 'mp4/bestaudio/bestvideo',
+        'format': 'bestvideo[height>=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
         'noplaylist': True
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
+        print("Título:", info.get("title"))
+        if "requested_formats" in info:
+            print("Formatos solicitados (requested_formats):")
+            for fmt in info["requested_formats"]:
+                print("  format_id: {}, ext: {}, resolution: {}, format note: {}".format(
+                    fmt.get("format_id"), fmt.get("ext"), fmt.get("resolution"), fmt.get("format_note")
+                ))
+        else:
+            print("Formato seleccionado:", info.get("format"))
         downloaded_filename = ydl.prepare_filename(info)
         return downloaded_filename
+
+
 
 @app.route("/", methods=["GET"])
 def index():

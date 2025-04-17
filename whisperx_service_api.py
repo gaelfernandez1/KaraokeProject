@@ -4,6 +4,8 @@ import whisperx
 import math
 import os
 import librosa
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 app = Flask(__name__)
 

@@ -15,4 +15,3 @@ Flask
 # Librerías que faltaban para get_duration con librosa
 librosa
 soundfile
-
