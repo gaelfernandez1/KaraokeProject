@@ -33,13 +33,17 @@ TEXT_STROKE_COLOR = "#000000"
 TEXT_STROKE_WIDTH = 2
 FONT_SIZE = 40
 FONT_SIZE_MIN = 28  # Tamaño mínimo de fuente para textos muy largos
+NEXT_LINE_FONT_SIZE_FACTOR = 0.85  # Factor para reducir la fuente de la línea siguiente
 FONT = "./fonts/kg.ttf"
 MARGIN = 40
 TEXT_CLIP_WIDTH = VIDEO_WIDTH - 2 * MARGIN  # Esto te da 1200
 TEXT_BG_COLOR = (0, 0, 0, 128)  # Color de fondo semitransparente (RGBA)
 TEXT_BG_PADDING = 10  # Padding del fondo de texto
+NEXT_LINE_COLOR = "#BBBBBB"  # Color para la línea siguiente (gris claro)
+NEXT_LINE_ALPHA = 0.7  # Transparencia para la línea siguiente
+NEXT_LINE_SPACING = 15  # Espaciado vertical entre línea actual y la siguiente
 MAX_CHARS_PER_LINE = 60  # Máximo de caracteres por línea antes de hacer wrap
-SUBTITLE_BOTTOM_MARGIN = 80  # Margen desde abajo para los subtítulos
+SUBTITLE_BOTTOM_MARGIN = 150  # Margen desde abajo para los subtítulos (aumentado para líneas dobles)
 
 if platform.system() == "Darwin":
     imagemagick_path = "/opt/homebrew/bin/magick"
@@ -488,13 +492,112 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
     return frame
 
 
-def create_karaoke_text_clip(line_info: dict, advance: float=0.5, duration_padding: float=0.5):
+def render_next_line_image(line_info: dict, clip_width: int = TEXT_CLIP_WIDTH,
+                        font_path: str = FONT, font_size: int = None) -> np.ndarray:
+    """
+    Renderiza una imagen para la próxima línea de karaoke (previsualización)
+    con un estilo visual distinto (más tenue) para diferenciarla de la línea actual.
+    """
+    if font_size is None:
+        # Usar un tamaño de fuente ligeramente más pequeño para la línea siguiente
+        font_size = int(FONT_SIZE * NEXT_LINE_FONT_SIZE_FACTOR)
+        
+    # Obtenemos el texto completo de la línea
+    full_text = line_info["line_text"]
+    
+    # Ajuste dinámico del tamaño de fuente basado en longitud
+    dynamic_font_size = font_size
+    if len(full_text) > 80:
+        reduction_factor = min(1.0, 80 / len(full_text))
+        dynamic_font_size = max(FONT_SIZE_MIN, int(font_size * reduction_factor))
+    
+    try:
+        font = ImageFont.truetype(font_path, dynamic_font_size)
+    except Exception as e:
+        print(f"[render_next_line_image] Error al cargar la fuente: {e}")
+        font = ImageFont.load_default()
+    
+    # Realizamos el ajuste visual (wrapping) igual que la línea principal
+    wrapped_lines = []
+    words = full_text.split()
+    current_line = ""
+    
+    for word in words:
+        if not current_line:
+            current_line = word
+            continue
+            
+        test_line = current_line + " " + word
+        text_width = font.getlength(test_line) if hasattr(font, 'getlength') else font.getsize(test_line)[0]
+        
+        if text_width <= clip_width - 2 * TEXT_BG_PADDING:
+            current_line = test_line
+        else:
+            wrapped_lines.append(current_line)
+            current_line = word
+    
+    if current_line:
+        wrapped_lines.append(current_line)
+    
+    if not wrapped_lines:
+        wrapped_lines = [full_text]
+    
+    # Calculamos altura total necesaria para todas las líneas
+    line_height = dynamic_font_size + 10
+    total_height = len(wrapped_lines) * line_height + 2 * TEXT_BG_PADDING
+    
+    # Creamos imagen con fondo transparente
+    img = Image.new("RGBA", (clip_width, total_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Creamos fondo semitransparente para la línea siguiente (más tenue que la principal)
+    bg_layer = Image.new("RGBA", (clip_width, total_height), (0, 0, 0, 0))
+    bg_draw = ImageDraw.Draw(bg_layer)
+    
+    # Calculamos ancho máximo del texto
+    max_line_width = 0
+    for line in wrapped_lines:
+        line_width = font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]
+        max_line_width = max(max_line_width, line_width)
+    
+    # Dibujamos fondo semitransparente con más transparencia que la línea principal
+    next_line_bg_color = (TEXT_BG_COLOR[0], TEXT_BG_COLOR[1], TEXT_BG_COLOR[2], 
+                         int(TEXT_BG_COLOR[3] * NEXT_LINE_ALPHA))
+    bg_width = min(max_line_width + 2 * TEXT_BG_PADDING, clip_width)
+    bg_x = (clip_width - bg_width) // 2
+    bg_draw.rectangle(
+        [(bg_x, 0), (bg_x + bg_width, total_height)],
+        fill=next_line_bg_color
+    )
+    
+    # Dibujamos cada línea visual con el color de la siguiente línea
+    for i, line in enumerate(wrapped_lines):
+        y = i * line_height + TEXT_BG_PADDING
+        
+        # Centramos cada línea
+        line_width = font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]
+        x = (clip_width - line_width) // 2
+        
+        # Dibujamos el texto en un color más claro/grisáceo
+        draw.text((x, y), line, font=font, fill=NEXT_LINE_COLOR,
+                 stroke_width=int(TEXT_STROKE_WIDTH * 0.75), stroke_fill=TEXT_STROKE_COLOR)
+    
+    # Combinamos el fondo y el texto
+    img = Image.alpha_composite(bg_layer, img)
+    
+    # Convertimos a formato RGB para moviepy
+    frame = np.array(img.convert("RGB"))
+    return frame
+
+
+def create_karaoke_text_clip(line_info: dict, next_line_info: dict = None, advance: float=0.5, duration_padding: float=0.5):
     """
     Crea un VideoClip para la línea de karaoke con mejoras:
     - Se inicia 'advance' segundos antes del tiempo real (no negativo)
     - Dura hasta (line_info["end"] - line_info["start"] + advance + duration_padding)
     - Ajuste adaptable al tamaño del texto
     - Soporte para textos muy largos con wrap automático
+    - Opcionalmente muestra la siguiente línea debajo (next_line_info)
     """
     line_duration = line_info["end"] - line_info["start"]
     clip_duration = line_duration + advance + duration_padding
@@ -505,8 +608,33 @@ def create_karaoke_text_clip(line_info: dict, advance: float=0.5, duration_paddi
         # t es el tiempo transcurrido en el clip
         # Se renderiza la imagen de la línea con t - display_offset (si ya es positivo)
         effective_t = max(t - display_offset, 0)
-        frame = render_line_image(line_info, effective_t)
-        return frame
+        
+        # Renderizamos la línea actual
+        current_frame = render_line_image(line_info, effective_t)
+        
+        # Si se proporcionó la línea siguiente, la renderizamos debajo
+        if next_line_info:
+            next_frame = render_next_line_image(next_line_info)
+            
+            # Combinamos los dos frames
+            height1 = current_frame.shape[0]
+            height2 = next_frame.shape[0]
+            width = max(current_frame.shape[1], next_frame.shape[1])
+            
+            # Creamos un frame combinado
+            combined_height = height1 + NEXT_LINE_SPACING + height2
+            combined_frame = np.zeros((combined_height, width, 3), dtype=np.uint8)
+            
+            # Copiamos la línea actual en la parte superior
+            combined_frame[:height1, :current_frame.shape[1]] = current_frame
+            
+            # Copiamos la línea siguiente en la parte inferior
+            combined_frame[height1 + NEXT_LINE_SPACING:, :next_frame.shape[1]] = next_frame
+            
+            return combined_frame
+        
+        # Si no hay línea siguiente, devolvemos solo el frame actual
+        return current_frame
 
     txt_clip = VideoClip(make_frame, duration=clip_duration)
     return txt_clip
@@ -620,10 +748,11 @@ def create(video_path: str):
 
     # 6) Crear y posicionar los clips de karaoke
     karaoke_clips = []
-    for grp in groups:
+    for idx, grp in enumerate(groups):
         start    = max(grp["start"] - 0.5, 0)
         duration = grp["end"] - grp["start"] + 1.0  # Aumentamos duración para mejor lectura
-        clip     = create_karaoke_text_clip(grp, advance=0.5, duration_padding=0.5)
+        next_line = groups[idx + 1] if idx + 1 < len(groups) else None
+        clip     = create_karaoke_text_clip(grp, next_line_info=next_line, advance=0.5, duration_padding=0.5)
         clip     = clip.set_start(start).set_duration(duration)
         
         # Posicionamos con margen inferior mejorado
@@ -693,13 +822,14 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
     
     # Crear clips de karaoke para cada línea con nuestras mejoras
     karaoke_clips = []
-    for group in groups:
+    for idx, group in enumerate(groups):
         # Se mostrará la línea empezando 0.5 seg antes de la palabra inicial
         start_offset = max(group["start"] - 0.5, 0)
         duration = group["end"] - group["start"] + 1.0  # Aumentamos duración para mejor lectura
         
-        # Usamos el clip mejorado con soporte para textos largos
-        clip = create_karaoke_text_clip(group, advance=0.5, duration_padding=0.5)
+        # Usamos el clip mejorado con soporte para textos largos y línea siguiente
+        next_line = groups[idx + 1] if idx + 1 < len(groups) else None
+        clip = create_karaoke_text_clip(group, next_line_info=next_line, advance=0.5, duration_padding=0.5)
         
         # Posicionamos el clip con el margen inferior mejorado
         bottom_pos = VIDEO_HEIGHT - SUBTITLE_BOTTOM_MARGIN
