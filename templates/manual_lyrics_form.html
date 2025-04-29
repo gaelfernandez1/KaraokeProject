@@ -1,19 +1,27 @@
-<!-- templates/manual_lyrics_form.html -->
 {% extends "base.html" %}
 {% block content %}
 
   <h1>Karaoke con Letra Manual</h1>
 
-  <form action="/process_manual_lyrics" method="post" class="mb-4">
+  <form action="/process_manual_lyrics" method="post" class="mb-4" enctype="multipart/form-data">
     <div class="mb-3">
-      <label for="youtube_url" class="form-label">URL de YouTube</label>
+      <label for="video_file" class="form-label">Ou sube un vídeo MP4</label>
+      <input
+        type="file"
+        class="form-control"
+        id="video_file"
+        name="video_file"
+        accept=".mp4"
+      >
+    </div>
+    <div class="mb-3">
+      <label for="youtube_url" class="form-label">Ou pega a URL de YouTube</label>
       <input
         type="text"
         class="form-control"
         id="youtube_url"
         name="youtube_url"
         placeholder="https://www.youtube.com/watch?v=..."
-        required
       >
     </div>
 
@@ -24,7 +32,7 @@
         id="manual_lyrics"
         name="manual_lyrics"
         rows="8"
-        placeholder="Introduce aquí la letra completa..."
+        placeholder="Introduce aquí a letra completa..."
         required
       ></textarea>
     </div>
