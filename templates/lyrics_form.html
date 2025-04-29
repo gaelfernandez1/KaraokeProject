@@ -1,18 +1,17 @@
-<!-- templates/lyrics_form.html -->
 {% extends "base.html" %}
 {% block content %}
 
-  <h1>Búsqueda de Letra (Futuro)</h1>
+  <h1>Busca de Letra (Futuro)</h1>
 
   <form action="/search_lyrics" method="post" class="mb-4">
     <div class="mb-3">
-      <label for="song_title" class="form-label">Título de la canción</label>
+      <label for="song_title" class="form-label">Título da canción</label>
       <input
         type="text"
         class="form-control"
         id="song_title"
         name="song_title"
-        placeholder="Ej: 'Imagine'"
+        placeholder="Ex: 'Imagine'"
         required
       >
     </div>
@@ -24,13 +23,13 @@
         class="form-control"
         id="artist"
         name="artist"
-        placeholder="Ej: 'John Lennon'"
+        placeholder="Ex: 'John Lennon'"
       >
     </div>
 
     <button type="submit" class="btn btn-primary">Buscar Letra</button>
   </form>
 
-  <p>Aquí, en el futuro, implementaremos la búsqueda real de la letra.</p>
+  <p>Aquí, no futuro, implementaremos a busca real da letra.</p>
 
 {% endblock %}

@@ -26,15 +26,20 @@ NUM_PASSES = 1
 VOCAL_VOLUME = 0.05
 VIDEO_WIDTH = 1280
 VIDEO_HEIGHT = 720
-TEXT_WIDTH = 1200
+TEXT_WIDTH = 1400
 TEXT_COLOR = "#FFFFFF"
 HIGHLIGHT_COLOR = "#FFFF00"  # por ejemplo amarillo para resaltar
 TEXT_STROKE_COLOR = "#000000"
-TEXT_STROKE_WIDTH = 1
+TEXT_STROKE_WIDTH = 2
 FONT_SIZE = 40
+FONT_SIZE_MIN = 28  # Tamaño mínimo de fuente para textos muy largos
 FONT = "./fonts/kg.ttf"
 MARGIN = 40
 TEXT_CLIP_WIDTH = VIDEO_WIDTH - 2 * MARGIN  # Esto te da 1200
+TEXT_BG_COLOR = (0, 0, 0, 128)  # Color de fondo semitransparente (RGBA)
+TEXT_BG_PADDING = 10  # Padding del fondo de texto
+MAX_CHARS_PER_LINE = 60  # Máximo de caracteres por línea antes de hacer wrap
+SUBTITLE_BOTTOM_MARGIN = 80  # Margen desde abajo para los subtítulos
 
 if platform.system() == "Darwin":
     imagemagick_path = "/opt/homebrew/bin/magick"
@@ -346,45 +351,150 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
                       font_path: str = FONT, font_size: int = FONT_SIZE, 
                       normal_color: str = TEXT_COLOR, highlight_color: str = HIGHLIGHT_COLOR) -> np.ndarray:
     """
-    Renderiza una imagen de la línea de texto para el karaoke.
-    Se centra horizontalmente y se pinta en highlight las palabras ya "cantadas".
+    Renderiza una imagen de la línea de texto para el karaoke con mejoras:
+    - Respeta las frases originales según delimitación por saltos de línea
+    - Ajuste visual de texto largo en múltiples líneas sin romper la sincronización
+    - Ajuste dinámico del tamaño de fuente según longitud
+    - Fondo semitransparente para mejor legibilidad
     """
-    # Creamos una imagen con fondo transparente usando el ancho definido
-    img = Image.new("RGBA", (clip_width, font_size + 20), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
+    # Obtenemos el texto completo de la línea, que debe mantenerse como una unidad
+    full_text = line_info["line_text"]
+    
+    # Ajuste dinámico del tamaño de fuente basado en longitud
+    dynamic_font_size = font_size
+    if len(full_text) > 80:
+        # Reducimos progresivamente el tamaño para textos muy largos
+        reduction_factor = min(1.0, 80 / len(full_text))
+        dynamic_font_size = max(FONT_SIZE_MIN, int(font_size * reduction_factor))
+    
     try:
-        font = ImageFont.truetype(font_path, font_size)
+        font = ImageFont.truetype(font_path, dynamic_font_size)
     except Exception as e:
         print(f"[render_line_image] Error al cargar la fuente: {e}")
         font = ImageFont.load_default()
-
-    # Concatenamos todas las palabras para medir el ancho total
-    full_text = " ".join([seg["word"] for seg in line_info["words"]])
-    total_text_width, _ = draw.textsize(full_text, font=font)
-    # Calculamos el margen horizontal para centrar el texto
-    x_start = max((clip_width - total_text_width) // 2, 0)
-    x = x_start
-    y = 10
-
-    # Iteramos sobre cada palabra para renderizarlas con el color adecuado
-    for seg in line_info["words"]:
-        word_relative_time = seg["start"] - line_info["start"]
-        word_text = seg["word"]
-        color = highlight_color if t_offset >= word_relative_time else normal_color
-        # Convertimos stroke_width a entero
-        draw.text((x, y), word_text + " ", font=font, fill=color,
-                  stroke_width=int(TEXT_STROKE_WIDTH), stroke_fill=TEXT_STROKE_COLOR)
-        word_width, _ = draw.textsize(word_text + " ", font=font)
-        x += word_width
+    
+    # Realizamos el ajuste visual (wrapping) sin alterar la estructura de sincronización
+    # Esto es puramente visual - la frase completa sigue siendo una unidad de sincronización
+    wrapped_lines = []
+    words = full_text.split()
+    current_line = ""
+    
+    for word in words:
+        # Si la línea está vacía, añadimos la palabra directamente
+        if not current_line:
+            current_line = word
+            continue
+            
+        # Probamos añadir la siguiente palabra
+        test_line = current_line + " " + word
+        
+        # Calculamos el ancho con la fuente actual
+        text_width = font.getlength(test_line) if hasattr(font, 'getlength') else font.getsize(test_line)[0]
+        
+        if text_width <= clip_width - 2 * TEXT_BG_PADDING:
+            # La palabra cabe en la línea actual
+            current_line = test_line
+        else:
+            # La palabra no cabe, guardamos línea actual y empezamos nueva con esta palabra
+            wrapped_lines.append(current_line)
+            current_line = word
+    
+    # No olvidamos la última línea
+    if current_line:
+        wrapped_lines.append(current_line)
+    
+    # Si no hay líneas (caso excepcional), usamos el texto completo
+    if not wrapped_lines:
+        wrapped_lines = [full_text]
+    
+    # Calculamos altura total necesaria para todas las líneas visuales
+    line_height = dynamic_font_size + 10  # Espacio entre líneas
+    total_height = len(wrapped_lines) * line_height + 2 * TEXT_BG_PADDING
+    
+    # Creamos imagen con altura adecuada para todas las líneas
+    img = Image.new("RGBA", (clip_width, total_height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Creamos fondo semitransparente para mejor legibilidad
+    bg_layer = Image.new("RGBA", (clip_width, total_height), (0, 0, 0, 0))
+    bg_draw = ImageDraw.Draw(bg_layer)
+    
+    # Calculamos ancho máximo para dimensionar el fondo
+    max_line_width = 0
+    for line in wrapped_lines:
+        line_width = font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]
+        max_line_width = max(max_line_width, line_width)
+    
+    # Dibujamos fondo semitransparente
+    bg_width = min(max_line_width + 2 * TEXT_BG_PADDING, clip_width)
+    bg_x = (clip_width - bg_width) // 2
+    bg_draw.rectangle(
+        [(bg_x, 0), (bg_x + bg_width, total_height)],
+        fill=TEXT_BG_COLOR
+    )
+    
+    # Ahora calculamos qué palabras deben resaltarse basado en el tiempo
+    # Estamos trabajando con la frase completa como una unidad de sincronización
+    words = full_text.split()
+    words_to_highlight = 0
+    
+    # Para la sincronización, usamos los tiempos de word_segments asociados a esta línea
+    if line_info["words"]:
+        duration = line_info["end"] - line_info["start"]
+        for i, seg in enumerate(line_info["words"]):
+            word_relative_time = seg["start"] - line_info["start"]
+            if t_offset >= word_relative_time:
+                words_to_highlight = i + 1
+    else:
+        # Modo fallback: avance proporcional al tiempo
+        progress_ratio = min(1.0, max(0.0, t_offset / (line_info["end"] - line_info["start"])))
+        words_to_highlight = int(progress_ratio * len(words))
+    
+    # Ahora dibujamos cada línea visual (wrapping puramente visual)
+    all_words = []
+    for wrapped_line in wrapped_lines:
+        all_words.extend(wrapped_line.split())
+    
+    # Reasignamos las palabras a las líneas visualmente envueltas
+    words_assigned = 0
+    for i, line in enumerate(wrapped_lines):
+        line_words = line.split()
+        y = i * line_height + TEXT_BG_PADDING
+        
+        # Centramos cada línea
+        line_width = font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]
+        x = (clip_width - line_width) // 2
+        
+        # Dibujamos palabra por palabra
+        for word in line_words:
+            # Determinamos si esta palabra debe resaltarse
+            color = highlight_color if words_assigned < words_to_highlight else normal_color
+            
+            # Dibujamos la palabra con su contorno
+            draw.text((x, y), word, font=font, fill=color,
+                     stroke_width=int(TEXT_STROKE_WIDTH), stroke_fill=TEXT_STROKE_COLOR)
+            
+            # Avanzamos la posición x para la siguiente palabra
+            word_width = font.getlength(word) if hasattr(font, 'getlength') else font.getsize(word)[0]
+            x += word_width + font.getlength(" ") if hasattr(font, 'getlength') else font.getsize(" ")[0]
+            
+            words_assigned += 1
+    
+    # Combinamos el fondo y el texto
+    img = Image.alpha_composite(bg_layer, img)
+    
+    # Convertimos a formato RGB para moviepy
     frame = np.array(img.convert("RGB"))
     return frame
 
 
-def create_karaoke_text_clip(line_info: dict, advance: float=0.5, duration_padding: float=0.0):
+def create_karaoke_text_clip(line_info: dict, advance: float=0.5, duration_padding: float=0.5):
     """
-    Crea un VideoClip para la línea de karaoke.
-    - Se inicia 'advance' segundos antes del tiempo real (no negativo).
+    Crea un VideoClip para la línea de karaoke con mejoras:
+    - Se inicia 'advance' segundos antes del tiempo real (no negativo)
     - Dura hasta (line_info["end"] - line_info["start"] + advance + duration_padding)
+    - Ajuste adaptable al tamaño del texto
+    - Soporte para textos muy largos con wrap automático
     """
     line_duration = line_info["end"] - line_info["start"]
     clip_duration = line_duration + advance + duration_padding
@@ -405,6 +515,56 @@ def create_karaoke_text_clip(line_info: dict, advance: float=0.5, duration_paddi
 # FUNCIONES DE CREACIÓN DE VIDEO
 # ------------------------------------------------------------------------------------
 
+def normalize_video(video_path: str) -> str:
+    """
+    Normaliza un video de entrada a un formato estándar para asegurar consistencia
+    entre videos de YouTube y clips recortados manualmente.
+    
+    Args:
+        video_path: Ruta al video original
+    
+    Returns:
+        Ruta al nuevo video normalizado
+    """
+    print(f"[normalize_video] Normalizando video: {video_path}")
+    normalized_path = video_path.replace(".mp4", "_normalized.mp4")
+    
+    # Si ya existe un video normalizado, lo devolvemos
+    if os.path.exists(normalized_path):
+        print(f"[normalize_video] Video normalizado ya existe: {normalized_path}")
+        return normalized_path
+    
+    try:
+        # Usamos ffmpeg para normalizar el video a un formato estándar
+        # - Formato: MP4 con codec h264
+        # - Resolución: 1280x720 (manteniendo aspect ratio)
+        # - Framerate: 30 fps
+        # - Audio: AAC codec, 44.1kHz, stereo
+        cmd = [
+            "ffmpeg",
+            "-i", video_path,
+            "-c:v", "libx264",
+            "-preset", "medium",  # Equilibrio entre calidad y velocidad
+            "-profile:v", "high",
+            "-vf", f"scale={VIDEO_WIDTH}:{VIDEO_HEIGHT}:force_original_aspect_ratio=decrease,pad={VIDEO_WIDTH}:{VIDEO_HEIGHT}:(ow-iw)/2:(oh-ih)/2",
+            "-r", "30",
+            "-c:a", "aac",
+            "-ar", "44100",
+            "-ac", "2",
+            "-b:a", "192k",
+            "-y",  # Sobrescribir si existe
+            normalized_path
+        ]
+        
+        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print(f"[normalize_video] Video normalizado guardado en: {normalized_path}")
+        return normalized_path
+    except Exception as e:
+        print(f"[normalize_video] ERROR normalizando video: {e}")
+        # Si falla la normalización, devolvemos el video original
+        return video_path
+
+
 def create(video_path: str):
     """
     Versión automática: transcribe con WhisperX, parsea el SRT en tokens,
@@ -414,6 +574,7 @@ def create(video_path: str):
 
     # 1) Convertir vídeo a mp3 y separar stems
     print(f"[create] Recibimos video_path={video_path}")
+    video_path = normalize_video(video_path)
     audio_path = video_to_mp3(video_path)
     if not audio_path:
         print("[create] audio_path vacío")
@@ -461,10 +622,14 @@ def create(video_path: str):
     karaoke_clips = []
     for grp in groups:
         start    = max(grp["start"] - 0.5, 0)
-        duration = grp["end"] - grp["start"] + 0.5
-        clip     = create_karaoke_text_clip(grp, advance=0.5)
+        duration = grp["end"] - grp["start"] + 1.0  # Aumentamos duración para mejor lectura
+        clip     = create_karaoke_text_clip(grp, advance=0.5, duration_padding=0.5)
         clip     = clip.set_start(start).set_duration(duration)
-        clip     = clip.set_position(("center","bottom"))
+        
+        # Posicionamos con margen inferior mejorado
+        bottom_pos = VIDEO_HEIGHT - SUBTITLE_BOTTOM_MARGIN
+        clip = clip.set_position(lambda t: ('center', bottom_pos))
+        
         karaoke_clips.append(clip)
 
     # 7) Componer y exportar
@@ -489,6 +654,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
     remove_previous_srt()
     manual_lyrics = normalize_manual_lyrics(manual_lyrics)
     print(f"[create_with_manual_lyrics] video={video_path}, language={language}")
+    video_path = normalize_video(video_path)
     audio_path = video_to_mp3(video_path)
     print(f"[create_with_manual_lyrics] audio_path => {audio_path}")
     if not audio_path:
@@ -524,17 +690,24 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
         print(f"[create_with_manual_lyrics] VideoFileClip error => {ee}")
         return ""
     dimmed = background.fl_image(lambda img: (img*0.3).astype("uint8"))
-    # Crear clips de karaoke para cada línea
+    
+    # Crear clips de karaoke para cada línea con nuestras mejoras
     karaoke_clips = []
     for group in groups:
         # Se mostrará la línea empezando 0.5 seg antes de la palabra inicial
         start_offset = max(group["start"] - 0.5, 0)
-        duration = group["end"] - group["start"] + 0.5
-        clip = create_karaoke_text_clip(group, advance=0.5, duration_padding=0.0)
-        # Posicionamos el clip (por ejemplo, centrado en la parte inferior)
+        duration = group["end"] - group["start"] + 1.0  # Aumentamos duración para mejor lectura
+        
+        # Usamos el clip mejorado con soporte para textos largos
+        clip = create_karaoke_text_clip(group, advance=0.5, duration_padding=0.5)
+        
+        # Posicionamos el clip con el margen inferior mejorado
+        bottom_pos = VIDEO_HEIGHT - SUBTITLE_BOTTOM_MARGIN
         clip = clip.set_start(start_offset).set_duration(duration)
-        clip = clip.set_position(("center", "bottom"))
+        clip = clip.set_position(lambda t: ('center', bottom_pos))
+        
         karaoke_clips.append(clip)
+        
     # Componer el video final superponiendo los clips de karaoke sobre el background
     final = CompositeVideoClip([dimmed] + karaoke_clips).set_audio(combined)
     filename = f"karaoke_manual_{os.path.basename(video_path)}"
