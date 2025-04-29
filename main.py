@@ -8,6 +8,7 @@ import glob
 import platform
 import numpy as np
 import re
+import pyphen  # Para división silábica
 
 from moviepy.editor import (
     AudioFileClip, VideoFileClip, CompositeAudioClip,
@@ -44,6 +45,10 @@ NEXT_LINE_ALPHA = 0.7  # Transparencia para la línea siguiente
 NEXT_LINE_SPACING = 15  # Espaciado vertical entre línea actual y la siguiente
 MAX_CHARS_PER_LINE = 60  # Máximo de caracteres por línea antes de hacer wrap
 SUBTITLE_BOTTOM_MARGIN = 150  # Margen desde abajo para los subtítulos (aumentado para líneas dobles)
+SYLLABLE_MODE = True  # Nueva constante para activar/desactivar el modo silábico
+
+# Diccionario de hyphenation para división silábica en español
+dic_pyphen = pyphen.Pyphen(lang='es_ES')
 
 if platform.system() == "Darwin":
     imagemagick_path = "/opt/homebrew/bin/magick"
@@ -360,8 +365,9 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
     - Ajuste visual de texto largo en múltiples líneas sin romper la sincronización
     - Ajuste dinámico del tamaño de fuente según longitud
     - Fondo semitransparente para mejor legibilidad
+    - Soporte para resaltado a nivel de sílaba
     """
-    # Obtenemos el texto completo de la línea, que debe mantenerse como una unidad
+    # Obtenemos el texto completo de la línea
     full_text = line_info["line_text"]
     
     # Ajuste dinámico del tamaño de fuente basado en longitud
@@ -377,49 +383,40 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
         print(f"[render_line_image] Error al cargar la fuente: {e}")
         font = ImageFont.load_default()
     
-    # Realizamos el ajuste visual (wrapping) sin alterar la estructura de sincronización
-    # Esto es puramente visual - la frase completa sigue siendo una unidad de sincronización
+    # Realizamos el ajuste visual (wrapping)
     wrapped_lines = []
     words = full_text.split()
     current_line = ""
     
     for word in words:
-        # Si la línea está vacía, añadimos la palabra directamente
         if not current_line:
             current_line = word
             continue
             
-        # Probamos añadir la siguiente palabra
         test_line = current_line + " " + word
-        
-        # Calculamos el ancho con la fuente actual
         text_width = font.getlength(test_line) if hasattr(font, 'getlength') else font.getsize(test_line)[0]
         
         if text_width <= clip_width - 2 * TEXT_BG_PADDING:
-            # La palabra cabe en la línea actual
             current_line = test_line
         else:
-            # La palabra no cabe, guardamos línea actual y empezamos nueva con esta palabra
             wrapped_lines.append(current_line)
             current_line = word
     
-    # No olvidamos la última línea
     if current_line:
         wrapped_lines.append(current_line)
     
-    # Si no hay líneas (caso excepcional), usamos el texto completo
     if not wrapped_lines:
         wrapped_lines = [full_text]
     
     # Calculamos altura total necesaria para todas las líneas visuales
-    line_height = dynamic_font_size + 10  # Espacio entre líneas
+    line_height = dynamic_font_size + 10
     total_height = len(wrapped_lines) * line_height + 2 * TEXT_BG_PADDING
     
-    # Creamos imagen con altura adecuada para todas las líneas
+    # Creamos imagen con fondo transparente
     img = Image.new("RGBA", (clip_width, total_height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     
-    # Creamos fondo semitransparente para mejor legibilidad
+    # Creamos fondo semitransparente
     bg_layer = Image.new("RGBA", (clip_width, total_height), (0, 0, 0, 0))
     bg_draw = ImageDraw.Draw(bg_layer)
     
@@ -437,52 +434,120 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
         fill=TEXT_BG_COLOR
     )
     
-    # Ahora calculamos qué palabras deben resaltarse basado en el tiempo
-    # Estamos trabajando con la frase completa como una unidad de sincronización
-    words = full_text.split()
-    words_to_highlight = 0
+    # MODO SILÁBICO: Preparamos las palabras y sílabas con sus tiempos
+    if SYLLABLE_MODE and line_info.get("words"):
+        # 1. Convertimos las palabras a sílabas con sus tiempos
+        all_syllables = []
+        
+        for word_info in line_info["words"]:
+            word_text = word_info["word"]
+            word_start = word_info["start"]
+            word_end = word_info["end"]
+            
+            # Dividimos la palabra en sílabas con sus tiempos proporcionales
+            syllables = split_word_into_syllables(word_text, word_start, word_end)
+            all_syllables.extend(syllables)
+        
+        # 2. Determinamos qué sílabas deben estar resaltadas en este momento
+        syllables_to_highlight = 0
+        for i, syl in enumerate(all_syllables):
+            syl_relative_time = syl["start"] - line_info["start"]
+            if t_offset >= syl_relative_time:
+                syllables_to_highlight = i + 1
+        
+        # 3. Generamos un nuevo texto donde cada sílaba está etiquetada como normal o resaltada
+        syllable_texts = []
+        syllable_colors = []
+        for i, syl in enumerate(all_syllables):
+            syllable_texts.append(syl["text"])
+            color = highlight_color if i < syllables_to_highlight else normal_color
+            syllable_colors.append(color)
+        
+        # 4. Ahora renderizamos cada línea visual con este etiquetado de sílabas
+        total_syllables = len(syllable_texts)
+        syllable_index = 0
+        
+        for i, line in enumerate(wrapped_lines):
+            y = i * line_height + TEXT_BG_PADDING
+            x = (clip_width - font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]) // 2
+            
+            # Renderizamos cada palabra, pero sílaba por sílaba
+            words_in_line = line.split()
+            
+            for word in words_in_line:
+                word_width = font.getlength(word) if hasattr(font, 'getlength') else font.getsize(word)[0]
+                space_width = font.getlength(" ") if hasattr(font, 'getlength') else font.getsize(" ")[0]
+                
+                # Buscamos las sílabas que corresponden a esta palabra
+                word_syllables = []
+                while syllable_index < total_syllables:
+                    syl_text = syllable_texts[syllable_index]
+                    
+                    # Añadimos esta sílaba a la palabra actual
+                    word_syllables.append((syl_text, syllable_colors[syllable_index]))
+                    syllable_index += 1
+                    
+                    # Si completamos la palabra, salimos del bucle
+                    current_word = "".join(s[0] for s in word_syllables)
+                    if current_word.lower() == word.lower():
+                        break
+                    
+                    # Si nos pasamos de la palabra, también salimos
+                    if len(current_word) >= len(word):
+                        break
+                
+                # Renderizamos cada sílaba de esta palabra
+                for syl_text, syl_color in word_syllables:
+                    syl_width = font.getlength(syl_text) if hasattr(font, 'getlength') else font.getsize(syl_text)[0]
+                    
+                    # Dibujamos la sílaba con su color correspondiente
+                    draw.text((x, y), syl_text, font=font, fill=syl_color,
+                             stroke_width=TEXT_STROKE_WIDTH, stroke_fill=TEXT_STROKE_COLOR)
+                    x += syl_width
+                
+                # Añadimos el espacio después de la palabra
+                x += space_width
     
-    # Para la sincronización, usamos los tiempos de word_segments asociados a esta línea
-    if line_info["words"]:
-        duration = line_info["end"] - line_info["start"]
-        for i, seg in enumerate(line_info["words"]):
-            word_relative_time = seg["start"] - line_info["start"]
-            if t_offset >= word_relative_time:
-                words_to_highlight = i + 1
     else:
-        # Modo fallback: avance proporcional al tiempo
-        progress_ratio = min(1.0, max(0.0, t_offset / (line_info["end"] - line_info["start"])))
-        words_to_highlight = int(progress_ratio * len(words))
-    
-    # Ahora dibujamos cada línea visual (wrapping puramente visual)
-    all_words = []
-    for wrapped_line in wrapped_lines:
-        all_words.extend(wrapped_line.split())
-    
-    # Reasignamos las palabras a las líneas visualmente envueltas
-    words_assigned = 0
-    for i, line in enumerate(wrapped_lines):
-        line_words = line.split()
-        y = i * line_height + TEXT_BG_PADDING
+        # MODO PALABRA: El código original que resalta palabras completas
+        words = full_text.split()
+        words_to_highlight = 0
         
-        # Centramos cada línea
-        line_width = font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]
-        x = (clip_width - line_width) // 2
+        # Para la sincronización, usamos los tiempos de word_segments
+        if line_info.get("words"):
+            for i, seg in enumerate(line_info["words"]):
+                word_relative_time = seg["start"] - line_info["start"]
+                if t_offset >= word_relative_time:
+                    words_to_highlight = i + 1
+        else:
+            # Modo fallback: avance proporcional al tiempo
+            progress_ratio = min(1.0, max(0.0, t_offset / (line_info["end"] - line_info["start"])))
+            words_to_highlight = int(progress_ratio * len(words))
         
-        # Dibujamos palabra por palabra
-        for word in line_words:
-            # Determinamos si esta palabra debe resaltarse
-            color = highlight_color if words_assigned < words_to_highlight else normal_color
+        # Ahora dibujamos cada línea visual
+        words_assigned = 0
+        for i, line in enumerate(wrapped_lines):
+            line_words = line.split()
+            y = i * line_height + TEXT_BG_PADDING
             
-            # Dibujamos la palabra con su contorno
-            draw.text((x, y), word, font=font, fill=color,
-                     stroke_width=int(TEXT_STROKE_WIDTH), stroke_fill=TEXT_STROKE_COLOR)
+            # Centramos cada línea
+            line_width = font.getlength(line) if hasattr(font, 'getlength') else font.getsize(line)[0]
+            x = (clip_width - line_width) // 2
             
-            # Avanzamos la posición x para la siguiente palabra
-            word_width = font.getlength(word) if hasattr(font, 'getlength') else font.getsize(word)[0]
-            x += word_width + font.getlength(" ") if hasattr(font, 'getlength') else font.getsize(" ")[0]
-            
-            words_assigned += 1
+            # Dibujamos palabra por palabra
+            for word in line_words:
+                # Determinamos si esta palabra debe resaltarse
+                color = highlight_color if words_assigned < words_to_highlight else normal_color
+                
+                # Dibujamos la palabra con su contorno
+                draw.text((x, y), word, font=font, fill=color,
+                         stroke_width=TEXT_STROKE_WIDTH, stroke_fill=TEXT_STROKE_COLOR)
+                
+                # Avanzamos la posición x para la siguiente palabra
+                word_width = font.getlength(word) if hasattr(font, 'getlength') else font.getsize(word)[0]
+                x += word_width + (font.getlength(" ") if hasattr(font, 'getlength') else font.getsize(" ")[0])
+                
+                words_assigned += 1
     
     # Combinamos el fondo y el texto
     img = Image.alpha_composite(bg_layer, img)
@@ -814,7 +879,6 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
     combined = CompositeAudioClip([music, vocals])
     try:
         background = VideoFileClip(video_path).set_duration(combined.duration).set_fps(30)
-
     except Exception as ee:
         print(f"[create_with_manual_lyrics] VideoFileClip error => {ee}")
         return ""
@@ -837,13 +901,16 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
         clip = clip.set_position(lambda t: ('center', bottom_pos))
         
         karaoke_clips.append(clip)
-        
+    
     # Componer el video final superponiendo los clips de karaoke sobre el background
     final = CompositeVideoClip([dimmed] + karaoke_clips).set_audio(combined)
+    
+    # Definir nombre y ruta de salida
     filename = f"karaoke_manual_{os.path.basename(video_path)}"
     if not os.path.exists("./output"):
         os.makedirs("./output")
     out_path = os.path.join("./output", filename)
+    
     print(f"[create_with_manual_lyrics] Generando videofile => {out_path}")
     try:
         final.write_videofile(out_path, fps=30, threads=4)
@@ -852,6 +919,57 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
         return ""
     print(f"[create_with_manual_lyrics] Final => {filename}")
     return filename
+
+def split_word_into_syllables(word: str, start_time: float, end_time: float) -> list:
+    """
+    Divide una palabra en sílabas y distribuye el tiempo total entre ellas.
+    
+    Args:
+        word: La palabra a dividir
+        start_time: Tiempo inicial de la palabra completa
+        end_time: Tiempo final de la palabra completa
+        
+    Returns:
+        Lista de diccionarios con {"text": sílaba, "start": tiempo_inicio, "end": tiempo_fin}
+    """
+    # Limpiamos la palabra de símbolos que puedan afectar la división silábica
+    clean_word = re.sub(r'[^\w\sáéíóúÁÉÍÓÚüÜñÑ]', '', word)
+    
+    # Si la palabra está vacía después de limpiarla, devolvemos la original sin dividir
+    if not clean_word:
+        return [{"text": word, "start": start_time, "end": end_time}]
+    
+    # Usamos pyphen para dividir en sílabas
+    syllables = dic_pyphen.inserted(clean_word).split('-')
+    
+    # Si no se pudo dividir o solo hay una sílaba, devolvemos la palabra original
+    if len(syllables) <= 1:
+        return [{"text": word, "start": start_time, "end": end_time}]
+    
+    # Calculamos la duración de cada sílaba (proporcional a su longitud)
+    total_duration = end_time - start_time
+    total_length = sum(len(s) for s in syllables)
+    
+    # Distribuimos el tiempo según la longitud de cada sílaba
+    result = []
+    current_time = start_time
+    for syl in syllables:
+        syl_duration = (len(syl) / total_length) * total_duration
+        syl_end = current_time + syl_duration
+        
+        result.append({
+            "text": syl, 
+            "start": current_time, 
+            "end": syl_end
+        })
+        
+        current_time = syl_end
+    
+    # Ajustamos el tiempo final de la última sílaba
+    if result:
+        result[-1]["end"] = end_time
+    
+    return result
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
