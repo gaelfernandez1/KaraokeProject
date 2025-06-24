@@ -1,45 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
+  <div class="page-header text-center">
+    <h1>Karaoke con Letra Manual</h1>
+    <p class="lead">Proporciona a letra da canción</p>
+  </div>
 
-  <h1>Karaoke con Letra Manual</h1>
-
-  <form action="/process_manual_lyrics" method="post" class="mb-4" enctype="multipart/form-data">
-    <div class="mb-3">
-      <label for="video_file" class="form-label">Ou sube un vídeo MP4</label>
-      <input
-        type="file"
-        class="form-control"
-        id="video_file"
-        name="video_file"
-        accept=".mp4"
-      >
+  <div class="row">
+    <div class="col-lg-10 offset-lg-1">
+      <div class="feature-card">        <div class="card-header">
+          <h2><i class="fas fa-sync-alt"></i> Sincronización de Letra</h2>
+        </div>
+        <div class="card-body">
+          <form action="/process_manual_lyrics" method="post" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="youtube_url" class="form-label"><i class="fab fa-youtube"></i> URL de YouTube</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="youtube_url"
+                    name="youtube_url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  >
+                </div>
+                
+                <p class="text-center my-2">- ou -</p>
+                
+                <div class="mb-3">
+                  <label for="video_file" class="form-label"><i class="fas fa-file-video"></i> Subir vídeo MP4</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="video_file"
+                    name="video_file"
+                    accept=".mp4"
+                  >
+                  <div class="file-info mt-2" style="display: none;"></div>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="mb-3 h-100">
+                  <label for="manual_lyrics" class="form-label"><i class="fas fa-align-left"></i> Letra Completa</label>
+                  <textarea
+                    class="form-control h-75"
+                    id="manual_lyrics"
+                    name="manual_lyrics"
+                    placeholder="Pega aquí a letra completa da canción..."
+                    required
+                  ></textarea>
+                </div>
+              </div>
+            </div>            <div class="row mt-3">
+              <div class="col-12">
+                <div class="alert alert-info">
+                  <i class="fas fa-info-circle"></i> <strong>¿Como funciona?</strong> O sistema sincronizará automáticamente cada palabra da letra co audio da canción utilizando "Forced Alignment".
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-center mt-3">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-magic"></i> Crear Vídeo de Karaoke
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="mb-3">
-      <label for="youtube_url" class="form-label">Ou pega a URL de YouTube</label>
-      <input
-        type="text"
-        class="form-control"
-        id="youtube_url"
-        name="youtube_url"
-        placeholder="https://www.youtube.com/watch?v=..."
-      >
-    </div>
+  </div>
+  <div class="divider"></div>
 
-    <div class="mb-3">
-      <label for="manual_lyrics" class="form-label">Letra (texto plano)</label>
-      <textarea
-        class="form-control"
-        id="manual_lyrics"
-        name="manual_lyrics"
-        rows="8"
-        placeholder="Introduce aquí a letra completa..."
-        required
-      ></textarea>
+  <div class="row">
+    <div class="col text-center">
+      <a href="/" class="btn btn-outline-light"><i class="fas fa-arrow-left"></i> Volver ao Inicio</a>
     </div>
-
-    <button type="submit" class="btn btn-primary">
-      Procesar con Letra Manual (Forced Alignment)
-    </button>
-  </form>
+  </div>
 
 {% endblock %}
