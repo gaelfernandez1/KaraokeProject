@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.A
     container_name: demucs_container
     
-    # IMPORTANTE: para GPU en demucs
+    #Para poder usar GPU en demucs. Non vexo moita diferencia. ALGO MAL? REVISAR
     runtime: nvidia
     deploy:
       resources:
@@ -26,7 +26,7 @@ services:
       dockerfile: Dockerfile.B
     container_name: whisperx_container
 
-    # IMPORTANTE: para GPU en whisperx
+    #para poder usar GPU en whisperx
     runtime: nvidia
     deploy:
       resources:

@@ -1,48 +1,72 @@
 {% extends "base.html" %}
 {% block content %}
-
-  <h1 class="mb-4">Karaoke Multilingüe (Contedor A)</h1>
+  <div class="page-header text-center">
+    <h1>Creación Automática de Karaoke</h1>
+    <p class="lead">Xera vídeos de karaoke utilizando intelixencia artificial para transcribir e sincronizar letras</p>
+  </div>
 
   <div class="row">
-    <div class="col-md-6">
-      <h2>Opción A: Karaoke con Transcrición Automática (WhisperX)</h2>
-      <!-- Añadimos enctype y un input file -->
-      <form action="/generate" method="post" class="mb-4" enctype="multipart/form-data">
-        <div class="mb-3">
-          <label for="video_file" class="form-label">Ou sube un vídeo MP4</label>
-          <input
-            type="file"
-            class="form-control"
-            id="video_file"
-            name="video_file"
-            accept=".mp4"
-          >
+    <div class="col-lg-6 mb-4">
+      <div class="feature-card">        <div class="card-header">
+          <h2><i class="fas fa-robot"></i> Transcrición Automática</h2>
         </div>
-        <div class="mb-3">
-          <label for="youtube_url" class="form-label">Ou pega a URL de YouTube</label>
-          <input
-            type="text"
-            class="form-control"
-            id="youtube_url"
-            name="youtube_url"
-            placeholder="https://www.youtube.com/watch?v=..."
-          >
+        <div class="card-body">
+          <p>O sistema utiliza <strong>WhisperX</strong> para analizar e transcribir automáticamente a letra de calquera canción e crear un vídeo de karaoke.</p>
+          
+          <form action="/generate" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="youtube_url" class="form-label"><i class="fab fa-youtube"></i> URL de YouTube</label>
+              <input
+                type="text"
+                class="form-control"
+                id="youtube_url"
+                name="youtube_url"
+                placeholder="https://www.youtube.com/watch?v=..."
+              >
+            </div>
+            
+            <p class="text-center my-2">- ou -</p>
+              <div class="mb-3">
+              <label for="video_file" class="form-label"><i class="fas fa-file-video"></i> Subir vídeo MP4</label>
+              <input
+                type="file"
+                class="form-control"
+                id="video_file"
+                name="video_file"
+                accept=".mp4"
+              >
+              <div class="file-info mt-2" style="display: none;"></div>
+            </div>
+            
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-play-circle"></i> Procesar Automáticamente</button>
+            </div>
+          </form>
         </div>
-        <button type="submit" class="btn btn-primary">Procesar con WhisperX</button>
-      </form>
+      </div>
     </div>
 
-    <div class="col-md-6">
-      <h2>Opción B: Letra Manual</h2>
-      <p>Introduce a URL de YouTube e a letra manualmente.</p>
-      <a href="/manual_lyrics_form" class="btn btn-secondary">Usar Letra Manual</a>
+    <div class="col-lg-6 mb-4">
+      <div class="feature-card">        <div class="card-header">
+          <h2><i class="fas fa-pen-fancy"></i> Letra Manual</h2>
+        </div>
+        <div class="card-body">
+          <p>Xa tes a letra da canción? Proporciona o texto e o sistema encargarase de sincronizalo co audio para crear un karaoke perfecto.</p>
+          
+          <div class="mb-4">
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Ideal para cancións en idiomas menos comúns</li>
+            </ul>
+          </div>
+          
+          <div class="text-center">
+            <a href="/manual_lyrics_form" class="btn btn-secondary"><i class="fas fa-edit"></i> Usar Letra Manual</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <hr />
-
-  <h2>(Opcional) Busca de Letra por Título/Artista</h2>
-  <p>(En desenvolvemento)</p>
-  <a href="/lyrics_form" class="btn btn-info">Buscar Letra</a>
+  <div class="divider">  </div>
 
 {% endblock %}

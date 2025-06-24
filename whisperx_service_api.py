@@ -14,109 +14,97 @@ def sec2tc(sec_float):
     hh = ms//3600000
     mm = (ms%3600000)//60000
     ss = (ms%60000)//1000
-    mmm= (ms%1000)
-    return f"{hh:02}:{mm:02}:{ss:02},{mmm:03}"
+    ms = (ms%1000)
+    return f"{hh:02}:{mm:02}:{ss:02},{ms:03}"
 
 def get_duration(audio_file):
     return librosa.get_duration(filename=audio_file)
 
+
+#Esperase un json, si existe a letra manual, faise forced aligment.
+# si language non está no payload autodetectase o idioma
+# podense probar varios modelos pero notase unha diferencia escasa polo menos nas cancions en galego que estou probando. Pode ser un error?
+# se non existe letra manual transcribese automaticamente con WhisperX
 @app.route("/align", methods=["POST"])
 def align_endpoint():
-    """
-    Espera un JSON con al menos: { "audio_path": "/data/vocals.wav" }
-    Opcionalmente: { "manual_lyrics": "texto...", "language": "es" }
 
-    Si 'manual_lyrics' existe, hacemos forced alignment con esa letra.
-      - Si 'language' NO está en el payload, autodetectamos el idioma
-        con un modelo pequeño (tiny o medium), y luego forzamos alignment.
-
-    Si 'manual_lyrics' NO existe, transcribimos automáticamente con WhisperX.
-    """
-
-    data = request.get_json()
-    if not data or "audio_path" not in data:
+    datos = request.get_json()
+    if not datos or "audio_path" not in datos:
         return jsonify({"error": "Missing 'audio_path'"}), 400
 
-    audio_path = data["audio_path"]
-    if not os.path.exists(audio_path):
-        return jsonify({"error": f"File {audio_path} not found"}), 404
+    ruta_audio = datos["audio_path"]
+    if not os.path.exists(ruta_audio):
+        return jsonify({"error": f"File {ruta_audio} not found"}), 404
 
-    manual_lyrics = data.get("manual_lyrics", None)
-    lang_code = data.get("language", None)  # si no envían nada, autodetect
+    letra_manual = datos.get("manual_lyrics", None)
+    codigo_idioma = datos.get("language", None)  
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"[WhisperX API] device={device}, audio={audio_path}")
+    dispositivo = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"-------USANDO DISPOSITIVO----- device={dispositivo}, audio={ruta_audio}")
 
-    if manual_lyrics:
-        # === FORCED ALIGNMENT CON LETRA MANUAL ===
-        if not lang_code:
-            # 1) Hacemos detección de idioma con un modelo pequeño (por ejemplo 'tiny')
-            print("[WhisperX API] No se especificó language, autodetectando con un modelo pequeño ...")
-            detect_model = whisperx.load_model("tiny", device=device, compute_type="float32")
-            detect_result = detect_model.transcribe(audio_path, language=None)  # autodetect
-            lang_code = detect_result["language"]
-            print(f"[WhisperX API] Autodetectado => {lang_code}")
+    if letra_manual:        #FORCED ALIGNMENT
+        if not codigo_idioma:            
+            modelo_deteccion = whisperx.load_model("large-v2", device=dispositivo, compute_type="float32")
+            resultado_deteccion = modelo_deteccion.transcribe(ruta_audio, language=None)  
+            codigo_idioma = resultado_deteccion["language"]
+            print(f"Autodetectado => {codigo_idioma}")
 
-        print(f"[WhisperX API] Forced alignment con letra manual, lang={lang_code}")
+        total_segundos = get_duration(ruta_audio)
 
-        total_sec = get_duration(audio_path)
-        # Simulamos segments con un único gran segmento [0..fin]
-        result = {
-            "language": lang_code,
+        # Simulase segments cun único gran segmento [0..fin]
+        resultado = {
+            "language": codigo_idioma,
             "segments": [
                 {
-                    "text": manual_lyrics,
+                    "text": letra_manual,
                     "start": 0.0,
-                    "end": total_sec
+                    "end": total_segundos
                 }
             ]
-        }
-
-        # Cargamos el modelo de alineación
-        align_model, metadata = whisperx.load_align_model(lang_code, device)
-        result_aligned = whisperx.align(
-            result["segments"], 
-            align_model, 
-            metadata, 
-            audio_path, 
-            device
+        }        
+        modelo_alineacion, metadatos = whisperx.load_align_model(codigo_idioma, dispositivo)
+        resultado_alineado = whisperx.align(
+            resultado["segments"], 
+            modelo_alineacion, 
+            metadatos, 
+            ruta_audio, 
+            dispositivo
         )
 
-    else:
-        # === TRANSCRIPCIÓN AUTOMÁTICA (como antes) ===
-        model = whisperx.load_model("tiny", device=device, compute_type="float32")
-        result = model.transcribe(audio_path, language=None)  # autodetect
-        lang_code = result["language"]
-        print(f"[WhisperX API] Automatic transcription, detected lang={lang_code}")
+    else:        #TRANSCRICIÓN AUTOMÁTICA
+        modelo = whisperx.load_model("large-v2", device=dispositivo, compute_type="float32")
+        resultado = modelo.transcribe(ruta_audio, language=None)  
+        codigo_idioma = resultado["language"]
+        print(f"IDIOMA DETECTADO={codigo_idioma}")
 
-        align_model, metadata = whisperx.load_align_model(lang_code, device)
-        result_aligned = whisperx.align(
-            result["segments"], 
-            align_model, 
-            metadata, 
-            audio_path, 
-            device
+        modelo_alineacion, metadatos = whisperx.load_align_model(codigo_idioma, dispositivo)
+        resultado_alineado = whisperx.align(
+            resultado["segments"], 
+            modelo_alineacion, 
+            metadatos, 
+            ruta_audio, 
+            dispositivo
         )
 
-    word_segments = result_aligned["word_segments"]
+    segmentos_palabras = resultado_alineado["word_segments"]
 
-    # 3) Crear SRT final a nivel de palabra
-    srt_path = audio_path.replace(".wav", "_whisperx.srt")
-    with open(srt_path, "w", encoding="utf-8") as f:
-        idx = 1
-        for seg in word_segments:
+    #Crear SRT final a nivel de palabra
+    ruta_srt = ruta_audio.replace(".wav", "_whisperx.srt")
+    with open(ruta_srt, "w", encoding="utf-8") as f:
+        indice = 1
+        for seg in segmentos_palabras:
             if "word" not in seg:
                 continue
-            text = seg["word"].strip()
-            start= seg["start"]
-            end  = seg["end"]
-            block = f"{idx}\n{sec2tc(start)} --> {sec2tc(end)}\n{text}\n\n"
-            f.write(block)
-            idx+=1
+            texto = seg["word"].strip()
+            inicio = seg["start"]
+            fin = seg["end"]
+            bloque = f"{indice}\n{sec2tc(inicio)} --> {sec2tc(fin)}\n{texto}\n\n"
+            f.write(bloque)
+            indice += 1
 
-    return jsonify({"srt_path": srt_path, "message": "Alignment done"}), 200
+    return jsonify({"srt_path": ruta_srt, "message": "Alignment done"}), 200
 
 
 if __name__ == "__main__":
-    # Levantamos en modo debug y en CPU
+    #Levantamos en modo debug e en CPU
     app.run(host="0.0.0.0", port=5001, debug=True)
