@@ -1,45 +1,48 @@
 services:
+  #CAMBIO. ahora si que se nota
   demucs:
     build:
       context: .
       dockerfile: Dockerfile.A
     container_name: demucs_container
-    
-    #Para poder usar GPU en demucs. Non vexo moita diferencia. ALGO MAL? REVISAR
-    runtime: nvidia
+    ports:
+      - "5000:5000"
+    volumes:
+      - shared_data:/data
+    #ahora funciona con ou sin gpu
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
-              capabilities: ["gpu"]
+              count: all
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    restart: unless-stopped
 
-    ports:
-      - "5000:5000"
-    volumes:
-      - shared_data:/data
-
+  #ahora vai con calquera gpu
   whisperx:
     build:
       context: .
       dockerfile: Dockerfile.B
     container_name: whisperx_container
-
-    #para poder usar GPU en whisperx
-    runtime: nvidia
+    ports:
+      - "5001:5001"
+    volumes:
+      - shared_data:/data
+    #pode ser opcional a GPU
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
-              capabilities: ["gpu"]
-
-    ports:
-      - "5001:5001"
-    volumes:
-      - shared_data:/data
+              count: all
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    restart: unless-stopped
 
 volumes:
   shared_data:
