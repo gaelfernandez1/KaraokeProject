@@ -3,6 +3,11 @@ import subprocess
 import shutil
 import requests
 from moviepy.editor import AudioFileClip
+from gpu_utils import detect_gpu_capability, get_optimal_demucs_args
+
+#añador esto para detectas as capacidades da gpu en general, non solo do meu equipo
+GPU_INFO = detect_gpu_capability()
+DEMUCS_ARGS = get_optimal_demucs_args(GPU_INFO)
 
 #Para convertir un video a un mp3 
 def video_to_mp3(video_path: str) -> str:
@@ -22,10 +27,13 @@ def video_to_mp3(video_path: str) -> str:
     return ruta_audio
 
 
-#Funcion para usar demucs, separa as pistas de audio. Esto devolve a ruta da voz e a ruta da instrumental
+#Funcion para usar demucs, separa as pistas de audio. Esto devolve a ruta da voz e a ruta da instrumental. ahora detecta a gpu automaticamente
 def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
-    print(f" Iniciando proceso demucs para: {audio_file_path}")
+
+    if GPU_INFO['has_cuda']:
+        print(f"GPU detectada: {GPU_INFO['gpu_name']} ({GPU_INFO['gpu_memory']:.1f}GB)")
+    
     directorio_saida = "./separated"
     if not os.path.exists("./stems"):
         os.makedirs("./stems")
@@ -33,14 +41,28 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     nombreArchivo = os.path.basename(audio_file_path)
     nombreBase = os.path.splitext(nombreArchivo)[0]
 
-    try:
-        subprocess.run(["demucs", "--device", "cuda", audio_file_path], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error de demucs {e}")
-        return "", ""
+    cmd = ["demucs"] + DEMUCS_ARGS + [audio_file_path]
+    #print(f"Comando demucs: {' '.join(cmd)}")
 
-    carpetaSeparado = os.path.join(directorio_saida, "htdemucs", nombreBase)       #chamase htdemucs desde unha das actualizacions. Importante
-    if not os.path.exists(carpetaSeparado):   #Si non se encontrou a carpeta de salida
+    try:
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        print("separaronse os stems sin problemas")
+    except subprocess.CalledProcessError as e:
+        print(f"Stderr: {e.stderr}")
+        
+        if GPU_INFO['recommended_device'] == 'cuda':
+            print("problemas con gpu, vaise seguir con cpu")
+            try:
+                cmd_cpu = ["demucs", "--device", "cpu", "--two-stems=vocals", "--jobs", "2", audio_file_path]
+                result = subprocess.run(cmd_cpu, check=True, capture_output=True, text=True)
+            except subprocess.CalledProcessError as e2:
+                print(f"error tamen con cpu: {e2}")
+                return "", ""
+        else:
+            return "", ""
+
+    carpetaSeparado = os.path.join(directorio_saida, "htdemucs", nombreBase)
+    if not os.path.exists(carpetaSeparado):
         return "", ""
 
     vocals_wav = os.path.join(carpetaSeparado, "vocals.wav")
@@ -52,21 +74,21 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
         other_wav = os.path.join(carpetaSeparado, "other.wav")
         instrumental_wav = os.path.join(carpetaSeparado, "music_instrumental.wav")
 
-
         #hai que combinar os stems de drums, bass e other para crear a instrumental porque demucs non o fai automaticamente
         if all(os.path.exists(p) for p in [drums_wav, bass_wav, other_wav]):
             try:
                 subprocess.run([
-                    "ffmpeg",
+                    "ffmpeg", "-y",  
                     "-i", drums_wav,
                     "-i", bass_wav,
                     "-i", other_wav,
                     "-filter_complex", "[0:a][1:a][2:a]amix=inputs=3",
                     instrumental_wav
                 ], check=True)
-            except subprocess.CalledProcessError as e:      #error ao combinar as partes
+            except subprocess.CalledProcessError as e:
                 return "", ""
-        else:   #se falta algunha das partes damos error
+        else:
+            print("Falta algun dos stems?")
             return "", ""
 
     if not os.path.exists(vocals_wav) or not os.path.exists(instrumental_wav):

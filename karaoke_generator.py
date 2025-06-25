@@ -21,7 +21,7 @@ def create(video_path: str):
  
     # Normalizo o video. Por que? Porque añadin a parte de poder meter un MP4 para poder recortar videos e facer que
     # ocupen menos, para facer ensayo e error mais rapidamente. Entonces necesito que o formato do video do link de YT
-    # e o formato do Mp4 sean o mismo, porque si os subtitulos non son iguales non me sirve de nada practicar cos mp4s.
+    # e o formato do Mp4 sean o mesmo, porque si os subtitulos non son iguais non me sirve de nada practicar cos mp4s.
     try:
         video_path = normalize_video(video_path)
     except Exception as erro_normalizacion:      
@@ -30,7 +30,11 @@ def create(video_path: str):
     ruta_audio = video_to_mp3(video_path)
     if not ruta_audio:
         return ""
+    
+    
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
+    
+    
     if not ruta_voz or not ruta_musica:
         return ""    
     
@@ -108,11 +112,9 @@ def create(video_path: str):
         posicion_inferior = ALTO_VIDEO - MARXE_INFERIOR_SUBTITULO
         clip_texto = clip_texto.set_position(('center', posicion_inferior))
         clips_karaoke.append(clip_texto)    
+        video_final = CompositeVideoClip([video_escurecido] + clips_karaoke).set_audio(audio_combinado)
     
-
-    video_final = CompositeVideoClip([video_escurecido] + clips_karaoke).set_audio(audio_combinado)
-    
-    nome_video_base = os.path.basename(video_path)
+    nome_video_base = os.path.basename(video_path).replace("_normalized", "")
     nome_video_seguro = sanitize_filename(nome_video_base)
     nome_saida = f"karaoke_{nome_video_seguro}"
 

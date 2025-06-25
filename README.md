@@ -7,15 +7,9 @@ Creación automática de vídeos de karaoke multilinüe mediante ferramentas de 
 
 Paso 1: Descargar Docker Desktop no equipo
 
-Paso 2: Instalar ImageMagick no equipo e metelo nesta ruta: "C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe" si estás en Windows, si estás en linux "/usr/bin/convert"
-Ou se non ir ao archivo config.py e cambiar a ruta ahí
-Nesta páxina está exlpicado: https://dev.to/muddylemon/making-my-own-karaoke-videos-with-ai-4b8l
-        
-Paso 3: Instalar ffmpeg no equipo. a version usada no proxecto é esta: ffmpeg-2025-01-20-git-504df09c34-full_build
+Paso 2: Istalar anaconda e usar o anaconda prompt(ou o sistema preferido de cada usuario). a versión de python usada é a 3.10.16 pero probablemente funciona con versións de python superiores. Opcional usar un conda environment
 
-Paso 4: Istalar anaconda e usar o anaconda prompt. a versión de python usada é a 3.10.16. Opcional usar un conda environment
-
-Paso 5: Clonar o repositorio do proxecto
+Paso 3: Clonar o repositorio do proxecto
 
 
 ## Instrucións de uso

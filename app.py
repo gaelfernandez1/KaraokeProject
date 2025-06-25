@@ -4,8 +4,12 @@ from flask import Flask, request, send_file, render_template
 from werkzeug.utils import secure_filename
 
 from karaoke_generator import create, create_with_manual_lyrics
+from gpu_utils import print_system_summary
 
 app = Flask(__name__)
+
+
+print_system_summary()
 
 DIRECTORIO_ENTRADA = "input"
 DIRECTORIO_SAIDA = "output"
@@ -73,10 +77,8 @@ def xerar_karaoke():
         app.logger.info(f" Archivos similares encontrados: {arquivos_similares}")
         return "Non se atopou o arquivo de saída", 500
 
-    #mirar tamaño del archivo
     tamano_ficheiro = os.path.getsize(ruta_saida)
     
-    #secure filename para crear un nombre seguro
     nome_descarga_seguro = secure_filename(nome_saida)
 
     try:

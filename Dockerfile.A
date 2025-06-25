@@ -2,15 +2,20 @@
 #ESENCIAL. Hai masivos problemas de compatibilidad entre as ferramentas usadas. Incompatibilidades con docker, cuda, demucs, whisperx...
 #Tuven que aislar dependencias e facer un monton de combinacions hasta encontrar unha que funcionara. Quizais se poda simplificar.
 
-
 FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg git imagemagick \
+    ffmpeg \
+    git \
+    imagemagick \
     libpangocairo-1.0-0 \
     libpangoft2-1.0-0 \
     libmagickwand-dev \
- && rm -rf /var/lib/apt/lists/*
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 #Esto parchea policy.xml de imagemagick. Necesario porque daba error. 
 #https://legacy.imagemagick.org/discourse-server/viewtopic.php?t=26801
@@ -18,10 +23,12 @@ RUN sed -i 's|<policy domain="path" rights="none" pattern="@\*"/>|<!-- <policy d
 
 WORKDIR /KaraokeProject
 
-COPY requirementsA.txt /KaraokeProject
+COPY requirementsA.txt /KaraokeProject/
 RUN pip install --no-cache-dir -r requirementsA.txt
 
 COPY . /KaraokeProject
+
+RUN mkdir -p /data /KaraokeProject/input /KaraokeProject/output /KaraokeProject/separated
 
 EXPOSE 5000
 CMD ["python", "app.py"]

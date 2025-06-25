@@ -1,20 +1,21 @@
 # requirements_whisperx.txt
 
-numpy<2.0
-
 #para gpu
 --extra-index-url https://download.pytorch.org/whl/cu117
-torch==2.0.0+cu117
-torchaudio==2.0.0+cu117
+torch>=2.0.0
+torchaudio>=2.0.0
 
+whisperx>=3.1.0
 
-whisperx
-
-Flask
+Flask>=2.3.0
 
 #Librerias que faltaban para get_duration con librosa
-librosa
-soundfile
+librosa>=0.10.0
+soundfile>=0.12.1
+scipy>=1.10.0
 
 #para dividir en silabas
-pyphen
+pyphen>=0.14.0
+
+numpy<2.0
+requests>=2.28.0
