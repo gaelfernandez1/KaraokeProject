@@ -54,3 +54,8 @@ docker cp demucs_container:/KaraokeProject/output/. "ruta a onde queiras copiar"
 docker exec -it demucs_container bash -c "rm -rf /data/*"
 ```
 
+### Liberar espazo de contedores no pc(docker)
+
+```bash
+docker system prune -a --volumes
+```
