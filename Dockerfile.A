@@ -2,7 +2,14 @@
 #ESENCIAL. Hai masivos problemas de compatibilidad entre as ferramentas usadas. Incompatibilidades con docker, cuda, demucs, whisperx...
 #Tuven que aislar dependencias e facer un monton de combinacions hasta encontrar unha que funcionara. Quizais se poda simplificar.
 
-FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+# Dockerfile para demucs. Actualizado con imagen máis moderna
+FROM pytorch/pytorch:2.3.0-cuda11.8-cudnn8-devel
+
+ENV DEBIAN_FRONTEND=noninteractive
+#arreglar as variables de entorno intel mkl, polo tema de haber arreglado o de av.
+ENV MKL_SERVICE_FORCE_INTEL=1
+ENV MKL_THREADING_LAYER=INTEL
+ENV OMP_NUM_THREADS=1
 
 ENV DEBIAN_FRONTEND=noninteractive
 
