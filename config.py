@@ -1,4 +1,5 @@
 import platform
+import os
 from moviepy.config import change_settings
 
 
@@ -30,23 +31,41 @@ MOSTRAR_LIÑA_SEGUINTE = True
 MODO_SILABICO = True  
 
 
-#IMPORTANTE: Hai que ter instalado ImageMagick no sistema 
 # Se imagemagick está instalado na localización estandar non lle di a moviepy onde esta, hai qye facer este codigo
 # https://dev.to/muddylemon/making-my-own-karaoke-videos-with-ai-4b8l
 #Ainda que ahora que esta todo en docker, a ruta de windows que usaba antes xa non se usa
 
 def configurar_imagemagick():
     """Configura ImageMagick según el sistema operativo"""
-    if platform.system() == "Darwin":
-        ruta_imagemagick = "/opt/homebrew/bin/magick"
-    elif platform.system() == "Windows":
-        ruta_imagemagick = "C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"
-    elif platform.system() == "Linux":
-        ruta_imagemagick = "/usr/bin/convert"    #-> esto e o que usa docker ahora, porque o SO dentro de docker é linux
-    else:
-        raise NotImplementedError("Unsupported operating system")
-    
-    change_settings({"IMAGEMAGICK_BINARY": ruta_imagemagick})
+    try:
+        if platform.system() == "Darwin":
+            ruta_imagemagick = "/opt/homebrew/bin/magick"
+        elif platform.system() == "Windows":
+            ruta_imagemagick = "C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/magick.exe"
+        elif platform.system() == "Linux":
+           
+            posibles_rutas = [
+                "/usr/bin/convert",      
+                "/usr/bin/magick",       
+                "/usr/local/bin/convert",
+                "/usr/local/bin/magick"
+            ]
+            
+            ruta_imagemagick = None
+            for ruta in posibles_rutas:
+                if os.path.exists(ruta):
+                    ruta_imagemagick = ruta
+                    break
+            
+            if not ruta_imagemagick:
+                ruta_imagemagick = "/usr/bin/convert"  # Fallback
+        else:
+            raise NotImplementedError("Unsupported operating system")
+        
+        change_settings({"IMAGEMAGICK_BINARY": ruta_imagemagick})
+        
+    except Exception as e:
+        print(f"Error configurando ImageMagick: {e}")
 
 
 configurar_imagemagick()
