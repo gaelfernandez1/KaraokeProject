@@ -14,7 +14,6 @@ ENV OMP_NUM_THREADS=1
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
     git \
     imagemagick \
     libpangocairo-1.0-0 \
@@ -22,7 +21,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libmagickwand-dev \
     wget \
     curl \
+    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
+
+#Instalar FFmpeg mais moderno con soporte AV1
+RUN add-apt-repository ppa:savoury1/ffmpeg4 -y || true && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
 
 #Esto parchea policy.xml de imagemagick. Necesario porque daba error. 
 #https://legacy.imagemagick.org/discourse-server/viewtopic.php?t=26801

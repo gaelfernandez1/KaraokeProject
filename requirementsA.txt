@@ -13,7 +13,7 @@ yt-dlp>=2023.12.30
 soundfile>=0.12.1   #en windows
 numpy<2.0
 requests>=2.28.0
-Pillow>=9.0.0
+Pillow>=9.0.0,<10.1.0   #Limito a versión para evitar problemas con antialias
 pyphen>=0.14.0   # para as silabas
 
 librosa>=0.10.0
