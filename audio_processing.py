@@ -133,14 +133,17 @@ def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, h
 
 
 #Esto chama ao endpoint pero da letra manual
-def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language="es", enable_diarization: bool = False, hf_token: str = None):
+def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None):
     url = "http://whisperx:5001/align"
     datos_envio = {
         "audio_path": vocals_path,
         "manual_lyrics": manual_lyrics,
-        "language": language,
         "enable_diarization": enable_diarization
     }
+    
+    # Solo añadir language si se especifica, si non WhisperX detectará automáticamente
+    if language:
+        datos_envio["language"] = language
     
    
     if hf_token:

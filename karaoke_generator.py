@@ -145,7 +145,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
 
 
 # A outra variante, uso de FORCED ALIGNMENT
-def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es", enable_diarization: bool = False, hf_token: str = None) -> str:
+def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None) -> str:
 
     remove_previous_srt()
     letras_normalizadas = normalize_manual_lyrics(manual_lyrics)

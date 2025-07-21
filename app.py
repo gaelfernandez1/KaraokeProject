@@ -134,7 +134,7 @@ def procesar_letras_manuales():
     
     #Xerar karaoke forced alignment
     try:
-        nome_saida = create_with_manual_lyrics(ruta_video, letra_manual, language="es", enable_diarization=enable_diarization, hf_token=hf_token)
+        nome_saida = create_with_manual_lyrics(ruta_video, letra_manual, language=None, enable_diarization=enable_diarization, hf_token=hf_token)
         if not nome_saida:
             raise RuntimeError("create_with_manual_lyrics devolveu cadea baleira")
     except Exception as e:

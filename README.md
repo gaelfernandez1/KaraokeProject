@@ -27,6 +27,17 @@ docker-compose up -d
 
 Despois de iniciar os contedores, accede á aplicación web en: http://127.0.0.1:5000/
 
+## Activación de Speaker Diarization
+1. Marcar checkbox "Enable Speaker Diarization" na interfaz web
+2. Introducir token válido de HuggingFace. IMPORTANTE: Tras autenticarte, hai que aceptar os termos e condicións dos seguintes modelos:
+https://huggingface.co/pyannote/speaker-diarization-3.1
+https://huggingface.co/pyannote/segmentation-3.0
+
+Despois crea un token modo READ na seguinte ligazón:
+https://huggingface.co/settings/tokens
+
+3. Procesar video normalmente
+
 
 ## Comandos para debug
 
