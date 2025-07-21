@@ -106,6 +106,32 @@ document.addEventListener('DOMContentLoaded', function() {
             clearAlerts();
         });
     });
+    
+    //Esto e para manejar a casilla do diarization para mostrar ou ocultar o campo do token
+    const diarizationCheckbox = document.getElementById('enable_diarization');
+    const diarizationCheckboxManual = document.getElementById('enable_diarization_manual');
+    const hfTokenGroup = document.getElementById('hf_token_group');
+    const hfTokenGroupManual = document.getElementById('hf_token_group_manual');
+    
+    if (diarizationCheckbox && hfTokenGroup) {
+        diarizationCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                hfTokenGroup.style.display = 'block';
+            } else {
+                hfTokenGroup.style.display = 'none';
+            }
+        });
+    }
+    
+    if (diarizationCheckboxManual && hfTokenGroupManual) {
+        diarizationCheckboxManual.addEventListener('change', function() {
+            if (this.checked) {
+                hfTokenGroupManual.style.display = 'block';
+            } else {
+                hfTokenGroupManual.style.display = 'none';
+            }
+        });
+    }
 });
 
 function showLoading(message = 'Procesando...') {

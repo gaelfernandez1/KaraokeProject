@@ -107,33 +107,53 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
 
 # Esto chama ao endpoint de  whisperx para facer a transcripción automatica
-def call_whisperx_endpoint(vocals_path: str):
+def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, hf_token: str = None):
     url = "http://whisperx:5001/align"              #dentro da red docker
-    datos_envio = {"audio_path": vocals_path}
+    datos_envio = {
+        "audio_path": vocals_path,
+        "enable_diarization": enable_diarization
+    }
+    
+    # Agregar token de HuggingFace
+    if hf_token:
+        datos_envio["hf_token"] = hf_token
+    
     #Facemos post
     try:
         resposta = requests.post(url, json=datos_envio, timeout=600)
         if resposta.status_code == 200:
             datos = resposta.json()
+            return datos  # Devolver datos para acceder a speaker_info
         else:
             print("WhisperX alignment Error:", resposta.text)
+            return None
     except Exception as e:
         print(f"error ao chamar ao endpoint: {e}")
+        return None
 
 
 #Esto chama ao endpoint pero da letra manual
-def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language="es"):
+def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language="es", enable_diarization: bool = False, hf_token: str = None):
     url = "http://whisperx:5001/align"
     datos_envio = {
         "audio_path": vocals_path,
         "manual_lyrics": manual_lyrics,
-        "language": language
+        "language": language,
+        "enable_diarization": enable_diarization
     }
+    
+   
+    if hf_token:
+        datos_envio["hf_token"] = hf_token
+    
     try:
         resposta = requests.post(url, json=datos_envio, timeout=600)
         if resposta.status_code == 200:
             datos = resposta.json()
+            return datos  
         else:
             print("Fallo do alineamento forzado:", resposta.text)
+            return None
     except Exception as e:
         print(f"error co endpoint da letra manual {e}")
+        return None

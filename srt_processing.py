@@ -44,7 +44,29 @@ def parse_word_srt(srt_path: str) -> list:
                     for i, token in enumerate(tokens):
                         inicio_token = inicio_bloque + i * duracion_token
                         fin_token = inicio_token + duracion_token
-                        segmentos.append({"start": inicio_token, "end": fin_token, "word": token})
+                        
+                        # Parsear información de speaker. Se hai, claro 
+                        
+                        if "|" in token and token.count("|") >= 2:     # Formato: speaker id|color|palabra
+                            partes = token.split("|", 2)
+                            speaker_id = partes[0]
+                            color = partes[1]
+                            palabra = partes[2]
+                            segmentos.append({
+                                "start": inicio_token, 
+                                "end": fin_token, 
+                                "word": palabra,
+                                "speaker": speaker_id,
+                                "color": color
+                            })
+                        else:
+                            segmentos.append({
+                                "start": inicio_token, 
+                                "end": fin_token, 
+                                "word": token,
+                                "speaker": None,
+                                "color": None
+                            })
                 indice += 1  #salto a linea vacia
             else:
                 indice += 1

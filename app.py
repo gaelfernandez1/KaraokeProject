@@ -63,8 +63,12 @@ def xerar_karaoke():
             ruta_video = descargar_video_youtube(url_youtube)
         except Exception as e:
             return f"Error descargando vídeo: {e}", 500                   #Chamada ao xerador
+    
+    enable_diarization = request.form.get("enable_diarization") == "true"     #obter os parametros para diarizaation
+    hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
+    
     try:
-        nome_saida = create(ruta_video)
+        nome_saida = create(ruta_video, enable_diarization, hf_token)
         if not nome_saida:
             raise RuntimeError("create() devolveu cadea baleira")
     except Exception as e:
@@ -122,9 +126,15 @@ def procesar_letras_manuales():
     #Letra manual
     letra_manual = request.form.get("manual_lyrics", "").strip()
     if not letra_manual:
-        return "Falta o texto da letra.", 400    #Xerar karaoke forced alignment
+        return "Falta o texto da letra.", 400
+    
+    
+    enable_diarization = request.form.get("enable_diarization") == "true"      # o mesmo, parametros para diarization
+    hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
+    
+    #Xerar karaoke forced alignment
     try:
-        nome_saida = create_with_manual_lyrics(ruta_video, letra_manual, language="es")
+        nome_saida = create_with_manual_lyrics(ruta_video, letra_manual, language="es", enable_diarization=enable_diarization, hf_token=hf_token)
         if not nome_saida:
             raise RuntimeError("create_with_manual_lyrics devolveu cadea baleira")
     except Exception as e:
