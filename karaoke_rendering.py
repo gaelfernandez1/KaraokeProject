@@ -10,6 +10,18 @@ from config import (
 from text_processing import dic_pyphen
 
 
+# Función auxiliar para obter a cor dun speaker específico
+def get_speaker_color(word_info: dict, is_highlighted: bool = False) -> str:
+
+    if is_highlighted:
+        if word_info.get("speaker") and word_info.get("color"):
+            color = word_info["color"]
+            return color
+        else:
+            return COR_RESALTADO
+    else:
+        return COR_TEXTO  #blanco
+
 # Renderiza a imaxe la linea principal de texto. VARIAS MELLORAS:
 #Silabeador implementado --> chequear mais abaixo a info
 #
@@ -168,12 +180,31 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
             
             palabras_liña = liña.split()
             
+            # Mapear palabras visuales con palabras de datos para obter speaker info
+            total_palabras_visuales = sum(len(línea.split()) for línea in lineasAjustadas[:i])
+            
             for idx_palabra, palabra in enumerate(palabras_liña):
+                word_info = {}
+                palabra_index = total_palabras_visuales + idx_palabra
+                
+                if line_info.get("words") and palabra_index < len(line_info["words"]):
+                    word_info = line_info["words"][palabra_index]
+                
+                if not word_info.get("speaker") and line_info.get("words"):
+                    # Buscar nun rango máis amplo
+                    for offset in [-2, -1, 1, 2]:
+                        test_index = palabra_index + offset
+                        if 0 <= test_index < len(line_info["words"]):
+                            test_word = line_info["words"][test_index]
+                            if test_word.get("speaker"):
+                                word_info = test_word
+                                break
+                
                 silabas_palabra = dic_pyphen.inserted(palabra).split('-')
                 
                 if len(silabas_palabra) <= 1:
                     # se a palabra é non divisible -> renderizar completa
-                    cor = highlight_color if indice_silaba < silabas_para_resaltar else normal_color
+                    cor = get_speaker_color(word_info, indice_silaba < silabas_para_resaltar)
                     debuxar.text((x, y), palabra, font=fonte, fill=cor,
                              stroke_width=GROSOR_CONTORNO_TEXTO, stroke_fill=COR_CONTORNO_TEXTO)
                     ancho_palabra = fonte.getlength(palabra) if hasattr(fonte, 'getlength') else fonte.getsize(palabra)[0]
@@ -182,7 +213,7 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
                 else:
                     # se é divisible -> renderizase silaba por silaba
                     for idx_sil, sil in enumerate(silabas_palabra):
-                        cor = highlight_color if indice_silaba < silabas_para_resaltar else normal_color
+                        cor = get_speaker_color(word_info, indice_silaba < silabas_para_resaltar)
                         debuxar.text((x, y), sil, font=fonte, fill=cor,
                                  stroke_width=GROSOR_CONTORNO_TEXTO, stroke_fill=COR_CONTORNO_TEXTO)
                         ancho_sil = fonte.getlength(sil) if hasattr(fonte, 'getlength') else fonte.getsize(sil)[0]
@@ -218,8 +249,26 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
             ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]   
             x = (clip_width - ancho_liña) // 2
             
-            for palabra in palabras_liña:
-                cor = highlight_color if palabras_asignadas < palabras_para_resaltar else normal_color
+            # Calcular offset de palabras para esta línea
+            total_palabras_visuales = sum(len(línea.split()) for línea in lineasAjustadas[:i])
+            
+            for idx_palabra, palabra in enumerate(palabras_liña):
+                word_info = {}
+                palabra_index = total_palabras_visuales + idx_palabra
+                
+                if line_info.get("words") and palabra_index < len(line_info["words"]):
+                    word_info = line_info["words"][palabra_index]
+                
+                if not word_info.get("speaker") and line_info.get("words"):
+                    for offset in [-2, -1, 1, 2]:
+                        test_index = palabra_index + offset
+                        if 0 <= test_index < len(line_info["words"]):
+                            test_word = line_info["words"][test_index]
+                            if test_word.get("speaker"):
+                                word_info = test_word
+                                break
+                
+                cor = get_speaker_color(word_info, palabras_asignadas < palabras_para_resaltar)
                 
                 debuxar.text((x, y), palabra, font=fonte, fill=cor,
                          stroke_width=GROSOR_CONTORNO_TEXTO, stroke_fill=COR_CONTORNO_TEXTO)

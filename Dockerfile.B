@@ -43,8 +43,14 @@ RUN pip install --no-cache-dir \
     "numpy<2.0" \
     requests>=2.28.0
 
+# Instalar dependencias de speaker diarization
+RUN pip install --no-cache-dir \
+    pyannote.audio>=3.1.0 \
+    pyannote.core>=5.0.0
+
 COPY whisperx_service_api.py /KaraokeProject/
 COPY gpu_utils.py /KaraokeProject/
+COPY speaker_diarization.py /KaraokeProject/
 
 RUN mkdir -p /data
 

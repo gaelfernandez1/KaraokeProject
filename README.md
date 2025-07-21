@@ -48,6 +48,8 @@ docker-compose logs -f whisperx
 docker cp whisperx_container:/data/. "ruta a onde queiras copiar"    
 docker cp demucs_container:/KaraokeProject/output/. "ruta a onde queiras copiar"
 
+docker cp whisperx_container:/data/. "C:\Users\gaelb\Desktop\KaraokeProject\carpetaconsrt" 
+
 ### Limpar datos
 
 ```bash

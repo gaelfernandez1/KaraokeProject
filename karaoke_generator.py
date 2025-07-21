@@ -15,7 +15,8 @@ from utils import remove_previous_srt, clean_abnormal_segments, sanitize_filenam
 
 #Este é o create para a version automática. WhisperX transcribe él mismo, despois parsease o SRT en tokens
 #agrupanse en frases cada N palabras e despois renderizase o karaoke
-def create(video_path: str):
+
+def create(video_path: str, enable_diarization: bool = False, hf_token: str = None):
 
     remove_previous_srt()     ##Borro os srts anteriores por si acaso me daban conflicto ao ir probando a misma cancion repetidas veces
  
@@ -38,7 +39,7 @@ def create(video_path: str):
     if not ruta_voz or not ruta_musica:
         return ""    
     
-    call_whisperx_endpoint(ruta_voz)    #Transcribe whisperX el mismo
+    whisper_response = call_whisperx_endpoint(ruta_voz, enable_diarization, hf_token)
     archivoSRT = ruta_voz.replace(".wav", "_whisperx.srt")
     
     # Esperamos un pouco para que whisperx genere o archivo 
@@ -144,7 +145,7 @@ def create(video_path: str):
 
 
 # A outra variante, uso de FORCED ALIGNMENT
-def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es") -> str:
+def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es", enable_diarization: bool = False, hf_token: str = None) -> str:
 
     remove_previous_srt()
     letras_normalizadas = normalize_manual_lyrics(manual_lyrics)
@@ -169,8 +170,8 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language="es"
         print(" Falta ou vocals ou music")
         return ""    
     
-    # Endpoint pero da letra manual
-    call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, language)
+    # Endpoint pero da letra manual con parámetros de diarization
+    whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, language, enable_diarization, hf_token)
     archivoSRT = ruta_voz.replace(".wav","_whisperx.srt")
     
     

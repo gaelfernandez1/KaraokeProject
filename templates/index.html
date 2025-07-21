@@ -38,6 +38,35 @@
               <div class="file-info mt-2" style="display: none;"></div>
             </div>
             
+            
+            <div class="mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="enable_diarization" name="enable_diarization" value="true">
+                <label class="form-check-label" for="enable_diarization">
+                  <i class="fas fa-users"></i> Diferenciación de voces (Speaker Diarization)
+                </label>
+              </div>
+              <small class="form-text text-muted">
+                Detectar distintos cantantes e colorealos de forma diferente
+              </small>
+            </div>
+            
+            <div class="mb-3" id="hf_token_group" style="display: none;">
+              <label for="hf_token" class="form-label">
+                <i class="fab fa-github"></i> Token HuggingFace (requerido para diarization)
+              </label>
+              <input
+                type="password"
+                class="form-control"
+                id="hf_token"
+                name="hf_token"
+                placeholder="hf_..."
+              >
+              <small class="form-text text-muted">
+                Obtén o token en <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a>
+              </small>
+            </div>
+            
             <div class="text-center">
               <button type="submit" class="btn btn-primary"><i class="fas fa-play-circle"></i> Procesar Automáticamente</button>
             </div>
