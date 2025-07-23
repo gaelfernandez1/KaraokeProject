@@ -23,12 +23,20 @@ MARXE = 40
 TEXT_CLIP_WIDTH = ANCHO_VIDEO - 2 * MARXE  
 COR_FONDO_TEXTO = (0, 0, 0, 180)  
 PADDING_FONDO_TEXTO = 15  
-COR_LIÑA_SEGUINTE = "#BBBBBB"     #Gris claro 
+COR_LIÑA_SEGUINTE = "#BBBBBB"     
 ALPHA_LIÑA_SEGUINTE = 0.7           #Transparencia para línea siguiente
 ESPACIADO_LIÑAS = 20            #Creo que o vou disminuir porque creo que o problema da frase larga esta arreglado. PROBAR ESTO
 MARXE_INFERIOR_SUBTITULO = 150  #Aumentado para deixar espacio a línea siguiente. PROBAR TAMEN
 MOSTRAR_LIÑA_SEGUINTE = True  
-MODO_SILABICO = True  
+MODO_SILABICO = True
+
+# Configuración para suavizado do resaltado. Con esto a ultima palabra ou silaba tamen se resalta. Non en todos os casos, se e demasiado rapido fai coma antes. Considerar forzar mais os valores
+# Esta solucion creo que e un pouco forzada. CONSEIDERAR CAMBIO
+BUFFER_ANTICIPACION = 0.15  # Segundos antes do final para empezar última sílaba
+PESO_PROGRESO_TEMPORAL = 0.2  
+PESO_PROGRESO_SEGMENTO = 0.8  #estes dous teñen que sumar 1
+UMBRAL_ACELERACION = 0.85  # A partir de qué progreso acelerar o final 
+FACTOR_ACELERACION_MAX = 2.0  
 
 
 # Se imagemagick está instalado na localización estandar non lle di a moviepy onde esta, hai qye facer este codigo

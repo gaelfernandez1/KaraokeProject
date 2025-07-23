@@ -5,7 +5,8 @@ from config import (
     TEXT_CLIP_WIDTH, FONTE, TAMAÑO_FONTE, TAMAÑO_FONTE_MIN, COR_TEXTO, COR_RESALTADO,
     GROSOR_CONTORNO_TEXTO, COR_CONTORNO_TEXTO, COR_FONDO_TEXTO, PADDING_FONDO_TEXTO,
     COR_LIÑA_SEGUINTE, ALPHA_LIÑA_SEGUINTE, FACTOR_FONTE_LIÑA_SEGUINTE, ESPACIADO_LIÑAS,
-    MOSTRAR_LIÑA_SEGUINTE, MODO_SILABICO
+    MOSTRAR_LIÑA_SEGUINTE, MODO_SILABICO, BUFFER_ANTICIPACION, PESO_PROGRESO_TEMPORAL,
+    PESO_PROGRESO_SEGMENTO, UMBRAL_ACELERACION, FACTOR_ACELERACION_MAX
 )
 from text_processing import dic_pyphen
 
@@ -131,22 +132,32 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
             segmentos_pasados = 0
             bonus_progreso_segmento = 0.0
             
+            # Buffer para anticipar a última sílaba (para que a ultima palabra se resalte tamen)
+            buffer_anticipacion = BUFFER_ANTICIPACION
+            
             for i, seg in enumerate(line_info["words"]):
-                if tempoActual >= seg["end"]:
+                
+                tiempo_fin_efectivo = seg["end"]
+                if i == len(line_info["words"]) - 1:  
+                    tiempo_fin_efectivo = max(seg["start"] + 0.1, seg["end"] - buffer_anticipacion)
+                
+                if tempoActual >= tiempo_fin_efectivo:
                     segmentos_pasados += 1
                 elif tempoActual >= seg["start"]:
-
-                    #Estamos dentro deste segmento
-                    duracion_seg = seg["end"] - seg["start"]
+                    # Estamos dentro deste segmento
+                    duracion_seg = tiempo_fin_efectivo - seg["start"]
                     if duracion_seg > 0:
                         progreso_seg = (tempoActual - seg["start"]) / duracion_seg
+                        # Aplicar curva suave para o progreso
+                        progreso_seg = min(1.0, progreso_seg * 1.2)  # Acelerar lixeiramente o final
                         bonus_progreso_segmento = progreso_seg / len(line_info["words"])
                     break
             
             progreso_segmento = (segmentos_pasados / len(line_info["words"])) if line_info["words"] else 0.0
             progreso_final = min(1.0, progreso_segmento + bonus_progreso_segmento)
             
-            progreso_combinado = (progreso_temporal * 0.3) + (progreso_final * 0.7) 
+            #axustar pesos para dar mais importancia ao progreso por segmentos
+            progreso_combinado = (progreso_temporal * PESO_PROGRESO_TEMPORAL) + (progreso_final * PESO_PROGRESO_SEGMENTO) 
         else:
             progreso_combinado = 0.0
         
@@ -167,7 +178,14 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
         
         # Calculalse cantas silabas resaltar dependendo do progreso
         total_silabas = len(info_todas_silabas)
-        silabas_para_resaltar = int(progreso_combinado * total_silabas)
+        # Usar redondeo en lugar de truncameento para mellor precisión
+        silabas_para_resaltar = min(total_silabas, round(progreso_combinado * total_silabas))
+        
+        
+        if progreso_combinado > UMBRAL_ACELERACION:
+            factor_progreso = (progreso_combinado - UMBRAL_ACELERACION) / (1.0 - UMBRAL_ACELERACION)
+            factor_aceleracion = 1 + factor_progreso * (FACTOR_ACELERACION_MAX - 1)
+            silabas_para_resaltar = min(total_silabas, int(progreso_combinado * total_silabas * factor_aceleracion))
         
         
         indice_silaba = 0
