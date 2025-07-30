@@ -271,3 +271,45 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         return ""
     print(f"Final => {nombreArchivo}")
     return nombreArchivo
+
+
+def generate_instrumental(video_path: str) -> str:
+
+    
+    try:
+        video_path = normalize_video(video_path)
+    except Exception as erro_normalizacion:      
+        print(f"Error na normalización: {erro_normalizacion}, continuando co video orixinal")
+    
+    ruta_audio = video_to_mp3(video_path)
+    if not ruta_audio:
+        return ""
+    
+    ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
+    if not ruta_musica:
+        print("Error separando a instrumental ")
+        return ""
+    
+    nome_video_base = os.path.basename(video_path).replace("_normalized", "")
+    nome_video_seguro = sanitize_filename(nome_video_base)
+    nome_saida = f"instrumental_{nome_video_seguro.replace('.mp4', '.wav')}"
+    
+    if not os.path.exists("./output"):
+        os.makedirs("./output")
+    
+    ruta_saida = os.path.join("./output", nome_saida)
+    
+    try:
+        import shutil
+        shutil.copy2(ruta_musica, ruta_saida)
+        
+        if os.path.exists(ruta_saida) and os.path.getsize(ruta_saida) > 0:
+            print(f"Instrumental xerada. {ruta_saida}")
+        else:
+            return ""
+            
+    except Exception as error_copia:
+        return ""
+    
+    print(f"Feito! {nome_saida}")
+    return nome_saida
