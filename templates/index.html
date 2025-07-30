@@ -96,6 +96,60 @@
     </div>
   </div>
 
+  </div>
+
+  
+  <div class="row mt-4">
+    <div class="col-lg-8 mx-auto">
+      <div class="feature-card">
+        <div class="card-header">
+          <h2><i class="fas fa-music"></i> Obtén a Instrumental</h2>
+        </div>
+        <div class="card-body">
+          <p>Extrae únicamente a parte instrumental dunha canción</p>
+          
+          <form action="/generate_instrumental" method="post" enctype="multipart/form-data">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="youtube_url_instrumental" class="form-label"><i class="fab fa-youtube"></i> URL de YouTube</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="youtube_url_instrumental"
+                    name="youtube_url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="video_file_instrumental" class="form-label"><i class="fas fa-file-video"></i> Subir vídeo MP4</label>
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="video_file_instrumental"
+                    name="video_file"
+                    accept=".mp4"
+                  >
+                </div>
+              </div>
+            </div>
+            
+            <p class="text-center my-2 text-muted">Escolle unha opción (URL ou arquivo)</p>
+            
+            <div class="text-center">
+              <button type="submit" class="btn btn-success"><i class="fas fa-download"></i> Xerar Instrumental</button>
+              <small class="form-text text-muted d-block mt-2">
+                Descargarase un arquivo WAV coa parte instrumental da canción
+              </small>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="divider">  </div>
 
 {% endblock %}

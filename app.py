@@ -3,7 +3,7 @@ import yt_dlp
 from flask import Flask, request, send_file, render_template
 from werkzeug.utils import secure_filename
 
-from karaoke_generator import create, create_with_manual_lyrics
+from karaoke_generator import create, create_with_manual_lyrics, generate_instrumental
 from gpu_utils import print_system_summary
 
 app = Flask(__name__)
@@ -17,6 +17,7 @@ os.makedirs(DIRECTORIO_ENTRADA, exist_ok=True)
 os.makedirs(DIRECTORIO_SAIDA, exist_ok=True)
 
 EXTENSIONES_PERMITIDAS = {"mp4"}
+EXTENSIONES_AUDIO_PERMITIDAS = {"wav", "mp3"}
 
 
 # PAra comprobar si o archivo ten unha extension permitida
@@ -162,6 +163,53 @@ def procesar_letras_manuales():
         return response
     except Exception as e:
         return f"Erro enviando arquivo: {e}", 500
+
+
+@app.route("/generate_instrumental", methods=["POST"])
+def xerar_instrumental():
+   
+    
+    ruta_video = None
+    arquivo_subido = request.files.get("video_file")
+    if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
+        nome_ficheiro = secure_filename(arquivo_subido.filename)
+        ruta_video = os.path.join(DIRECTORIO_ENTRADA, nome_ficheiro)
+        arquivo_subido.save(ruta_video)
+    else:
+        url_youtube = request.form.get("youtube_url", "").strip()
+        if not url_youtube:
+            return "Tes que mandar ou un mp4 ou un link de YouTube", 400
+        try:
+            ruta_video = descargar_video_youtube(url_youtube)
+        except Exception as e:
+            return f"Erro descargando vídeo: {e}", 500
+    
+    try:
+        nome_saida = generate_instrumental(ruta_video)
+        if not nome_saida:
+            raise RuntimeError("generate_instrumental() devolveu cadea baleira")
+    except Exception as e:
+        return f"Erro xerando instrumental: {e}", 500
+    
+    ruta_saida = os.path.join(DIRECTORIO_SAIDA, nome_saida)
+    if not os.path.exists(ruta_saida):
+        #Debug: buscar arquivos parecidos
+        import glob
+        arquivos_similares = glob.glob(os.path.join(DIRECTORIO_SAIDA, "instrumental_*"))
+        app.logger.info(f"Archivos similares atopados: {arquivos_similares}")
+        return "Non se atopou o arquivo de saída", 500
+
+    tamano_ficheiro = os.path.getsize(ruta_saida)
+    nome_descarga_seguro = secure_filename(nome_saida)
+
+    try:
+        response = send_file(ruta_saida, as_attachment=True, download_name=nome_descarga_seguro)
+          #Headers especificos para audio wav
+        response.headers["Content-Type"] = "audio/wav"
+        response.headers["Content-Length"] = str(tamano_ficheiro)
+        return response
+    except Exception as e:
+        return f"Erro enviando archivo: {e}", 500
 
 
 if __name__ == "__main__":
