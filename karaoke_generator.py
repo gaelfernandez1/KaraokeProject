@@ -138,7 +138,24 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         print(f" error de escritura de video => {errorEscritura}")
         print(f" Traceback completo: {traceback.format_exc()}")
         return ""
-    print(f" Terminado => {nome_saida}")
+    
+    #Aqui gardo os archivos separados para o tema do reprodutor web
+    try:
+        video_sin_audio = video_escurecido
+        ruta_video_silencioso = ruta_saida.replace(".mp4", "_video_only.mp4")
+        video_sin_audio.write_videofile(ruta_video_silencioso, fps=30, threads=4, audio=False)
+        
+        nome_sin_extension = nome_video_seguro.replace('.mp4', '')
+        ruta_vocal_output = os.path.join("./output", f"vocal_{nome_sin_extension}.wav")
+        ruta_instrumental_output = os.path.join("./output", f"instrumental_{nome_sin_extension}.wav")
+        
+        import shutil
+        shutil.copy2(ruta_voz, ruta_vocal_output)
+        shutil.copy2(ruta_musica, ruta_instrumental_output)
+        
+    except Exception as e:
+        print(f"Erro cos archivos separados: {e}")
+    
     return nome_saida
 
 
@@ -269,7 +286,24 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         # O mismo que no automatico, mostramos mais info do error debido a varios problemas
         print(f"Traceback completo: {traceback.format_exc()}")
         return ""
-    print(f"Final => {nombreArchivo}")
+    
+    #Aqui gardo os archivos separados para o tema do reprodutor web
+    try:
+        video_sin_audio = video_escurecido
+        ruta_video_silencioso = ruta_saida.replace(".mp4", "_video_only.mp4")
+        video_sin_audio.write_videofile(ruta_video_silencioso, fps=30, threads=4, audio=False)
+        
+        nome_sin_extension = nome_video_seguro.replace('.mp4', '')
+        ruta_vocal_output = os.path.join("./output", f"vocal_{nome_sin_extension}.wav")
+        ruta_instrumental_output = os.path.join("./output", f"instrumental_{nome_sin_extension}.wav")
+        
+        import shutil
+        shutil.copy2(ruta_voz, ruta_vocal_output)
+        shutil.copy2(ruta_musica, ruta_instrumental_output)
+        
+    except Exception as e:
+        print(f"Error cos arquivos separados: {e}")
+    
     return nombreArchivo
 
 

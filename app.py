@@ -1,6 +1,6 @@
 import os
 import yt_dlp
-from flask import Flask, request, send_file, render_template
+from flask import Flask, request, send_file, render_template, redirect, url_for
 from werkzeug.utils import secure_filename
 
 from karaoke_generator import create, create_with_manual_lyrics, generate_instrumental
@@ -86,14 +86,8 @@ def xerar_karaoke():
     
     nome_descarga_seguro = secure_filename(nome_saida)
 
-    try:
-        response = send_file(ruta_saida, as_attachment=True, download_name=nome_descarga_seguro)
-        #Esto son headers a mayores para mellorar a compatibilidad
-        response.headers["Content-Type"] = "video/mp4"
-        response.headers["Content-Length"] = str(tamano_ficheiro)
-        return response
-    except Exception as e:
-        return f"Erro enviando archiivo: {e}", 500
+    # Redirigir al reproductor en lugar de descargar directamente
+    return redirect(url_for('reproductor_karaoke', filename=nome_saida))
 
 
 @app.route("/manual_lyrics_form", methods=["GET"])
@@ -155,14 +149,8 @@ def procesar_letras_manuales():
     
     nome_descarga_seguro = secure_filename(nome_saida)
 
-    try:
-        response = send_file(ruta_saida, as_attachment=True, download_name=nome_descarga_seguro)
-        
-        response.headers["Content-Type"] = "video/mp4"
-        response.headers["Content-Length"] = str(tamano_ficheiro)
-        return response
-    except Exception as e:
-        return f"Erro enviando arquivo: {e}", 500
+    # Redirigir al reproductor en lugar de descargar directamente
+    return redirect(url_for('reproductor_karaoke', filename=nome_saida))
 
 
 @app.route("/generate_instrumental", methods=["POST"])
@@ -210,6 +198,71 @@ def xerar_instrumental():
         return response
     except Exception as e:
         return f"Erro enviando archivo: {e}", 500
+
+
+
+# Páxina do reprodutor web
+@app.route("/player/<filename>")
+def reproductor_karaoke(filename):
+
+    ruta_video = os.path.join(DIRECTORIO_SAIDA, filename)
+    if not os.path.exists(ruta_video):
+        return "Arquivo non encontrado", 404
+    
+    if filename.startswith("karaoke_manual_"):
+        nome_base = filename.replace("karaoke_manual_", "").replace(".mp4", "")
+    elif filename.startswith("karaoke_"):
+        nome_base = filename.replace("karaoke_", "").replace(".mp4", "")
+    else:
+        nome_base = filename.replace(".mp4", "")
+    
+    return render_template("player.html", 
+                         video_filename=filename,
+                         base_name=nome_base)
+
+
+@app.route("/serve_video/<filename>")
+def servir_video(filename):
+
+    ruta_archivo = os.path.join(DIRECTORIO_SAIDA, filename)
+    if not os.path.exists(ruta_archivo):
+        return "Archivo non encontrado", 404
+    
+    return send_file(ruta_archivo, mimetype='video/mp4')
+
+
+@app.route("/serve_audio/<filename>")
+def servir_audio(filename):
+
+    ruta_archivo = os.path.join(DIRECTORIO_SAIDA, filename)
+    if not os.path.exists(ruta_archivo):
+        return "Arquivo non encontrado", 404
+    
+    return send_file(ruta_archivo, mimetype='audio/wav')
+
+
+@app.route("/download/<filename>")
+def descargar_archivo(filename):
+
+    ruta_arquivo = os.path.join(DIRECTORIO_SAIDA, filename)
+    if not os.path.exists(ruta_arquivo):
+        return "Arquivo non encontrado", 404
+    
+    tamano_ficheiro = os.path.getsize(ruta_arquivo)
+    nome_descarga_seguro = secure_filename(filename)
+    
+    try:
+        response = send_file(ruta_arquivo, as_attachment=True, download_name=nome_descarga_seguro)
+        
+        if filename.endswith('.mp4'):
+            response.headers["Content-Type"] = "video/mp4"
+        elif filename.endswith('.wav'):
+            response.headers["Content-Type"] = "audio/wav"
+        
+        response.headers["Content-Length"] = str(tamano_ficheiro)
+        return response
+    except Exception as e:
+        return f"Errro enviando archivo: {e}", 500
 
 
 if __name__ == "__main__":

@@ -30,56 +30,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            showLoading('Procesando a solicitude...');
-            
-            //convertir a AJAX se é un dos formularios de karaoke
             const isKaraokeForm = form.getAttribute('action') === '/generate' || 
                                  form.getAttribute('action') === '/process_manual_lyrics';
             
             if (isKaraokeForm) {
-                event.preventDefault();
+                showLoading('Procesando o karaoke...');
                 
-                const formData = new FormData(form);     //esto recolle os datos do formulario
+                //deshabilitar o botón de submit para evitar varios envíos
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                }
                 
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(text || 'Error no procesamento');
-                        });
-                    }
-                    
-                    const contentDisposition = response.headers.get('content-disposition');
-                    let filename = 'karaoke.mp4';
-                    if (contentDisposition) {
-                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-                        if (filenameMatch && filenameMatch[1]) {
-                            filename = filenameMatch[1].replace(/['"]/g, '');
-                        }
-                    }
-                    
-                    return response.blob().then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                        hideLoading();
-                        showAlert('O karaoke xerouse correctamente', 'success');
-                    });
-                })
-                .catch(error => {
-                    hideLoading();
-                    console.error('Erro:', error);
-                    showAlert(error.message || 'Erro durante o procesamento');
-                });
+                return;
             }
+            
+            showLoading('Procesando a solicitude...');
         });
     });
     
