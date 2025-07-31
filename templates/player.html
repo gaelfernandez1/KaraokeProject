@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="page-header text-center">
+    <h1>Reproductor de Karaoke</h1>
+    <p class="lead"> Controla o volume das voces</p>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="player-container">
+        <!-- Reprodutor de video -->
+        <div class="video-container mb-3">
+          <video id="karaokeVideo" class="video-player" controls preload="metadata">
+            <source src="{{ url_for('servir_video', filename=video_filename) }}" type="video/mp4">
+            O teu navegador non soporta o reproductor de video.
+          </video>
+        </div>
+
+        <!-- controles de audio para subir e baixar ao cantante -->
+        <div class="audio-controls-panel">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="control-group">
+                <label for="vocalVolume" class="control-label">
+                  <i class="fas fa-microphone"></i> Volume Vocal
+                </label>
+                <div class="volume-control">
+                  <input type="range" id="vocalVolume" class="volume-slider" 
+                         min="0" max="100" value="5" step="1">
+                  <span id="vocalVolumeValue" class="volume-value">5%</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="control-group">
+                <label for="instrumentalVolume" class="control-label">
+                  <i class="fas fa-music"></i> Volume Instrumental
+                </label>
+                <div class="volume-control">
+                  <input type="range" id="instrumentalVolume" class="volume-slider" 
+                         min="0" max="100" value="100" step="1">
+                  <span id="instrumentalVolumeValue" class="volume-value">100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="playback-controls mt-3">
+            <button id="playPauseBtn" class="btn btn-primary btn-lg">
+              <i class="fas fa-play" id="playPauseIcon"></i> Reproducir
+            </button>
+          </div>
+        </div>
+
+        <div class="download-section mt-4">
+          <h5><i class="fas fa-download"></i> Descargas Dispoñibles</h5>
+          <div class="btn-group" role="group">
+            <a href="{{ url_for('descargar_archivo', filename=video_filename) }}" 
+               class="btn btn-outline-primary">
+              <i class="fas fa-video"></i> Karaoke Completo
+            </a>
+            <a href="{{ url_for('descargar_archivo', filename=base_name + '_video_only.mp4') }}" 
+               class="btn btn-outline-secondary">
+              <i class="fas fa-film"></i> Video Sen Audio
+            </a>
+            <a href="{{ url_for('descargar_archivo', filename='vocal_' + base_name + '.wav') }}" 
+               class="btn btn-outline-info">
+              <i class="fas fa-microphone"></i> Vocal
+            </a>
+            <a href="{{ url_for('descargar_archivo', filename='instrumental_' + base_name + '.wav') }}" 
+               class="btn btn-outline-success">
+              <i class="fas fa-music"></i> Instrumental
+            </a>
+          </div>
+        </div>
+
+        <audio id="vocalAudio" preload="metadata" style="display: none;">
+          <source src="{{ url_for('servir_audio', filename='vocal_' + base_name + '.wav') }}" type="audio/wav">
+        </audio>
+        <audio id="instrumentalAudio" preload="metadata" style="display: none;">
+          <source src="{{ url_for('servir_audio', filename='instrumental_' + base_name + '.wav') }}" type="audio/wav">
+        </audio>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="{{ url_for('inicio') }}" class="btn btn-outline-dark">
+      <i class="fas fa-home"></i> Volver ao Inicio
+    </a>
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
+<script>
+// Ocultar loading cando se carga o reproductor
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const loadingElement = document.getElementById('loading');
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+    
+    const submitBtns = document.querySelectorAll('button[type="submit"]');
+    submitBtns.forEach(btn => {
+        btn.disabled = false;
+        if (btn.innerHTML.includes('Procesando')) {
+            if (btn.closest('form').action.includes('manual')) {
+                btn.innerHTML = '<i class="fas fa-play-circle"></i> Procesar Letra Manual';
+            } else if (btn.closest('form').action.includes('generate')) {
+                btn.innerHTML = '<i class="fas fa-play-circle"></i> Procesar Automáticamente';
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
