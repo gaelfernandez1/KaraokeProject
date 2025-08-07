@@ -488,6 +488,56 @@ textarea.form-control {
 }
 
 
+/* para a biblioteca  */
+
+
+.card .btn-group .dropdown-menu {
+  position: absolute !important;
+  z-index: 1050 !important;
+  min-width: 200px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.375rem;
+}
+
+
+.card {
+  position: relative;
+  overflow: visible !important;
+}
+
+.card .btn-group {
+  position: static;
+}
+
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(124, 77, 255, 0.1);
+  color: var(--primary);
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+.dropdown-item i {
+  width: 16px;
+  margin-right: 0.5rem;
+}
+
+
+.feature-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
 @media (max-width: 768px) {
   .page-header {
     padding: 2rem 1rem;
@@ -499,5 +549,12 @@ textarea.form-control {
   
   .feature-card .card-header h2 {
     font-size: 1.3rem;
+  }
+  
+  /* movil para un futuro? */
+  .card .btn-group .dropdown-menu {
+    min-width: 180px;
+    left: auto !important;
+    right: 0 !important;
   }
 }
