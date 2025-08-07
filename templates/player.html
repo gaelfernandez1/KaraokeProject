@@ -85,7 +85,7 @@
   </div>
 
   <div class="text-center mt-4">
-    <a href="{{ url_for('inicio') }}" class="btn btn-outline-dark">
+    <a href="{{ url_for('inicio') }}" class="btn btn-outline-dark" id="backToHomeBtn">
       <i class="fas fa-home"></i> Volver ao Inicio
     </a>
   </div>
@@ -114,6 +114,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    
+    // manejar o da confirmacion
+    function setupNavigationConfirmation() {
+        const navigationLinks = document.querySelectorAll('a[href]:not([href^="#"]):not([href^="javascript:"]):not([download])');
+        
+        navigationLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (window.karaokePlayer && window.karaokePlayer.hasStartedPlaying && window.karaokePlayer.isPlaying) {
+                    e.preventDefault();
+                    
+                    const userConfirmed = confirm('Estás reproducindo unha canción. Seguro que ques saír? A reprodución vaise cancelar.');
+                    
+                    if (userConfirmed) {
+                        window.karaokePlayer.stopPlayback();
+                        window.location.href = this.href;
+                    }
+                }
+            });
+        });
+    }
+    
+    setTimeout(() => {
+        setupNavigationConfirmation();
+    }, 1000);
 });
 </script>
 {% endblock %}

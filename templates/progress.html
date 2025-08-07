@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header text-center">
+    <h1><i class="fas fa-cogs"></i> Procesando canción</h1>
+    <p class="lead">Agarda mentres se crea o teu karaoke...</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body text-center">
+                
+                <div class="mb-4">
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            0%
+                        </div>
+                    </div>
+                    
+                    <h5 id="statusText" class="text-muted">
+                        <i class="fas fa-spinner fa-spin"></i> Iniciando...
+                    </h5>
+                </div>
+
+                <div class="alert alert-info mb-4" id="taskInfo">
+                    <strong><i class="fas fa-info-circle"></i> ID da Tarea:</strong> 
+                    <code id="taskId">{{ task_id }}</code>
+                </div>
+
+                <div class="mb-3" id="actionButtons">
+                    <button id="cancelBtn" class="btn btn-danger" onclick="cancelarProcesamiento()">
+                        <i class="fas fa-stop"></i> Cancelar procesamento
+                    </button>
+                    
+                    <a id="downloadBtn" href="#" class="btn btn-success" style="display: none;">
+                        <i class="fas fa-download"></i> Ir ó Resultado
+                    </a>
+                    
+                    <a id="backBtn" href="{{ url_for('inicio') }}" class="btn btn-secondary" style="display: none;">
+                        <i class="fas fa-home"></i> Volver ao Inicio
+                    </a>
+                </div>
+
+                <div id="errorAlert" class="alert alert-danger" style="display: none;">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Erro no procesamento</h6>
+                    <p id="errorMessage"></p>
+                </div>
+
+                <div id="cancelAlert" class="alert alert-warning" style="display: none;">
+                    <h6><i class="fas fa-ban"></i> Procesamento cancelado</h6>
+                    <p>O procesamiento foi cancelado. Tódolos arquivos parciais foron eliminados.</p>
+                </div>
+
+                <div class="mt-4">
+                    <details>
+                        <summary class="text-muted">
+                            <i class="fas fa-info-circle"></i> Info
+                        </summary>
+                        <div class="mt-2 text-start">
+                            <ol class="text-muted">
+                                <li><strong>Normalización do video:</strong> Asegurando formato compatible</li>
+                                <li><strong>Extracción de audio:</strong> Convertindo video a audio</li>
+                                <li><strong>Separación de fontes:</strong> Separando voces e instrumental con demucs</li>
+                                <li><strong>Transcripción/Alineación:</strong> Sincronizando letra co audio con WhisperX</li>
+                                <li><strong>Renderizado final:</strong> Creando o video final con subtítulos</li>
+                            </ol>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const taskId = '{{ task_id }}';
+let pollInterval;
+let isCancelled = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    startPolling();
+});
+
+function startPolling() {
+    checkTaskStatus();
+    
+    pollInterval = setInterval(checkTaskStatus, 2000);
+}
+
+function stopPolling() {
+    if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+    }
+}
+
+function checkTaskStatus() {
+    if (isCancelled) {
+        return;
+    }
+
+    fetch(`/api/task_status/${taskId}`)
+        .then(response => response.json())
+        .then(data => {
+            updateUI(data);
+        })
+        .catch(error => {
+            console.error('Error checking task status:', error);
+            showError('Erro comprobando estado da tarea: ' + error.message);
+        });
+}
+
+function updateUI(data) {
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const backBtn = document.getElementById('backBtn');
+    const errorAlert = document.getElementById('errorAlert');
+    const cancelAlert = document.getElementById('cancelAlert');
+    const errorMessage = document.getElementById('errorMessage');
+
+    errorAlert.style.display = 'none';
+    cancelAlert.style.display = 'none';
+
+    switch(data.state) {
+        case 'PENDING':
+            progressBar.style.width = '10%';
+            progressBar.textContent = '10%';
+            statusText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + data.status;
+            break;
+            
+        case 'PROGRESS':
+            const current = data.current || 0;
+            const total = data.total || 100;
+            const percentage = Math.round((current / total) * 100);
+            
+            progressBar.style.width = percentage + '%';
+            progressBar.textContent = percentage + '%';
+            statusText.innerHTML = '<i class="fas fa-cogs fa-spin"></i> ' + data.status;
+            break;
+            
+        case 'SUCCESS':
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
+            progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+            progressBar.classList.add('bg-success');
+            
+            statusText.innerHTML = '<i class="fas fa-check-circle text-success"></i> ' + data.status;
+            
+            downloadBtn.href = `/api/download_result/${taskId}`;
+            downloadBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'none';
+            backBtn.style.display = 'inline-block';
+            
+            stopPolling();
+            break;
+            
+        case 'FAILURE':
+            progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+            progressBar.classList.add('bg-danger');
+            statusText.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Erro en procesamento';
+            
+            errorAlert.style.display = 'block';
+            errorMessage.textContent = data.error || 'Erro descoñecido';
+            
+            cancelBtn.style.display = 'none';
+            backBtn.style.display = 'inline-block';
+            
+            stopPolling();
+            break;
+            
+        case 'REVOKED':
+            progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+            progressBar.classList.add('bg-warning');
+            statusText.innerHTML = '<i class="fas fa-ban text-warning"></i> Procesamento cancelado';
+
+            cancelAlert.style.display = 'block';
+            
+            cancelBtn.style.display = 'none';
+            backBtn.style.display = 'inline-block';
+            
+            stopPolling();
+            break;
+            
+        default:
+            statusText.innerHTML = '<i class="fas fa-question-circle"></i> ' + data.status;
+            break;
+    }
+}
+
+function cancelarProcesamiento() {
+    if (confirm('Estás seguro de que ques cancelar o procesamento? Tódolos arquivos parciais serán eliminados.')) {
+        isCancelled = true;
+        
+        const cancelBtn = document.getElementById('cancelBtn');
+        const originalText = cancelBtn.innerHTML;
+        cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cancelando...';
+        cancelBtn.disabled = true;
+        
+        fetch(`/api/cancel_task/${taskId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const progressBar = document.getElementById('progressBar');
+                const statusText = document.getElementById('statusText');
+                const cancelAlert = document.getElementById('cancelAlert');
+                const backBtn = document.getElementById('backBtn');
+                
+                progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+                progressBar.classList.add('bg-warning');
+                statusText.innerHTML = '<i class="fas fa-ban text-warning"></i> Procesamento cancelado';
+                
+                cancelAlert.style.display = 'block';
+                cancelBtn.style.display = 'none';
+                backBtn.style.display = 'inline-block';
+                
+                stopPolling();
+            } else {
+                throw new Error(data.message || 'Erro cancelando tarefa');
+            }
+        })
+        .catch(error => {
+            console.error('Erro cancelando tarefa:', error);
+            cancelBtn.innerHTML = originalText;
+            cancelBtn.disabled = false;
+            isCancelled = false;
+            alert('Erro cancelando procesamento: ' + error.message);
+        });
+    }
+}
+
+function showError(message) {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
+    const statusText = document.getElementById('statusText');
+    
+    errorAlert.style.display = 'block';
+    errorMessage.textContent = message;
+    statusText.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Error d comunicacion';
+    
+    stopPolling();
+}
+
+window.addEventListener('beforeunload', function(e) {
+    if (!isCancelled && pollInterval) {
+        e.preventDefault();
+        e.returnValue = 'Hai un procesamento en curso. ';
+        return e.returnValue;
+    }
+});
+</script>
+
+{% endblock %}

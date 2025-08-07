@@ -1,15 +1,23 @@
 import os
 import yt_dlp
-from flask import Flask, request, send_file, render_template, redirect, url_for
+import json
+from flask import Flask, request, send_file, render_template, redirect, url_for, jsonify, session
 from werkzeug.utils import secure_filename
 
 from karaoke_generator import create, create_with_manual_lyrics, generate_instrumental
 from gpu_utils import print_system_summary
+from database import init_database
+
+#meter celery no proyecto
+from celery_app import celery
+from celery_tasks import process_automatic_karaoke, process_manual_lyrics_karaoke, process_instrumental_only
 
 app = Flask(__name__)
+app.secret_key = 'karaoke_secret_key_change_in_production'
 
 
 print_system_summary()
+init_database()
 
 DIRECTORIO_ENTRADA = "input"
 DIRECTORIO_SAIDA = "output"
@@ -44,11 +52,9 @@ def descargar_video_youtube(url: str, directorio_saida: str = DIRECTORIO_ENTRADA
 def inicio():
     return render_template("index.html")
 
-#Esta é para generar un Karaoke automático. Chama a create() e devolve un mp4. Hai varios try except debido a sucesivos errores que foron aparecendo
+#asincronia
 @app.route("/generate", methods=["POST"])
 def xerar_karaoke():
-
-    # Si se lle pasa un MP4:
     ruta_video = None
     arquivo_subido = request.files.get("video_file")
     if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
@@ -56,38 +62,28 @@ def xerar_karaoke():
         ruta_video = os.path.join(DIRECTORIO_ENTRADA, nome_ficheiro)
         arquivo_subido.save(ruta_video)
     else:
-        #especie de Fallback a  unha url de YT
         url_youtube = request.form.get("youtube_url", "").strip()
         if not url_youtube:
             return "Debes mandar ou un mp4 ou un link de Youtube", 400
         try:
             ruta_video = descargar_video_youtube(url_youtube)
         except Exception as e:
-            return f"Error descargando vídeo: {e}", 500                   #Chamada ao xerador
+            return f"Error descargando vídeo: {e}", 500
     
-    enable_diarization = request.form.get("enable_diarization") == "true"     #obter os parametros para diarizaation
+    enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
     
-    try:
-        nome_saida = create(ruta_video, enable_diarization, hf_token)
-        if not nome_saida:
-            raise RuntimeError("create() devolveu cadea baleira")
-    except Exception as e:
-        return f"Error generando karaoke: {e}", 500               #envío do resultado
-    ruta_saida = os.path.join(DIRECTORIO_SAIDA, nome_saida)
-    if not os.path.exists(ruta_saida):
-        #debug: buscar archivos parecidos para debug
-        import glob
-        arquivos_similares = glob.glob(os.path.join(DIRECTORIO_SAIDA, "karaoke_*"))
-        app.logger.info(f" Archivos similares encontrados: {arquivos_similares}")
-        return "Non se atopou o arquivo de saída", 500
-
-    tamano_ficheiro = os.path.getsize(ruta_saida)
+    source_type = "upload" if arquivo_subido else "youtube"
+    source_url = url_youtube if not arquivo_subido else None
     
-    nome_descarga_seguro = secure_filename(nome_saida)
-
-    # Redirigir al reproductor en lugar de descargar directamente
-    return redirect(url_for('reproductor_karaoke', filename=nome_saida))
+    task = process_automatic_karaoke.delay(
+        ruta_video, enable_diarization, hf_token, source_type, source_url, True
+    )
+    
+    session['current_task_id'] = task.id
+    session['task_type'] = 'automatic'
+    
+    return redirect(url_for('mostrar_progreso', task_id=task.id))
 
 
 @app.route("/manual_lyrics_form", methods=["GET"])
@@ -97,12 +93,6 @@ def formulario_letras_manuales():
 
 @app.route("/process_manual_lyrics", methods=["POST"])
 def procesar_letras_manuales():
-    """
-    Esto genera o karaoke con letra manual (forced alignment):
-      - Acepta subida de MP4 ou URL de YouTube
-      - Lee o textarea 'manual_lyrics' e chama a create_with_manual_lyrics(video_path, lyrics, lang)
-    """
-    #Pasaslle un mp4 ou un link de yt, igual que antes
     ruta_video = None
     arquivo_subido = request.files.get("video_file")
     if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
@@ -116,47 +106,31 @@ def procesar_letras_manuales():
         try:
             ruta_video = descargar_video_youtube(url_youtube)
         except Exception as e:
-            return f"Error descargando vídeo: {e}", 500
+            return f"Erro descargando vídeo: {e}", 500
 
-    #Letra manual
     letra_manual = request.form.get("manual_lyrics", "").strip()
     if not letra_manual:
         return "Falta o texto da letra.", 400
     
-    
-    enable_diarization = request.form.get("enable_diarization") == "true"      # o mesmo, parametros para diarization
+    enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
     
-    #Xerar karaoke forced alignment
-    try:
-        nome_saida = create_with_manual_lyrics(ruta_video, letra_manual, language=None, enable_diarization=enable_diarization, hf_token=hf_token)
-        if not nome_saida:
-            raise RuntimeError("create_with_manual_lyrics devolveu cadea baleira")
-    except Exception as e:
-        return f"Erro xerando karaoke con letra manual: {e}", 500  #Enviamos o resultado
-    ruta_saida = os.path.join(DIRECTORIO_SAIDA, nome_saida)
-    if not os.path.exists(ruta_saida):
-        app.logger.error(f"[process_manual_lyrics] Non existe saída: {ruta_saida}")
-
-        #archivos similares para debug
-        import glob
-        arquivos_similares = glob.glob(os.path.join(DIRECTORIO_SAIDA, "karaoke_manual_*"))
-        app.logger.info(f"[process_manual_lyrics] Arquivos similares encontrados: {arquivos_similares}")
-        return "Non se atopou o archivo de salida", 500
-
+    source_type = "upload" if arquivo_subido else "youtube"
+    source_url = url_youtube if not arquivo_subido else None
     
-    tamano_ficheiro = os.path.getsize(ruta_saida)
+    task = process_manual_lyrics_karaoke.delay(
+        ruta_video, letra_manual, None, enable_diarization, hf_token, 
+        source_type, source_url, True
+    )
     
-    nome_descarga_seguro = secure_filename(nome_saida)
-
-    # Redirigir al reproductor en lugar de descargar directamente
-    return redirect(url_for('reproductor_karaoke', filename=nome_saida))
+    session['current_task_id'] = task.id
+    session['task_type'] = 'manual_lyrics'
+    
+    return redirect(url_for('mostrar_progreso', task_id=task.id))
 
 
 @app.route("/generate_instrumental", methods=["POST"])
 def xerar_instrumental():
-   
-    
     ruta_video = None
     arquivo_subido = request.files.get("video_file")
     if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
@@ -172,36 +146,135 @@ def xerar_instrumental():
         except Exception as e:
             return f"Erro descargando vídeo: {e}", 500
     
-    try:
-        nome_saida = generate_instrumental(ruta_video)
-        if not nome_saida:
-            raise RuntimeError("generate_instrumental() devolveu cadea baleira")
-    except Exception as e:
-        return f"Erro xerando instrumental: {e}", 500
+    task = process_instrumental_only.delay(ruta_video)
     
-    ruta_saida = os.path.join(DIRECTORIO_SAIDA, nome_saida)
-    if not os.path.exists(ruta_saida):
-        #Debug: buscar arquivos parecidos
-        import glob
-        arquivos_similares = glob.glob(os.path.join(DIRECTORIO_SAIDA, "instrumental_*"))
-        app.logger.info(f"Archivos similares atopados: {arquivos_similares}")
-        return "Non se atopou o arquivo de saída", 500
+    session['current_task_id'] = task.id
+    session['task_type'] = 'instrumental'
+    
+    return redirect(url_for('mostrar_progreso', task_id=task.id))
 
-    tamano_ficheiro = os.path.getsize(ruta_saida)
-    nome_descarga_seguro = secure_filename(nome_saida)
 
+#hai q meter novos endpoints para as tareas asincronas
+
+@app.route("/progress/<task_id>")
+def mostrar_progreso(task_id):
+    return render_template("progress.html", task_id=task_id)
+
+@app.route("/api/task_status/<task_id>")
+def estado_tarea(task_id):
     try:
-        response = send_file(ruta_saida, as_attachment=True, download_name=nome_descarga_seguro)
-          #Headers especificos para audio wav
-        response.headers["Content-Type"] = "audio/wav"
-        response.headers["Content-Length"] = str(tamano_ficheiro)
-        return response
+        task_result = celery.AsyncResult(task_id)
+        
+        if task_result.state == 'PENDING':
+            response = {
+                'state': task_result.state,
+                'status': 'Tarea en cola...'
+            }
+        elif task_result.state == 'PROGRESS':
+            response = {
+                'state': task_result.state,
+                'status': task_result.info.get('status', 'Procesando...'),
+                'current': task_result.info.get('current', 0),
+                'total': task_result.info.get('total', 100)
+            }
+        elif task_result.state == 'SUCCESS':
+            response = {
+                'state': task_result.state,
+                'status': 'Completado!',
+                'result': task_result.info.get('result'),
+                'message': task_result.info.get('message', 'Procesamento completado')
+            }
+        elif task_result.state == 'FAILURE':
+            response = {
+                'state': task_result.state,
+                'status': task_result.info.get('status', 'Erro en procesameento'),
+                'error': str(task_result.info.get('error', 'Erro descoñecido'))
+            }
+        elif task_result.state == 'REVOKED':
+            response = {
+                'state': task_result.state,
+                'status': 'Tarefa cancelada',
+                'message': 'o procesamiento foi cancelado'
+            }
+        else:
+            response = {
+                'state': task_result.state,
+                'status': f'Estado: {task_result.state}'
+            }
+            
+        return jsonify(response)
+        
     except Exception as e:
-        return f"Erro enviando archivo: {e}", 500
+        return jsonify({
+            'state': 'ERROR',
+            'status': f'Error obtendo estado: {str(e)}'
+        }), 500
+
+@app.route("/api/cancel_task/<task_id>", methods=["POST"])
+def cancelar_tarea(task_id):
+    try:
+        #revocar a tarea en celery
+        celery.control.revoke(task_id, terminate=True, signal='SIGKILL')
+        
+        if session.get('current_task_id') == task_id:
+            session.pop('current_task_id', None)
+            session.pop('task_type', None)
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Tarefa cancelada'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Error cancelando: {str(e)}'
+        }), 500
+
+@app.route("/api/download_result/<task_id>")
+def descargar_resultado_tarea(task_id):
+    try:
+        task_result = celery.AsyncResult(task_id)
+        
+        if task_result.state != 'SUCCESS':
+            return jsonify({'error': 'A tarefa non se completou exitosamente'}), 400
+
+        resultado = task_result.info.get('result')
+        if not resultado:
+            return jsonify({'error': 'Non hai resultado'}), 404
+            
+        #redirigir ao reproductor
+        task_type = session.get('task_type', 'unknown')
+        if task_type in ['automatic', 'manual_lyrics']:
+            return redirect(url_for('reproductor_karaoke', filename=resultado))
+        elif task_type == 'instrumental':
+            ruta_saida = os.path.join(DIRECTORIO_SAIDA, resultado)
+            if os.path.exists(ruta_saida):
+                return send_file(ruta_saida, as_attachment=True, download_name=resultado)
+            else:
+                return jsonify({'error': 'Arquivo non encontrado'}), 404
+        else:
+            return jsonify({'error': 'Tipo de tarefa descoñecido'}), 400
+
+    except Exception as e:
+        return jsonify({'error': f'Erro descargando resultado: {str(e)}'}), 500
 
 
 
-# Páxina do reprodutor web
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route("/player/<filename>")
 def reproductor_karaoke(filename):
 
@@ -263,6 +336,126 @@ def descargar_archivo(filename):
         return response
     except Exception as e:
         return f"Errro enviando archivo: {e}", 500
+
+
+@app.route("/library")
+def biblioteca_cancions():
+    """Páxina da biblioteca de cancións gardadas"""
+    from database import get_all_songs, get_database_stats
+    from metadata_utils import format_file_size, format_duration
+    
+    try:
+        songs = get_all_songs()
+        stats = get_database_stats()
+        
+        # Formatear tamaños e duracións para mostrar
+        for song in songs:
+            song['formatted_file_size'] = format_file_size(song['file_size'] or 0)
+            song['formatted_duration'] = format_duration(song['duration'])
+        
+        return render_template("library.html", songs=songs, stats=stats)
+    except Exception as e:
+        return f"Erro cargando biblioteca: {e}", 500
+
+
+@app.route("/library/search")
+def buscar_cancions():
+    """Endpoint para buscar cancións na biblioteca"""
+    from database import get_songs_by_search
+    from metadata_utils import format_file_size, format_duration
+    
+    query = request.args.get('q', '').strip()
+    if not query:
+        return redirect(url_for('biblioteca_cancions'))
+    
+    try:
+        songs = get_songs_by_search(query)
+        
+        # Formatear tamaños e duracións
+        for song in songs:
+            song['formatted_file_size'] = format_file_size(song['file_size'] or 0)
+            song['formatted_duration'] = format_duration(song['duration'])
+        
+        return render_template("library.html", songs=songs, search_query=query)
+    except Exception as e:
+        return f"Erro buscando cancións: {e}", 500
+
+
+@app.route("/library/play/<int:song_id>")
+def reproducir_dende_biblioteca(song_id):
+    """Reproduce unha canción dende a biblioteca usando o seu ID"""
+    from database import get_song_by_id, update_last_played
+    
+    try:
+        song = get_song_by_id(song_id)
+        if not song:
+            return "Canción non encontrada na biblioteca", 404
+        
+        # Verificar que o arquivo existe
+        ruta_video = os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename'])
+        if not os.path.exists(ruta_video):
+            return "Arquivo de video non encontrado", 404
+        
+        # Actualizar timestamp da última reprodución
+        update_last_played(song_id)
+        
+        # Redirigir ao reproductor
+        return redirect(url_for('reproductor_karaoke', filename=song['karaoke_filename']))
+        
+    except Exception as e:
+        return f"Erro reproducindo canción: {e}", 500
+
+
+@app.route("/library/delete/<int:song_id>", methods=["POST"])
+def borrar_cancion_biblioteca(song_id):
+    """Borra unha canción da biblioteca e os seus arquivos"""
+    from database import get_song_by_id, delete_song
+    
+    try:
+        song = get_song_by_id(song_id)
+        if not song:
+            return "Canción non encontrada na biblioteca", 404
+        
+        # Lista de arquivos para borrar
+        arquivos_para_borrar = []
+        
+        # Arquivo principal de karaoke
+        if song['karaoke_filename']:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename']))
+        
+        # Video sin audio
+        if song['video_only_filename']:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['video_only_filename']))
+        
+        # Arquivos de audio
+        if song['vocal_filename']:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['vocal_filename']))
+        
+        if song['instrumental_filename']:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['instrumental_filename']))
+        
+        # Borrar arquivos do disco
+        arquivos_borrados = 0
+        for arquivo in arquivos_para_borrar:
+            try:
+                if os.path.exists(arquivo):
+                    os.remove(arquivo)
+                    arquivos_borrados += 1
+                    print(f"Arquivo borrado: {arquivo}")
+            except Exception as e:
+                print(f"Erro borrando arquivo {arquivo}: {e}")
+        
+        # Borrar da base de datos
+        if delete_song(song_id):
+            print(f"Canción {song['title']} borrada da biblioteca (ID: {song_id})")
+            return redirect(url_for('biblioteca_cancions'))
+        else:
+            return "Erro borrando canción da base de datos", 500
+            
+    except Exception as e:
+        return f"Erro borrando canción: {e}", 500
+
+
 
 
 if __name__ == "__main__":

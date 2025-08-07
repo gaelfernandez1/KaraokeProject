@@ -14,6 +14,7 @@ class KaraokePlayer {
         this.playPauseIcon = document.getElementById('playPauseIcon');
         
         this.isPlaying = false;
+        this.hasStartedPlaying = false;
         
         this.init();
     }
@@ -26,8 +27,9 @@ class KaraokePlayer {
         this.instrumentalAudio.volume = 1.0; // 100%
         this.setupEventListeners();
         this.setupSynchronization();
+        this.setupBeforeUnloadConfirmation();
         
-        console.log('reprodutor de karaoke inicializado');
+        console.log('Reprodutor de karaoke inicializado');
     }
     
     setupEventListeners() {
@@ -100,6 +102,7 @@ class KaraokePlayer {
                 
                 this.playPauseIcon.className = 'fas fa-pause';
                 this.isPlaying = true;
+                this.hasStartedPlaying = true;
             }
         } catch (error) {
             console.error('Erro ao reproducir:', error);
@@ -107,6 +110,35 @@ class KaraokePlayer {
         }
     }
     
+    
+    setupBeforeUnloadConfirmation() {
+        
+        window.addEventListener('beforeunload', (e) => {
+            if (this.hasStartedPlaying && this.isPlaying) {
+                e.preventDefault();
+                e.returnValue = 'Estás reproducindo unha canción. Seguro que ques saír? A reprodución vaise cancelar.';
+                return e.returnValue;
+            }
+        });
+        
+        window.addEventListener('pagehide', () => {
+            this.stopPlayback();
+        });
+        
+        window.addEventListener('unload', () => {
+            this.stopPlayback();
+        });
+    }
+    
+    stopPlayback() {
+        if (this.isPlaying) {
+            this.video.pause();
+            this.vocalAudio.pause();
+            this.instrumentalAudio.pause();
+            this.isPlaying = false;
+            console.log('Reprodución cancelada');
+        }
+    }
     
     showError(message) {
         let errorDiv = document.getElementById('playerError');

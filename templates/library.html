@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header text-center">
+    <h1><i class="fas fa-music"></i> Biblioteca de cancións</h1>
+    <p class="lead">Tódas as túas cancións de karaoke gardadas</p>
+</div>
+
+{% if stats %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ stats.total_songs }}</h5>
+                <p class="card-text">Total de cancións</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-success">{{ stats.automatic_songs }}</h5>
+                <p class="card-text">Automáticas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-info">{{ stats.manual_songs }}</h5>
+                <p class="card-text">Con letras manuais</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-warning">{{ (stats.total_size / (1024*1024*1024))|round(1) }} GB</h5>
+                <p class="card-text">Tamaño total</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <form action="{{ url_for('buscar_cancions') }}" method="GET" class="d-flex">
+            <input 
+                type="text" 
+                name="q" 
+                class="form-control me-2" 
+                placeholder="Buscar cancións por título..." 
+                value="{{ search_query or '' }}"
+            >
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            {% if search_query %}
+            <a href="{{ url_for('biblioteca_cancions') }}" class="btn btn-secondary ms-2">
+                <i class="fas fa-times"></i> Limpar
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% if search_query %}
+<div class="alert alert-info">
+    <i class="fas fa-search"></i> Resultados da busca para: <strong>{{ search_query }}</strong>
+    ({{ songs|length }} {{ 'canción' if songs|length == 1 else 'cancións' }} encontrada{{ 's' if songs|length != 1 else '' }})
+</div>
+{% endif %}
+
+{% if songs %}
+<div class="row">
+    {% for song in songs %}
+    <div class="col-12 mb-3">
+        <div class="card feature-card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="card-title mb-2">
+                            <i class="fas fa-music text-primary"></i>
+                            {{ song.title }}
+                        </h5>
+                        <div class="text-muted mb-2">
+                            {% if song.source_type == 'youtube' %}
+                                <i class="fab fa-youtube text-danger"></i> YouTube
+                            {% else %}
+                                <i class="fas fa-upload text-info"></i> Arquivo subido
+                            {% endif %}
+                            
+                            {% if song.processing_type == 'manual_lyrics' %}
+                                <span class="badge bg-info ms-2">Letras Manuais</span>
+                            {% else %}
+                                <span class="badge bg-success ms-2">Automático</span>
+                            {% endif %}
+                            
+                            {% if song.enable_diarization %}
+                                <span class="badge bg-warning ms-1">Diarización</span>
+                            {% endif %}
+                        </div>
+                        
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i> {{ song.created_at[:10] }}
+                            | <i class="fas fa-clock"></i> {{ song.formatted_duration }}
+                            | <i class="fas fa-hdd"></i> {{ song.formatted_file_size }}
+                            {% if song.last_played %}
+                                <br><i class="fas fa-play text-success"></i> Última reprodución: {{ song.last_played[:10] }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    
+                    <div class="col-md-6 text-md-end">
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('reproducir_dende_biblioteca', song_id=song.id) }}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-play"></i> Reproducir
+                            </a>
+                            
+                            <a href="{{ url_for('descargar_archivo', filename=song.karaoke_filename) }}" 
+                               class="btn btn-success">
+                                <i class="fas fa-download"></i> Descargar Karaoke
+                            </a>
+                            
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" 
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if song.vocal_filename %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('descargar_archivo', filename=song.vocal_filename) }}">
+                                            <i class="fas fa-microphone"></i> Descargar vocal
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if song.instrumental_filename %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('descargar_archivo', filename=song.instrumental_filename) }}">
+                                            <i class="fas fa-music"></i> Descargar instrumental
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if song.video_only_filename %}
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('descargar_archivo', filename=song.video_only_filename) }}">
+                                            <i class="fas fa-video"></i> Descargar video Sen audio
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if song.source_url %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ song.source_url }}" target="_blank">
+                                            <i class="fas fa-external-link-alt"></i> Ver orixinal
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button type="button" class="dropdown-item text-danger" 
+                                                data-song-id="{{ song.id }}" 
+                                                data-song-title="{{ song.title }}"
+                                                onclick="confirmarBorrado(this.getAttribute('data-song-id'), this.getAttribute('data-song-title'))">
+                                            <i class="fas fa-trash"></i> Borrar canción
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if song.manual_lyrics %}
+                <div class="mt-3">
+                    <details>
+                        <summary class="text-muted">
+                            <i class="fas fa-align-left"></i> Ver letras manuais
+                        </summary>
+                        <div class="mt-2 p-2 bg-light rounded">
+                            <pre class="mb-0">{{ song.manual_lyrics }}</pre>
+                        </div>
+                    </details>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Paginacion (para un futuro) -->
+<div class="row">
+    <div class="col-12 text-center">
+        <p class="text-muted">
+            Mostrando {{ songs|length }} {{ 'canción' if songs|length == 1 else 'cancións' }}
+        </p>
+    </div>
+</div>
+
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-music-slash fa-4x text-muted mb-3"></i>
+    {% if search_query %}
+        <h3>Non se encontraron cancións</h3>
+        <p class="text-muted">Non hai cancións que coincidan coa búsqueda.</p>
+        <a href="{{ url_for('biblioteca_cancions') }}" class="btn btn-primary">
+            <i class="fas fa-list"></i> Ver toda a biblioteca
+        </a>
+    {% else %}
+        <h3>A biblioteca está baleira</h3>
+        <p class="text-muted">Aínda non tes cancións gardadas. Crea a túa primeira canción de karaoke!</p>
+        <a href="{{ url_for('inicio') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Crear Karaoke
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('inicio') }}" class="btn btn-outline-primary">
+        <i class="fas fa-home"></i> Volver ao inicio
+    </a>
+</div>
+
+<form id="deleteForm" method="POST" style="display: none;">
+    <input type="hidden" name="_method" value="POST">
+</form>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                    Confirmar borrado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Estás seguro de que ques borrar a canción:</p>
+                <p><strong id="songToDelete"></strong></p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle"></i>
+                    Esto eliminará a canción e todos os seus arquivos asociados (karaoke, vocal, instrumental, video). 
+                    <strong>Non se pode desfacer.</strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="borrarCancion()">
+                    <i class="fas fa-trash"></i> Si, borrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let songIdToDelete = null;
+
+function confirmarBorrado(songId, songTitle) {
+    songIdToDelete = songId;
+    document.getElementById('songToDelete').textContent = songTitle;
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+function borrarCancion() {
+    if (songIdToDelete) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/library/delete/${songIdToDelete}`;
+        
+        const deleteBtn = document.querySelector('#deleteModal .btn-danger');
+        const originalText = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Borrando...';
+        deleteBtn.disabled = true;
+        
+        form.submit();
+    }
+}
+</script>
+
+{% endblock %}

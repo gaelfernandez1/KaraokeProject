@@ -4,8 +4,27 @@
 document.addEventListener('DOMContentLoaded', function() {
     hideLoading();
     
-    window.addEventListener('beforeunload', function() {
+    let processingActive = false;
+    
+    
+    window.addEventListener('beforeunload', function(event) {
+        if (processingActive) {
+            const message = 'Hai un proceso en execución. Se saes agora, cancelarase o procesamento. Quere saír?';
+            event.preventDefault();
+            event.returnValue = message;
+            return message;
+        }
         hideLoading();
+    });
+    
+    // quito a proteccion cando se carga a páxina
+    window.addEventListener('load', function() {
+        processingActive = false;
+    });
+    
+    
+    window.addEventListener('pageshow', function() {
+        processingActive = false;
     });
     
     const forms = document.querySelectorAll('form');
@@ -42,6 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
                 }
+                
+                //activar proteccion 
+                setTimeout(() => {
+                    processingActive = true;
+                }, 1000); 
                 
                 return;
             }
@@ -148,3 +172,4 @@ function clearAlerts() {
         alert.remove();
     });
 }
+

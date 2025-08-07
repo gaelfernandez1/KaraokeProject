@@ -10,14 +10,17 @@ from srt_processing import parse_word_srt, group_word_segments
 from text_processing import normalize_manual_lyrics
 from karaoke_rendering import create_karaoke_text_clip
 from utils import remove_previous_srt, clean_abnormal_segments, sanitize_filename
+from database import save_song_to_database
+from metadata_utils import generate_song_metadata
 
 
 
 #Este é o create para a version automática. WhisperX transcribe él mismo, despois parsease o SRT en tokens
 #agrupanse en frases cada N palabras e despois renderizase o karaoke
 
-def create(video_path: str, enable_diarization: bool = False, hf_token: str = None):
-
+def create(video_path: str, enable_diarization: bool = False, hf_token: str = None, 
+           source_type: str = "upload", source_url: str = None, save_to_db: bool = True):
+    
     remove_previous_srt()     ##Borro os srts anteriores por si acaso me daban conflicto ao ir probando a misma cancion repetidas veces
  
     # Normalizo o video. Por que? Porque añadin a parte de poder meter un MP4 para poder recortar videos e facer que
@@ -32,9 +35,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     if not ruta_audio:
         return ""
     
-    
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
-    
     
     if not ruta_voz or not ruta_musica:
         return ""    
@@ -156,13 +157,32 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     except Exception as e:
         print(f"Erro cos archivos separados: {e}")
     
+    #gardar na base de datos se está habilitado
+    if save_to_db:
+        try:
+            original_filename = os.path.basename(video_path)
+            metadata = generate_song_metadata(
+                original_filename=original_filename,
+                karaoke_filename=nome_saida,
+                source_type=source_type,
+                source_url=source_url,
+                processing_type="automatic",
+                enable_diarization=enable_diarization,
+                output_dir="./output"
+            )
+            song_id = save_song_to_database(metadata)
+            print(f"Canción gardada na base de datos con ID: {song_id}")
+        except Exception as e:
+            print(f"Erro gardando na base de datos: {e}")
+    
     return nome_saida
 
 
 
 
 # A outra variante, uso de FORCED ALIGNMENT
-def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None) -> str:
+def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None,
+                             source_type: str = "upload", source_url: str = None, save_to_db: bool = True) -> str:
 
     remove_previous_srt()
     letras_normalizadas = normalize_manual_lyrics(manual_lyrics)
@@ -303,6 +323,26 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         
     except Exception as e:
         print(f"Error cos arquivos separados: {e}")
+    
+    #Gardar na base de datos 
+    if save_to_db:
+        try:
+            original_filename = os.path.basename(video_path)
+            metadata = generate_song_metadata(
+                original_filename=original_filename,
+                karaoke_filename=nombreArchivo,
+                source_type=source_type,
+                source_url=source_url,
+                processing_type="manual_lyrics",
+                manual_lyrics=manual_lyrics,
+                language=language,
+                enable_diarization=enable_diarization,
+                output_dir="./output"
+            )
+            song_id = save_song_to_database(metadata)
+            print(f"canción con letras manuais gardada na base de datos con ID: {song_id}")
+        except Exception as e:
+            print(f"Erro gardando na base de datos: {e}")
     
     return nombreArchivo
 

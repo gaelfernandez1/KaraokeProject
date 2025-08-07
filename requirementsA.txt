@@ -22,3 +22,7 @@ scipy>=1.10.0
 # Para speaker diarization
 pyannote.audio>=3.1.0
 pyannote.core>=5.0.0
+
+#para procesamento asíncrono
+celery>=5.3.0
+redis>=4.5.0

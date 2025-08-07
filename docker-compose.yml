@@ -1,4 +1,13 @@
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis_container
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
   #CAMBIO. ahora si que se nota
   demucs:
     build:
@@ -9,6 +18,12 @@ services:
       - "5000:5000"
     volumes:
       - shared_data:/data
+      - shared_input:/KaraokeProject/input
+      - shared_output:/KaraokeProject/output
+      - shared_db:/KaraokeProject/db
+    depends_on:
+      - redis
+      - whisperx
     #ahora funciona con ou sin gpu
     deploy:
       resources:
@@ -20,6 +35,36 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    restart: unless-stopped
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.A
+    container_name: celery_worker_container
+    volumes:
+      - shared_data:/data
+      - shared_input:/KaraokeProject/input
+      - shared_output:/KaraokeProject/output
+      - shared_db:/KaraokeProject/db
+    depends_on:
+      - redis
+      - whisperx
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    command: celery -A celery_app worker --loglevel=info
     restart: unless-stopped
 
   #ahora vai con calquera gpu
@@ -47,4 +92,12 @@ services:
 
 volumes:
   shared_data:
+    driver: local
+  redis_data:
+    driver: local
+  shared_input:
+    driver: local
+  shared_output:
+    driver: local
+  shared_db:
     driver: local
