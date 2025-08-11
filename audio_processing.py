@@ -9,10 +9,16 @@ from gpu_utils import detect_gpu_capability, get_optimal_demucs_args
 GPU_INFO = detect_gpu_capability()
 DEMUCS_ARGS = get_optimal_demucs_args(GPU_INFO)
 
-#Para convertir un video a un mp3 
 def video_to_mp3(video_path: str) -> str:
 
-    print(f"Convertindo video a mp3 => {video_path}")
+    
+    if video_path.lower().endswith('.mp3'):
+        if os.path.exists(video_path):
+            return video_path
+        else:
+            print(f"Archivo MP3 non encontrado: {video_path}")
+            return ""
+    
     ruta_audio = video_path.replace(".mp4", ".mp3")
     if os.path.exists(ruta_audio):
         return ruta_audio

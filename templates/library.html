@@ -8,15 +8,15 @@
 
 {% if stats %}
 <div class="row mb-4">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title text-primary">{{ stats.total_songs }}</h5>
-                <p class="card-text">Total de cancións</p>
+                <p class="card-text">Total</p>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title text-success">{{ stats.automatic_songs }}</h5>
@@ -24,18 +24,26 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title text-info">{{ stats.manual_songs }}</h5>
-                <p class="card-text">Con letras manuais</p>
+                <p class="card-text">Manuais</p>
             </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="card text-center">
             <div class="card-body">
-                <h5 class="card-title text-warning">{{ (stats.total_size / (1024*1024*1024))|round(1) }} GB</h5>
+                <h5 class="card-title text-warning">{{ stats.instrumental_songs }}</h5>
+                <p class="card-text">Instrumentais</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title text-secondary">{{ (stats.total_size / (1024*1024*1024))|round(1) }} GB</h5>
                 <p class="card-text">Tamaño total</p>
             </div>
         </div>
@@ -93,6 +101,8 @@
                             
                             {% if song.processing_type == 'manual_lyrics' %}
                                 <span class="badge bg-info ms-2">Letras Manuais</span>
+                            {% elif song.processing_type == 'instrumental' %}
+                                <span class="badge bg-warning ms-2">Instrumental</span>
                             {% else %}
                                 <span class="badge bg-success ms-2">Automático</span>
                             {% endif %}
@@ -114,15 +124,22 @@
                     
                     <div class="col-md-6 text-md-end">
                         <div class="btn-group" role="group">
-                            <a href="{{ url_for('reproducir_dende_biblioteca', song_id=song.id) }}" 
-                               class="btn btn-primary">
-                                <i class="fas fa-play"></i> Reproducir
-                            </a>
-                            
-                            <a href="{{ url_for('descargar_archivo', filename=song.karaoke_filename) }}" 
-                               class="btn btn-success">
-                                <i class="fas fa-download"></i> Descargar Karaoke
-                            </a>
+                            {% if song.processing_type == 'instrumental' %}
+                                <a href="{{ url_for('descargar_archivo', filename=song.karaoke_filename) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-play"></i> Descargar
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('reproducir_dende_biblioteca', song_id=song.id) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-play"></i> Reproducir
+                                </a>
+                                
+                                <a href="{{ url_for('descargar_archivo', filename=song.karaoke_filename) }}" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-download"></i> Descargar Karaoke
+                                </a>
+                            {% endif %}
                             
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-secondary dropdown-toggle" 

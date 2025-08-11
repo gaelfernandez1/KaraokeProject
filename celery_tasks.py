@@ -115,7 +115,7 @@ def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None
 
 
 @celery.task(bind=True, name='process_instrumental_only')
-def process_instrumental_only(self, video_path):
+def process_instrumental_only(self, video_path, source_type="upload", source_url=None, save_to_db=True):
 
     task_id = self.request.id
     
@@ -124,7 +124,7 @@ def process_instrumental_only(self, video_path):
         
         check_if_cancelled()
         
-        resultado = generate_instrumental_with_cancellation_check(video_path)
+        resultado = generate_instrumental_with_cancellation_check(video_path, source_type, source_url, save_to_db)
         
         if not resultado:
             raise Exception("O procesamento non devolviu resultado")
@@ -173,10 +173,10 @@ def create_with_manual_lyrics_with_cancellation_check(video_path, manual_lyrics,
                                    hf_token, source_type, source_url, save_to_db)
 
 
-def generate_instrumental_with_cancellation_check(video_path):
+def generate_instrumental_with_cancellation_check(video_path, source_type="upload", source_url=None, save_to_db=True):
 
     check_if_cancelled()
-    return generate_instrumental(video_path)
+    return generate_instrumental(video_path, source_type, source_url, save_to_db)
 
 
 def cleanup_partial_files(video_path):
