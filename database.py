@@ -170,6 +170,9 @@ def get_database_stats() -> Dict:
     cursor.execute('SELECT COUNT(*) as manual_songs FROM songs WHERE processing_type = "manual_lyrics"')
     manual_songs = cursor.fetchone()[0]
     
+    cursor.execute('SELECT COUNT(*) as instrumental_songs FROM songs WHERE processing_type = "instrumental"')
+    instrumental_songs = cursor.fetchone()[0]
+    
     cursor.execute('SELECT SUM(file_size) as total_size FROM songs')
     total_size = cursor.fetchone()[0] or 0
     
@@ -179,5 +182,6 @@ def get_database_stats() -> Dict:
         'total_songs': total_songs,
         'automatic_songs': automatic_songs,
         'manual_songs': manual_songs,
+        'instrumental_songs': instrumental_songs,
         'total_size': total_size
     }

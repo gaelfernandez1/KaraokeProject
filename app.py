@@ -26,11 +26,17 @@ os.makedirs(DIRECTORIO_SAIDA, exist_ok=True)
 
 EXTENSIONES_PERMITIDAS = {"mp4"}
 EXTENSIONES_AUDIO_PERMITIDAS = {"wav", "mp3"}
+EXTENSIONES_INSTRUMENTAL_PERMITIDAS = {"mp4", "mp3"}
 
 
 # PAra comprobar si o archivo ten unha extension permitida
 def archivo_permitido(nome_arquivo: str) -> bool:
     return "." in nome_arquivo and nome_arquivo.rsplit(".", 1)[1].lower() in EXTENSIONES_PERMITIDAS
+
+
+
+def archivo_instrumental_permitido(nome_arquivo: str) -> bool:
+    return "." in nome_arquivo and nome_arquivo.rsplit(".", 1)[1].lower() in EXTENSIONES_INSTRUMENTAL_PERMITIDAS
 
 
 def descargar_video_youtube(url: str, directorio_saida: str = DIRECTORIO_ENTRADA) -> str:
@@ -133,20 +139,23 @@ def procesar_letras_manuales():
 def xerar_instrumental():
     ruta_video = None
     arquivo_subido = request.files.get("video_file")
-    if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
+    if arquivo_subido and arquivo_subido.filename and archivo_instrumental_permitido(arquivo_subido.filename):
         nome_ficheiro = secure_filename(arquivo_subido.filename)
         ruta_video = os.path.join(DIRECTORIO_ENTRADA, nome_ficheiro)
         arquivo_subido.save(ruta_video)
     else:
         url_youtube = request.form.get("youtube_url", "").strip()
         if not url_youtube:
-            return "Tes que mandar ou un mp4 ou un link de YouTube", 400
+            return "Tes que mandar un mp4/mp3 ou un link de YouTube", 400
         try:
             ruta_video = descargar_video_youtube(url_youtube)
         except Exception as e:
             return f"Erro descargando vídeo: {e}", 500
     
-    task = process_instrumental_only.delay(ruta_video)
+    source_type = "upload" if arquivo_subido else "youtube"
+    source_url = url_youtube if not arquivo_subido else None
+    
+    task = process_instrumental_only.delay(ruta_video, source_type, source_url, True)
     
     session['current_task_id'] = task.id
     session['task_type'] = 'instrumental'

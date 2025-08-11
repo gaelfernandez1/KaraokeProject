@@ -347,13 +347,15 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
     return nombreArchivo
 
 
-def generate_instrumental(video_path: str) -> str:
+def generate_instrumental(video_path: str, source_type: str = "upload", source_url: str = None, save_to_db: bool = True) -> str:
 
     
-    try:
-        video_path = normalize_video(video_path)
-    except Exception as erro_normalizacion:      
-        print(f"Error na normalización: {erro_normalizacion}, continuando co video orixinal")
+    #solo normalizar se é un video mp4, non se é mp3
+    if not video_path.lower().endswith('.mp3'):
+        try:
+            video_path = normalize_video(video_path)
+        except Exception as erro_normalizacion:      
+            print(f"Error na normalización: {erro_normalizacion}, continuando co video orixinal")
     
     ruta_audio = video_to_mp3(video_path)
     if not ruta_audio:
@@ -366,7 +368,14 @@ def generate_instrumental(video_path: str) -> str:
     
     nome_video_base = os.path.basename(video_path).replace("_normalized", "")
     nome_video_seguro = sanitize_filename(nome_video_base)
-    nome_saida = f"instrumental_{nome_video_seguro.replace('.mp4', '.wav')}"
+    
+    if nome_video_seguro.lower().endswith('.mp4'):
+        nome_saida = f"instrumental_{nome_video_seguro.replace('.mp4', '.wav')}"
+    elif nome_video_seguro.lower().endswith('.mp3'):
+        nome_saida = f"instrumental_{nome_video_seguro.replace('.mp3', '.wav')}"
+    else:
+        #fallback: añadir extension .wav
+        nome_saida = f"instrumental_{nome_video_seguro}.wav"
     
     if not os.path.exists("./output"):
         os.makedirs("./output")
@@ -385,5 +394,48 @@ def generate_instrumental(video_path: str) -> str:
     except Exception as error_copia:
         return ""
     
-    print(f"Feito! {nome_saida}")
+    #gardar instrumental na base de datos se está activado
+    if save_to_db:
+        try:
+            from moviepy.editor import AudioFileClip
+            
+            nome_original = os.path.basename(video_path)
+            title = nome_original.replace('_normalized', '')
+            if title.lower().endswith('.mp4'):
+                title = title[:-4]   # eliminar .mp4
+            elif title.lower().endswith('.mp3'):
+                title = title[:-4]    # eliminar .mp3
+            title = f"[Instrumental] {title}"
+            
+            file_size = os.path.getsize(ruta_saida)
+            
+            try:
+                audio_clip = AudioFileClip(ruta_saida)
+                duration = audio_clip.duration
+                audio_clip.close()
+            except:
+                duration = None
+            
+            song_data = {
+                'title': title,
+                'original_filename': nome_original,
+                'karaoke_filename': nome_saida,  #este e o principal archivo para instrumentales
+                'video_only_filename': None,
+                'vocal_filename': None,
+                'instrumental_filename': nome_saida,
+                'source_type': source_type,
+                'source_url': source_url,
+                'processing_type': 'instrumental',
+                'manual_lyrics': None,
+                'language': None,
+                'enable_diarization': False,
+                'file_size': file_size,
+                'duration': duration
+            }
+            
+            song_id = save_song_to_database(song_data)
+            
+        except Exception as e:
+            print(f"Erro gardando instrumental na bd: {e}")
+    
     return nome_saida
