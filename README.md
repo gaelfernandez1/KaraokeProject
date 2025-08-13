@@ -25,7 +25,9 @@ docker-compose build
 docker-compose up -d
 ```
 
-Despois de iniciar os contedores, accede á aplicación web en: http://127.0.0.1:5000/
+Despois de iniciar os contedores, accede á aplicación web en: http://127.0.0.1:5000/  en local.
+
+Para compartir a web con terceiros, vai a http://localhost:4040    (ngrok),  copia a nova URL pública e compártea!
 
 ## Activación de Speaker Diarization
 1. Marcar checkbox "Enable Speaker Diarization" na interfaz web
