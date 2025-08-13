@@ -90,6 +90,18 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     restart: unless-stopped
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok_container
+    command: http demucs:5000 --log stdout
+    ports:
+      - "4040:4040"  
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTH_TOKEN}
+    depends_on:
+      - demucs
+    restart: unless-stopped
+
 volumes:
   shared_data:
     driver: local

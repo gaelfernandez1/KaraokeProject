@@ -7,14 +7,13 @@ from werkzeug.utils import secure_filename
 from karaoke_generator import create, create_with_manual_lyrics, generate_instrumental
 from gpu_utils import print_system_summary
 from database import init_database
+from security_config import setup_security, validate_file_size, sanitize_filename
 
 #meter celery no proyecto
 from celery_app import celery
 from celery_tasks import process_automatic_karaoke, process_manual_lyrics_karaoke, process_instrumental_only
 
 app = Flask(__name__)
-app.secret_key = 'karaoke_secret_key_change_in_production'
-
 
 print_system_summary()
 init_database()
@@ -466,6 +465,9 @@ def borrar_cancion_biblioteca(song_id):
 
 
 
+
+#configurar a seguridade despois de definir as rutas(ngrok)
+limiter = setup_security(app)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
