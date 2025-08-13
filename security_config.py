@@ -20,7 +20,7 @@ def setup_security(app):
     app.view_functions['procesar_letras_manuales'] = limiter.limit("3 per minute")(app.view_functions['procesar_letras_manuales'])
     app.view_functions['xerar_instrumental'] = limiter.limit("5 per minute")(app.view_functions['xerar_instrumental'])
     
-    # Excluir endpoints de consulta de estado del rate limiting
+    #excluir endpoints de consulta de estado do rate limiting
     limiter.exempt(app.view_functions['estado_tarea'])
     
     app.secret_key = os.getenv('FLASK_SECRET_KEY', 'karaoke_secret_key_change_in_production')
