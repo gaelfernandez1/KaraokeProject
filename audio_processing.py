@@ -2,6 +2,7 @@ import os
 import subprocess
 import shutil
 import requests
+import torch
 from moviepy.editor import AudioFileClip
 from gpu_utils import detect_gpu_capability, get_optimal_demucs_args
 
@@ -165,4 +166,50 @@ def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language
             return None
     except Exception as e:
         print(f"error co endpoint da letra manual {e}")
+        return None
+
+
+def transcribe_with_faster_whisper(audio_path: str) -> str:
+    """
+    Transcribe audio using faster-whisper directly in Demucs container
+    Returns the transcribed text as a string
+    """
+    try:
+        print("Iniciando transcripción automática con faster-whisper...")
+        from faster_whisper import WhisperModel
+        
+        # Detectar dispositivo - usar CPU para evitar conflictos de CUDA
+        device = "cpu"  # Forzar CPU para evitar conflictos con Demucs
+        compute_type = "int8"
+        
+        print(f"Cargando modelo faster-whisper en {device} (CPU para evitar conflictos CUDA)...")
+        try:
+            model = WhisperModel("small", device=device, compute_type=compute_type)
+        except Exception as e:
+            print(f"Error cargando modelo small, probando tiny: {e}")
+            model = WhisperModel("tiny", device=device, compute_type=compute_type)
+        
+        print("Transcribiendo audio...")
+        segments, info = model.transcribe(audio_path, language=None)
+        
+        print(f"Idioma detectado: {info.language}")
+        
+        # Combinar todos los segmentos en un texto continuo
+        transcribed_text = ""
+        for segment in segments:
+            transcribed_text += segment.text + " "
+        
+        # Limpiar memoria
+        del model
+        # No limpiar CUDA cache ya que estamos usando CPU para faster-whisper
+        
+        transcribed_text = transcribed_text.strip()
+        print(f"Transcripción completada: {len(transcribed_text)} caracteres")
+        
+        return transcribed_text
+        
+    except Exception as e:
+        print(f"Error en transcripción con faster-whisper: {e}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
         return None

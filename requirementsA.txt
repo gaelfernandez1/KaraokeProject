@@ -29,3 +29,6 @@ redis>=4.5.0
 
 #para seguridade
 flask-limiter>=3.0.0
+
+#para transcripción automática estable
+faster-whisper==1.0.1

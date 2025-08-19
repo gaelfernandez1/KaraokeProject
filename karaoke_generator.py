@@ -4,7 +4,7 @@ import traceback
 from moviepy.editor import AudioFileClip, VideoFileClip, CompositeAudioClip, CompositeVideoClip
 
 from config import VOLUME_VOCAL, ALTO_VIDEO, MARXE_INFERIOR_SUBTITULO
-from audio_processing import video_to_mp3, separate_stems_cli, call_whisperx_endpoint, call_whisperx_endpoint_manual
+from audio_processing import video_to_mp3, separate_stems_cli, call_whisperx_endpoint, call_whisperx_endpoint_manual, transcribe_with_faster_whisper
 from video_processing import normalize_video
 from srt_processing import parse_word_srt, group_word_segments
 from text_processing import normalize_manual_lyrics
@@ -23,9 +23,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     
     remove_previous_srt()     ##Borro os srts anteriores por si acaso me daban conflicto ao ir probando a misma cancion repetidas veces
  
-    # Normalizo o video. Por que? Porque añadin a parte de poder meter un MP4 para poder recortar videos e facer que
-    # ocupen menos, para facer ensayo e error mais rapidamente. Entonces necesito que o formato do video do link de YT
-    # e o formato do Mp4 sean o mesmo, porque si os subtitulos non son iguais non me sirve de nada practicar cos mp4s.
+    # Normalizo o video
     try:
         video_path = normalize_video(video_path)
     except Exception as erro_normalizacion:      
@@ -40,81 +38,82 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     if not ruta_voz or not ruta_musica:
         return ""    
     
-    whisper_response = call_whisperx_endpoint(ruta_voz, enable_diarization, hf_token)
+    # NUEVA ESTRATEGIA: Transcribir con faster-whisper localmente
+    print("Iniciando transcripción automática...")
+    transcribed_lyrics = transcribe_with_faster_whisper(ruta_voz)
+    if not transcribed_lyrics:
+        print("Error: Non se puido transcribir o audio")
+        return ""
+    
+    print(f"Texto transcrito: {transcribed_lyrics[:100]}...")
+    
+    # Normalizar las letras transcritas como si fueran manuales
+    letras_normalizadas = normalize_manual_lyrics(transcribed_lyrics)
+    
+    # Usar el endpoint manual con las letras transcritas automáticamente
+    print("Realizando alineación forzada con letras transcritas...")
+    whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, None, enable_diarization, hf_token)
     archivoSRT = ruta_voz.replace(".wav", "_whisperx.srt")
     
-    # Esperamos un pouco para que whisperx genere o archivo 
+    # Esperar a que se genere el archivo SRT
     tempo_maximo = 30  
     tempo_esperado = 0
     while not os.path.exists(archivoSRT) and tempo_esperado < tempo_maximo:
         time.sleep(1)
         tempo_esperado += 1
     
-    if not os.path.exists(archivoSRT):          #se non encontra o srt despois do tempo ese, return ""
+    if not os.path.exists(archivoSRT):
+        print(f"Error: Non se xerou o arquivo SRT despois de {tempo_maximo}s")
         return ""
     
-    if os.path.getsize(archivoSRT) == 0:        #Esto é para asegurar que o srt non esta vacio
+    if os.path.getsize(archivoSRT) == 0:
+        print("Error: O arquivo SRT está vacio")
         return ""
     
-    # Parsear o srt en segmentos de palabra
-    segmentos_palabras = parse_word_srt(archivoSRT)
-    if not segmentos_palabras:
-        print("Non hai segmentos de palabra")
+    # Usar el mismo sistema de agrupación que el modo manual
+    segmento_palabras = parse_word_srt(archivoSRT)
+    grupos_texto = group_word_segments(letras_normalizadas, segmento_palabras)
+    if not grupos_texto:
+        print("Error na agrupación de texto")
         return ""
     
-    #Esto é para que desapareza a ultima frase cando empeza un sólo de instrumental. Pode ser contraproducente.
-    segmentos_palabras = clean_abnormal_segments(segmentos_palabras)    
-    palabras_por_frase = 10                          #Van aparecer 10 palabras por frase
-    grupos_texto = []
-    for i in range(0, len(segmentos_palabras), palabras_por_frase):
-        segmentos_actuais = segmentos_palabras[i:i+palabras_por_frase]
-
-        # constrúo a linea unindo as palabras destos segmentos
-        texto_linha = " ".join([w["word"] for w in segmentos_actuais])
-        grupos_texto.append({
-            "line_text": texto_linha,
-            "start": segmentos_actuais[0]["start"],
-            "end":   segmentos_actuais[-1]["end"],
-            "words": segmentos_actuais
-        })
-    
+    # Composición con moviepy (igual que en modo manual)
     try:
-        audio_musica  = AudioFileClip(ruta_musica).set_fps(44100)
-        audio_voz = AudioFileClip(ruta_voz).volumex(VOLUME_VOCAL).set_fps(44100)
-        audio_combinado = CompositeAudioClip([audio_musica, audio_voz])
-        print(f" Audio combinado OK, dura: {audio_combinado.duration}s")
+        audio_musica = AudioFileClip(ruta_musica).set_fps(44100)
+        audio_voces = AudioFileClip(ruta_voz).volumex(VOLUME_VOCAL).set_fps(44100)
+        audio_mesturado = CompositeAudioClip([audio_musica, audio_voces])
     except Exception as erro_audio:
-        print(f" Error cargando audio: {erro_audio}")
+        print(f"Error cargando audio {erro_audio}")
         return ""
     
     try:
-        video_fondo = VideoFileClip(video_path).set_duration(audio_combinado.duration).set_fps(30)
-        print(f" Video cargado OK, dura: {video_fondo.duration}s, e ocupa: {video_fondo.size}")
+        video_fondo = VideoFileClip(video_path).set_duration(audio_mesturado.duration).set_fps(30)
     except Exception as erro_video:
+        print(f"Error cargando video {erro_video}")
         return ""
     
     video_escurecido = video_fondo.fl_image(lambda img: (img*0.3).astype("uint8"))
     
-    #Crear e posicionar os clips de karaoke
+    # Crear clips de karaoke usando la misma lógica que el modo manual
     clips_karaoke = []
     for indice, grupo in enumerate(grupos_texto):
+        # Mostrar medio segundo antes por comodidad
+        inicio_compensado = max(grupo["start"] - 0.5, 0)
+        duracion_extendida = grupo["end"] - grupo["start"] + 1.0  
+        
+        # Obtener línea siguiente si existe
+        linha_seguinte = grupos_texto[indice + 1] if indice + 1 < len(grupos_texto) else None
+        clip_texto = create_karaoke_text_clip(grupo, next_line_info=linha_seguinte, advance=0.5, duration_padding=0.5)
+        
+        posicion_baixo = ALTO_VIDEO - MARXE_INFERIOR_SUBTITULO
+        
+        clip_texto = clip_texto.set_start(inicio_compensado).set_duration(duracion_extendida)
+        clip_texto = clip_texto.set_position(('center', posicion_baixo))
+        
+        clips_karaoke.append(clip_texto) 
 
-        # Aseguro a misma ventana de teempo e posicion para cada subtitulo
-        inicio_tempo    = max(grupo["start"] - 0.5, 0)        # aparece 0.5 segundos antes
-        duracion_total = grupo["end"] - grupo["start"] + 1.0  #1 segundo despois
-        
-        #Para obter a linea siguiente (se hai)
-        proxima_linha = grupos_texto[indice + 1] if indice + 1 < len(grupos_texto) else None
-        
-        # Creo o clip co mismo avance e padding para todos
-        clip_texto = create_karaoke_text_clip(grupo, next_line_info=proxima_linha, advance=0.5, duration_padding=0.5)
-        clip_texto = clip_texto.set_start(inicio_tempo).set_duration(duracion_total)
-        
-        #POSICIONS FIJAS, importante, porque daba muitos problemas
-        posicion_inferior = ALTO_VIDEO - MARXE_INFERIOR_SUBTITULO
-        clip_texto = clip_texto.set_position(('center', posicion_inferior))
-        clips_karaoke.append(clip_texto)    
-        video_final = CompositeVideoClip([video_escurecido] + clips_karaoke).set_audio(audio_combinado)
+    # Crear video final superponiendo los clips de karaoke sobre el fondo
+    video_final = CompositeVideoClip([video_escurecido] + clips_karaoke).set_audio(audio_mesturado)
     
     nome_video_base = os.path.basename(video_path).replace("_normalized", "")
     nome_video_seguro = sanitize_filename(nome_video_base)
