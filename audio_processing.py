@@ -169,47 +169,40 @@ def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language
         return None
 
 
+
+#Cambio obligado. Problemas con VAD de whisperx, voy a transcribir directamente con faster whisper e alinear con whisperx
 def transcribe_with_faster_whisper(audio_path: str) -> str:
-    """
-    Transcribe audio using faster-whisper directly in Demucs container
-    Returns the transcribed text as a string
-    """
+
     try:
-        print("Iniciando transcripción automática con faster-whisper...")
         from faster_whisper import WhisperModel
         
-        # Detectar dispositivo - usar CPU para evitar conflictos de CUDA
-        device = "cpu"  # Forzar CPU para evitar conflictos con Demucs
+        
+        device = "cpu"  #aqui vou usar cpu para non complicarme a vida, CAMBIO POSTERIOR PASAR A CUDA
         compute_type = "int8"
         
-        print(f"Cargando modelo faster-whisper en {device} (CPU para evitar conflictos CUDA)...")
         try:
-            model = WhisperModel("small", device=device, compute_type=compute_type)
-        except Exception as e:
-            print(f"Error cargando modelo small, probando tiny: {e}")
+
             model = WhisperModel("tiny", device=device, compute_type=compute_type)
+        except Exception as e:
+            print(f"Error cargando modelo {e}")
+            raise
         
-        print("Transcribiendo audio...")
         segments, info = model.transcribe(audio_path, language=None)
         
         print(f"Idioma detectado: {info.language}")
         
-        # Combinar todos los segmentos en un texto continuo
         transcribed_text = ""
         for segment in segments:
             transcribed_text += segment.text + " "
         
-        # Limpiar memoria
         del model
-        # No limpiar CUDA cache ya que estamos usando CPU para faster-whisper
         
         transcribed_text = transcribed_text.strip()
-        print(f"Transcripción completada: {len(transcribed_text)} caracteres")
+        print(f"Transcricion: {len(transcribed_text)} caracteres")
         
         return transcribed_text
         
     except Exception as e:
-        print(f"Error en transcripción con faster-whisper: {e}")
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
         return None

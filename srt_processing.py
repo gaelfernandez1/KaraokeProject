@@ -141,3 +141,58 @@ def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
             })
 
     return agrupados
+
+
+#nova funciona para o automatico, en vez de 10, agrupar inteligente, xa non sirve o do salto de linea. faise por duracion de pausas
+def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int = 8, max_duration: float = 4.0) -> list:
+
+    if not word_segments:
+        return []
+    
+    grupos = []
+    grupo_actual = []
+    
+    for i, segment in enumerate(word_segments):
+        grupo_actual.append(segment)
+        
+        duracion_grupo = segment["end"] - grupo_actual[0]["start"]
+        
+        debe_cerrar = False
+        
+        if len(grupo_actual) >= max_words_per_phrase:
+            debe_cerrar = True
+        
+        elif duracion_grupo >= max_duration:
+            debe_cerrar = True
+        
+        elif i + 1 < len(word_segments):
+            pausa_siguiente = word_segments[i + 1]["start"] - segment["end"]
+            if pausa_siguiente > 0.8:
+                debe_cerrar = True
+        
+        elif i == len(word_segments) - 1:
+            debe_cerrar = True
+        
+        if segment["word"].rstrip().endswith(('.', '!', '?')):
+            debe_cerrar = True
+        
+        if debe_cerrar and grupo_actual:
+            texto_grupo = " ".join([w["word"] for w in grupo_actual])
+            grupos.append({
+                "line_text": texto_grupo,
+                "start": grupo_actual[0]["start"],
+                "end": grupo_actual[-1]["end"],
+                "words": grupo_actual
+            })
+            grupo_actual = []
+    
+    if grupo_actual:
+        texto_grupo = " ".join([w["word"] for w in grupo_actual])
+        grupos.append({
+            "line_text": texto_grupo,
+            "start": grupo_actual[0]["start"],
+            "end": grupo_actual[-1]["end"],
+            "words": grupo_actual
+        })
+    
+    return grupos
