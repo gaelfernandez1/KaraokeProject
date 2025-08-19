@@ -6,7 +6,7 @@ from moviepy.editor import AudioFileClip, VideoFileClip, CompositeAudioClip, Com
 from config import VOLUME_VOCAL, ALTO_VIDEO, MARXE_INFERIOR_SUBTITULO
 from audio_processing import video_to_mp3, separate_stems_cli, call_whisperx_endpoint, call_whisperx_endpoint_manual, transcribe_with_faster_whisper
 from video_processing import normalize_video
-from srt_processing import parse_word_srt, group_word_segments
+from srt_processing import parse_word_srt, group_word_segments, group_word_segments_automatic
 from text_processing import normalize_manual_lyrics
 from karaoke_rendering import create_karaoke_text_clip
 from utils import remove_previous_srt, clean_abnormal_segments, sanitize_filename
@@ -23,7 +23,9 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     
     remove_previous_srt()     ##Borro os srts anteriores por si acaso me daban conflicto ao ir probando a misma cancion repetidas veces
  
-    # Normalizo o video
+   # Normalizo o video. Por que? Porque añadin a parte de poder meter un MP4 para poder recortar videos e facer que
+    # ocupen menos, para facer ensayo e error mais rapidamente. Entonces necesito que o formato do video do link de YT
+    # e o formato do Mp4 sean o mesmo, porque si os subtitulos non son iguais non me sirve de nada practicar cos mp4s.
     try:
         video_path = normalize_video(video_path)
     except Exception as erro_normalizacion:      
@@ -38,24 +40,18 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     if not ruta_voz or not ruta_musica:
         return ""    
     
-    # NUEVA ESTRATEGIA: Transcribir con faster-whisper localmente
-    print("Iniciando transcripción automática...")
+    #cambio a faster whisper para o automatico por culpa do VAD de whisperx.
     transcribed_lyrics = transcribe_with_faster_whisper(ruta_voz)
     if not transcribed_lyrics:
-        print("Error: Non se puido transcribir o audio")
         return ""
     
-    print(f"Texto transcrito: {transcribed_lyrics[:100]}...")
     
-    # Normalizar las letras transcritas como si fueran manuales
+    #solucion medio casera, normalizo as letras como se foran manuales. mais ou menos fago todo o posible como se fora manual menos a trancricion
     letras_normalizadas = normalize_manual_lyrics(transcribed_lyrics)
     
-    # Usar el endpoint manual con las letras transcritas automáticamente
-    print("Realizando alineación forzada con letras transcritas...")
     whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, None, enable_diarization, hf_token)
     archivoSRT = ruta_voz.replace(".wav", "_whisperx.srt")
     
-    # Esperar a que se genere el archivo SRT
     tempo_maximo = 30  
     tempo_esperado = 0
     while not os.path.exists(archivoSRT) and tempo_esperado < tempo_maximo:
@@ -63,21 +59,22 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         tempo_esperado += 1
     
     if not os.path.exists(archivoSRT):
-        print(f"Error: Non se xerou o arquivo SRT despois de {tempo_maximo}s")
+        print(f"Error: Nnn se xerou o arquivo SRT despois d {tempo_maximo}s")    #se non encontra o srt despois do tempo ese, return ""
         return ""
     
-    if os.path.getsize(archivoSRT) == 0:
-        print("Error: O arquivo SRT está vacio")
+    if os.path.getsize(archivoSRT) == 0:  #Esto é para asegurar que o srt non esta vacio
+        print("error: O arquivo SRT está vacio")
         return ""
     
-    # Usar el mismo sistema de agrupación que el modo manual
+    #fixen unha funcion para agrupar frases no modo automatico, porque non pode ser con saltos de linea
     segmento_palabras = parse_word_srt(archivoSRT)
-    grupos_texto = group_word_segments(letras_normalizadas, segmento_palabras)
+    grupos_texto = group_word_segments_automatic(segmento_palabras, max_words_per_phrase=6, max_duration=3.5)
     if not grupos_texto:
-        print("Error na agrupación de texto")
         return ""
     
-    # Composición con moviepy (igual que en modo manual)
+    print(f"Creados {len(grupos_texto)} grupos de frases (debug) ")
+    
+    # Composición con moviepy (igual q en modo manual)
     try:
         audio_musica = AudioFileClip(ruta_musica).set_fps(44100)
         audio_voces = AudioFileClip(ruta_voz).volumex(VOLUME_VOCAL).set_fps(44100)
@@ -94,14 +91,13 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     
     video_escurecido = video_fondo.fl_image(lambda img: (img*0.3).astype("uint8"))
     
-    # Crear clips de karaoke usando la misma lógica que el modo manual
+   
     clips_karaoke = []
     for indice, grupo in enumerate(grupos_texto):
-        # Mostrar medio segundo antes por comodidad
+        #mostrar medio segundo antes por comodidad
         inicio_compensado = max(grupo["start"] - 0.5, 0)
         duracion_extendida = grupo["end"] - grupo["start"] + 1.0  
         
-        # Obtener línea siguiente si existe
         linha_seguinte = grupos_texto[indice + 1] if indice + 1 < len(grupos_texto) else None
         clip_texto = create_karaoke_text_clip(grupo, next_line_info=linha_seguinte, advance=0.5, duration_padding=0.5)
         
@@ -112,7 +108,6 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         
         clips_karaoke.append(clip_texto) 
 
-    # Crear video final superponiendo los clips de karaoke sobre el fondo
     video_final = CompositeVideoClip([video_escurecido] + clips_karaoke).set_audio(audio_mesturado)
     
     nome_video_base = os.path.basename(video_path).replace("_normalized", "")
