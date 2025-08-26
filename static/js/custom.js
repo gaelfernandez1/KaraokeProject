@@ -77,17 +77,54 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInputs = document.querySelectorAll('input[type="file"]');
     fileInputs.forEach(input => {
         input.addEventListener('change', function() {
-            const fileInfo = this.parentNode.querySelector('.file-info');
-            if (!fileInfo) return;
+            const wrapper = this.closest('.file-input-wrapper');
+            const fileInfo = this.parentNode.querySelector('.file-info') || 
+                            this.parentNode.parentNode.querySelector('.file-info');
+            const clearBtn = wrapper ? wrapper.querySelector('.btn-clear-file') : null;
             
             if (this.files && this.files[0]) {
                 const file = this.files[0];
                 const size = (file.size / (1024 * 1024)).toFixed(2); 
-                fileInfo.innerHTML = `<strong>${file.name}</strong> (${size} MB)`;
-                fileInfo.style.display = 'block';
+                if (fileInfo) {
+                    fileInfo.innerHTML = `<strong>${file.name}</strong> (${size} MB)`;
+                    fileInfo.style.display = 'block';
+                }
+                if (clearBtn) {
+                    clearBtn.style.display = 'block';
+                }
             } else {
-                fileInfo.style.display = 'none';
+                if (fileInfo) {
+                    fileInfo.style.display = 'none';
+                }
+                if (clearBtn) {
+                    clearBtn.style.display = 'none';
+                }
             }
+        });
+    });
+    
+    //para o de eliminar mp4
+    const clearFileButtons = document.querySelectorAll('.btn-clear-file');
+    clearFileButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const wrapper = this.closest('.file-input-wrapper');
+            const fileInput = wrapper.querySelector('input[type="file"]');
+            const fileInfo = wrapper.parentNode.querySelector('.file-info');
+            
+            if (fileInput) {
+                fileInput.value = '';
+                const event = new Event('change', { bubbles: true });
+                fileInput.dispatchEvent(event);
+            }
+            
+            if (fileInfo) {
+                fileInfo.style.display = 'none';
+                fileInfo.innerHTML = '';
+            }
+            
+            this.style.display = 'none';
         });
     });
     

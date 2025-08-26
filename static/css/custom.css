@@ -179,11 +179,45 @@ body::before {
   margin-right: 0.5rem;
 }
 
+.download-section .btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
 .download-section .btn-group .btn {
-  border-radius: 20px;
-  margin: 0.25rem;
+  border-radius: 20px !important;
+  margin: 0;
   font-weight: 500;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  flex: 0 1 auto;
+  min-width: 120px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  border: 1px solid !important;
+}
+
+.download-section .btn-group .btn-outline-primary {
+  border-color: var(--primary) !important;
+}
+
+.download-section .btn-group .btn-outline-secondary {
+  border-color: #6c757d !important;
+}
+
+.download-section .btn-group .btn-outline-info {
+  border-color: #29b6f6 !important;
+}
+
+.download-section .btn-group .btn-outline-success {
+  border-color: #28a745 !important;
+}
+
+.download-section .btn-group .btn {
+  border-radius: 20px !important;
 }
 
 .download-section .btn-group .btn:hover {
@@ -213,12 +247,17 @@ body::before {
   }
   
   .download-section .btn-group {
-    display: flex;
     flex-direction: column;
+    gap: 0.5rem;
   }
   
   .download-section .btn-group .btn {
-    margin: 0.25rem 0;
+    margin: 0;
+    min-width: auto;
+    width: 100%;
+    border-radius: 20px !important;
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
   }
 }
 
@@ -538,6 +577,67 @@ textarea.form-control {
   z-index: 1;
 }
 
+/* para o de eliminar mp4 */
+.file-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.btn-clear-file {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.btn-clear-file:hover {
+  background: #d32f2f;
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.btn-clear-file:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 61, 0, 0.25);
+}
+
+.btn-clear-file:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.btn-clear-file[style*="display: block"] {
+  animation: fadeInScale 0.3s ease;
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.file-input-wrapper .form-control {
+  padding-right: 45px;
+}
+
 @media (max-width: 768px) {
   .page-header {
     padding: 2rem 1rem;
@@ -556,5 +656,12 @@ textarea.form-control {
     min-width: 180px;
     left: auto !important;
     right: 0 !important;
+  }
+  
+  .btn-clear-file {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+    right: 8px;
   }
 }
