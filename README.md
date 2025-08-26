@@ -55,6 +55,7 @@ docker exec -it whisperx_container /bin/bash
 ```bash
 docker-compose logs -f demucs
 docker-compose logs -f whisperx
+docker-compose logs -f celery_worker
 ```
 
 ### Copiar cousas do contenedor a local

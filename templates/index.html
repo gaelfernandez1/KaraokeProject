@@ -28,13 +28,18 @@
             <p class="text-center my-2">- ou -</p>
               <div class="mb-3">
               <label for="video_file" class="form-label"><i class="fas fa-file-video"></i> Subir vídeo MP4</label>
-              <input
-                type="file"
-                class="form-control"
-                id="video_file"
-                name="video_file"
-                accept=".mp4"
-              >
+              <div class="file-input-wrapper">
+                <input
+                  type="file"
+                  class="form-control"
+                  id="video_file"
+                  name="video_file"
+                  accept=".mp4"
+                >
+                <button type="button" class="btn-clear-file" style="display: none;" title="Eliminar arquivo">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
               <div class="file-info mt-2" style="display: none;"></div>
             </div>
             
@@ -125,13 +130,19 @@
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="video_file_instrumental" class="form-label"><i class="fas fa-file-video"></i> Subir MP4 ou <i class="fas fa-file-audio"></i> MP3</label>
-                  <input
-                    type="file"
-                    class="form-control"
-                    id="video_file_instrumental"
-                    name="video_file"
-                    accept=".mp4,.mp3"
-                  >
+                  <div class="file-input-wrapper">
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="video_file_instrumental"
+                      name="video_file"
+                      accept=".mp4,.mp3"
+                    >
+                    <button type="button" class="btn-clear-file" style="display: none;" title="Eliminar arquivo">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div class="file-info mt-2" style="display: none;"></div>
                 </div>
               </div>
             </div>

@@ -43,7 +43,7 @@ def descargar_video_youtube(url: str, directorio_saida: str = DIRECTORIO_ENTRADA
 
     opcions_ydl = {
         'outtmpl': os.path.join(directorio_saida, '%(title)s.%(ext)s'),
-        'format': 'bestvideo[height>=720][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',   # Esta combinacion funciona, varias que probei antes daban diversos errores
+        'format': 'best[ext=mp4]/mp4/best',   #arreglado, comentar no commit
         'noplaylist': True
     }
     with yt_dlp.YoutubeDL(opcions_ydl) as ydl:
@@ -307,7 +307,7 @@ def servir_video(filename):
 
     ruta_archivo = os.path.join(DIRECTORIO_SAIDA, filename)
     if not os.path.exists(ruta_archivo):
-        return "Archivo non encontrado", 404
+        return "Arquiivo non encontrado", 404
     
     return send_file(ruta_archivo, mimetype='video/mp4')
 
@@ -348,7 +348,6 @@ def descargar_archivo(filename):
 
 @app.route("/library")
 def biblioteca_cancions():
-    """Páxina da biblioteca de cancións gardadas"""
     from database import get_all_songs, get_database_stats
     from metadata_utils import format_file_size, format_duration
     
@@ -356,19 +355,17 @@ def biblioteca_cancions():
         songs = get_all_songs()
         stats = get_database_stats()
         
-        # Formatear tamaños e duracións para mostrar
         for song in songs:
             song['formatted_file_size'] = format_file_size(song['file_size'] or 0)
             song['formatted_duration'] = format_duration(song['duration'])
         
         return render_template("library.html", songs=songs, stats=stats)
     except Exception as e:
-        return f"Erro cargando biblioteca: {e}", 500
+        return f"erro cargando biblioteca: {e}", 500
 
 
 @app.route("/library/search")
 def buscar_cancions():
-    """Endpoint para buscar cancións na biblioteca"""
     from database import get_songs_by_search
     from metadata_utils import format_file_size, format_duration
     
@@ -379,70 +376,55 @@ def buscar_cancions():
     try:
         songs = get_songs_by_search(query)
         
-        # Formatear tamaños e duracións
         for song in songs:
             song['formatted_file_size'] = format_file_size(song['file_size'] or 0)
             song['formatted_duration'] = format_duration(song['duration'])
         
         return render_template("library.html", songs=songs, search_query=query)
     except Exception as e:
-        return f"Erro buscando cancións: {e}", 500
+        return f"Error buscando cancións: {e}", 500
 
 
 @app.route("/library/play/<int:song_id>")
 def reproducir_dende_biblioteca(song_id):
-    """Reproduce unha canción dende a biblioteca usando o seu ID"""
     from database import get_song_by_id, update_last_played
     
     try:
         song = get_song_by_id(song_id)
         if not song:
-            return "Canción non encontrada na biblioteca", 404
+            return "Canción non encontrada", 404
         
-        # Verificar que o arquivo existe
         ruta_video = os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename'])
         if not os.path.exists(ruta_video):
             return "Arquivo de video non encontrado", 404
         
-        # Actualizar timestamp da última reprodución
         update_last_played(song_id)
-        
-        # Redirigir ao reproductor
         return redirect(url_for('reproductor_karaoke', filename=song['karaoke_filename']))
         
     except Exception as e:
-        return f"Erro reproducindo canción: {e}", 500
+        return f"Error reproducindo canción: {e}", 500
 
 
 @app.route("/library/delete/<int:song_id>", methods=["POST"])
 def borrar_cancion_biblioteca(song_id):
-    """Borra unha canción da biblioteca e os seus arquivos"""
     from database import get_song_by_id, delete_song
     
     try:
         song = get_song_by_id(song_id)
         if not song:
-            return "Canción non encontrada na biblioteca", 404
+            return "Canción non encontrada na bib", 404
         
-        # Lista de arquivos para borrar
         arquivos_para_borrar = []
         
-        # Arquivo principal de karaoke
         if song['karaoke_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename']))
-        
-        # Video sin audio
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename']))        
         if song['video_only_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['video_only_filename']))
-        
-        # Arquivos de audio
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['video_only_filename']))        
         if song['vocal_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['vocal_filename']))
-        
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['vocal_filename']))      
         if song['instrumental_filename']:
             arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['instrumental_filename']))
         
-        # Borrar arquivos do disco
         arquivos_borrados = 0
         for arquivo in arquivos_para_borrar:
             try:
@@ -453,12 +435,11 @@ def borrar_cancion_biblioteca(song_id):
             except Exception as e:
                 print(f"Erro borrando arquivo {arquivo}: {e}")
         
-        # Borrar da base de datos
         if delete_song(song_id):
             print(f"Canción {song['title']} borrada da biblioteca (ID: {song_id})")
             return redirect(url_for('biblioteca_cancions'))
         else:
-            return "Erro borrando canción da base de datos", 500
+            return "error borrando canción", 500
             
     except Exception as e:
         return f"Erro borrando canción: {e}", 500
