@@ -43,8 +43,19 @@ def descargar_video_youtube(url: str, directorio_saida: str = DIRECTORIO_ENTRADA
 
     opcions_ydl = {
         'outtmpl': os.path.join(directorio_saida, '%(title)s.%(ext)s'),
-        'format': 'best[ext=mp4]/mp4/best',   #arreglado, comentar no commit
-        'noplaylist': True
+        'format': 'best[height<=720][ext=mp4]/best[height<=1080][ext=mp4]/best[ext=mp4]/best',
+        'noplaylist': True,
+        'extract_flat': False,
+        'concurrent_fragment_downloads': 1,
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        },
+        'extractor_args': {
+            'youtube': {
+                'skip': ['hls', 'dash'],
+                'player_client': ['android', 'web']
+            }
+        }
     }
     with yt_dlp.YoutubeDL(opcions_ydl) as ydl:
         info = ydl.extract_info(url, download=True)
