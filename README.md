@@ -1,13 +1,13 @@
 # Karaoke con IA - Proxecto TFG - Gael Fernández
 
-Creación automática de vídeos de karaoke multilinüe mediante ferramentas de aprendizaxe profundo utilizando demucs, whisperx e moviepy.
+Creación automática de vídeos de karaoke multilinües mediante ferramentas de aprendizaxe profundo utilizando Demucs, WhisperX e MoviePy.
 
 
 ## Guía de instalación
 
 Paso 1: Descargar Docker Desktop no equipo
 
-Paso 2: Istalar anaconda e usar o anaconda prompt(ou o sistema preferido de cada usuario). a versión de python usada é a 3.10.16 pero probablemente funciona con versións de python superiores. Opcional usar un conda environment
+Paso 2: Instalar anaconda e usar o anaconda prompt(ou o sistema preferido de cada usuario). a versión de python usada é a 3.10.16 pero pode funcionar con versións de python superiores. Opcional usar un conda environment
 
 Paso 3: Clonar o repositorio do proxecto
 
@@ -16,7 +16,7 @@ Paso 3: Clonar o repositorio do proxecto
 
 ### Compilar e executar os contedores
 
-Primeiro abre Docker Desktop e deixa a máquina correndo (Engine Running), con abrir Docker Desktop é suficiente en principio.
+Primeiro abre Docker Desktop e deixa a máquina correndo (Engine Running), con abrir Docker Desktop é suficiente.
 
 Agora no anaconda prompt, meterse na carpeta do proxecto e executar os seguintes comandos:
 
@@ -30,15 +30,13 @@ Despois de iniciar os contedores, accede á aplicación web en: http://127.0.0.1
 Para compartir a web con terceiros, vai a http://localhost:4040    (ngrok),  copia a nova URL pública e compártea!
 
 ## Activación de Speaker Diarization
-1. Marcar checkbox "Enable Speaker Diarization" na interfaz web
-2. Introducir token válido de HuggingFace. IMPORTANTE: Tras autenticarte, hai que aceptar os termos e condicións dos seguintes modelos:
-https://huggingface.co/pyannote/speaker-diarization-3.1
-https://huggingface.co/pyannote/segmentation-3.0
+1. Marcar checkbox "Enable Speaker Diarization" na interface web
 
-Despois crea un token modo READ na seguinte ligazón:
-https://huggingface.co/settings/tokens
+2. Introducir token válido de HuggingFace. IMPORTANTE: Tras autenticarse, hai que aceptar os termos e condicións dos seguintes modelos: https://huggingface.co/pyannote/speaker-diarization-3.1 e https://huggingface.co/pyannote/segmentation-3.0
 
-3. Procesar video normalmente
+3. Despois crea un token modo READ na seguinte ligazón: https://huggingface.co/settings/tokens
+
+4. Procesar vídeo normalmente
 
 
 ## Comandos para debug
@@ -61,8 +59,8 @@ docker-compose logs -f celery_worker
 ### Copiar cousas do contenedor a local
 docker cp whisperx_container:/data/. "ruta a onde queiras copiar"    
 docker cp demucs_container:/KaraokeProject/output/. "ruta a onde queiras copiar"
+<!--  docker cp whisperx_container:/data/. "C:\Users\gaelb\Desktop\KaraokeProject\carpetaconsrt"  -->
 
-docker cp whisperx_container:/data/. "C:\Users\gaelb\Desktop\KaraokeProject\carpetaconsrt" 
 
 ### Limpar datos
 
@@ -70,7 +68,7 @@ docker cp whisperx_container:/data/. "C:\Users\gaelb\Desktop\KaraokeProject\carp
 docker exec -it demucs_container bash -c "rm -rf /data/*"
 ```
 
-### Liberar espazo de contedores no pc(docker)
+### Liberar espazo de contedores no pc (Docker)
 
 ```bash
 docker system prune -a --volumes
