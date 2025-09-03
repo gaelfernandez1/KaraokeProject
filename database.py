@@ -30,12 +30,24 @@ def init_database():
             manual_lyrics TEXT,  -- Letras manuais se aplica
             language TEXT,
             enable_diarization BOOLEAN DEFAULT FALSE,
+            whisper_model TEXT DEFAULT 'small',  -- Modelo Whisper utilizado
             file_size INTEGER,
             duration REAL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_played TIMESTAMP
         )
     ''')
+    
+    # Migración: Añadir columna whisper_model a tablas existentes si no existe
+    try:
+        cursor.execute("ALTER TABLE songs ADD COLUMN whisper_model TEXT DEFAULT 'small'")
+        print("Columna whisper_model añadida a la tabla songs")
+    except sqlite3.OperationalError as e:
+        # La columna ya existe - esto es normal
+        if "duplicate column name" not in str(e).lower():
+            print(f"Error en migración whisper_model: {e}")
+        else:
+            print("Columna whisper_model ya existe - saltando migración")
     
     conn.commit()
     conn.close()
@@ -44,13 +56,17 @@ def save_song_to_database(song_data: Dict) -> int:
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     
+    # Debug: imprimir el modelo que se está guardando
+    whisper_model = song_data.get('whisper_model', 'small')
+    print(f"DEBUG: Guardando canción con whisper_model = '{whisper_model}'")
+    
     cursor.execute('''
         INSERT INTO songs (
             title, original_filename, karaoke_filename, video_only_filename,
             vocal_filename, instrumental_filename, source_type, source_url,
             processing_type, manual_lyrics, language, enable_diarization,
-            file_size, duration, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            whisper_model, file_size, duration, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         song_data.get('title'),
         song_data.get('original_filename'),
@@ -64,6 +80,7 @@ def save_song_to_database(song_data: Dict) -> int:
         song_data.get('manual_lyrics'),
         song_data.get('language'),
         song_data.get('enable_diarization', False),
+        whisper_model,
         song_data.get('file_size'),
         song_data.get('duration'),
         datetime.now().isoformat()

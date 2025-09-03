@@ -88,12 +88,13 @@ def xerar_karaoke():
     
     enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
+    whisper_model = request.form.get("whisper_model", "small").strip()  #para poder elixir modelo de whisper na interface
     
     source_type = "upload" if arquivo_subido else "youtube"
     source_url = url_youtube if not arquivo_subido else None
     
     task = process_automatic_karaoke.delay(
-        ruta_video, enable_diarization, hf_token, source_type, source_url, True
+        ruta_video, enable_diarization, hf_token, whisper_model, source_type, source_url, True
     )
     
     session['current_task_id'] = task.id
@@ -130,12 +131,13 @@ def procesar_letras_manuales():
     
     enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
+    whisper_model = request.form.get("whisper_model", "small").strip() #o mesmo, para elegir modelo de whisper
     
     source_type = "upload" if arquivo_subido else "youtube"
     source_url = url_youtube if not arquivo_subido else None
     
     task = process_manual_lyrics_karaoke.delay(
-        ruta_video, letra_manual, None, enable_diarization, hf_token, 
+        ruta_video, letra_manual, None, enable_diarization, hf_token, whisper_model,
         source_type, source_url, True
     )
     

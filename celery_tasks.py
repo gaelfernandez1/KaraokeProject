@@ -28,7 +28,7 @@ def check_if_cancelled():
 
 
 @celery.task(bind=True, name='process_automatic_karaoke')
-def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_token=None, 
+def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_token=None, whisper_model="small",
                              source_type="upload", source_url=None, save_to_db=True):
  
     task_id = self.request.id
@@ -40,7 +40,7 @@ def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_tok
         
         #chamar a función orixinal pero con checkeos de cancelacion
         resultado = create_with_cancellation_check(
-            video_path, enable_diarization, hf_token, source_type, source_url, save_to_db
+            video_path, enable_diarization, hf_token, whisper_model, source_type, source_url, save_to_db
         )
         
         if not resultado:
@@ -73,7 +73,7 @@ def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_tok
 
 @celery.task(bind=True, name='process_manual_lyrics_karaoke')  
 def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None, 
-                                 enable_diarization=False, hf_token=None,
+                                 enable_diarization=False, hf_token=None, whisper_model="small",
                                  source_type="upload", source_url=None, save_to_db=True):
 
     task_id = self.request.id
@@ -83,7 +83,7 @@ def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None
         
         check_if_cancelled()
         resultado = create_with_manual_lyrics_with_cancellation_check(
-            video_path, manual_lyrics, language, enable_diarization, hf_token,
+            video_path, manual_lyrics, language, enable_diarization, hf_token, whisper_model,
             source_type, source_url, save_to_db
         )
         
@@ -153,24 +153,41 @@ def process_instrumental_only(self, video_path, source_type="upload", source_url
         raise Exception(error_msg)
 
 
-def create_with_cancellation_check(video_path, enable_diarization=False, hf_token=None,
+def create_with_cancellation_check(video_path, enable_diarization=False, hf_token=None, whisper_model="small",
                                   source_type="upload", source_url=None, save_to_db=True):
 
     check_if_cancelled()
     
     #aqui igual poderia añadir mais chequeos nas etapas criticas, de momento chamo solo a funcion original
-    return create(video_path, enable_diarization, hf_token, source_type, source_url, save_to_db)
+    return create(
+        video_path=video_path, 
+        enable_diarization=enable_diarization, 
+        hf_token=hf_token, 
+        whisper_model=whisper_model, 
+        source_type=source_type, 
+        source_url=source_url, 
+        save_to_db=save_to_db
+    )
 
 
 def create_with_manual_lyrics_with_cancellation_check(video_path, manual_lyrics, language=None,
-                                                     enable_diarization=False, hf_token=None,
+                                                     enable_diarization=False, hf_token=None, whisper_model="small",
                                                      source_type="upload", source_url=None, save_to_db=True):
 
     check_if_cancelled()
     
     #o mismo
-    return create_with_manual_lyrics(video_path, manual_lyrics, language, enable_diarization, 
-                                   hf_token, source_type, source_url, save_to_db)
+    return create_with_manual_lyrics(
+        video_path=video_path, 
+        manual_lyrics=manual_lyrics, 
+        language=language, 
+        enable_diarization=enable_diarization, 
+        hf_token=hf_token, 
+        whisper_model=whisper_model, 
+        source_type=source_type, 
+        source_url=source_url, 
+        save_to_db=save_to_db
+    )
 
 
 def generate_instrumental_with_cancellation_check(video_path, source_type="upload", source_url=None, save_to_db=True):
