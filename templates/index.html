@@ -43,6 +43,23 @@
               <div class="file-info mt-2" style="display: none;"></div>
             </div>
             
+            <div class="mb-3">
+              <label for="whisper_model" class="form-label">
+                <i class="fas fa-brain"></i> Modelo de Whisper para transcrición
+              </label>
+              <select class="form-control" id="whisper_model" name="whisper_model">
+                <option value="tiny">Tiny - (~39MB, ~1GB VRAM)</option>
+                <option value="base">Base - (~74MB, ~1GB VRAM)</option>
+                <option value="small" selected>Small - (~244MB, ~2GB VRAM)</option>
+                <option value="medium">Medium - (~769MB, ~5GB VRAM)</option>
+                <option value="large-v2">Large-v2 (~1.5GB, ~10GB VRAM)</option>
+                <option value="large-v3">Large-v3 (~1.5GB, ~10GB VRAM)</option>
+              </select>
+              <small class="form-text text-muted">
+                <strong>Para transcrición automática:</strong> Modelos máis grandes ofrecen mellor precisión pero requieren máis tempo e memoria.<br>
+                <i class="fas fa-lightbulb"></i> <strong>Recomendado:</strong> <span class="badge bg-success">medium</span> para galego | <span class="badge bg-info">Large-v2</span> para máxima calidade
+              </small>
+            </div>
             
             <div class="mb-3">
               <div class="form-check">

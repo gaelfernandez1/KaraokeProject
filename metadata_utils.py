@@ -61,6 +61,7 @@ def generate_song_metadata(
     manual_lyrics: Optional[str] = None,
     language: Optional[str] = None,
     enable_diarization: bool = False,
+    whisper_model: str = "small",
     output_dir: str = "output"
 ) -> Dict:
     """Xera metadatos completos para unha canción"""
@@ -103,6 +104,7 @@ def generate_song_metadata(
         'manual_lyrics': manual_lyrics,
         'language': language,
         'enable_diarization': enable_diarization,
+        'whisper_model': whisper_model,
         'file_size': file_size,
         'duration': duration
     }

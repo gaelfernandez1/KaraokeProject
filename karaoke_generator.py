@@ -18,7 +18,7 @@ from metadata_utils import generate_song_metadata
 #Este é o create para a version automática. WhisperX transcribe él mismo, despois parsease o SRT en tokens
 #agrupanse en frases cada N palabras e despois renderizase o karaoke
 
-def create(video_path: str, enable_diarization: bool = False, hf_token: str = None, 
+def create(video_path: str, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small",
            source_type: str = "upload", source_url: str = None, save_to_db: bool = True):
     
     remove_previous_srt()     ##Borro os srts anteriores por si acaso me daban conflicto ao ir probando a misma cancion repetidas veces
@@ -41,7 +41,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         return ""    
     
     #cambio a faster whisper para o automatico por culpa do VAD de whisperx.
-    transcribed_lyrics = transcribe_with_faster_whisper(ruta_voz)
+    transcribed_lyrics = transcribe_with_faster_whisper(ruta_voz, whisper_model)
     if not transcribed_lyrics:
         return ""
     
@@ -49,7 +49,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     #solucion medio casera, normalizo as letras como se foran manuales. mais ou menos fago todo o posible como se fora manual menos a trancricion
     letras_normalizadas = normalize_manual_lyrics(transcribed_lyrics)
     
-    whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, None, enable_diarization, hf_token)
+    whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, None, enable_diarization, hf_token, whisper_model)
     archivoSRT = ruta_voz.replace(".wav", "_whisperx.srt")
     
     tempo_maximo = 30  
@@ -162,6 +162,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
                 source_url=source_url,
                 processing_type="automatic",
                 enable_diarization=enable_diarization,
+                whisper_model=whisper_model,
                 output_dir="./output"
             )
             song_id = save_song_to_database(metadata)
@@ -175,7 +176,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
 
 
 # A outra variante, uso de FORCED ALIGNMENT
-def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None,
+def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small",
                              source_type: str = "upload", source_url: str = None, save_to_db: bool = True) -> str:
 
     remove_previous_srt()
@@ -202,7 +203,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         return ""    
     
     # Endpoint pero da letra manual con parámetros de diarization
-    whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, language, enable_diarization, hf_token)
+    whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, language, enable_diarization, hf_token, whisper_model)
     archivoSRT = ruta_voz.replace(".wav","_whisperx.srt")
     
     
@@ -331,6 +332,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
                 manual_lyrics=manual_lyrics,
                 language=language,
                 enable_diarization=enable_diarization,
+                whisper_model=whisper_model,
                 output_dir="./output"
             )
             song_id = save_song_to_database(metadata)

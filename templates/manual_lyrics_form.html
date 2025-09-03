@@ -63,6 +63,24 @@
             <div class="row mt-3">
               <div class="col-12">
                 <div class="mb-3">
+                  <label for="whisper_model_manual" class="form-label">
+                    <i class="fas fa-brain"></i> Modelo de Whisper para aliñación
+                  </label>
+                  <select class="form-control" id="whisper_model_manual" name="whisper_model">
+                    <option value="tiny">Tiny - (~39MB, ~1GB VRAM)</option>
+                    <option value="base">Base - (~74MB, ~1GB VRAM)</option>
+                    <option value="small" selected>Small - (~244MB, ~2GB VRAM)</option>
+                    <option value="medium">Medium - (~769MB, ~5GB VRAM)</option>
+                    <option value="large-v2">Large-v2 - (~1.5GB, ~10GB VRAM)</option>
+                    <option value="large-v3">Large-v3 - (~1.5GB, ~10GB VRAM)</option>
+                  </select>
+                  <small class="form-text text-muted">
+                    <strong>Para aliñación forzada:</strong> Modelos máis grandes adoitan dar mellor sincronización do texto co audio.<br>
+                    <i class="fas fa-lightbulb"></i> <strong>Recomendado:</strong> <span class="badge bg-success">small</span> para uso xeral | <span class="badge bg-info">medium</span> para gran precisión
+                  </small>
+                </div>
+                
+                <div class="mb-3">
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="enable_diarization_manual" name="enable_diarization" value="true">
                     <label class="form-check-label" for="enable_diarization_manual">

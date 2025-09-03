@@ -114,11 +114,12 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
 
 # Esto chama ao endpoint de  whisperx para facer a transcripción automatica
-def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, hf_token: str = None):
-    url = "http://whisperx:5001/align"              #dentro da red docker
+def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small"):
+    url = "http://whisperx:5001/align"              #dentro da rede docker
     datos_envio = {
         "audio_path": vocals_path,
-        "enable_diarization": enable_diarization
+        "enable_diarization": enable_diarization,
+        "whisper_model": whisper_model
     }
     
     # Agregar token de HuggingFace
@@ -140,12 +141,13 @@ def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, h
 
 
 #Esto chama ao endpoint pero da letra manual
-def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None):
+def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small"):
     url = "http://whisperx:5001/align"
     datos_envio = {
         "audio_path": vocals_path,
         "manual_lyrics": manual_lyrics,
-        "enable_diarization": enable_diarization
+        "enable_diarization": enable_diarization,
+        "whisper_model": whisper_model
     }
     
     # Solo añadir language si se especifica, si non WhisperX detectará automáticamente
@@ -171,7 +173,7 @@ def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language
 
 
 #Cambio obligado. Problemas con VAD de whisperx, voy a transcribir directamente con faster whisper e alinear con whisperx
-def transcribe_with_faster_whisper(audio_path: str) -> str:
+def transcribe_with_faster_whisper(audio_path: str, model_size: str = "tiny") -> str:
 
     try:
         from faster_whisper import WhisperModel
@@ -181,10 +183,9 @@ def transcribe_with_faster_whisper(audio_path: str) -> str:
         compute_type = "int8"
         
         try:
-
-            model = WhisperModel("tiny", device=device, compute_type=compute_type)
+            model = WhisperModel(model_size, device=device, compute_type=compute_type)
         except Exception as e:
-            print(f"Error cargando modelo {e}")
+            print(f"Erro cargando modelo {model_size}: {e}")
             raise
         
         segments, info = model.transcribe(audio_path, language=None)

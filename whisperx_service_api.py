@@ -44,7 +44,8 @@ def align_endpoint():
     letra_manual = datos.get("manual_lyrics", None)
     codigo_idioma = datos.get("language", None)
     enable_diarization = datos.get("enable_diarization", False)
-    hf_token = datos.get("hf_token", None)  
+    hf_token = datos.get("hf_token", None)
+    whisper_model = datos.get("whisper_model", "small")  
 
     dispositivo = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"-------USANDO DISPOSITIVO----- device={dispositivo}, audio={ruta_audio}")
@@ -53,16 +54,16 @@ def align_endpoint():
         if not codigo_idioma:            
             
             try:
-                modelo_deteccion = whisperx.load_model("small", device=dispositivo, compute_type="int8")
+                modelo_deteccion = whisperx.load_model(whisper_model, device=dispositivo, compute_type="int8")
                 resultado_deteccion = modelo_deteccion.transcribe(ruta_audio, language=None)  
                 codigo_idioma = resultado_deteccion["language"]
-                print(f"Autodetectado => {codigo_idioma}")
+                print(f"Autodetectado con modelo {whisper_model} => {codigo_idioma}")
 
                 # Liberar memoria 
                 del modelo_deteccion
                 torch.cuda.empty_cache() if torch.cuda.is_available() else None
             except Exception as e:
-                print(f"Erro na detección automática, usando inglés por defecto: {e}")
+                print(f"Erro, usando inglés por defecto: {e}")
                 codigo_idioma = "en"
 
         total_segundos = get_duration(ruta_audio)
@@ -89,10 +90,11 @@ def align_endpoint():
 
     else:        #TRANSCRICIÓN AUTOMÁTICA
         
-        modelo = whisperx.load_model("small", device=dispositivo, compute_type="int8")
+        print(f"Usando modelo {whisper_model} para transcrición automática")
+        modelo = whisperx.load_model(whisper_model, device=dispositivo, compute_type="int8")
         resultado = modelo.transcribe(ruta_audio, language=None)  
         codigo_idioma = resultado["language"]
-        print(f"IDIOMA DETECTADO={codigo_idioma}")
+        print(f"idioma detectado con {whisper_model}={codigo_idioma}")
         del modelo
         torch.cuda.empty_cache() if torch.cuda.is_available() else None
 

@@ -110,6 +110,12 @@
                             {% if song.enable_diarization %}
                                 <span class="badge bg-warning ms-1">Diarización</span>
                             {% endif %}
+                            
+                            {% if song.whisper_model %}
+                                <span class="badge bg-secondary ms-1">
+                                    <i class="fas fa-brain"></i> {{ song.whisper_model }}
+                                </span>
+                            {% endif %}
                         </div>
                         
                         <small class="text-muted">
