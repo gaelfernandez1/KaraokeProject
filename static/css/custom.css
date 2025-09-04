@@ -57,6 +57,7 @@ body::before {
   height: auto;
   max-height: 60vh;
   display: block;
+  cursor: pointer;
 }
 
 .audio-controls-panel {
@@ -149,6 +150,7 @@ body::before {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3);
 }
 
 .playback-controls .btn-lg {

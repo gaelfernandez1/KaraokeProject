@@ -25,9 +25,15 @@ class KaraokePlayer {
         
         this.vocalAudio.volume = 0.05; // 5%
         this.instrumentalAudio.volume = 1.0; // 100%
+        
         this.setupEventListeners();
         this.setupSynchronization();
         this.setupBeforeUnloadConfirmation();
+        
+        this.video.addEventListener('loadeddata', () => {
+            this.video.volume = 0;
+            this.video.muted = true;
+        });
         
         console.log('Reprodutor de karaoke inicializado');
     }
@@ -53,9 +59,59 @@ class KaraokePlayer {
             this.syncAudioToVideo();
         });
         
+        this.video.addEventListener('seeking', () => {
+            if (this.isPlaying) {
+                this.pauseAudioTracks();
+            }
+        });
+        
+        this.video.addEventListener('seeked', () => {
+            this.syncAudioToVideo();
+            if (this.isPlaying) {
+                this.playAudioTracks();
+            }
+        });
+        
+        this.video.addEventListener('play', () => {
+            if (!this.isPlaying) {
+                this.playAudioTracks();
+                this.updatePlayPauseButton(true);
+            }
+        });
+        
+        this.video.addEventListener('pause', () => {
+            if (this.isPlaying) {
+                this.pauseAudioTracks();
+                this.updatePlayPauseButton(false);
+            }
+        });
+        
+        this.video.addEventListener('timeupdate', () => {
+            if (this.isPlaying) {
+                this.syncAudioToVideo();
+            }
+        });
+        
+        this.video.addEventListener('loadedmetadata', () => {
+            this.video.volume = 0;
+            this.video.muted = true;
+        });
+        
+        this.video.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.togglePlayPause();
+        });
+        
+        this.video.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                this.togglePlayPause();
+            }
+        });
+        
         //Control de teclado
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
                 e.preventDefault();
                 this.togglePlayPause();
             }
@@ -84,25 +140,79 @@ class KaraokePlayer {
         }
     }
     
+    updatePlayPauseButton(isPlaying) {
+        this.isPlaying = isPlaying;
+        if (isPlaying) {
+            this.playPauseIcon.className = 'fas fa-pause';
+            this.playPauseBtn.innerHTML = '<i class="fas fa-pause" id="playPauseIcon"></i> Pausar';
+            this.hasStartedPlaying = true;
+        } else {
+            this.playPauseIcon.className = 'fas fa-play';
+            this.playPauseBtn.innerHTML = '<i class="fas fa-play" id="playPauseIcon"></i> Reproducir';
+        }
+        this.playPauseIcon = document.getElementById('playPauseIcon');
+    }
+    
+    async playAudioTracks() {
+        try {
+            this.syncAudioToVideo();
+            
+            if (this.vocalAudio.readyState >= 2 && this.instrumentalAudio.readyState >= 2) {
+                await Promise.all([
+                    this.vocalAudio.play(),
+                    this.instrumentalAudio.play()
+                ]);
+            } else {
+                await new Promise((resolve) => {
+                    const checkReady = () => {
+                        if (this.vocalAudio.readyState >= 2 && this.instrumentalAudio.readyState >= 2) {
+                            resolve();
+                        } else {
+                            setTimeout(checkReady, 100);
+                        }
+                    };
+                    checkReady();
+                });
+                
+                await Promise.all([
+                    this.vocalAudio.play(),
+                    this.instrumentalAudio.play()
+                ]);
+            }
+        } catch (error) {
+            console.error('Erro ao reproducir pistas de audio:', error);
+            this.showError('Erro ao reproducir audio. Comproba que os arquivos estean dispoñibles.');
+        }
+    }
+    
+    pauseAudioTracks() {
+        try {
+            const vocalPaused = this.vocalAudio.pause();
+            const instrumentalPaused = this.instrumentalAudio.pause();
+            
+            if (vocalPaused instanceof Promise) {
+                vocalPaused.catch(e => console.warn('Erro pausando vocal:', e));
+            }
+            if (instrumentalPaused instanceof Promise) {
+                instrumentalPaused.catch(e => console.warn('Erro pausando instrumental:', e));
+            }
+        } catch (error) {
+            console.error('Erro ao pausar pistas de audio:', error);
+        }
+    }
+    
     async togglePlayPause() {
         try {
             if (this.isPlaying) {
                 this.video.pause();
-                this.vocalAudio.pause();
-                this.instrumentalAudio.pause();
-                
-                this.playPauseIcon.className = 'fas fa-play';
-                this.isPlaying = false;
+                this.pauseAudioTracks();
+                this.updatePlayPauseButton(false);
             } else {
                 this.syncAudioToVideo();
                 
                 await this.video.play();
-                await this.vocalAudio.play();
-                await this.instrumentalAudio.play();
-                
-                this.playPauseIcon.className = 'fas fa-pause';
-                this.isPlaying = true;
-                this.hasStartedPlaying = true;
+                await this.playAudioTracks();
+                this.updatePlayPauseButton(true);
             }
         } catch (error) {
             console.error('Erro ao reproducir:', error);
@@ -133,9 +243,8 @@ class KaraokePlayer {
     stopPlayback() {
         if (this.isPlaying) {
             this.video.pause();
-            this.vocalAudio.pause();
-            this.instrumentalAudio.pause();
-            this.isPlaying = false;
+            this.pauseAudioTracks();
+            this.updatePlayPauseButton(false);
             console.log('Reprodución cancelada');
         }
     }

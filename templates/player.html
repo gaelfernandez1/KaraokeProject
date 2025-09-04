@@ -10,7 +10,7 @@
       <div class="player-container">
         <!-- Reprodutor de video -->
         <div class="video-container mb-3">
-          <video id="karaokeVideo" class="video-player" controls preload="metadata">
+          <video id="karaokeVideo" class="video-player" controls preload="metadata" controlsList="novolume">
             <source src="{{ url_for('servir_video', filename=video_filename) }}" type="video/mp4">
             O teu navegador non soporta o reproductor de video.
           </video>
