@@ -35,7 +35,7 @@ def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_tok
     
     try:
         self.update_state(state='PROGRESS', meta={
-            'status': 'Iniciando procesamiento automático...', 
+            'status': 'Iniciando procesamento automático...', 
             'current': 0, 
             'total': 100
         })
@@ -84,7 +84,7 @@ def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None
     
     try:
         self.update_state(state='PROGRESS', meta={
-            'status': 'Iniciando procesamento con letras manuales...', 
+            'status': 'Iniciando procesamento con letras manuais...', 
             'current': 0, 
             'total': 100
         })
