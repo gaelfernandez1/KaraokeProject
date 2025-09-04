@@ -34,13 +34,17 @@ def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_tok
     task_id = self.request.id
     
     try:
-        self.update_state(state='PROGRESS', meta={'status': 'Iniciando procesamiento automático...'})
+        self.update_state(state='PROGRESS', meta={
+            'status': 'Iniciando procesamiento automático...', 
+            'current': 0, 
+            'total': 100
+        })
         
         check_if_cancelled()
         
-        #chamar a función orixinal pero con checkeos de cancelacion
+        #chamar a función orixinal pero con checkeos de cancelacion e actualizacións de progreso
         resultado = create_with_cancellation_check(
-            video_path, enable_diarization, hf_token, whisper_model, source_type, source_url, save_to_db
+            self, video_path, enable_diarization, hf_token, whisper_model, source_type, source_url, save_to_db
         )
         
         if not resultado:
@@ -79,11 +83,15 @@ def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None
     task_id = self.request.id
     
     try:
-        self.update_state(state='PROGRESS', meta={'status': 'Iniciando procesamento con letras manuales...'})
+        self.update_state(state='PROGRESS', meta={
+            'status': 'Iniciando procesamento con letras manuales...', 
+            'current': 0, 
+            'total': 100
+        })
         
         check_if_cancelled()
         resultado = create_with_manual_lyrics_with_cancellation_check(
-            video_path, manual_lyrics, language, enable_diarization, hf_token, whisper_model,
+            self, video_path, manual_lyrics, language, enable_diarization, hf_token, whisper_model,
             source_type, source_url, save_to_db
         )
         
@@ -120,11 +128,17 @@ def process_instrumental_only(self, video_path, source_type="upload", source_url
     task_id = self.request.id
     
     try:
-        self.update_state(state='PROGRESS', meta={'status': 'Xerando instrumental...'})
+        self.update_state(state='PROGRESS', meta={
+            'status': 'Xerando instrumental...', 
+            'current': 0, 
+            'total': 100
+        })
         
         check_if_cancelled()
         
-        resultado = generate_instrumental_with_cancellation_check(video_path, source_type, source_url, save_to_db)
+        resultado = generate_instrumental_with_cancellation_check(
+            self, video_path, source_type, source_url, save_to_db
+        )
         
         if not resultado:
             raise Exception("O procesamento non devolviu resultado")
@@ -153,7 +167,7 @@ def process_instrumental_only(self, video_path, source_type="upload", source_url
         raise Exception(error_msg)
 
 
-def create_with_cancellation_check(video_path, enable_diarization=False, hf_token=None, whisper_model="small",
+def create_with_cancellation_check(task, video_path, enable_diarization=False, hf_token=None, whisper_model="small",
                                   source_type="upload", source_url=None, save_to_db=True):
 
     check_if_cancelled()
@@ -166,11 +180,15 @@ def create_with_cancellation_check(video_path, enable_diarization=False, hf_toke
         whisper_model=whisper_model, 
         source_type=source_type, 
         source_url=source_url, 
-        save_to_db=save_to_db
+        save_to_db=save_to_db,
+        progress_callback=lambda step, progress: task.update_state(
+            state='PROGRESS', 
+            meta={'status': step, 'current': progress, 'total': 100}
+        )
     )
 
 
-def create_with_manual_lyrics_with_cancellation_check(video_path, manual_lyrics, language=None,
+def create_with_manual_lyrics_with_cancellation_check(task, video_path, manual_lyrics, language=None,
                                                      enable_diarization=False, hf_token=None, whisper_model="small",
                                                      source_type="upload", source_url=None, save_to_db=True):
 
@@ -186,14 +204,24 @@ def create_with_manual_lyrics_with_cancellation_check(video_path, manual_lyrics,
         whisper_model=whisper_model, 
         source_type=source_type, 
         source_url=source_url, 
-        save_to_db=save_to_db
+        save_to_db=save_to_db,
+        progress_callback=lambda step, progress: task.update_state(
+            state='PROGRESS', 
+            meta={'status': step, 'current': progress, 'total': 100}
+        )
     )
 
 
-def generate_instrumental_with_cancellation_check(video_path, source_type="upload", source_url=None, save_to_db=True):
+def generate_instrumental_with_cancellation_check(task, video_path, source_type="upload", source_url=None, save_to_db=True):
 
     check_if_cancelled()
-    return generate_instrumental(video_path, source_type, source_url, save_to_db)
+    return generate_instrumental(
+        video_path, source_type, source_url, save_to_db,
+        progress_callback=lambda step, progress: task.update_state(
+            state='PROGRESS', 
+            meta={'status': step, 'current': progress, 'total': 100}
+        )
+    )
 
 
 def cleanup_partial_files(video_path):

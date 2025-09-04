@@ -19,27 +19,38 @@ from metadata_utils import generate_song_metadata
 #agrupanse en frases cada N palabras e despois renderizase o karaoke
 
 def create(video_path: str, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small",
-           source_type: str = "upload", source_url: str = None, save_to_db: bool = True):
+           source_type: str = "upload", source_url: str = None, save_to_db: bool = True, progress_callback=None):
     
     remove_previous_srt()     ##Borro os srts anteriores por si acaso me daban conflicto ao ir probando a misma cancion repetidas veces
+    
+    if progress_callback:
+        progress_callback("Iniciando procesamento...", 5)
  
    # Normalizo o video. Por que? Porque añadin a parte de poder meter un MP4 para poder recortar videos e facer que
     # ocupen menos, para facer ensayo e error mais rapidamente. Entonces necesito que o formato do video do link de YT
     # e o formato do Mp4 sean o mesmo, porque si os subtitulos non son iguais non me sirve de nada practicar cos mp4s.
     try:
+        if progress_callback:
+            progress_callback("Normalizando vídeo...", 10)
         video_path = normalize_video(video_path)
     except Exception as erro_normalizacion:      
         print(f" Error na normalización: {erro_normalizacion}, continuando co video original")
     
+    if progress_callback:
+        progress_callback("Extraendo audio...", 15)
     ruta_audio = video_to_mp3(video_path)
     if not ruta_audio:
         return ""
     
+    if progress_callback:
+        progress_callback("Separando voces e instrumental...", 25)
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
     
     if not ruta_voz or not ruta_musica:
         return ""    
     
+    if progress_callback:
+        progress_callback("Transcribindo letra con IA...", 45)
     #cambio a faster whisper para o automatico por culpa do VAD de whisperx.
     transcribed_lyrics = transcribe_with_faster_whisper(ruta_voz, whisper_model)
     if not transcribed_lyrics:
@@ -49,6 +60,8 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     #solucion medio casera, normalizo as letras como se foran manuales. mais ou menos fago todo o posible como se fora manual menos a trancricion
     letras_normalizadas = normalize_manual_lyrics(transcribed_lyrics)
     
+    if progress_callback:
+        progress_callback("Sincronizando letra con audio...", 60)
     whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, None, enable_diarization, hf_token, whisper_model)
     archivoSRT = ruta_voz.replace(".wav", "_whisperx.srt")
     
@@ -66,6 +79,8 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         print("error: O arquivo SRT está vacio")
         return ""
     
+    if progress_callback:
+        progress_callback("Procesando subtítulos...", 70)
     #fixen unha funcion para agrupar frases no modo automatico, porque non pode ser con saltos de linea
     segmento_palabras = parse_word_srt(archivoSRT)
     grupos_texto = group_word_segments_automatic(segmento_palabras, max_words_per_phrase=6, max_duration=3.5)
@@ -74,6 +89,8 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     
     print(f"Creados {len(grupos_texto)} grupos de frases (debug) ")
     
+    if progress_callback:
+        progress_callback("Creando vídeo final...", 80)
     # Composición con moviepy (igual q en modo manual)
     try:
         audio_musica = AudioFileClip(ruta_musica).set_fps(44100)
@@ -119,7 +136,8 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         os.makedirs("./output")
     ruta_saida = os.path.join("./output", nome_saida)
     try:
-
+        if progress_callback:
+            progress_callback("Renderizando vídeo final...", 90)
         video_final.write_videofile(ruta_saida, fps=30, threads=4)
         
         if os.path.exists(ruta_saida) and os.path.getsize(ruta_saida) > 0:
@@ -177,14 +195,19 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
 
 # A outra variante, uso de FORCED ALIGNMENT
 def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small",
-                             source_type: str = "upload", source_url: str = None, save_to_db: bool = True) -> str:
+                             source_type: str = "upload", source_url: str = None, save_to_db: bool = True, progress_callback=None) -> str:
 
     remove_previous_srt()
+    
+    if progress_callback:
+        progress_callback("Iniciando procesamento con letras manuais...", 5)
     letras_normalizadas = normalize_manual_lyrics(manual_lyrics)
     
     #Forzar normalizado porque se non os subtitulos poden salir diferentes en algunhas ocasions
     ruta_video_orixinal = video_path
     try:
+        if progress_callback:
+            progress_callback("Normalizando vídeo...", 10)
         ruta_normalizada = normalize_video(video_path)
         if ruta_normalizada != video_path:
             video_path = ruta_normalizada
@@ -193,15 +216,21 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
     except Exception as erro_norm:
         print(f"error na normalización: {erro_norm}, continuando co video orixinal")
     
+    if progress_callback:
+        progress_callback("Extraendo audio...", 15)
     ruta_audio = video_to_mp3(video_path)
     if not ruta_audio:
         return ""
     
+    if progress_callback:
+        progress_callback("Separando voces e instrumental...", 25)
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
     if not ruta_voz or not ruta_musica:
         print(" Falta ou vocals ou music")
         return ""    
     
+    if progress_callback:
+        progress_callback("Sincronizando letras con audio...", 45)
     # Endpoint pero da letra manual con parámetros de diarization
     whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, language, enable_diarization, hf_token, whisper_model)
     archivoSRT = ruta_voz.replace(".wav","_whisperx.srt")
@@ -220,6 +249,8 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
     if os.path.getsize(archivoSRT) == 0:
         return ""
     
+    if progress_callback:
+        progress_callback("Procesando subtítulos...", 60)
     # DIFERENTE: agrupanse as palabras segun a letra manual
     segmento_palabras = parse_word_srt(archivoSRT)
     grupos_manuais = group_word_segments(letras_normalizadas, segmento_palabras)
@@ -227,6 +258,8 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         print("error na agrupacion")
         return ""
     
+    if progress_callback:
+        progress_callback("Creando vídeo final...", 75)
     #Compoñer con moviepy
     try:
         audio_musica = AudioFileClip(ruta_musica).set_fps(44100)
@@ -288,6 +321,8 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
     ruta_saida = os.path.join("./output", nombreArchivo)
     
     try:
+        if progress_callback:
+            progress_callback("Renderizando vídeo final...", 90)
         video_final.write_videofile(ruta_saida, fps=30, threads=4)
         
         if os.path.exists(ruta_saida) and os.path.getsize(ruta_saida) > 0:
@@ -343,20 +378,28 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
     return nombreArchivo
 
 
-def generate_instrumental(video_path: str, source_type: str = "upload", source_url: str = None, save_to_db: bool = True) -> str:
+def generate_instrumental(video_path: str, source_type: str = "upload", source_url: str = None, save_to_db: bool = True, progress_callback=None) -> str:
 
+    if progress_callback:
+        progress_callback("Iniciando extracción instrumental...", 5)
     
     #solo normalizar se é un video mp4, non se é mp3
     if not video_path.lower().endswith('.mp3'):
         try:
+            if progress_callback:
+                progress_callback("Normalizando vídeo...", 15)
             video_path = normalize_video(video_path)
         except Exception as erro_normalizacion:      
             print(f"Error na normalización: {erro_normalizacion}, continuando co video orixinal")
     
+    if progress_callback:
+        progress_callback("Extraendo audio...", 25)
     ruta_audio = video_to_mp3(video_path)
     if not ruta_audio:
         return ""
     
+    if progress_callback:
+        progress_callback("Separando instrumental...", 50)
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
     if not ruta_musica:
         print("Error separando a instrumental ")
@@ -379,6 +422,8 @@ def generate_instrumental(video_path: str, source_type: str = "upload", source_u
     ruta_saida = os.path.join("./output", nome_saida)
     
     try:
+        if progress_callback:
+            progress_callback("Copiando arquivo final...", 85)
         import shutil
         shutil.copy2(ruta_musica, ruta_saida)
         

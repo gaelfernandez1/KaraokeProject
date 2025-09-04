@@ -112,6 +112,9 @@ function checkTaskStatus() {
         });
 }
 
+//para evitar que la barra retroceda pq se me bugueaba e iba do 10 ao 0
+let lastProgressPercentage = 0;
+
 function updateUI(data) {
     const progressBar = document.getElementById('progressBar');
     const statusText = document.getElementById('statusText');
@@ -127,22 +130,32 @@ function updateUI(data) {
 
     switch(data.state) {
         case 'PENDING':
-            progressBar.style.width = '10%';
-            progressBar.textContent = '10%';
+            //Solo mostrar 10% se non se progresou
+            if (lastProgressPercentage < 10) {
+                lastProgressPercentage = 10;
+                progressBar.style.width = '10%';
+                progressBar.textContent = '10%';
+            }
             statusText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + data.status;
             break;
             
         case 'PROGRESS':
             const current = data.current || 0;
             const total = data.total || 100;
-            const percentage = Math.round((current / total) * 100);
+            let percentage = Math.round((current / total) * 100);
             
-            progressBar.style.width = percentage + '%';
-            progressBar.textContent = percentage + '%';
+            //para evitar que la barra retroceda pq se me bugueaba e iba do 10 ao 0
+            if (percentage > lastProgressPercentage) {
+                lastProgressPercentage = percentage;
+                progressBar.style.width = percentage + '%';
+                progressBar.textContent = percentage + '%';
+            }
+            
             statusText.innerHTML = '<i class="fas fa-cogs fa-spin"></i> ' + data.status;
             break;
             
         case 'SUCCESS':
+            lastProgressPercentage = 100;
             progressBar.style.width = '100%';
             progressBar.textContent = '100%';
             progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
