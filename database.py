@@ -38,16 +38,14 @@ def init_database():
         )
     ''')
     
-    # Migración: Añadir columna whisper_model a tablas existentes si no existe
     try:
         cursor.execute("ALTER TABLE songs ADD COLUMN whisper_model TEXT DEFAULT 'small'")
-        print("Columna whisper_model añadida a la tabla songs")
     except sqlite3.OperationalError as e:
-        # La columna ya existe - esto es normal
+        
         if "duplicate column name" not in str(e).lower():
             print(f"Error en migración whisper_model: {e}")
         else:
-            print("Columna whisper_model ya existe - saltando migración")
+            print("Columna whisper_model xa existe - saltando migración")
     
     conn.commit()
     conn.close()
@@ -56,9 +54,8 @@ def save_song_to_database(song_data: Dict) -> int:
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     
-    # Debug: imprimir el modelo que se está guardando
     whisper_model = song_data.get('whisper_model', 'small')
-    print(f"DEBUG: Guardando canción con whisper_model = '{whisper_model}'")
+    print(f"debug: Gardando canción con whisper_model = '{whisper_model}'")
     
     cursor.execute('''
         INSERT INTO songs (
