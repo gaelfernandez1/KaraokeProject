@@ -60,6 +60,22 @@ body::before {
   cursor: pointer;
 }
 
+/* sacar o boton de sonido integrado no reprodutor pq se me buguea cos outros 2 */
+.video-player::-webkit-media-controls-volume-slider,
+.video-player::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
+.video-player::-moz-media-controls-volume-slider,
+.video-player::-moz-media-controls-mute-button {
+  display: none !important;
+}
+
+.video-player[controlsList*="novolume"]::-webkit-media-controls-volume-slider,
+.video-player[controlsList*="novolume"]::-webkit-media-controls-mute-button {
+  display: none !important;
+}
+
 .audio-controls-panel {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
