@@ -8,7 +8,8 @@ from urllib.parse import urlparse, parse_qs
 def extract_title_from_filename(filename: str) -> str:
 
     title = os.path.splitext(filename)[0]
-    title = re.sub(r'^(karaoke_|karaoke_manual_|instrumental_)', '', title)
+    title = re.sub(r'^(karaoke_manual_[^_]+_|karaoke_[^_]+_|instrumental_[^_]+_|vocal_[^_]+_)', '', title)
+    title = re.sub(r'^(karaoke_|karaoke_manual_|instrumental_|vocal_)', '', title)
     title = re.sub(r'_normalized$', '', title)   
     title = title.replace('_', ' ')    
     title = ' '.join(word.capitalize() for word in title.split())

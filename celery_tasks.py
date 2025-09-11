@@ -72,7 +72,7 @@ def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_tok
             'error': error_msg,
             'traceback': traceback_str
         })
-        raise Exception(error_msg)
+        return {'status': 'failed', 'error': error_msg, 'traceback': traceback_str}
 
 
 @celery.task(bind=True, name='process_manual_lyrics_karaoke')  
@@ -119,7 +119,7 @@ def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None
             'error': error_msg,
             'traceback': traceback_str
         })
-        raise Exception(error_msg)
+        return {'status': 'failed', 'error': error_msg, 'traceback': traceback_str}
 
 
 @celery.task(bind=True, name='process_instrumental_only')
@@ -164,7 +164,7 @@ def process_instrumental_only(self, video_path, source_type="upload", source_url
             'error': error_msg,
             'traceback': traceback_str
         })
-        raise Exception(error_msg)
+        return {'status': 'failed', 'error': error_msg, 'traceback': traceback_str}
 
 
 def create_with_cancellation_check(task, video_path, enable_diarization=False, hf_token=None, whisper_model="small",
@@ -246,7 +246,7 @@ def cleanup_partial_files(video_path):
             f"karaoke_manual_{base_name}*",
             f"instrumental_{base_name}*",
             f"vocal_{base_name}*",
-            f"*_whisperx.srt"
+            f"*_whisperx_*.srt"
         ]
         
         import glob

@@ -130,7 +130,7 @@ def align_endpoint():
             # Continuar sin diarization
 
     #Crear srt final a nivel de palabra (con speaker info se hai)
-    ruta_srt = ruta_audio.replace(".wav", "_whisperx.srt")
+    ruta_srt = ruta_audio.replace(".wav", f"_whisperx_{whisper_model}.srt")
     with open(ruta_srt, "w", encoding="utf-8") as f:
         indice = 1
         for seg in segmentos_palabras:

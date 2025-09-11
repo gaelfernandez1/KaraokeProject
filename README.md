@@ -73,3 +73,9 @@ docker exec -it demucs_container bash -c "rm -rf /data/*"
 ```bash
 docker system prune -a --volumes
 ```
+
+## Recomendacións
+
+Para o modo manual (aliñación forzada), os modelos grandes non sempre dan mellores resultados. Recoméndase:
+  - small ou medium son ideales para alineación forzada, a non ser que se conte con grandes capacidades de GPU.
+  - large-v2 ou v3 só para transcrición automática cando se precise máxima precisión.
