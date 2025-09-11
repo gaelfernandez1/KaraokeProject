@@ -63,7 +63,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     if progress_callback:
         progress_callback("Sincronizando letra con audio...", 60)
     whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, None, enable_diarization, hf_token, whisper_model)
-    archivoSRT = ruta_voz.replace(".wav", "_whisperx.srt")
+    archivoSRT = ruta_voz.replace(".wav", f"_whisperx_{whisper_model}.srt")
     
     tempo_maximo = 30  
     tempo_esperado = 0
@@ -129,7 +129,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     
     nome_video_base = os.path.basename(video_path).replace("_normalized", "")
     nome_video_seguro = sanitize_filename(nome_video_base)
-    nome_saida = f"karaoke_{nome_video_seguro}"
+    nome_saida = f"karaoke_{whisper_model}_{nome_video_seguro}"
 
     
     if not os.path.exists("./output"):
@@ -159,8 +159,8 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         video_sin_audio.write_videofile(ruta_video_silencioso, fps=30, threads=4, audio=False)
         
         nome_sin_extension = nome_video_seguro.replace('.mp4', '')
-        ruta_vocal_output = os.path.join("./output", f"vocal_{nome_sin_extension}.wav")
-        ruta_instrumental_output = os.path.join("./output", f"instrumental_{nome_sin_extension}.wav")
+        ruta_vocal_output = os.path.join("./output", f"vocal_{whisper_model}_{nome_sin_extension}.wav")
+        ruta_instrumental_output = os.path.join("./output", f"instrumental_{whisper_model}_{nome_sin_extension}.wav")
         
         import shutil
         shutil.copy2(ruta_voz, ruta_vocal_output)
@@ -233,7 +233,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         progress_callback("Sincronizando letras con audio...", 45)
     # Endpoint pero da letra manual con parámetros de diarization
     whisper_response = call_whisperx_endpoint_manual(ruta_voz, letras_normalizadas, language, enable_diarization, hf_token, whisper_model)
-    archivoSRT = ruta_voz.replace(".wav","_whisperx.srt")
+    archivoSRT = ruta_voz.replace(".wav", f"_whisperx_{whisper_model}.srt")
     
     
     tempo_limite = 30  
@@ -313,7 +313,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
 
     nome_video_base = os.path.basename(video_path)
     nome_video_seguro = sanitize_filename(nome_video_base)
-    nombreArchivo = f"karaoke_manual_{nome_video_seguro}"
+    nombreArchivo = f"karaoke_manual_{whisper_model}_{nome_video_seguro}"
 
 
     if not os.path.exists("./output"):
@@ -344,8 +344,8 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         video_sin_audio.write_videofile(ruta_video_silencioso, fps=30, threads=4, audio=False)
         
         nome_sin_extension = nome_video_seguro.replace('.mp4', '')
-        ruta_vocal_output = os.path.join("./output", f"vocal_{nome_sin_extension}.wav")
-        ruta_instrumental_output = os.path.join("./output", f"instrumental_{nome_sin_extension}.wav")
+        ruta_vocal_output = os.path.join("./output", f"vocal_{whisper_model}_{nome_sin_extension}.wav")
+        ruta_instrumental_output = os.path.join("./output", f"instrumental_{whisper_model}_{nome_sin_extension}.wav")
         
         import shutil
         shutil.copy2(ruta_voz, ruta_vocal_output)
