@@ -1,13 +1,31 @@
-# Karaoke con IA - Proxecto TFG - Gael Fernández
+# 🎤 Karaoke con IA - Proxecto TFG - Gael Fernández
 
-Creación automática de vídeos de karaoke multilinües mediante ferramentas de aprendizaxe profundo utilizando Demucs, WhisperX e MoviePy.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![AI Powered](https://img.shields.io/badge/AI-Powered-brightgreen.svg)](/)
+
+**Sistema automático de xeración de vídeos de karaoke multilingües con Intelixencia Artificial**
+
+Creación automática de vídeos de karaoke optimizada para **idiomas minoritarios** (especialmente galego) mediante ferramentas de aprendizaxe profundo: Demucs, WhisperX e MoviePy.
+
+##  Características Principais
+
+-  **Separación automática** de voces e instrumental con Demucs 4.0
+-  **Transcripción e aliñamento** temporal con WhisperX 3.1  
+-  **Renderizado silábico** con algoritmos propios híbridos
+-  **Arquitectura de microservizos** containerizada con Docker
+-  **Interface web responsive** con seguimento de progreso en tempo real
+-  **Soporte GPU/CPU** con optimización automática
+-  **Diarización de falantes** con cores automáticas
+-  **Acceso público** mediante túneles Ngrok seguros
 
 
 ## Guía de instalación
 
 Paso 1: Descargar Docker Desktop no equipo
 
-Paso 2: Instalar anaconda e usar o anaconda prompt(ou o sistema preferido de cada usuario). a versión de python usada é a 3.10.16 pero pode funcionar con versións de python superiores. Opcional usar un conda environment
+Paso 2: Instalar anaconda e usar o anaconda prompt (ou o sistema preferido de cada usuario). a versión de python usada é a 3.10.16 pero pode funcionar con versións de python superiores. Opcional usar un conda environment
 
 Paso 3: Clonar o repositorio do proxecto
 
@@ -56,10 +74,9 @@ docker-compose logs -f whisperx
 docker-compose logs -f celery_worker
 ```
 
-### Copiar cousas do contenedor a local
-docker cp whisperx_container:/data/. "ruta a onde queiras copiar"    
-docker cp demucs_container:/KaraokeProject/output/. "ruta a onde queiras copiar"
-<!--  docker cp whisperx_container:/data/. "C:\Users\gaelb\Desktop\KaraokeProject\carpetaconsrt"  -->
+### Copiar arquivos do contedor a local
+docker cp whisperx_container:/data/. "ruta_a_onde_queiras_copiar"    
+docker cp demucs_container:/KaraokeProject/output/. "ruta_a_onde_queiras_copiar"
 
 
 ### Limpar datos
