@@ -1,0 +1,1052 @@
+openapi: 3.0.3
+info:
+  title: Karaoke Generator API
+  description: |
+    Professional API for generating karaoke videos from YouTube URLs or uploaded files.
+    
+    ## Features
+    - **Automatic Lyrics Extraction**: Uses WhisperX for accurate transcription and word-level timing
+    - **Manual Lyrics Input**: Align custom lyrics with audio using forced alignment
+    - **Instrumental Generation**: Remove vocals using Demucs audio separation
+    - **Speaker Diarization**: Identify different speakers in multi-person songs
+    - **Library Management**: Store, search, and manage your karaoke collection
+    
+    ## Processing Pipeline
+    All karaoke generation tasks are processed asynchronously using Celery with Redis.
+    Use the task management endpoints to monitor progress and retrieve results.
+    
+    ## Rate Limits
+    - General API: 1000 requests per hour
+    - Karaoke generation: 3 requests per minute
+    - Instrumental generation: 5 requests per minute
+    - Task status queries: No limit
+    
+    ## File Constraints
+    - Maximum file size: 100 MB
+    - Supported video formats: MP4
+    - Supported audio formats: MP3, WAV (instrumental only)
+    - Video resolution: Up to 1080p (720p preferred for performance)
+    
+  version: 1.0.0
+  contact:
+    name: Karaoke Project
+  license:
+    name: MIT
+    
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+  - url: https://your-production-domain.com
+    description: Production server
+
+tags:
+  - name: Karaoke Generation
+    description: |
+      Endpoints for generating karaoke videos with synchronized lyrics.
+      Supports both automatic transcription and manual lyrics input.
+  - name: Task Management
+    description: |
+      Monitor and control asynchronous processing tasks.
+      All generation tasks return a task_id for tracking progress.
+  - name: Media Serving
+    description: |
+      Stream and download generated karaoke videos and audio files.
+      Supports range requests for video streaming.
+  - name: Library
+    description: |
+      Manage your karaoke collection with full metadata.
+      Search, play, and delete songs from the database.
+
+paths:
+  /generate:
+    post:
+      tags:
+        - Karaoke Generation
+      summary: Generate karaoke with automatic lyrics
+      description: |
+        Generate a karaoke video with automatic lyrics extraction using WhisperX.
+        
+        **Processing Steps:**
+        1. Downloads video from YouTube or uses uploaded file
+        2. Separates vocals from instrumental using Demucs
+        3. Transcribes lyrics using WhisperX with word-level timestamps
+        4. Optionally identifies speakers using pyannote diarization
+        5. Generates synchronized karaoke video with highlighted text
+        6. Saves metadata to database
+        
+        **Output Files Generated:**
+        - `karaoke_{title}.mp4` - Full karaoke video with lyrics overlay
+        - `karaoke_{title}_video_only.mp4` - Video without audio track
+        - `vocal_{title}.wav` - Isolated vocal track
+        - `instrumental_{title}.wav` - Instrumental (backing) track
+        
+        **Processing Time:** 2-10 minutes depending on video length and model size
+        
+      operationId: generateAutoKaraoke
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              oneOf:
+                - required: [video_file]
+                - required: [youtube_url]
+              properties:
+                video_file:
+                  type: string
+                  format: binary
+                  description: |
+                    MP4 video file to process. Must be under 100MB.
+                    Cannot be used together with youtube_url.
+                  example: my_song.mp4
+                youtube_url:
+                  type: string
+                  format: uri
+                  pattern: '^https?://(www\.)?(youtube\.com/watch\?v=|youtu\.be/).+$'
+                  description: |
+                    YouTube video URL. Supports standard and short URLs.
+                    Video will be downloaded at best quality up to 1080p.
+                    Cannot be used together with video_file.
+                  maxLength: 2048
+                  example: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                enable_diarization:
+                  type: string
+                  enum: ["true", "false"]
+                  default: "false"
+                  description: |
+                    Enable speaker diarization to identify different speakers.
+                    Requires HuggingFace token with pyannote/speaker-diarization access.
+                    Adds 30-60 seconds to processing time.
+                  maxLength: 5
+                  example: "false"
+                hf_token:
+                  type: string
+                  format: password
+                  description: |
+                    HuggingFace API token (required if enable_diarization is "true").
+                    Must have accepted pyannote/speaker-diarization terms.
+                    Get token at: https://huggingface.co/settings/tokens
+                  maxLength: 128
+                  example: hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                whisper_model:
+                  type: string
+                  enum: [tiny, base, small, medium, large, large-v2, large-v3]
+                  default: small
+                  description: |
+                    WhisperX model size for transcription accuracy vs speed:
+                    - tiny: Fastest, least accurate (~1GB VRAM, ~1x realtime)
+                    - base: Fast, basic accuracy (~1GB VRAM, ~1.5x realtime)
+                    - small: Balanced, good accuracy (~2GB VRAM, ~2x realtime) [RECOMMENDED]
+                    - medium: Slower, better accuracy (~5GB VRAM, ~3x realtime)
+                    - large: Slowest, best accuracy (~10GB VRAM, ~4x realtime)
+                    - large-v2: Enhanced large model
+                    - large-v3: Latest large model with improved accuracy
+                  maxLength: 16
+                  example: small
+            examples:
+              uploadFile:
+                summary: Upload MP4 file
+                value:
+                  video_file: (binary)
+                  whisper_model: small
+                  enable_diarization: "false"
+              youtubeUrl:
+                summary: YouTube URL with diarization
+                value:
+                  youtube_url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                  enable_diarization: "true"
+                  hf_token: hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                  whisper_model: medium
+      responses:
+        '302':
+          description: |
+            Redirect to progress tracking page.
+            Task has been queued successfully.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+                example: /progress/3fa85f64-5717-4562-b3fc-2c963f66afa6
+            Set-Cookie:
+              schema:
+                type: string
+                example: session=...; current_task_id=3fa85f64-5717-4562-b3fc-2c963f66afa6; task_type=automatic
+        '400':
+          description: |
+            Bad request - validation errors
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                missingInput:
+                  summary: No video source provided
+                  value: Debes mandar ou un mp4 ou un link de Youtube
+                invalidFile:
+                  summary: Invalid file format
+                  value: Only MP4 files are allowed
+                fileTooLarge:
+                  summary: File exceeds size limit
+                  value: File size must be under 100MB
+                diarizationMissingToken:
+                  summary: Diarization enabled without token
+                  value: HuggingFace token required when diarization is enabled
+        '429':
+          description: Rate limit exceeded (3 requests per minute)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitError'
+        '500':
+          description: Server error during video download or task creation
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                downloadError:
+                  summary: YouTube download failed
+                  value: "Error descargando vídeo: Video not available"
+                celeryError:
+                  summary: Task queue error
+                  value: "Error creating task: Connection refused"
+
+  /manual_lyrics_form:
+    get:
+      tags:
+        - Karaoke Generation
+      summary: Manual lyrics form page
+      description: |
+        Returns the HTML form for submitting manual lyrics.
+        This is a UI endpoint that renders a web page.
+      operationId: getManualLyricsForm
+      responses:
+        '200':
+          description: HTML form page rendered successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                description: Complete HTML page with manual lyrics input form
+
+  /process_manual_lyrics:
+    post:
+      tags:
+        - Karaoke Generation
+      summary: Generate karaoke with manual lyrics
+      description: |
+        Generate a karaoke video using manually provided lyrics.
+        Accepts either a video file upload or a YouTube URL.
+      operationId: generateManualKaraoke
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - manual_lyrics
+              properties:
+                video_file:
+                  type: string
+                  format: binary
+                  description: |
+                    MP4 video file upload. Use this when providing a local file instead of a YouTube URL.
+                youtube_url:
+                  type: string
+                  format: uri
+                  description: |
+                    YouTube video URL to download. Supports the same constraints as the automatic workflow.
+                  maxLength: 2048
+                  example: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+                manual_lyrics:
+                  type: string
+                  description: |
+                    Manual lyrics text to align with the audio. Preserve line breaks as they will be used for timing.
+                  minLength: 1
+                  maxLength: 20000
+                  example: |
+                    Never gonna give you up
+                    Never gonna let you down
+                enable_diarization:
+                  type: string
+                  enum: ["true", "false"]
+                  description: Enable speaker diarization
+                  default: "false"
+                  maxLength: 5
+                  example: "false"
+                hf_token:
+                  type: string
+                  format: password
+                  description: HuggingFace token (required if enable_diarization is true)
+                  maxLength: 128
+                  example: hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                whisper_model:
+                  type: string
+                  enum: [tiny, base, small, medium, large]
+                  description: Whisper model to use for transcription
+                  default: small
+                  maxLength: 16
+                  example: small
+      responses:
+        '302':
+          description: |
+            Redirect to the progress tracking page once the manual-lyrics task has been enqueued.
+        '400':
+          description: Bad request - missing required parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                missingManualLyrics:
+                  summary: Manual lyrics missing
+                  value: Falta o texto da letra.
+                missingSource:
+                  summary: No media source provided
+                  value: Tes que subir un mp4 ou un link de Youtube
+                invalidSource:
+                  summary: Unsupported file type
+                  value: Only MP4 files are allowed
+        '500':
+          description: Server error during manual lyrics processing setup
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                downloadError:
+                  summary: YouTube download failure
+                  value: "Erro descargando vídeo: Video not available"
+                queueError:
+                  summary: Task queue issue
+                  value: "Erro creando tarefa: Connection refused"
+
+  /generate_instrumental:
+    post:
+      tags:
+        - Karaoke Generation
+      summary: Generate instrumental-only version
+      description: |
+        Generate an instrumental version (vocals removed) from a video or audio file.
+        Accepts MP4 or MP3 files, or a YouTube URL.
+      operationId: generateInstrumentalOnly
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                video_file:
+                  type: string
+                  format: binary
+                  description: |
+                    MP4 or MP3 file upload used as the source for instrumental extraction. Cannot be combined with youtube_url.
+                youtube_url:
+                  type: string
+                  format: uri
+                  description: |
+                    YouTube video URL pointing to the track to process. The service downloads the media before running separation.
+                  maxLength: 2048
+                  example: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+            examples:
+              uploadAudio:
+                summary: Upload MP3 instrumental request
+                value:
+                  video_file: (binary)
+              youtubeAudio:
+                summary: Instrumental from YouTube video
+                value:
+                  youtube_url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+      responses:
+        '302':
+          description: |
+            Redirect to the progress page after the instrumental-only task has been queued.
+        '400':
+          description: Bad request - missing video/audio file or YouTube URL
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                missingSource:
+                  summary: No input provided
+                  value: Tes que mandar un mp4/mp3 ou un link de YouTube
+                invalidFormat:
+                  summary: Unsupported upload format
+                  value: Only MP4 and MP3 files are allowed
+        '500':
+          description: Error downloading or processing the requested media
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                downloadError:
+                  summary: Download failure
+                  value: "Erro descargando vídeo: Video not available"
+                separationError:
+                  summary: Instrumental extraction failure
+                  value: "Erro procesando instrumental: Unexpected error"
+
+  /progress/{task_id}:
+    get:
+      tags:
+        - Task Management
+      summary: Progress page
+      description: Returns the progress tracking page for a task
+      operationId: getProgressPage
+      parameters:
+        - $ref: '#/components/parameters/taskIdPath'
+      responses:
+        '200':
+          description: HTML progress page rendered successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                description: Complete HTML page showing task progress, status polling script, and controls.
+
+  /api/task_status/{task_id}:
+    get:
+      tags:
+        - Task Management
+      summary: Get task status
+      description: Get the current status of an asynchronous task
+      operationId: getTaskStatus
+      parameters:
+        - $ref: '#/components/parameters/taskIdPath'
+      responses:
+        '200':
+          description: Task status retrieved successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TaskStatusPending'
+                  - $ref: '#/components/schemas/TaskStatusProgress'
+                  - $ref: '#/components/schemas/TaskStatusSuccess'
+                  - $ref: '#/components/schemas/TaskStatusFailure'
+                  - $ref: '#/components/schemas/TaskStatusRevoked'
+              examples:
+                pending:
+                  value:
+                    state: PENDING
+                    status: Tarea en cola...
+                progress:
+                  value:
+                    state: PROGRESS
+                    status: Procesando...
+                    current: 50
+                    total: 100
+                success:
+                  value:
+                    state: SUCCESS
+                    status: Completado!
+                    result: karaoke_song.mp4
+                    message: Procesamento completado
+        '500':
+          description: Error retrieving task status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatusError'
+
+  /api/cancel_task/{task_id}:
+    post:
+      tags:
+        - Task Management
+      summary: Cancel a task
+      description: Cancel a running or pending task
+      operationId: cancelTask
+      parameters:
+        - $ref: '#/components/parameters/taskIdPath'
+      responses:
+        '200':
+          description: Task cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskCancellationResponse'
+        '500':
+          description: Error cancelling task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOperationError'
+
+  /api/download_result/{task_id}:
+    get:
+      tags:
+        - Task Management
+      summary: Download task result
+      description: Download or view the result of a completed task
+      operationId: downloadTaskResult
+      parameters:
+        - $ref: '#/components/parameters/taskIdPath'
+      responses:
+        '302':
+          description: Redirect to player or file download
+          headers:
+            Location:
+              description: Destination player page or static file URL for the processed media.
+              schema:
+                type: string
+                format: uri
+                maxLength: 2048
+                example: /player/karaoke_song.mp4
+        '400':
+          description: Task not completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+        '404':
+          description: Result not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+        '500':
+          description: Error downloading result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericErrorResponse'
+
+  /player/{filename}:
+    get:
+      tags:
+        - Media Serving
+      summary: Karaoke player
+      description: Returns the karaoke player page for a specific video
+      operationId: getKaraokePlayer
+      parameters:
+        - $ref: '#/components/parameters/filenamePath'
+      responses:
+        '200':
+          description: HTML player page rendered successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                description: Fully rendered HTML player view, including metadata, controls, and embedded media element.
+        '404':
+          description: File not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                notFound:
+                  summary: File missing
+                  value: Arquivo non encontrado
+
+  /serve_video/{filename}:
+    get:
+      tags:
+        - Media Serving
+      summary: Serve video file
+      description: Stream a video file
+      operationId: serveVideoFile
+      parameters:
+        - $ref: '#/components/parameters/filenamePath'
+      responses:
+        '200':
+          description: Video file served successfully
+          content:
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                maxLength: 50
+              description: Video MIME type; always video/mp4 for this endpoint.
+        '404':
+          description: File not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                notFound:
+                  summary: Video missing
+                  value: Arquiivo non encontrado
+
+  /serve_audio/{filename}:
+    get:
+      tags:
+        - Media Serving
+      summary: Serve audio file
+      description: Stream an audio file
+      operationId: serveAudioFile
+      parameters:
+        - $ref: '#/components/parameters/filenamePath'
+      responses:
+        '200':
+          description: Audio file served successfully
+          content:
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Type:
+              schema:
+                type: string
+                maxLength: 50
+              description: Audio MIME type; typically audio/wav for generated instrumentals.
+        '404':
+          description: File not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                notFound:
+                  summary: Audio missing
+                  value: Arquivo non encontrado
+
+  /download/{filename}:
+    get:
+      tags:
+        - Media Serving
+      summary: Download file
+      description: Download a video or audio file
+      operationId: downloadMediaFile
+      parameters:
+        - $ref: '#/components/parameters/filenamePath'
+      responses:
+        '200':
+          description: File download started
+          content:
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                maxLength: 200
+              description: Indicates attachment disposition with sanitized filename.
+            Content-Length:
+              schema:
+                type: string
+                pattern: '^[0-9]+$'
+                maxLength: 20
+              description: Size of the streamed file in bytes.
+        '404':
+          description: File not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                notFound:
+                  summary: Download source missing
+                  value: Arquivo non encontrado
+        '500':
+          description: Error sending file
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                sendError:
+                  summary: File transfer error
+                  value: "Error enviando archivo: Connection reset by peer"
+
+  /library:
+    get:
+      tags:
+        - Library
+      summary: Song library
+      description: Returns the song library page with all stored karaoke songs
+      operationId: getLibraryPage
+      responses:
+        '200':
+          description: Library page rendered successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                description: Complete HTML library view with song table and action buttons.
+        '500':
+          description: Error loading library
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                loadError:
+                  summary: Database or rendering failure
+                  value: "Error cargando biblioteca: Database locked"
+
+  /library/search:
+    get:
+      tags:
+        - Library
+      summary: Search songs
+      description: Search for songs in the library
+      operationId: searchLibrary
+      parameters:
+        - $ref: '#/components/parameters/librarySearchQuery'
+      responses:
+        '200':
+          description: Search results rendered successfully
+          content:
+            text/html:
+              schema:
+                type: string
+                description: Library HTML view filtered with matching songs and highlighting active query.
+        '302':
+          description: Redirect to library (empty query)
+        '500':
+          description: Error searching songs
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                searchError:
+                  summary: Search failure
+                  value: "Error buscando cancións: Database locked"
+
+  /library/play/{song_id}:
+    get:
+      tags:
+        - Library
+      summary: Play song from library
+      description: Play a karaoke song from the library
+      operationId: playLibrarySong
+      parameters:
+        - $ref: '#/components/parameters/songIdPath'
+      responses:
+        '302':
+          description: Redirect to player
+        '404':
+          description: Song or file not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                notFound:
+                  summary: Song missing
+                  value: Canción non encontrada
+        '500':
+          description: Error playing song
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                playError:
+                  summary: Playback redirect failure
+                  value: "Error reproducindo canción: Unexpected error"
+
+  /library/delete/{song_id}:
+    post:
+      tags:
+        - Library
+      summary: Delete song from library
+      description: Delete a song and all its associated files from the library
+      operationId: deleteLibrarySong
+      parameters:
+        - $ref: '#/components/parameters/songIdPath'
+      responses:
+        '302':
+          description: Redirect to library after successful deletion
+        '404':
+          description: Song not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                notFound:
+                  summary: Song not found
+                  value: Canción non encontrada na bib
+        '500':
+          description: Error deleting song
+          content:
+            text/plain:
+              schema:
+                type: string
+                maxLength: 200
+              examples:
+                deleteError:
+                  summary: Delete failure
+                  value: "Error borrando canción: Database locked"
+
+components:
+  parameters:
+    taskIdPath:
+      name: task_id
+      in: path
+      required: true
+      description: Celery task identifier used to track asynchronous processing jobs.
+      schema:
+        type: string
+        format: uuid
+        pattern: '^[0-9a-fA-F-]{36}$'
+        maxLength: 36
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    filenamePath:
+      name: filename
+      in: path
+      required: true
+      description: Sanitized file name stored under the output directory.
+      schema:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]+$'
+      example: karaoke_song.mp4
+    songIdPath:
+      name: song_id
+      in: path
+      required: true
+      description: Numeric identifier for a stored karaoke entry in the database.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 2147483647
+        example: 42
+    librarySearchQuery:
+      name: q
+      in: query
+      required: true
+      description: Free-text search filter applied to song titles, artists, and metadata.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+      example: never gonna give you up
+  schemas:
+    RateLimitError:
+      type: object
+      description: Error payload returned when a rate limit is exceeded.
+      required:
+        - error
+        - retryAfterSeconds
+      properties:
+        error:
+          type: string
+          maxLength: 200
+          example: Rate limit exceeded. Retry later.
+        retryAfterSeconds:
+          type: integer
+          minimum: 1
+          maximum: 3600
+          example: 60
+    TaskStatusPending:
+      type: object
+      description: Task status payload for jobs waiting to be executed.
+      required:
+        - state
+        - status
+      properties:
+        state:
+          type: string
+          enum: [PENDING]
+          description: Celery task state constant.
+          maxLength: 20
+          example: PENDING
+        status:
+          type: string
+          description: Human-readable status update.
+          maxLength: 200
+          example: Tarea en cola...
+    TaskStatusProgress:
+      type: object
+      description: Task status payload while processing is underway.
+      required:
+        - state
+        - status
+        - current
+        - total
+      properties:
+        state:
+          type: string
+          enum: [PROGRESS]
+          description: Celery task state constant.
+          maxLength: 20
+          example: PROGRESS
+        status:
+          type: string
+          description: Human-readable status update.
+          maxLength: 200
+          example: Procesando...
+        current:
+          type: integer
+          description: Current unit of work completed.
+          minimum: 0
+          maximum: 1000000
+          example: 50
+        total:
+          type: integer
+          description: Total units of work expected.
+          minimum: 1
+          maximum: 1000000
+          example: 100
+    TaskStatusSuccess:
+      type: object
+      description: Task status payload after successful completion.
+      required:
+        - state
+        - status
+        - result
+        - message
+      properties:
+        state:
+          type: string
+          enum: [SUCCESS]
+          description: Celery task state constant.
+          maxLength: 20
+          example: SUCCESS
+        status:
+          type: string
+          description: Human-readable status update.
+          maxLength: 200
+          example: Completado!
+        result:
+          type: string
+          description: Filename of the generated karaoke video.
+          maxLength: 255
+          example: karaoke_song.mp4
+        message:
+          type: string
+          description: Additional success context for the processing pipeline.
+          maxLength: 200
+          example: Procesamento completado
+    TaskStatusFailure:
+      type: object
+      description: Task status payload when processing finishes with errors.
+      required:
+        - state
+        - status
+        - error
+      properties:
+        state:
+          type: string
+          enum: [FAILURE]
+          description: Celery task state constant.
+          maxLength: 20
+          example: FAILURE
+        status:
+          type: string
+          description: Human-readable status update summarizing the failure.
+          maxLength: 200
+          example: Erro en procesameento
+        error:
+          type: string
+          description: Detailed error message bubbled up from the processing task.
+          maxLength: 400
+          example: Erro descoñecido
+    TaskStatusRevoked:
+      type: object
+      description: Task status payload returned when a job is cancelled.
+      required:
+        - state
+        - status
+        - message
+      properties:
+        state:
+          type: string
+          enum: [REVOKED]
+          description: Celery task state constant.
+          maxLength: 20
+          example: REVOKED
+        status:
+          type: string
+          description: Human-readable status update describing the cancellation.
+          maxLength: 200
+          example: Tarefa cancelada
+        message:
+          type: string
+          description: Additional information about the cancellation action.
+          maxLength: 200
+          example: o procesamiento foi cancelado
+    TaskStatusError:
+      type: object
+      description: Error payload returned when the API cannot retrieve task status information.
+      required:
+        - state
+        - status
+      properties:
+        state:
+          type: string
+          description: Flag indicating the internal error state.
+          maxLength: 20
+          example: ERROR
+        status:
+          type: string
+          description: Error message detailing why task status retrieval failed.
+          maxLength: 200
+          example: Error obtendo estado
+    TaskCancellationResponse:
+      type: object
+      description: Successful cancellation payload confirming the task has been revoked.
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: Outcome indicator for the cancellation request.
+          maxLength: 20
+          example: success
+        message:
+          type: string
+          description: Human-readable confirmation text.
+          maxLength: 200
+          example: Tarefa cancelada
+    TaskOperationError:
+      type: object
+      description: Error payload returned when task operations fail unexpectedly.
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          description: Outcome indicator for the failed operation.
+          maxLength: 20
+          example: error
+        message:
+          type: string
+          description: Diagnostic message describing the failure.
+          maxLength: 200
+          example: "Error cancelando: Connection refused"
+    GenericErrorResponse:
+      type: object
+      description: Generic single-field error payload used by several endpoints.
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error explanation message returned to the caller.
+          maxLength: 200
+          example: "Error descargando resultado: Video not available"
