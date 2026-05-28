@@ -5,7 +5,9 @@ __pycache__/
 *$py.class
 
 *.so
-
+.CLAUDE
+CLAUDE.md
+docs/
 .Python
 build/
 develop-eggs/
