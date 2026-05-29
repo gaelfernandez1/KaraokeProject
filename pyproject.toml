@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=69.5.1", "wheel>=0.43.0"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "karaoke"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "Automatic karaoke video generator for minority languages"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+# Shared Flask web layer, async queue, and common utilities
+core = [
+    "Flask==2.3.3",
+    "Werkzeug==2.3.7",
+    "blinker==1.6.3",
+    "itsdangerous==2.1.2",
+    "celery==5.3.4",
+    "redis==5.0.1",
+    "flask-limiter==3.5.0",
+    "yt-dlp==2024.8.6",
+    "numpy==1.26.4",
+    "requests==2.32.3",
+    "Pillow==10.0.1",
+    "pyphen==0.14.0",
+    "setuptools==69.5.1",
+    "wheel==0.43.0",
+    "packaging==24.1",
+]
+
+# Demucs/Celery worker container: GPU, audio separation, video rendering
+worker = [
+    "karaoke[core]",
+    "torch==2.3.0",
+    "torchaudio==2.3.0",
+    "torchvision==0.18.0",
+    "demucs==4.0.1",
+    "moviepy==1.0.3",
+    "soundfile==0.12.1",
+    "librosa==0.10.2",
+    "scipy==1.13.1",
+    "imageio==2.34.2",
+    "imageio-ffmpeg==0.4.9",
+    "pyannote.audio==3.1.1",
+    "pyannote.core==5.0.0",
+    "faster-whisper==1.0.1",
+    # psutil is used directly in celery_app signal handlers; pulled transitively
+    # by celery but listed here so the direct dependency is explicit
+    "psutil",
+]
+
+# WhisperX service container: transcription + forced alignment
+# Note: requests version discrepancy — requirementsB.txt pins 2.32.3 but
+# Dockerfile.B's inline pip install used 2.31.0. Using 2.32.3 to match the
+# requirements file; revert to 2.31.0 here if the whisperx service regresses.
+whisperx = [
+    "torch==2.3.0",
+    "torchaudio==2.3.0",
+    "torchvision==0.18.0",
+    "whisperx==3.1.3",
+    "faster-whisper==1.0.1",
+    "openai-whisper==20231117",
+    "Flask==2.3.3",
+    "Werkzeug==2.3.7",
+    "blinker==1.6.3",
+    "itsdangerous==2.1.2",
+    "librosa==0.10.2",
+    "soundfile==0.12.1",
+    "scipy==1.13.1",
+    "pyphen==0.14.0",
+    "numpy==1.26.4",
+    "requests==2.32.3",
+    "pyannote.audio==3.1.1",
+    "pyannote.core==5.0.0",
+    "torch-audiomentations==0.11.1",
+    "torchaudio-augmentations==0.2.4",
+    "setuptools==69.5.1",
+    "wheel==0.43.0",
+    "packaging==24.1",
+]
