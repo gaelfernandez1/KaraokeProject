@@ -5,8 +5,8 @@ import math
 import os
 import librosa
 import ssl
-from speaker_diarization import (
-    perform_speaker_diarization, 
+from whisperx_service.speaker_diarization import (
+    perform_speaker_diarization,
     merge_transcription_with_speakers,
     assign_colors_to_speakers
 )
@@ -45,21 +45,21 @@ def align_endpoint():
     codigo_idioma = datos.get("language", None)
     enable_diarization = datos.get("enable_diarization", False)
     hf_token = datos.get("hf_token", None)
-    whisper_model = datos.get("whisper_model", "small")  
+    whisper_model = datos.get("whisper_model", "small")
 
     dispositivo = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"-------USANDO DISPOSITIVO----- device={dispositivo}, audio={ruta_audio}")
 
     if letra_manual:        #FORCED ALIGNMENT
-        if not codigo_idioma:            
-            
+        if not codigo_idioma:
+
             try:
                 modelo_deteccion = whisperx.load_model(whisper_model, device=dispositivo, compute_type="int8")
-                resultado_deteccion = modelo_deteccion.transcribe(ruta_audio, language=None)  
+                resultado_deteccion = modelo_deteccion.transcribe(ruta_audio, language=None)
                 codigo_idioma = resultado_deteccion["language"]
                 print(f"Autodetectado con modelo {whisper_model} => {codigo_idioma}")
 
-                # Liberar memoria 
+                # Liberar memoria
                 del modelo_deteccion
                 torch.cuda.empty_cache() if torch.cuda.is_available() else None
             except Exception as e:
@@ -78,21 +78,21 @@ def align_endpoint():
                     "end": total_segundos
                 }
             ]
-        }        
+        }
         modelo_alineacion, metadatos = whisperx.load_align_model(codigo_idioma, dispositivo)
         resultado_alineado = whisperx.align(
-            resultado["segments"], 
-            modelo_alineacion, 
-            metadatos, 
-            ruta_audio, 
+            resultado["segments"],
+            modelo_alineacion,
+            metadatos,
+            ruta_audio,
             dispositivo
         )
 
     else:        #TRANSCRICIÓN AUTOMÁTICA
-        
+
         print(f"Usando modelo {whisper_model} para transcrición automática")
         modelo = whisperx.load_model(whisper_model, device=dispositivo, compute_type="int8")
-        resultado = modelo.transcribe(ruta_audio, language=None)  
+        resultado = modelo.transcribe(ruta_audio, language=None)
         codigo_idioma = resultado["language"]
         print(f"idioma detectado con {whisper_model}={codigo_idioma}")
         del modelo
@@ -100,15 +100,15 @@ def align_endpoint():
 
         modelo_alineacion, metadatos = whisperx.load_align_model(codigo_idioma, dispositivo)
         resultado_alineado = whisperx.align(
-            resultado["segments"], 
-            modelo_alineacion, 
-            metadatos, 
-            ruta_audio, 
+            resultado["segments"],
+            modelo_alineacion,
+            metadatos,
+            ruta_audio,
             dispositivo
         )
 
     segmentos_palabras = resultado_alineado["word_segments"]
-    
+
     #speaker diarization
     speaker_info = None
     speaker_colors = None
@@ -118,7 +118,7 @@ def align_endpoint():
             if speaker_info and speaker_info["num_speakers"] > 1:
                 print(f"Detectados {speaker_info['num_speakers']} speakers")
                 segmentos_palabras = merge_transcription_with_speakers(
-                    segmentos_palabras, 
+                    segmentos_palabras,
                     speaker_info["segments"]
                 )
                 speaker_colors = assign_colors_to_speakers(speaker_info["speakers"])
@@ -139,25 +139,25 @@ def align_endpoint():
             texto = seg["word"].strip()
             inicio = seg["start"]
             fin = seg["end"]
-            
+
             if "speaker" in seg and speaker_colors:
                 speaker_id = seg["speaker"]
                 color = speaker_colors.get(speaker_id, "#FFFFFF")
                 texto = f"{speaker_id}|{color}|{texto}"
-            
+
             bloque = f"{indice}\n{sec2tc(inicio)} --> {sec2tc(fin)}\n{texto}\n\n"
             f.write(bloque)
             indice += 1
 
     response_data = {
-        "srt_path": ruta_srt, 
+        "srt_path": ruta_srt,
         "message": "Alignment done"
     }
-    
+
     if speaker_info:
         response_data["speaker_info"] = speaker_info
         response_data["speaker_colors"] = speaker_colors
-    
+
     return jsonify(response_data), 200
 
 

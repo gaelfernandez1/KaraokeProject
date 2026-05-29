@@ -1,10 +1,9 @@
 import os
 import subprocess
 import shutil
-import requests
 import torch
 from moviepy.editor import AudioFileClip
-from gpu_utils import detect_gpu_capability, get_optimal_demucs_args
+from karaoke.infra.gpu_utils import detect_gpu_capability, get_optimal_demucs_args
 
 #añador esto para detectas as capacidades da gpu en general, non solo do meu equipo
 GPU_INFO = detect_gpu_capability()
@@ -12,14 +11,14 @@ DEMUCS_ARGS = get_optimal_demucs_args(GPU_INFO)
 
 def video_to_mp3(video_path: str) -> str:
 
-    
+
     if video_path.lower().endswith('.mp3'):
         if os.path.exists(video_path):
             return video_path
         else:
             print(f"Archivo MP3 non encontrado: {video_path}")
             return ""
-    
+
     ruta_audio = video_path.replace(".mp4", ".mp3")
     if os.path.exists(ruta_audio):
         return ruta_audio
@@ -40,7 +39,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
     if GPU_INFO['has_cuda']:
         print(f"GPU detectada: {GPU_INFO['gpu_name']} ({GPU_INFO['gpu_memory']:.1f}GB)")
-    
+
     directorio_saida = "./separated"
     if not os.path.exists("./stems"):
         os.makedirs("./stems")
@@ -56,7 +55,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
         print("separaronse os stems sin problemas")
     except subprocess.CalledProcessError as e:
         print(f"Stderr: {e.stderr}")
-        
+
         if GPU_INFO['recommended_device'] == 'cuda':
             print("problemas con gpu, vaise seguir con cpu")
             try:
@@ -85,7 +84,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
         if all(os.path.exists(p) for p in [drums_wav, bass_wav, other_wav]):
             try:
                 subprocess.run([
-                    "ffmpeg", "-y",  
+                    "ffmpeg", "-y",
                     "-i", drums_wav,
                     "-i", bass_wav,
                     "-i", other_wav,
@@ -113,96 +112,37 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     return ruta_final_vocals, ruta_final_musica
 
 
-# Esto chama ao endpoint de  whisperx para facer a transcripción automatica
-def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small"):
-    url = "http://whisperx:5001/align"              #dentro da rede docker
-    datos_envio = {
-        "audio_path": vocals_path,
-        "enable_diarization": enable_diarization,
-        "whisper_model": whisper_model
-    }
-    
-    # Agregar token de HuggingFace
-    if hf_token:
-        datos_envio["hf_token"] = hf_token
-    
-    #Facemos post
-    try:
-        resposta = requests.post(url, json=datos_envio, timeout=600)
-        if resposta.status_code == 200:
-            datos = resposta.json()
-            return datos  # Devolver datos para acceder a speaker_info
-        else:
-            print("WhisperX alignment Error:", resposta.text)
-            return None
-    except Exception as e:
-        print(f"error ao chamar ao endpoint: {e}")
-        return None
-
-
-#Esto chama ao endpoint pero da letra manual
-def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language=None, enable_diarization: bool = False, hf_token: str = None, whisper_model: str = "small"):
-    url = "http://whisperx:5001/align"
-    datos_envio = {
-        "audio_path": vocals_path,
-        "manual_lyrics": manual_lyrics,
-        "enable_diarization": enable_diarization,
-        "whisper_model": whisper_model
-    }
-    
-    # Solo añadir language si se especifica, si non WhisperX detectará automáticamente
-    if language:
-        datos_envio["language"] = language
-    
-   
-    if hf_token:
-        datos_envio["hf_token"] = hf_token
-    
-    try:
-        resposta = requests.post(url, json=datos_envio, timeout=600)
-        if resposta.status_code == 200:
-            datos = resposta.json()
-            return datos  
-        else:
-            print("Fallo do alineamento forzado:", resposta.text)
-            return None
-    except Exception as e:
-        print(f"error co endpoint da letra manual {e}")
-        return None
-
-
-
 #Cambio obligado. Problemas con VAD de whisperx, voy a transcribir directamente con faster whisper e alinear con whisperx
 def transcribe_with_faster_whisper(audio_path: str, model_size: str = "tiny") -> str:
 
     try:
         from faster_whisper import WhisperModel
-        
-        
+
+
         device = "cpu"  #aqui vou usar cpu para non complicarme a vida, CAMBIO POSTERIOR PASAR A CUDA
         compute_type = "int8"
-        
+
         try:
             model = WhisperModel(model_size, device=device, compute_type=compute_type)
         except Exception as e:
             print(f"Erro cargando modelo {model_size}: {e}")
             raise
-        
+
         segments, info = model.transcribe(audio_path, language=None)
-        
+
         print(f"Idioma detectado: {info.language}")
-        
+
         transcribed_text = ""
         for segment in segments:
             transcribed_text += segment.text + " "
-        
+
         del model
-        
+
         transcribed_text = transcribed_text.strip()
         print(f"Transcricion: {len(transcribed_text)} caracteres")
-        
+
         return transcribed_text
-        
+
     except Exception as e:
         import traceback
         print(f"Traceback: {traceback.format_exc()}")

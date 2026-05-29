@@ -1,7 +1,7 @@
 import os
 import re
-from utils import time_str_to_sec, clean_abnormal_segments
-from text_processing import normalize_manual_lyrics
+from karaoke.infra.utils import time_str_to_sec, clean_abnormal_segments
+from karaoke.domain.text_processing import normalize_manual_lyrics
 import logging
 
 
@@ -19,7 +19,7 @@ def parse_word_srt(srt_path: str) -> list:
     while indice < len(liñas):
         liña = liñas[indice].strip()
         if liña.isdigit():
-            indice += 1  
+            indice += 1
             if indice < len(liñas):
                 liña_tempo = liñas[indice].strip()
                 try:
@@ -44,25 +44,25 @@ def parse_word_srt(srt_path: str) -> list:
                     for i, token in enumerate(tokens):
                         inicio_token = inicio_bloque + i * duracion_token
                         fin_token = inicio_token + duracion_token
-                        
-                        # Parsear información de speaker. Se hai, claro 
-                        
+
+                        # Parsear información de speaker. Se hai, claro
+
                         if "|" in token and token.count("|") >= 2:     # Formato: speaker id|color|palabra
                             partes = token.split("|", 2)
                             speaker_id = partes[0]
                             color = partes[1]
                             palabra = partes[2]
                             segmentos.append({
-                                "start": inicio_token, 
-                                "end": fin_token, 
+                                "start": inicio_token,
+                                "end": fin_token,
                                 "word": palabra,
                                 "speaker": speaker_id,
                                 "color": color
                             })
                         else:
                             segmentos.append({
-                                "start": inicio_token, 
-                                "end": fin_token, 
+                                "start": inicio_token,
+                                "end": fin_token,
                                 "word": token,
                                 "speaker": None,
                                 "color": None
@@ -72,9 +72,9 @@ def parse_word_srt(srt_path: str) -> list:
                 indice += 1
         else:
             indice += 1
-    
+
     segmentos = clean_abnormal_segments(segmentos)
-    
+
     return segmentos
 
 
@@ -83,7 +83,7 @@ def parse_word_srt(srt_path: str) -> list:
 # Devolve outra lista de diccionarios
 def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
 
-    
+
     normalizado = re.sub(r'\n+', '\n', manual_lyrics)   #por si hai doble salto de linea deixo solo 1
     liñas = [liña.strip() for liña in normalizado.splitlines() if liña.strip()]  #Separado de lineas
 
@@ -148,34 +148,34 @@ def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int
 
     if not word_segments:
         return []
-    
+
     grupos = []
     grupo_actual = []
-    
+
     for i, segment in enumerate(word_segments):
         grupo_actual.append(segment)
-        
+
         duracion_grupo = segment["end"] - grupo_actual[0]["start"]
-        
+
         debe_cerrar = False
-        
+
         if len(grupo_actual) >= max_words_per_phrase:
             debe_cerrar = True
-        
+
         elif duracion_grupo >= max_duration:
             debe_cerrar = True
-        
+
         elif i + 1 < len(word_segments):
             pausa_siguiente = word_segments[i + 1]["start"] - segment["end"]
             if pausa_siguiente > 0.8:
                 debe_cerrar = True
-        
+
         elif i == len(word_segments) - 1:
             debe_cerrar = True
-        
+
         if segment["word"].rstrip().endswith(('.', '!', '?')):
             debe_cerrar = True
-        
+
         if debe_cerrar and grupo_actual:
             texto_grupo = " ".join([w["word"] for w in grupo_actual])
             grupos.append({
@@ -185,7 +185,7 @@ def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int
                 "words": grupo_actual
             })
             grupo_actual = []
-    
+
     if grupo_actual:
         texto_grupo = " ".join([w["word"] for w in grupo_actual])
         grupos.append({
@@ -194,5 +194,5 @@ def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int
             "end": grupo_actual[-1]["end"],
             "words": grupo_actual
         })
-    
+
     return grupos

@@ -1,14 +1,14 @@
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from moviepy.editor import VideoClip
-from config import (
+from karaoke.config import (
     TEXT_CLIP_WIDTH, FONTE, TAMAÑO_FONTE, TAMAÑO_FONTE_MIN, COR_TEXTO, COR_RESALTADO,
     GROSOR_CONTORNO_TEXTO, COR_CONTORNO_TEXTO, COR_FONDO_TEXTO, PADDING_FONDO_TEXTO,
     COR_LIÑA_SEGUINTE, ALPHA_LIÑA_SEGUINTE, FACTOR_FONTE_LIÑA_SEGUINTE, ESPACIADO_LIÑAS,
     MOSTRAR_LIÑA_SEGUINTE, MODO_SILABICO, BUFFER_ANTICIPACION, PESO_PROGRESO_TEMPORAL,
     PESO_PROGRESO_SEGMENTO, UMBRAL_ACELERACION, FACTOR_ACELERACION_MAX
 )
-from text_processing import dic_pyphen
+from karaoke.domain.text_processing import dic_pyphen
 
 
 # Función auxiliar para obter a cor dun speaker específico
@@ -26,79 +26,79 @@ def get_speaker_color(word_info: dict, is_highlighted: bool = False) -> str:
 # Renderiza a imaxe la linea principal de texto. VARIAS MELLORAS:
 #Silabeador implementado --> chequear mais abaixo a info
 #
-def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_CLIP_WIDTH, 
-                      font_path: str = FONTE, font_size: int = TAMAÑO_FONTE, 
+def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_CLIP_WIDTH,
+                      font_path: str = FONTE, font_size: int = TAMAÑO_FONTE,
                       normal_color: str = COR_TEXTO, highlight_color: str = COR_RESALTADO) -> np.ndarray:
 
 
     texto_completo = line_info["line_text"]
-    
+
     #Aqui temos que usar fuentes fijas para as lineas pero o problema é que si a frase é moi larga(xa que a delimita o salto de linea),
     #pois temos que reducir o tamaño nese caso (improbable, a maioria de casos son frases cortas)
     tamaño_fonte_dinamico = font_size
-    if len(texto_completo) > 100:  
+    if len(texto_completo) > 100:
         factor_reduccion = min(1.0, 100 / len(texto_completo))
         tamaño_fonte_dinamico = max(TAMAÑO_FONTE_MIN, int(font_size * factor_reduccion))
-    
-    
+
+
     try:
         fonte = ImageFont.truetype(font_path, tamaño_fonte_dinamico)
     except Exception as e:
-        print(f"Non se puido cargar a fonte {e}")        
+        print(f"Non se puido cargar a fonte {e}")
         fonte = ImageFont.load_default()
-    
+
     #axustes visuales varios:
     lineasAjustadas = []
     palabras = texto_completo.split()
     lineaActual = ""
-    
-    ancho_maximo = clip_width - 2 * PADDING_FONDO_TEXTO    
+
+    ancho_maximo = clip_width - 2 * PADDING_FONDO_TEXTO
     for palabra in palabras:
         if not lineaActual:
             lineaActual = palabra
             continue
-            
+
         liñaPrueba = lineaActual + " " + palabra
         ancho_texto = fonte.getlength(liñaPrueba) if hasattr(fonte, 'getlength') else fonte.getsize(liñaPrueba)[0]
-        
+
         if ancho_texto <= ancho_maximo:
             lineaActual = liñaPrueba
         else:
             lineasAjustadas.append(lineaActual)
             lineaActual = palabra
-    
+
     if lineaActual:
         lineasAjustadas.append(lineaActual)
-    
+
     if not lineasAjustadas:
         lineasAjustadas = [texto_completo]
-    
+
     altura_liña = int(tamaño_fonte_dinamico * 1.4)  #puxen un espaciado de linea un 40% mais alto ca o tamaño da fonte
 
     #aqui temos q calcular a altura total para todas as lineas visuales e asegurar unha altura minima (para as lineas cortas tamen. REVISAR)
     altura_minima = tamaño_fonte_dinamico + 2 * PADDING_FONDO_TEXTO
-    altura_total = max(altura_minima, len(lineasAjustadas) * altura_liña + 2 * PADDING_FONDO_TEXTO)  
+    altura_total = max(altura_minima, len(lineasAjustadas) * altura_liña + 2 * PADDING_FONDO_TEXTO)
 
 
     #tuven que poñer esto para asegurar a consistencia no posicionamento.
     imaxe = Image.new("RGBA", (clip_width, altura_total), (0, 0, 0, 0))
     debuxar = ImageDraw.Draw(imaxe)
-    
+
     capa_fondo = Image.new("RGBA", (clip_width, altura_total), (0, 0, 0, 0)) #fondo +- transparente
     debuxar_fondo = ImageDraw.Draw(capa_fondo)
-    
-    
+
+
     ancho_maximo_liña = 0
     for liña in lineasAjustadas:
         ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]  #serviume esto para o problema do ancho. REVISAR A REFERENCIA EN INTERNET PARA AÑADILA NA MEMORIA!!!
-        ancho_maximo_liña = max(ancho_maximo_liña, ancho_liña)     
-    
+        ancho_maximo_liña = max(ancho_maximo_liña, ancho_liña)
+
 
     #Fondo trnsparente con bordes redondeados
     ancho_minimo = int(clip_width * 0.4)  #colle polo menos un 40% do ancho disponible do clip
     ancho_fondo = max(ancho_minimo, min(ancho_maximo_liña + 2 * PADDING_FONDO_TEXTO, clip_width))
     x_fondo = (clip_width - ancho_fondo) // 2
-    
+
 
     #o fondo vai ser un rectangulo. Verifico ahi si a version do PIL soporta a funcion de rounded_rectangle porque me daba problemas
     if hasattr(debuxar_fondo, 'rounded_rectangle'):
@@ -108,12 +108,12 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
             fill=COR_FONDO_TEXTO
         )
     else:
-        
+
         #polo problema ese fago un fallback para versions antiguas de PIL
         debuxar_fondo.rectangle(
             [(x_fondo, 0), (x_fondo + ancho_fondo, altura_total)],
             fill=COR_FONDO_TEXTO
-        )    
+        )
 
     # Vale, IMPORTANTE, arreglei o silabeador, xa non fai cousas raras cos caracteres especiales. Esta documentado nas notas
     #COMO FUNCIONA? --> primeiro calculo o progreso temporal basandome nos segmentos de audio (usase tanto o nº de segmentos como o progreso dentro do segmento actual)
@@ -125,22 +125,22 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
         tempoActual = line_info["start"] + t_offset
         tempoActual = line_info["start"] + t_offset
         duracion_total_liña = line_info["end"] - line_info["start"]
-        
+
         if duracion_total_liña > 0:
             progreso_temporal = min(1.0, max(0.0, t_offset / duracion_total_liña))
-            
+
             segmentos_pasados = 0
             bonus_progreso_segmento = 0.0
-            
+
             # Buffer para anticipar a última sílaba (para que a ultima palabra se resalte tamen)
             buffer_anticipacion = BUFFER_ANTICIPACION
-            
+
             for i, seg in enumerate(line_info["words"]):
-                
+
                 tiempo_fin_efectivo = seg["end"]
-                if i == len(line_info["words"]) - 1:  
+                if i == len(line_info["words"]) - 1:
                     tiempo_fin_efectivo = max(seg["start"] + 0.1, seg["end"] - buffer_anticipacion)
-                
+
                 if tempoActual >= tiempo_fin_efectivo:
                     segmentos_pasados += 1
                 elif tempoActual >= seg["start"]:
@@ -152,62 +152,62 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
                         progreso_seg = min(1.0, progreso_seg * 1.2)  # Acelerar lixeiramente o final
                         bonus_progreso_segmento = progreso_seg / len(line_info["words"])
                     break
-            
+
             progreso_segmento = (segmentos_pasados / len(line_info["words"])) if line_info["words"] else 0.0
             progreso_final = min(1.0, progreso_segmento + bonus_progreso_segmento)
-            
+
             #axustar pesos para dar mais importancia ao progreso por segmentos
-            progreso_combinado = (progreso_temporal * PESO_PROGRESO_TEMPORAL) + (progreso_final * PESO_PROGRESO_SEGMENTO) 
+            progreso_combinado = (progreso_temporal * PESO_PROGRESO_TEMPORAL) + (progreso_final * PESO_PROGRESO_SEGMENTO)
         else:
             progreso_combinado = 0.0
-        
+
         info_todas_silabas = []  # Lista de [silaba, es_final_de_palabra]
-        
+
         for palabra in texto_completo.split():
 
             silabas_palabra = dic_pyphen.inserted(palabra).split('-')
-            
+
             if len(silabas_palabra) <= 1:   # Palabra non divisible
-                
+
                 info_todas_silabas.append((palabra, True))
             else:
                 # si que é divisible
                 for i, sil in enumerate(silabas_palabra):
                     e_ultima_silaba = (i == len(silabas_palabra) - 1)
                     info_todas_silabas.append((sil, e_ultima_silaba))
-        
+
         # Calculalse cantas silabas resaltar dependendo do progreso
         total_silabas = len(info_todas_silabas)
         # Usar redondeo en lugar de truncameento para mellor precisión
         silabas_para_resaltar = min(total_silabas, round(progreso_combinado * total_silabas))
-        
-        
+
+
         if progreso_combinado > UMBRAL_ACELERACION:
             factor_progreso = (progreso_combinado - UMBRAL_ACELERACION) / (1.0 - UMBRAL_ACELERACION)
             factor_aceleracion = 1 + factor_progreso * (FACTOR_ACELERACION_MAX - 1)
             silabas_para_resaltar = min(total_silabas, int(progreso_combinado * total_silabas * factor_aceleracion))
-        
-        
+
+
         indice_silaba = 0
-        
+
         for i, liña in enumerate(lineasAjustadas):
             y = i * altura_liña + PADDING_FONDO_TEXTO
-            
+
             ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]    #fajo un cálculo do ancho total da linea para o tema de que este centrada
             x = (clip_width - ancho_liña) // 2
-            
+
             palabras_liña = liña.split()
-            
+
             # Mapear palabras visuales con palabras de datos para obter speaker info
             total_palabras_visuales = sum(len(línea.split()) for línea in lineasAjustadas[:i])
-            
+
             for idx_palabra, palabra in enumerate(palabras_liña):
                 word_info = {}
                 palabra_index = total_palabras_visuales + idx_palabra
-                
+
                 if line_info.get("words") and palabra_index < len(line_info["words"]):
                     word_info = line_info["words"][palabra_index]
-                
+
                 if not word_info.get("speaker") and line_info.get("words"):
                     # Buscar nun rango máis amplo
                     for offset in [-2, -1, 1, 2]:
@@ -217,9 +217,9 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
                             if test_word.get("speaker"):
                                 word_info = test_word
                                 break
-                
+
                 silabas_palabra = dic_pyphen.inserted(palabra).split('-')
-                
+
                 if len(silabas_palabra) <= 1:
                     # se a palabra é non divisible -> renderizar completa
                     cor = get_speaker_color(word_info, indice_silaba < silabas_para_resaltar)
@@ -237,16 +237,16 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
                         ancho_sil = fonte.getlength(sil) if hasattr(fonte, 'getlength') else fonte.getsize(sil)[0]
                         x += ancho_sil
                         indice_silaba += 1
-                
+
                 # IMPORTANTE: Añadir espacio pois de cada palabra (menos a ultima da linea) REVISAR ESTO -> contraproducente? Non se ve demasiado smooth
                 if idx_palabra < len(palabras_liña) - 1:
                     ancho_espacio = fonte.getlength(" ") if hasattr(fonte, 'getlength') else fonte.getsize(" ")[0]
-                    x += ancho_espacio    
+                    x += ancho_espacio
     else:
         #original antes do silabeador: Esto seria para o modo de resaltado palabra por palabra por si acaso, q é como fai whisperx, fai un srt a nivel de palabra, non de silaba nin frase (visualmente incomodo para o resaltado)
         palabras = texto_completo.split()
         palabras_para_resaltar = 0
-        
+
         # para sincronizar usanse os tempos dos segmentos de palabras
         if line_info.get("words"):
             for i, seg in enumerate(line_info["words"]):
@@ -257,26 +257,26 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
             #outro fallback q avanza proporcional ao tempo
             ratio_progreso = min(1.0, max(0.0, t_offset / (line_info["end"] - line_info["start"])))
             palabras_para_resaltar = int(ratio_progreso * len(palabras))
-        
+
         #Vanse dibujando as lineas e as palabras
         palabras_asignadas = 0
         for i, liña in enumerate(lineasAjustadas):
             palabras_liña = liña.split()
             y = i * altura_liña + PADDING_FONDO_TEXTO
-            
-            ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]   
+
+            ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]
             x = (clip_width - ancho_liña) // 2
-            
+
             # Calcular offset de palabras para esta línea
             total_palabras_visuales = sum(len(línea.split()) for línea in lineasAjustadas[:i])
-            
+
             for idx_palabra, palabra in enumerate(palabras_liña):
                 word_info = {}
                 palabra_index = total_palabras_visuales + idx_palabra
-                
+
                 if line_info.get("words") and palabra_index < len(line_info["words"]):
                     word_info = line_info["words"][palabra_index]
-                
+
                 if not word_info.get("speaker") and line_info.get("words"):
                     for offset in [-2, -1, 1, 2]:
                         test_index = palabra_index + offset
@@ -285,20 +285,20 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
                             if test_word.get("speaker"):
                                 word_info = test_word
                                 break
-                
+
                 cor = get_speaker_color(word_info, palabras_asignadas < palabras_para_resaltar)
-                
+
                 debuxar.text((x, y), palabra, font=fonte, fill=cor,
                          stroke_width=GROSOR_CONTORNO_TEXTO, stroke_fill=COR_CONTORNO_TEXTO)
-                
+
                 #Avanzase a posivion x para a siguiente palabra
                 ancho_palabra = fonte.getlength(palabra) if hasattr(fonte, 'getlength') else fonte.getsize(palabra)[0]
                 x += ancho_palabra + (fonte.getlength(" ") if hasattr(fonte, 'getlength') else fonte.getsize(" ")[0])
-                
+
                 palabras_asignadas += 1
-    
+
     imaxe = Image.alpha_composite(capa_fondo, imaxe)
-    
+
     frame = np.array(imaxe.convert("RGB"))
     return frame
 
@@ -311,60 +311,60 @@ def render_next_line_image(line_info: dict, clip_width: int = TEXT_CLIP_WIDTH,
     if font_size is None:
 
         font_size = int(TAMAÑO_FONTE * FACTOR_FONTE_LIÑA_SEGUINTE)
-        
+
     texto_completo = line_info["line_text"]
-    
+
     # tamaño fijo a non ser que sea unha frase moi larga
     tamaño_fonte_dinamico = font_size
     if len(texto_completo) > 100:
         factor_reduccion = min(1.0, 100 / len(texto_completo))
         tamaño_fonte_dinamico = max(TAMAÑO_FONTE_MIN * FACTOR_FONTE_LIÑA_SEGUINTE, int(font_size * factor_reduccion))
-    
+
     try:
         fonte = ImageFont.truetype(font_path, tamaño_fonte_dinamico)
     except Exception as e:
         print(f"fallo cargando a fonte {e}")
         fonte = ImageFont.load_default()
-    
+
     lineasAjustadas = []
     palabras = texto_completo.split()
     lineaActual = ""
-    
+
     ancho_maximo = clip_width - 2 * PADDING_FONDO_TEXTO
-    
+
     for palabra in palabras:
         if not lineaActual:
             lineaActual = palabra
             continue
-            
+
         liñaPrueba = lineaActual + " " + palabra
         ancho_texto = fonte.getlength(liñaPrueba) if hasattr(fonte, 'getlength') else fonte.getsize(liñaPrueba)[0]
-        
+
         if ancho_texto <= ancho_maximo:
             lineaActual = liñaPrueba
         else:
             lineasAjustadas.append(lineaActual)
             lineaActual = palabra
-    
+
     if lineaActual:
         lineasAjustadas.append(lineaActual)
-    
+
     if not lineasAjustadas:
         lineasAjustadas = [texto_completo]
-    
+
     altura_liña = tamaño_fonte_dinamico + 10
-    altura_total = len(lineasAjustadas) * altura_liña + 2 * PADDING_FONDO_TEXTO    
+    altura_total = len(lineasAjustadas) * altura_liña + 2 * PADDING_FONDO_TEXTO
     imaxe = Image.new("RGBA", (clip_width, altura_total), (0, 0, 0, 0))
     debuxar = ImageDraw.Draw(imaxe)
-    capa_fondo = Image.new("RGBA", (clip_width, altura_total), (0, 0, 0, 0))    
+    capa_fondo = Image.new("RGBA", (clip_width, altura_total), (0, 0, 0, 0))
     debuxar_fondo = ImageDraw.Draw(capa_fondo)
-    
+
     ancho_maximo_liña = 0
     for liña in lineasAjustadas:
         ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]
         ancho_maximo_liña = max(ancho_maximo_liña, ancho_liña)
-    
-    colorDeFondoDaSiguienteLinea = (COR_FONDO_TEXTO[0], COR_FONDO_TEXTO[1], COR_FONDO_TEXTO[2], 
+
+    colorDeFondoDaSiguienteLinea = (COR_FONDO_TEXTO[0], COR_FONDO_TEXTO[1], COR_FONDO_TEXTO[2],
                          int(COR_FONDO_TEXTO[3] * ALPHA_LIÑA_SEGUINTE))
     ancho_fondo = min(ancho_maximo_liña + 2 * PADDING_FONDO_TEXTO, clip_width)
     x_fondo = (clip_width - ancho_fondo) // 2
@@ -372,18 +372,18 @@ def render_next_line_image(line_info: dict, clip_width: int = TEXT_CLIP_WIDTH,
         [(x_fondo, 0), (x_fondo + ancho_fondo, altura_total)],
         fill=colorDeFondoDaSiguienteLinea
     )
-    
+
     for i, liña in enumerate(lineasAjustadas):
         y = i * altura_liña + PADDING_FONDO_TEXTO
-        
+
         ancho_liña = fonte.getlength(liña) if hasattr(fonte, 'getlength') else fonte.getsize(liña)[0]
         x = (clip_width - ancho_liña) // 2
-        
+
         debuxar.text((x, y), liña, font=fonte, fill=COR_LIÑA_SEGUINTE,
                  stroke_width=int(GROSOR_CONTORNO_TEXTO * 0.75), stroke_fill=COR_CONTORNO_TEXTO)
-    
+
     imaxe = Image.alpha_composite(capa_fondo, imaxe)
-    
+
     frame = np.array(imaxe.convert("RGB"))
     return frame
 
@@ -392,7 +392,7 @@ def render_next_line_image(line_info: dict, clip_width: int = TEXT_CLIP_WIDTH,
 # iniciase advance segundos antes do tempo real (non negativo) e dura hasta (line_info["end"] - line_info["start"] + advance + duration_padding)
 # ten o wrap automatico polo tema dos textos largos
 # renderizase a imagen da línea con t - display_offset (se xa é positivo)
-# Se a configuración permite mostrar a línea siguiente e temos a información, combinamos os dous frames e crease un frame combinado con espacio abondo entre lineas. 
+# Se a configuración permite mostrar a línea siguiente e temos a información, combinamos os dous frames e crease un frame combinado con espacio abondo entre lineas.
 # Centro horizontalmente as duas imagenes, copio la linea actual na parte de arriba e a linea siguiente ponse na parte de abaixo
 # CHEQUEAR A REF EN INTERNET, esta explicado mais ou menos
 def create_karaoke_text_clip(line_info: dict, next_line_info: dict = None, advance: float=0.5, duration_padding: float=0.5):
@@ -403,34 +403,34 @@ def create_karaoke_text_clip(line_info: dict, next_line_info: dict = None, advan
 
     def facer_frame(t):
         # t es el tiempo transcurrido en el clip
-        
+
         t_efectivo = max(t - offset_visualizacion, 0) #t seria o tempo transcurrido no clip
-        
+
         frameActual = render_line_image(line_info, t_efectivo)
-        
-        
+
+
         if MOSTRAR_LIÑA_SEGUINTE and next_line_info:
             frame_seguinte = render_next_line_image(next_line_info)
-            
-            
+
+
             altura1 = frameActual.shape[0]
             altura2 = frame_seguinte.shape[0]
             ancho = max(frameActual.shape[1], frame_seguinte.shape[1])
-            
+
             altura_combinada = altura1 + ESPACIADO_LIÑAS + altura2
             frame_combinado = np.zeros((altura_combinada, ancho, 3), dtype=np.uint8)
-            
-            
+
+
             offset_x1 = (ancho - frameActual.shape[1]) // 2
             offset_x2 = (ancho - frame_seguinte.shape[1]) // 2
-            
+
             frame_combinado[:altura1, offset_x1:offset_x1+frameActual.shape[1]] = frameActual
-            
+
             y_seguinte_liña = altura1 + ESPACIADO_LIÑAS
             frame_combinado[y_seguinte_liña:y_seguinte_liña+altura2, offset_x2:offset_x2+frame_seguinte.shape[1]] = frame_seguinte
-            
+
             return frame_combinado
-        
+
         # se non hai linea siguiente solo se devolve o frame actual
         return frameActual
 
