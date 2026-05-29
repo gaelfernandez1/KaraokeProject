@@ -8,18 +8,26 @@ ENV MKL_THREADING_LAYER=INTEL
 ENV OMP_NUM_THREADS=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-    libavformat-dev \
-    libavcodec-dev \
-    libavdevice-dev \
-    libavutil-dev \
-    libavfilter-dev \
-    libswscale-dev \
-    libswresample-dev \
     git \
     wget \
     build-essential \
     pkg-config \
+    software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+# Ubuntu 20.04 ships ffmpeg 4.2; av==11.* needs AV_CODEC_CAP_OTHER_THREADS (added in 4.4).
+# The savoury1 PPA provides 4.4+ for Focal, same as Dockerfile.A.
+RUN add-apt-repository ppa:savoury1/ffmpeg4 -y || true && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ffmpeg \
+        libavformat-dev \
+        libavcodec-dev \
+        libavdevice-dev \
+        libavutil-dev \
+        libavfilter-dev \
+        libswscale-dev \
+        libswresample-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /KaraokeProject
