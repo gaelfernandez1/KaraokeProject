@@ -23,7 +23,10 @@ def setup_security(app):
     #excluir endpoints de consulta de estado do rate limiting
     limiter.exempt(app.view_functions['estado_tarea'])
     
-    app.secret_key = os.getenv('FLASK_SECRET_KEY', 'karaoke_secret_key_change_in_production')
+    secret_key = os.getenv('FLASK_SECRET_KEY')
+    if not secret_key:
+        raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
+    app.secret_key = secret_key
     
     @app.after_request
     def add_security_headers(response):

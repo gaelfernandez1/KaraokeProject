@@ -317,33 +317,46 @@ def reproductor_karaoke(filename):
 
 @app.route("/serve_video/<filename>")
 def servir_video(filename):
-
-    ruta_archivo = os.path.join(DIRECTORIO_SAIDA, filename)
+    safe_name = secure_filename(filename)
+    if not safe_name:
+        return "Arquivo non encontrado", 404
+    abs_dir = os.path.abspath(DIRECTORIO_SAIDA)
+    ruta_archivo = os.path.abspath(os.path.join(DIRECTORIO_SAIDA, safe_name))
+    if os.path.commonpath([ruta_archivo, abs_dir]) != abs_dir:
+        return "Arquivo non encontrado", 404
     if not os.path.exists(ruta_archivo):
-        return "Arquiivo non encontrado", 404
-    
+        return "Arquivo non encontrado", 404
     return send_file(ruta_archivo, mimetype='video/mp4')
 
 
 @app.route("/serve_audio/<filename>")
 def servir_audio(filename):
-
-    ruta_archivo = os.path.join(DIRECTORIO_SAIDA, filename)
+    safe_name = secure_filename(filename)
+    if not safe_name:
+        return "Arquivo non encontrado", 404
+    abs_dir = os.path.abspath(DIRECTORIO_SAIDA)
+    ruta_archivo = os.path.abspath(os.path.join(DIRECTORIO_SAIDA, safe_name))
+    if os.path.commonpath([ruta_archivo, abs_dir]) != abs_dir:
+        return "Arquivo non encontrado", 404
     if not os.path.exists(ruta_archivo):
         return "Arquivo non encontrado", 404
-    
     return send_file(ruta_archivo, mimetype='audio/wav')
 
 
 @app.route("/download/<filename>")
 def descargar_archivo(filename):
-
-    ruta_arquivo = os.path.join(DIRECTORIO_SAIDA, filename)
+    safe_name = secure_filename(filename)
+    if not safe_name:
+        return "Arquivo non encontrado", 404
+    abs_dir = os.path.abspath(DIRECTORIO_SAIDA)
+    ruta_arquivo = os.path.abspath(os.path.join(DIRECTORIO_SAIDA, safe_name))
+    if os.path.commonpath([ruta_arquivo, abs_dir]) != abs_dir:
+        return "Arquivo non encontrado", 404
     if not os.path.exists(ruta_arquivo):
         return "Arquivo non encontrado", 404
-    
+
     tamano_ficheiro = os.path.getsize(ruta_arquivo)
-    nome_descarga_seguro = secure_filename(filename)
+    nome_descarga_seguro = safe_name
     
     try:
         response = send_file(ruta_arquivo, as_attachment=True, download_name=nome_descarga_seguro)
@@ -464,4 +477,4 @@ def borrar_cancion_biblioteca(song_id):
 limiter = setup_security(app)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=os.getenv("FLASK_DEBUG", "false").lower() == "true", host="0.0.0.0", port=5000)
