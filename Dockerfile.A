@@ -41,12 +41,13 @@ RUN pip install --no-cache-dir --upgrade \
     setuptools==69.5.1 \
     wheel==0.43.0
 
-COPY requirementsA.txt /KaraokeProject/
-RUN pip install --no-cache-dir -r requirementsA.txt
+COPY pyproject.toml /KaraokeProject/
+COPY src/ /KaraokeProject/src/
+RUN pip install --no-cache-dir -e ".[worker]"
 
 COPY . /KaraokeProject
 
 RUN mkdir -p /data /KaraokeProject/input /KaraokeProject/output /KaraokeProject/separated
 
 EXPOSE 5000
-CMD ["python", "app.py"]
+CMD ["python", "-m", "karaoke.api.app"]

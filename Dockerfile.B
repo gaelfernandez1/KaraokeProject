@@ -23,41 +23,13 @@ RUN pip install --no-cache-dir --upgrade \
     setuptools==69.5.1 \
     wheel==0.43.0
 
+COPY pyproject.toml /KaraokeProject/
+COPY src/ /KaraokeProject/src/
+RUN pip install --no-cache-dir -e ".[whisperx]"
 
-RUN pip install --no-cache-dir \
-    torch==2.3.0 \
-    torchaudio==2.3.0 \
-    torchvision==0.18.0
-
-RUN pip install --no-cache-dir \
-    librosa==0.10.2 \
-    soundfile==0.12.1 \
-    scipy==1.13.1
-
-RUN pip install --no-cache-dir \
-    faster-whisper==1.0.1 \
-    whisperx==3.1.3 \
-    openai-whisper==20231117
-
-RUN pip install --no-cache-dir \
-    Flask==2.3.3 \
-    Werkzeug==2.3.7 \
-    pyphen==0.14.0 \
-    numpy==1.26.4 \
-    requests==2.31.0
-
-# Instalar dependencias de speaker diarization
-RUN pip install --no-cache-dir \
-    pyannote.audio==3.1.1 \
-    pyannote.core==5.0.0 \
-    torch-audiomentations==0.11.1 \
-    torchaudio-augmentations==0.2.4
-
-COPY whisperx_service_api.py /KaraokeProject/
-COPY gpu_utils.py /KaraokeProject/
-COPY speaker_diarization.py /KaraokeProject/
+COPY . /KaraokeProject
 
 RUN mkdir -p /data
 
 EXPOSE 5001
-CMD ["python", "whisperx_service_api.py"]
+CMD ["python", "-m", "whisperx_service.api"]

@@ -66,7 +66,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    command: celery -A celery_app worker --loglevel=info
+    command: celery -A karaoke.workers.celery_app worker --loglevel=info
     restart: unless-stopped
 
   #ahora vai con calquera gpu
