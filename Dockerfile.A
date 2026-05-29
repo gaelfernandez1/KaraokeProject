@@ -53,6 +53,17 @@ RUN pip install --no-cache-dir --upgrade \
 
 COPY pyproject.toml /KaraokeProject/
 COPY src/ /KaraokeProject/src/
+
+# The worker pulls faster-whisper==1.0.1, which hard-pins av==11.*. PyAV 11
+# ships no cp310 wheel, so pip builds it from source, and it needs FFmpeg >= 5
+# (AV_CODEC_CAP_OTHER_THREADS) — the savoury1 ffmpeg4 PPA headers above are too
+# old. Pull FFmpeg 6 from conda-forge (libmamba solver; classic never finishes
+# in this env) and build av against it before the editable install picks it up.
+# Same approach as Dockerfile.B.
+RUN conda install -c conda-forge --solver=libmamba "ffmpeg=6" -y && conda clean -a -y
+RUN PKG_CONFIG_PATH=/opt/conda/lib/pkgconfig \
+    pip install --no-cache-dir "av==11.*"
+
 RUN pip install --no-cache-dir -e ".[worker]"
 
 COPY . /KaraokeProject

@@ -26,13 +26,16 @@ RUN pip install --no-cache-dir --upgrade \
 COPY pyproject.toml /KaraokeProject/
 COPY src/ /KaraokeProject/src/
 
-# av==11.* (required by faster-whisper) has no pre-built pip wheel for this
-# conda-based Python environment and needs ffmpeg >= 4.4 headers to compile.
-# The apt ffmpeg on Ubuntu 20.04 is 4.2. Install ffmpeg from conda-forge
-# (which lands at /opt/conda) and build av against those headers explicitly.
-RUN conda install -c conda-forge ffmpeg cython -y && conda clean -a -y
+# faster-whisper 1.0.1 hard-pins av==11.*, and PyAV 11 ships no wheel for
+# cp310, so pip must build it from source. PyAV 11 also needs FFmpeg >= 5
+# (AV_CODEC_CAP_OTHER_THREADS), but Ubuntu 22.04's apt only has 4.4 and the
+# pytorch base env carries FFmpeg 4.3 — both too old. So pull FFmpeg 6 from
+# conda-forge (with the libmamba solver; the classic solver never finishes in
+# this constrained env) and build av against it. Only the native FFmpeg libs
+# come from conda — av itself stays pip-managed like the rest of the stack.
+RUN conda install -c conda-forge --solver=libmamba "ffmpeg=6" -y && conda clean -a -y
 RUN PKG_CONFIG_PATH=/opt/conda/lib/pkgconfig \
-    pip install --no-cache-dir --no-build-isolation "av==11.*"
+    pip install --no-cache-dir "av==11.*"
 
 # openai-whisper uses a legacy setup.py that imports pkg_resources, which is
 # unavailable inside pip's isolated build env; install it first without isolation
