@@ -9,6 +9,13 @@ ENV OMP_NUM_THREADS=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
+    libavformat-dev \
+    libavcodec-dev \
+    libavdevice-dev \
+    libavutil-dev \
+    libavfilter-dev \
+    libswscale-dev \
+    libswresample-dev \
     git \
     wget \
     build-essential \
@@ -25,6 +32,9 @@ RUN pip install --no-cache-dir --upgrade \
 
 COPY pyproject.toml /KaraokeProject/
 COPY src/ /KaraokeProject/src/
+# openai-whisper uses a legacy setup.py that imports pkg_resources, which is
+# unavailable inside pip's isolated build env; install it first without isolation
+RUN pip install --no-cache-dir --no-build-isolation openai-whisper==20231117
 RUN pip install --no-cache-dir -e ".[whisperx]"
 
 COPY . /KaraokeProject
