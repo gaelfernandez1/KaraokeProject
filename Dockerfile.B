@@ -29,11 +29,12 @@ COPY src/ /KaraokeProject/src/
 # faster-whisper 1.0.1 hard-pins av==11.*, and PyAV 11 ships no wheel for
 # cp310, so pip must build it from source. PyAV 11 also needs FFmpeg >= 5
 # (AV_CODEC_CAP_OTHER_THREADS), but Ubuntu 22.04's apt only has 4.4 and the
-# pytorch base env carries FFmpeg 4.3 — both too old. So pull FFmpeg 6 from
-# conda-forge (with the libmamba solver; the classic solver never finishes in
-# this constrained env) and build av against it. Only the native FFmpeg libs
-# come from conda — av itself stays pip-managed like the rest of the stack.
-RUN conda install -c conda-forge --solver=libmamba "ffmpeg=6" -y && conda clean -a -y
+# pytorch base env carries FFmpeg 4.3 — both too old. The base image's default
+# conda channels already ship ffmpeg 6.1.1, so install from there and build av
+# against it. Avoid the conda-forge channel on purpose: its huge repodata blows
+# up memory when several images build in parallel and crashes Docker Desktop on
+# WSL2. Only the native FFmpeg libs come from conda — av stays pip-managed.
+RUN conda install --solver=libmamba "ffmpeg=6" -y && conda clean -a -y
 RUN PKG_CONFIG_PATH=/opt/conda/lib/pkgconfig \
     pip install --no-cache-dir "av==11.*"
 

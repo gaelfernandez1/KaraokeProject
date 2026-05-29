@@ -27,26 +27,26 @@ def archivo_instrumental_permitido(nome_arquivo: str) -> bool:
 def descargar_video_youtube(url: str, directorio_saida: str = DIRECTORIO_ENTRADA) -> str:
     """ Funcion para descargar un video de YT e devolve a ruta do mp4 descargado """
 
+    # YouTube serves modern video/audio as separate DASH streams; a single
+    # progressive mp4 rarely exists above 360p. So pick the best video+audio
+    # under 1080p and let yt-dlp merge them, remuxing to mp4 so the rest of the
+    # pipeline (which assumes a .mp4 path) keeps working.
     opcions_ydl = {
         'outtmpl': os.path.join(directorio_saida, '%(title)s.%(ext)s'),
-        'format': 'best[height<=720][ext=mp4]/best[height<=1080][ext=mp4]/best[ext=mp4]/best',
+        'format': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]/best',
+        'merge_output_format': 'mp4',
         'noplaylist': True,
         'extract_flat': False,
         'concurrent_fragment_downloads': 1,
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        },
-        'extractor_args': {
-            'youtube': {
-                'skip': ['hls', 'dash'],
-                'player_client': ['android', 'web']
-            }
-        }
     }
     with yt_dlp.YoutubeDL(opcions_ydl) as ydl:
         info = ydl.extract_info(url, download=True)
-        nome_ficheiro = ydl.prepare_filename(info)
-        return nome_ficheiro
+        # After a merge/remux prepare_filename returns the pre-merge container,
+        # so prefer the real path yt-dlp records in requested_downloads.
+        downloads = info.get('requested_downloads')
+        if downloads:
+            return downloads[0]['filepath']
+        return ydl.prepare_filename(info)
 
 
 @bp.route("/", methods=["GET"])
