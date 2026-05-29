@@ -30,7 +30,7 @@ COPY src/ /KaraokeProject/src/
 # conda-based Python environment and needs ffmpeg >= 4.4 headers to compile.
 # The apt ffmpeg on Ubuntu 20.04 is 4.2. Install ffmpeg from conda-forge
 # (which lands at /opt/conda) and build av against those headers explicitly.
-RUN conda install -c conda-forge ffmpeg -y && conda clean -a -y
+RUN conda install -c conda-forge ffmpeg cython -y && conda clean -a -y
 RUN PKG_CONFIG_PATH=/opt/conda/lib/pkgconfig \
     pip install --no-cache-dir --no-build-isolation "av==11.*"
 
