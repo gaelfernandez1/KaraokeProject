@@ -78,6 +78,8 @@ stems/
 *.mp3
 *.wav
 *.srt
+# But track test fixtures regardless of the *.srt rule above
+!fixtures/*.srt
 
 db/
 *.db
