@@ -40,6 +40,24 @@ def sample_lyrics_text() -> str:
 
 
 @pytest.fixture
+def db_session():
+    """In-memory SQLAlchemy session with a fresh schema, for fast repository tests."""
+    from sqlalchemy.orm import Session
+
+    from karaoke.infra.db.engine import create_db_engine
+    from karaoke.infra.db.models import Base
+
+    engine = create_db_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    session = Session(bind=engine, expire_on_commit=False)
+    try:
+        yield session
+    finally:
+        session.close()
+        engine.dispose()
+
+
+@pytest.fixture
 def flask_app():
     from karaoke.api.app import create_app
 
