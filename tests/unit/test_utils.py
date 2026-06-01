@@ -1,6 +1,11 @@
 import pytest
 
-from karaoke.infra.utils import clean_abnormal_segments, sanitize_filename, seconds_to_timecode, time_str_to_sec
+from karaoke.infra.utils import (
+    clean_abnormal_segments,
+    sanitize_filename,
+    seconds_to_timecode,
+    time_str_to_sec,
+)
 
 
 class TestSecondsToTimecode:

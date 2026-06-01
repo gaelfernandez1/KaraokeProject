@@ -2,7 +2,7 @@ import logging
 import os
 
 import yt_dlp
-from flask import Blueprint, abort, g, redirect, render_template, request, session, url_for
+from flask import Blueprint, abort, redirect, render_template, request, session, url_for
 from werkzeug.utils import secure_filename
 
 from karaoke.workers.celery_tasks import (
@@ -13,7 +13,7 @@ from karaoke.workers.celery_tasks import (
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint('generation', __name__)
+bp = Blueprint("generation", __name__)
 
 DIRECTORIO_ENTRADA = "input"
 DIRECTORIO_SAIDA = "output"
@@ -27,33 +27,35 @@ def archivo_permitido(nome_arquivo: str) -> bool:
     return "." in nome_arquivo and nome_arquivo.rsplit(".", 1)[1].lower() in EXTENSIONES_PERMITIDAS
 
 
-
 def archivo_instrumental_permitido(nome_arquivo: str) -> bool:
-    return "." in nome_arquivo and nome_arquivo.rsplit(".", 1)[1].lower() in EXTENSIONES_INSTRUMENTAL_PERMITIDAS
+    return (
+        "." in nome_arquivo
+        and nome_arquivo.rsplit(".", 1)[1].lower() in EXTENSIONES_INSTRUMENTAL_PERMITIDAS
+    )
 
 
 def descargar_video_youtube(url: str, directorio_saida: str = DIRECTORIO_ENTRADA) -> str:
-    """ Funcion para descargar un video de YT e devolve a ruta do mp4 descargado """
+    """Funcion para descargar un video de YT e devolve a ruta do mp4 descargado"""
 
     # YouTube serves modern video/audio as separate DASH streams; a single
     # progressive mp4 rarely exists above 360p. So pick the best video+audio
     # under 1080p and let yt-dlp merge them, remuxing to mp4 so the rest of the
     # pipeline (which assumes a .mp4 path) keeps working.
     opcions_ydl = {
-        'outtmpl': os.path.join(directorio_saida, '%(title)s.%(ext)s'),
-        'format': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]/best',
-        'merge_output_format': 'mp4',
-        'noplaylist': True,
-        'extract_flat': False,
-        'concurrent_fragment_downloads': 1,
+        "outtmpl": os.path.join(directorio_saida, "%(title)s.%(ext)s"),
+        "format": "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
+        "merge_output_format": "mp4",
+        "noplaylist": True,
+        "extract_flat": False,
+        "concurrent_fragment_downloads": 1,
     }
     with yt_dlp.YoutubeDL(opcions_ydl) as ydl:
         info = ydl.extract_info(url, download=True)
         # After a merge/remux prepare_filename returns the pre-merge container,
         # so prefer the real path yt-dlp records in requested_downloads.
-        downloads = info.get('requested_downloads')
+        downloads = info.get("requested_downloads")
         if downloads:
-            return downloads[0]['filepath']
+            return downloads[0]["filepath"]
         return ydl.prepare_filename(info)
 
 
@@ -62,7 +64,7 @@ def inicio():
     return render_template("index.html")
 
 
-#asincronia
+# asincronia
 @bp.route("/generate", methods=["POST"])
 def xerar_karaoke():
     ruta_video = None
@@ -83,7 +85,9 @@ def xerar_karaoke():
 
     enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
-    whisper_model = request.form.get("whisper_model", "small").strip()  #para poder elixir modelo de whisper na interface
+    whisper_model = request.form.get(
+        "whisper_model", "small"
+    ).strip()  # para poder elixir modelo de whisper na interface
 
     source_type = "upload" if arquivo_subido else "youtube"
     source_url = url_youtube if not arquivo_subido else None
@@ -92,10 +96,10 @@ def xerar_karaoke():
         ruta_video, enable_diarization, hf_token, whisper_model, source_type, source_url, True
     )
 
-    session['current_task_id'] = task.id
-    session['task_type'] = 'automatic'
+    session["current_task_id"] = task.id
+    session["task_type"] = "automatic"
 
-    return redirect(url_for('tasks.mostrar_progreso', task_id=task.id))
+    return redirect(url_for("tasks.mostrar_progreso", task_id=task.id))
 
 
 @bp.route("/manual_lyrics_form", methods=["GET"])
@@ -127,27 +131,40 @@ def procesar_letras_manuales():
 
     enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
-    whisper_model = request.form.get("whisper_model", "small").strip() #o mesmo, para elegir modelo de whisper
+    whisper_model = request.form.get(
+        "whisper_model", "small"
+    ).strip()  # o mesmo, para elegir modelo de whisper
 
     source_type = "upload" if arquivo_subido else "youtube"
     source_url = url_youtube if not arquivo_subido else None
 
     task = process_manual_lyrics_karaoke.delay(
-        ruta_video, letra_manual, None, enable_diarization, hf_token, whisper_model,
-        source_type, source_url, True
+        ruta_video,
+        letra_manual,
+        None,
+        enable_diarization,
+        hf_token,
+        whisper_model,
+        source_type,
+        source_url,
+        True,
     )
 
-    session['current_task_id'] = task.id
-    session['task_type'] = 'manual_lyrics'
+    session["current_task_id"] = task.id
+    session["task_type"] = "manual_lyrics"
 
-    return redirect(url_for('tasks.mostrar_progreso', task_id=task.id))
+    return redirect(url_for("tasks.mostrar_progreso", task_id=task.id))
 
 
 @bp.route("/generate_instrumental", methods=["POST"])
 def xerar_instrumental():
     ruta_video = None
     arquivo_subido = request.files.get("video_file")
-    if arquivo_subido and arquivo_subido.filename and archivo_instrumental_permitido(arquivo_subido.filename):
+    if (
+        arquivo_subido
+        and arquivo_subido.filename
+        and archivo_instrumental_permitido(arquivo_subido.filename)
+    ):
         nome_ficheiro = secure_filename(arquivo_subido.filename)
         ruta_video = os.path.join(DIRECTORIO_ENTRADA, nome_ficheiro)
         arquivo_subido.save(ruta_video)
@@ -166,7 +183,7 @@ def xerar_instrumental():
 
     task = process_instrumental_only.delay(ruta_video, source_type, source_url, True)
 
-    session['current_task_id'] = task.id
-    session['task_type'] = 'instrumental'
+    session["current_task_id"] = task.id
+    session["task_type"] = "instrumental"
 
-    return redirect(url_for('tasks.mostrar_progreso', task_id=task.id))
+    return redirect(url_for("tasks.mostrar_progreso", task_id=task.id))

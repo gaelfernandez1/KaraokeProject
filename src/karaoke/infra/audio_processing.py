@@ -3,21 +3,20 @@ import os
 import shutil
 import subprocess
 
-import torch
 from moviepy.editor import AudioFileClip
 
 from karaoke.infra.gpu_utils import detect_gpu_capability, get_optimal_demucs_args
 
 logger = logging.getLogger(__name__)
 
-#añador esto para detectas as capacidades da gpu en general, non solo do meu equipo
+# añador esto para detectas as capacidades da gpu en general, non solo do meu equipo
 GPU_INFO = detect_gpu_capability()
 DEMUCS_ARGS = get_optimal_demucs_args(GPU_INFO)
 
+
 def video_to_mp3(video_path: str) -> str:
 
-
-    if video_path.lower().endswith('.mp3'):
+    if video_path.lower().endswith(".mp3"):
         if os.path.exists(video_path):
             return video_path
         else:
@@ -38,11 +37,10 @@ def video_to_mp3(video_path: str) -> str:
     return ruta_audio
 
 
-#Funcion para usar demucs, separa as pistas de audio. Esto devolve a ruta da voz e a ruta da instrumental. ahora detecta a gpu automaticamente
+# Funcion para usar demucs, separa as pistas de audio. Esto devolve a ruta da voz e a ruta da instrumental. ahora detecta a gpu automaticamente
 def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
-
-    if GPU_INFO['has_cuda']:
+    if GPU_INFO["has_cuda"]:
         logger.info(f"GPU detectada: {GPU_INFO['gpu_name']} ({GPU_INFO['gpu_memory']:.1f}GB)")
 
     directorio_saida = "./separated"
@@ -60,10 +58,18 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     except subprocess.CalledProcessError as e:
         logger.error(f"Stderr: {e.stderr}")
 
-        if GPU_INFO['recommended_device'] == 'cuda':
+        if GPU_INFO["recommended_device"] == "cuda":
             logger.warning("problemas con gpu, vaise seguir con cpu")
             try:
-                cmd_cpu = ["demucs", "--device", "cpu", "--two-stems=vocals", "--jobs", "2", audio_file_path]
+                cmd_cpu = [
+                    "demucs",
+                    "--device",
+                    "cpu",
+                    "--two-stems=vocals",
+                    "--jobs",
+                    "2",
+                    audio_file_path,
+                ]
                 result = subprocess.run(cmd_cpu, check=True, capture_output=True, text=True)
             except subprocess.CalledProcessError as e2:
                 logger.error(f"error tamen con cpu: {e2}")
@@ -84,18 +90,26 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
         other_wav = os.path.join(carpetaSeparado, "other.wav")
         instrumental_wav = os.path.join(carpetaSeparado, "music_instrumental.wav")
 
-        #hai que combinar os stems de drums, bass e other para crear a instrumental porque demucs non o fai automaticamente
+        # hai que combinar os stems de drums, bass e other para crear a instrumental porque demucs non o fai automaticamente
         if all(os.path.exists(p) for p in [drums_wav, bass_wav, other_wav]):
             try:
-                subprocess.run([
-                    "ffmpeg", "-y",
-                    "-i", drums_wav,
-                    "-i", bass_wav,
-                    "-i", other_wav,
-                    "-filter_complex", "[0:a][1:a][2:a]amix=inputs=3",
-                    instrumental_wav
-                ], check=True)
-            except subprocess.CalledProcessError as e:
+                subprocess.run(
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        drums_wav,
+                        "-i",
+                        bass_wav,
+                        "-i",
+                        other_wav,
+                        "-filter_complex",
+                        "[0:a][1:a][2:a]amix=inputs=3",
+                        instrumental_wav,
+                    ],
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
                 return "", ""
         else:
             logger.warning("Falta algun dos stems?")
@@ -110,20 +124,21 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     try:
         shutil.move(vocals_wav, ruta_final_vocals)
         shutil.move(instrumental_wav, ruta_final_musica)
-    except Exception as e:
+    except Exception:
         return "", ""
 
     return ruta_final_vocals, ruta_final_musica
 
 
-#Cambio obligado. Problemas con VAD de whisperx, voy a transcribir directamente con faster whisper e alinear con whisperx
+# Cambio obligado. Problemas con VAD de whisperx, voy a transcribir directamente con faster whisper e alinear con whisperx
 def transcribe_with_faster_whisper(audio_path: str, model_size: str = "tiny") -> str:
 
     try:
         from faster_whisper import WhisperModel
 
-
-        device = "cpu"  #aqui vou usar cpu para non complicarme a vida, CAMBIO POSTERIOR PASAR A CUDA
+        device = (
+            "cpu"  # aqui vou usar cpu para non complicarme a vida, CAMBIO POSTERIOR PASAR A CUDA
+        )
         compute_type = "int8"
 
         try:
@@ -147,6 +162,6 @@ def transcribe_with_faster_whisper(audio_path: str, model_size: str = "tiny") ->
 
         return transcribed_text
 
-    except Exception as e:
-        logger.exception(f"Traceback transcribe_with_faster_whisper")
+    except Exception:
+        logger.exception("Traceback transcribe_with_faster_whisper")
         return None

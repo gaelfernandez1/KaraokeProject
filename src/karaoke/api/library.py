@@ -4,14 +4,18 @@ import os
 from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from karaoke.infra.database import (
-    get_all_songs, get_database_stats, get_songs_by_search,
-    get_song_by_id, update_last_played, delete_song
+    delete_song,
+    get_all_songs,
+    get_database_stats,
+    get_song_by_id,
+    get_songs_by_search,
+    update_last_played,
 )
-from karaoke.infra.metadata_utils import format_file_size, format_duration
+from karaoke.infra.metadata_utils import format_duration, format_file_size
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint('library', __name__)
+bp = Blueprint("library", __name__)
 
 DIRECTORIO_SAIDA = "output"
 
@@ -23,8 +27,8 @@ def biblioteca_cancions():
         stats = get_database_stats()
 
         for song in songs:
-            song['formatted_file_size'] = format_file_size(song['file_size'] or 0)
-            song['formatted_duration'] = format_duration(song['duration'])
+            song["formatted_file_size"] = format_file_size(song["file_size"] or 0)
+            song["formatted_duration"] = format_duration(song["duration"])
 
         return render_template("library.html", songs=songs, stats=stats)
     except Exception:
@@ -34,16 +38,16 @@ def biblioteca_cancions():
 
 @bp.route("/library/search")
 def buscar_cancions():
-    query = request.args.get('q', '').strip()
+    query = request.args.get("q", "").strip()
     if not query:
-        return redirect(url_for('library.biblioteca_cancions'))
+        return redirect(url_for("library.biblioteca_cancions"))
 
     try:
         songs = get_songs_by_search(query)
 
         for song in songs:
-            song['formatted_file_size'] = format_file_size(song['file_size'] or 0)
-            song['formatted_duration'] = format_duration(song['duration'])
+            song["formatted_file_size"] = format_file_size(song["file_size"] or 0)
+            song["formatted_duration"] = format_duration(song["duration"])
 
         return render_template("library.html", songs=songs, search_query=query)
     except Exception:
@@ -58,12 +62,12 @@ def reproducir_dende_biblioteca(song_id):
         if not song:
             return "Canción non encontrada", 404
 
-        ruta_video = os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename'])
+        ruta_video = os.path.join(DIRECTORIO_SAIDA, song["karaoke_filename"])
         if not os.path.exists(ruta_video):
             return "Arquivo de video non encontrado", 404
 
         update_last_played(song_id)
-        return redirect(url_for('player.reproductor_karaoke', filename=song['karaoke_filename']))
+        return redirect(url_for("player.reproductor_karaoke", filename=song["karaoke_filename"]))
 
     except Exception:
         logger.exception(f"Error reproducindo canción {song_id}")
@@ -79,14 +83,16 @@ def borrar_cancion_biblioteca(song_id):
 
         arquivos_para_borrar = []
 
-        if song['karaoke_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['karaoke_filename']))
-        if song['video_only_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['video_only_filename']))
-        if song['vocal_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['vocal_filename']))
-        if song['instrumental_filename']:
-            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song['instrumental_filename']))
+        if song["karaoke_filename"]:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song["karaoke_filename"]))
+        if song["video_only_filename"]:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song["video_only_filename"]))
+        if song["vocal_filename"]:
+            arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song["vocal_filename"]))
+        if song["instrumental_filename"]:
+            arquivos_para_borrar.append(
+                os.path.join(DIRECTORIO_SAIDA, song["instrumental_filename"])
+            )
 
         arquivos_borrados = 0
         for arquivo in arquivos_para_borrar:
@@ -100,7 +106,7 @@ def borrar_cancion_biblioteca(song_id):
 
         if delete_song(song_id):
             logger.info(f"Canción {song['title']} borrada da biblioteca (ID: {song_id})")
-            return redirect(url_for('library.biblioteca_cancions'))
+            return redirect(url_for("library.biblioteca_cancions"))
         else:
             return "error borrando canción", 500
 

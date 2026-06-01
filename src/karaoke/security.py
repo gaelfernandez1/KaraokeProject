@@ -1,8 +1,9 @@
-#hai q meter certas configuracions de seguridade para o acceso publico
+# hai q meter certas configuracions de seguridade para o acceso publico
 import os
 
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+
 
 def setup_security(app):
 
@@ -10,39 +11,48 @@ def setup_security(app):
         key_func=get_remote_address,
         app=app,
         default_limits=["1000 per hour"],
-        storage_uri=os.getenv("REDIS_URL", "redis://redis:6379/0")
+        storage_uri=os.getenv("REDIS_URL", "redis://redis:6379/0"),
     )
 
     @limiter.limit("5 per minute")
     def limite_procesamiento():
         pass
 
-    app.view_functions['generation.xerar_karaoke'] = limiter.limit("3 per minute")(app.view_functions['generation.xerar_karaoke'])
-    app.view_functions['generation.procesar_letras_manuales'] = limiter.limit("3 per minute")(app.view_functions['generation.procesar_letras_manuales'])
-    app.view_functions['generation.xerar_instrumental'] = limiter.limit("5 per minute")(app.view_functions['generation.xerar_instrumental'])
+    app.view_functions["generation.xerar_karaoke"] = limiter.limit("3 per minute")(
+        app.view_functions["generation.xerar_karaoke"]
+    )
+    app.view_functions["generation.procesar_letras_manuales"] = limiter.limit("3 per minute")(
+        app.view_functions["generation.procesar_letras_manuales"]
+    )
+    app.view_functions["generation.xerar_instrumental"] = limiter.limit("5 per minute")(
+        app.view_functions["generation.xerar_instrumental"]
+    )
 
-    #excluir endpoints de consulta de estado do rate limiting
-    limiter.exempt(app.view_functions['tasks.estado_tarea'])
+    # excluir endpoints de consulta de estado do rate limiting
+    limiter.exempt(app.view_functions["tasks.estado_tarea"])
 
-    secret_key = os.getenv('FLASK_SECRET_KEY')
+    secret_key = os.getenv("FLASK_SECRET_KEY")
     if not secret_key:
         raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
     app.secret_key = secret_key
 
     @app.after_request
     def add_security_headers(response):
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['X-Frame-Options'] = 'DENY'
-        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
         return response
 
     return limiter
 
+
 def validate_file_size(file_size_mb, max_size_mb=100):
     return file_size_mb <= max_size_mb
 
+
 def sanitize_filename(filename):
     import re
-    filename = re.sub(r'[<>:"/\\|?*]', '', filename)
+
+    filename = re.sub(r'[<>:"/\\|?*]', "", filename)
     filename = filename[:255]
     return filename

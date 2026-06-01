@@ -14,7 +14,7 @@ def parse_word_srt(srt_path: str) -> list:
     if not os.path.exists(srt_path):
         logger.error(f"non se atopou o srt {srt_path}")
         return segmentos
-    with open(srt_path, "r", encoding="utf-8") as f:
+    with open(srt_path, encoding="utf-8") as f:
         liñas = f.readlines()
     indice = 0
     while indice < len(liñas):
@@ -48,27 +48,33 @@ def parse_word_srt(srt_path: str) -> list:
 
                         # Parsear información de speaker. Se hai, claro
 
-                        if "|" in token and token.count("|") >= 2:     # Formato: speaker id|color|palabra
+                        if (
+                            "|" in token and token.count("|") >= 2
+                        ):  # Formato: speaker id|color|palabra
                             partes = token.split("|", 2)
                             speaker_id = partes[0]
                             color = partes[1]
                             palabra = partes[2]
-                            segmentos.append({
-                                "start": inicio_token,
-                                "end": fin_token,
-                                "word": palabra,
-                                "speaker": speaker_id,
-                                "color": color
-                            })
+                            segmentos.append(
+                                {
+                                    "start": inicio_token,
+                                    "end": fin_token,
+                                    "word": palabra,
+                                    "speaker": speaker_id,
+                                    "color": color,
+                                }
+                            )
                         else:
-                            segmentos.append({
-                                "start": inicio_token,
-                                "end": fin_token,
-                                "word": token,
-                                "speaker": None,
-                                "color": None
-                            })
-                indice += 1  #salto a linea vacia
+                            segmentos.append(
+                                {
+                                    "start": inicio_token,
+                                    "end": fin_token,
+                                    "word": token,
+                                    "speaker": None,
+                                    "color": None,
+                                }
+                            )
+                indice += 1  # salto a linea vacia
             else:
                 indice += 1
         else:
@@ -84,11 +90,14 @@ def parse_word_srt(srt_path: str) -> list:
 # Devolve outra lista de diccionarios
 def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
 
+    normalizado = re.sub(
+        r"\n+", "\n", manual_lyrics
+    )  # por si hai doble salto de linea deixo solo 1
+    liñas = [
+        liña.strip() for liña in normalizado.splitlines() if liña.strip()
+    ]  # Separado de lineas
 
-    normalizado = re.sub(r'\n+', '\n', manual_lyrics)   #por si hai doble salto de linea deixo solo 1
-    liñas = [liña.strip() for liña in normalizado.splitlines() if liña.strip()]  #Separado de lineas
-
-    #conto cantas palabras se esperan por línea
+    # conto cantas palabras se esperan por línea
     contador_tokens_manual = [len(liña.split()) for liña in liñas]
     total_esperado = sum(contador_tokens_manual)
     total_real = len(word_segments)
@@ -96,56 +105,59 @@ def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
     if total_esperado == 0 or total_real == 0:
         return []
 
-    proporcional = [ (cnt/total_esperado) * total_real for cnt in contador_tokens_manual ]
+    proporcional = [(cnt / total_esperado) * total_real for cnt in contador_tokens_manual]
 
     asignados = []
     for cnt_esperado, prop in zip(contador_tokens_manual, proporcional):
         crudo = int(round(prop))
         if cnt_esperado > 0:
-            #se a linea ten polo menos unha palabra, forzamos polo menos 1 token
+            # se a linea ten polo menos unha palabra, forzamos polo menos 1 token
             asignados.append(max(1, crudo))
         else:
-            asignados.append(0)    #axustar para que a suma coincida con total_real
+            asignados.append(0)  # axustar para que a suma coincida con total_real
     diferencia = total_real - sum(asignados)
-    decimais = [(p - round(p)) for p in proporcional]   #decimales para saber onde axustar
+    decimais = [(p - round(p)) for p in proporcional]  # decimales para saber onde axustar
 
     while diferencia != 0:
         if diferencia > 0:
-            #aumento 1 token onde o decimal sexa maior
+            # aumento 1 token onde o decimal sexa maior
             indice = max(range(len(decimais)), key=lambda i: decimais[i])
             asignados[indice] += 1
             decimais[indice] = 0
             diferencia -= 1
         else:  # diferencia < 0
-
-            #disminuo 1 token onde o decimal sea mais pequeno pero sin caer por debaixo de 1 (se a liña tiña palabras claro)
+            # disminuo 1 token onde o decimal sea mais pequeno pero sin caer por debaixo de 1 (se a liña tiña palabras claro)
             indice = min(range(len(decimais)), key=lambda i: decimais[i])
             if asignados[indice] > 1:
                 asignados[indice] -= 1
                 decimais[indice] = 0
                 diferencia += 1
             else:
-                break #se non se poden quitar mais sin romper a regla de minimo 1 salese
+                break  # se non se poden quitar mais sin romper a regla de minimo 1 salese
 
-    #cortanse os segmentos segun os asignados e contruese o resultado
+    # cortanse os segmentos segun os asignados e contruese o resultado
     agrupados = []
     actual = 0
     for liña, cantidad in zip(liñas, asignados):
-        segmentos_parciais = word_segments[actual: actual+cantidad]
+        segmentos_parciais = word_segments[actual : actual + cantidad]
         actual += cantidad
         if segmentos_parciais:
-            agrupados.append({
-                "line_text": liña,
-                "start": segmentos_parciais[0]["start"],
-                "end": segmentos_parciais[-1]["end"],
-                "words": segmentos_parciais
-            })
+            agrupados.append(
+                {
+                    "line_text": liña,
+                    "start": segmentos_parciais[0]["start"],
+                    "end": segmentos_parciais[-1]["end"],
+                    "words": segmentos_parciais,
+                }
+            )
 
     return agrupados
 
 
-#nova funciona para o automatico, en vez de 10, agrupar inteligente, xa non sirve o do salto de linea. faise por duracion de pausas
-def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int = 8, max_duration: float = 4.0) -> list:
+# nova funciona para o automatico, en vez de 10, agrupar inteligente, xa non sirve o do salto de linea. faise por duracion de pausas
+def group_word_segments_automatic(
+    word_segments: list, max_words_per_phrase: int = 8, max_duration: float = 4.0
+) -> list:
 
     if not word_segments:
         return []
@@ -160,10 +172,7 @@ def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int
 
         debe_cerrar = False
 
-        if len(grupo_actual) >= max_words_per_phrase:
-            debe_cerrar = True
-
-        elif duracion_grupo >= max_duration:
+        if len(grupo_actual) >= max_words_per_phrase or duracion_grupo >= max_duration:
             debe_cerrar = True
 
         elif i + 1 < len(word_segments):
@@ -174,26 +183,30 @@ def group_word_segments_automatic(word_segments: list, max_words_per_phrase: int
         elif i == len(word_segments) - 1:
             debe_cerrar = True
 
-        if segment["word"].rstrip().endswith(('.', '!', '?')):
+        if segment["word"].rstrip().endswith((".", "!", "?")):
             debe_cerrar = True
 
         if debe_cerrar and grupo_actual:
             texto_grupo = " ".join([w["word"] for w in grupo_actual])
-            grupos.append({
-                "line_text": texto_grupo,
-                "start": grupo_actual[0]["start"],
-                "end": grupo_actual[-1]["end"],
-                "words": grupo_actual
-            })
+            grupos.append(
+                {
+                    "line_text": texto_grupo,
+                    "start": grupo_actual[0]["start"],
+                    "end": grupo_actual[-1]["end"],
+                    "words": grupo_actual,
+                }
+            )
             grupo_actual = []
 
     if grupo_actual:
         texto_grupo = " ".join([w["word"] for w in grupo_actual])
-        grupos.append({
-            "line_text": texto_grupo,
-            "start": grupo_actual[0]["start"],
-            "end": grupo_actual[-1]["end"],
-            "words": grupo_actual
-        })
+        grupos.append(
+            {
+                "line_text": texto_grupo,
+                "start": grupo_actual[0]["start"],
+                "end": grupo_actual[-1]["end"],
+                "words": grupo_actual,
+            }
+        )
 
     return grupos

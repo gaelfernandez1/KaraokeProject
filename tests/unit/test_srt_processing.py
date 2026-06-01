@@ -142,7 +142,13 @@ class TestGroupWordSegmentsAutomatic:
     def test_large_pause_triggers_group_close(self):
         segs = [
             {"start": 0.0, "end": 0.5, "word": "hello", "speaker": None, "color": None},
-            {"start": 2.0, "end": 2.5, "word": "world", "speaker": None, "color": None},  # 1.5 s gap > 0.8 s
+            {
+                "start": 2.0,
+                "end": 2.5,
+                "word": "world",
+                "speaker": None,
+                "color": None,
+            },  # 1.5 s gap > 0.8 s
         ]
         result = group_word_segments_automatic(segs, max_words_per_phrase=10)
         assert len(result) == 2

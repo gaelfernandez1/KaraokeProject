@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 logger = logging.getLogger(__name__)
 
-bp = Blueprint('player', __name__)
+bp = Blueprint("player", __name__)
 
 DIRECTORIO_SAIDA = "output"
 
@@ -25,9 +25,7 @@ def reproductor_karaoke(filename):
     else:
         nome_base = filename.replace(".mp4", "")
 
-    return render_template("player.html",
-                         video_filename=filename,
-                         base_name=nome_base)
+    return render_template("player.html", video_filename=filename, base_name=nome_base)
 
 
 @bp.route("/serve_video/<filename>")
@@ -41,7 +39,7 @@ def servir_video(filename):
         return "Arquivo non encontrado", 404
     if not os.path.exists(ruta_archivo):
         return "Arquivo non encontrado", 404
-    return send_file(ruta_archivo, mimetype='video/mp4')
+    return send_file(ruta_archivo, mimetype="video/mp4")
 
 
 @bp.route("/serve_audio/<filename>")
@@ -55,7 +53,7 @@ def servir_audio(filename):
         return "Arquivo non encontrado", 404
     if not os.path.exists(ruta_archivo):
         return "Arquivo non encontrado", 404
-    return send_file(ruta_archivo, mimetype='audio/wav')
+    return send_file(ruta_archivo, mimetype="audio/wav")
 
 
 @bp.route("/download/<filename>")
@@ -76,9 +74,9 @@ def descargar_archivo(filename):
     try:
         response = send_file(ruta_arquivo, as_attachment=True, download_name=nome_descarga_seguro)
 
-        if filename.endswith('.mp4'):
+        if filename.endswith(".mp4"):
             response.headers["Content-Type"] = "video/mp4"
-        elif filename.endswith('.wav'):
+        elif filename.endswith(".wav"):
             response.headers["Content-Type"] = "audio/wav"
 
         response.headers["Content-Length"] = str(tamano_ficheiro)
