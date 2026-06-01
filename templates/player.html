@@ -11,7 +11,7 @@
         <!-- Reprodutor de video -->
         <div class="video-container mb-3">
           <video id="karaokeVideo" class="video-player" controls preload="metadata" controlsList="novolume">
-            <source src="{{ url_for('servir_video', filename=video_filename) }}" type="video/mp4">
+            <source src="{{ url_for('player.servir_video', filename=video_filename) }}" type="video/mp4">
             O teu navegador non soporta o reproductor de video.
           </video>
         </div>
@@ -55,19 +55,19 @@
         <div class="download-section mt-4">
           <h5><i class="fas fa-download"></i> Descargas Dispoñibles</h5>
           <div class="btn-group" role="group">
-            <a href="{{ url_for('descargar_archivo', filename=video_filename) }}" 
+            <a href="{{ url_for('player.descargar_archivo', filename=video_filename) }}" 
                class="btn btn-outline-primary">
               <i class="fas fa-video"></i> Karaoke Completo
             </a>
-            <a href="{{ url_for('descargar_archivo', filename=base_name + '_video_only.mp4') }}" 
+            <a href="{{ url_for('player.descargar_archivo', filename=base_name + '_video_only.mp4') }}" 
                class="btn btn-outline-secondary">
               <i class="fas fa-film"></i> Video Sen Audio
             </a>
-            <a href="{{ url_for('descargar_archivo', filename='vocal_' + base_name + '.wav') }}" 
+            <a href="{{ url_for('player.descargar_archivo', filename='vocal_' + base_name + '.wav') }}" 
                class="btn btn-outline-info">
               <i class="fas fa-microphone"></i> Vocal
             </a>
-            <a href="{{ url_for('descargar_archivo', filename='instrumental_' + base_name + '.wav') }}" 
+            <a href="{{ url_for('player.descargar_archivo', filename='instrumental_' + base_name + '.wav') }}" 
                class="btn btn-outline-success">
               <i class="fas fa-music"></i> Instrumental
             </a>
@@ -75,17 +75,17 @@
         </div>
 
         <audio id="vocalAudio" preload="metadata" style="display: none;">
-          <source src="{{ url_for('servir_audio', filename='vocal_' + base_name + '.wav') }}" type="audio/wav">
+          <source src="{{ url_for('player.servir_audio', filename='vocal_' + base_name + '.wav') }}" type="audio/wav">
         </audio>
         <audio id="instrumentalAudio" preload="metadata" style="display: none;">
-          <source src="{{ url_for('servir_audio', filename='instrumental_' + base_name + '.wav') }}" type="audio/wav">
+          <source src="{{ url_for('player.servir_audio', filename='instrumental_' + base_name + '.wav') }}" type="audio/wav">
         </audio>
       </div>
     </div>
   </div>
 
   <div class="text-center mt-4">
-    <a href="{{ url_for('inicio') }}" class="btn btn-outline-dark" id="backToHomeBtn">
+    <a href="{{ url_for('generation.inicio') }}" class="btn btn-outline-dark" id="backToHomeBtn">
       <i class="fas fa-home"></i> Volver ao Inicio
     </a>
   </div>
