@@ -121,6 +121,7 @@ def align_endpoint():
 
     # Crear srt final a nivel de palabra (con speaker info se hai)
     ruta_srt = ruta_audio.replace(".wav", f"_whisperx_{whisper_model}.srt")
+    srt_blocks: list[str] = []
     with open(ruta_srt, "w", encoding="utf-8") as f:
         indice = 1
         for seg in segmentos_palabras:
@@ -137,9 +138,11 @@ def align_endpoint():
 
             bloque = f"{indice}\n{sec2tc(inicio)} --> {sec2tc(fin)}\n{texto}\n\n"
             f.write(bloque)
+            srt_blocks.append(bloque)
             indice += 1
 
-    response_data = {"srt_path": ruta_srt, "message": "Alignment done"}
+    srt_content = "".join(srt_blocks)
+    response_data = {"srt_content": srt_content, "message": "Alignment done"}
 
     if speaker_info:
         response_data["speaker_info"] = speaker_info

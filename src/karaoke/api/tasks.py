@@ -42,10 +42,17 @@ def estado_tarea(task_id):
                 "message": task_result.info.get("message", "Procesamento completado"),
             }
         elif task_result.state == "FAILURE":
+            info = task_result.info
+            if isinstance(info, dict):
+                error_status = info.get("status", "Erro en procesameento")
+                error_msg = str(info.get("error", "Erro descoñecido"))
+            else:
+                error_status = "Erro en procesameento"
+                error_msg = str(info) if info else "Erro descoñecido"
             response = {
                 "state": task_result.state,
-                "status": task_result.info.get("status", "Erro en procesameento"),
-                "error": str(task_result.info.get("error", "Erro descoñecido")),
+                "status": error_status,
+                "error": error_msg,
             }
         elif task_result.state == "REVOKED":
             response = {
