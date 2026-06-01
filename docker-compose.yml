@@ -39,6 +39,8 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
       - FLASK_DEBUG=${FLASK_DEBUG:-false}
+      - REDIS_URL=redis://redis:6379/0
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     restart: unless-stopped
 
   celery_worker:
@@ -66,6 +68,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
     command: celery -A karaoke.workers.celery_app worker --loglevel=info
     restart: unless-stopped
 

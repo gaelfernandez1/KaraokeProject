@@ -1,9 +1,15 @@
 import os
+import logging
+import time
 from celery import Celery
 from celery.signals import task_prerun, task_postrun, task_failure, task_revoked
 import signal
 import psutil
-import time
+
+from karaoke.logging_config import _task_id_var
+
+logger = logging.getLogger(__name__)
+
 
 def make_celery():
     broker_url = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
@@ -33,7 +39,8 @@ active_processes = {}
 
 @task_prerun.connect
 def task_prerun_handler(task_id, task, *args, **kwargs):
-    print(f"Iniciando tarefa {task_id}: {task.name}")
+    _task_id_var.set(task_id)
+    logger.info(f"Iniciando tarefa {task_id}: {task.name}", extra={"task_id": task_id})
     active_processes[task_id] = {
         'pid': os.getpid(),
         'started_at': time.time(),
@@ -42,21 +49,23 @@ def task_prerun_handler(task_id, task, *args, **kwargs):
 
 @task_postrun.connect
 def task_postrun_handler(task_id, task, *args, **kwargs):
-    print(f" Tarefa completada {task_id}")
+    logger.info(f"Tarefa completada {task_id}", extra={"task_id": task_id})
     if task_id in active_processes:
         active_processes[task_id]['status'] = 'COMPLETED'
         del active_processes[task_id]
+    _task_id_var.set("")
 
 @task_failure.connect
 def task_failure_handler(task_id, exception, einfo, *args, **kwargs):
-    print(f" Tarefa fallida (celery) {task_id}: {exception}")
+    logger.error(f"Tarefa fallida (celery) {task_id}: {exception}", extra={"task_id": task_id})
     if task_id in active_processes:
         active_processes[task_id]['status'] = 'FAILED'
         del active_processes[task_id]
+    _task_id_var.set("")
 
 @task_revoked.connect
 def task_revoked_handler(task_id, *args, **kwargs):
-    print(f" Tarefa cancelada {task_id}")
+    logger.info(f"Tarefa cancelada {task_id}", extra={"task_id": task_id})
     if task_id in active_processes:
         try:
             pid = active_processes[task_id]['pid']
@@ -78,10 +87,11 @@ def task_revoked_handler(task_id, *args, **kwargs):
                     pass
 
         except Exception as e:
-            print(f"Error matando procesos: {e}")
+            logger.error(f"Error matando procesos: {e}", extra={"task_id": task_id})
 
         active_processes[task_id]['status'] = 'REVOKED'
         del active_processes[task_id]
+    _task_id_var.set("")
 
 def cleanup_orphaned_processes():
     current_time = time.time()

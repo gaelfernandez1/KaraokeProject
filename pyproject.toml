@@ -29,6 +29,8 @@ core = [
     "setuptools==69.5.1",
     "wheel==0.43.0",
     "packaging==24.1",
+    "pydantic-settings>=2.0.0",
+    "python-json-logger>=2.0.0",
 ]
 
 # Demucs/Celery worker container: GPU, audio separation, video rendering
