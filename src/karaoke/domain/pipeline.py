@@ -15,7 +15,8 @@ from karaoke.domain.errors import (
 from karaoke.domain.progress import NoopProgressReporter, ProgressReporter
 from karaoke.domain.srt_processing import parse_word_srt
 from karaoke.domain.strategies import AlignmentStrategy
-from karaoke.infra.database import save_song_to_database
+from karaoke.infra.db import session_scope
+from karaoke.infra.db.repository import save_song
 from karaoke.infra.utils import sanitize_filename
 
 logger = logging.getLogger(__name__)
@@ -303,7 +304,8 @@ class KaraokeJob:
                 whisper_model=self.config.whisper_model,
                 output_dir=str(self.config.output_dir),
             )
-            song_id = save_song_to_database(metadata)
+            with session_scope() as session:
+                song_id = save_song(session, metadata)
             logger.info(f"Song saved to database with ID: {song_id}")
         except Exception as e:
             logger.error(f"Failed to save to database (non-fatal): {e}")
@@ -446,6 +448,7 @@ class InstrumentalJob:
                 "file_size": file_size,
                 "duration": duration,
             }
-            save_song_to_database(song_data)
+            with session_scope() as session:
+                save_song(session, song_data)
         except Exception as e:
             logger.error(f"Failed to save instrumental to database (non-fatal): {e}")

@@ -81,7 +81,8 @@ stems/
 # But track test fixtures regardless of the *.srt rule above
 !fixtures/*.srt
 
-db/
+# Only the top-level SQLite data dir; not the src/karaoke/infra/db package.
+/db/
 *.db
 *.sqlite
 *.sqlite3

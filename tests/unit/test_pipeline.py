@@ -447,7 +447,7 @@ class TestInstrumentalJob:
 
         monkeypatch.setattr(InstrumentalJob, "_prepare", _prepare)
         monkeypatch.setattr(InstrumentalJob, "_separate", _separate)
-        monkeypatch.setattr("karaoke.domain.pipeline.save_song_to_database", lambda d: 1)
+        monkeypatch.setattr("karaoke.domain.pipeline.save_song", lambda *a, **k: 1)
 
         config = JobConfig(
             video_path=tmp_path / input_name,

@@ -6,19 +6,19 @@ import pytest
 
 
 def pytest_configure(config):
-    """Set env vars and patch database path before any karaoke module is imported.
+    """Set env vars before any karaoke module is imported.
 
     pytest_configure fires before test collection, so these side effects happen
     before any test file triggers an import of karaoke.api.app (which has
-    module-level calls to init_database and setup_security).
+    module-level calls to init_db and setup_security).
     """
     os.environ.setdefault("FLASK_SECRET_KEY", "test-secret-key-for-ci-only")
     # Flask-Limiter reads REDIS_URL; "memory://" keeps tests self-contained.
     os.environ.setdefault("REDIS_URL", "memory://")
-
-    import karaoke.infra.database as _db
-
-    _db.DATABASE_PATH = os.path.join(tempfile.mkdtemp(), "test_ci.db")
+    # Point the app at a throwaway SQLite file so init_db builds a clean schema.
+    os.environ.setdefault(
+        "DATABASE_URL", f"sqlite:///{os.path.join(tempfile.mkdtemp(), 'test_ci.db')}"
+    )
 
 
 FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"

@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from karaoke.api.errors import register_error_handlers
 from karaoke.config import Settings
-from karaoke.infra.database import init_database
+from karaoke.infra.db import init_db
 from karaoke.infra.gpu_utils import print_system_summary
 from karaoke.logging_config import _request_id_var, configure_logging
 from karaoke.security import setup_security
@@ -63,7 +63,7 @@ def create_app() -> Flask:
 
 
 print_system_summary()
-init_database()
+init_db()
 os.makedirs("input", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 
