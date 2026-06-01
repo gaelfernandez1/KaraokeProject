@@ -1,6 +1,7 @@
+import contextvars
 import logging
 import sys
-import contextvars
+
 from pythonjsonlogger import jsonlogger
 
 # Context vars for structured log fields injected per-task and per-request

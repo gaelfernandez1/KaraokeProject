@@ -1,6 +1,7 @@
 import logging
 import os
-from flask import Blueprint, render_template, jsonify, session, redirect, url_for, send_file, abort
+
+from flask import Blueprint, abort, jsonify, redirect, render_template, send_file, session, url_for
 
 from karaoke.workers.celery_app import celery
 

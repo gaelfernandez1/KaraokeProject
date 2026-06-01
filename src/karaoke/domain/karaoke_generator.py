@@ -2,18 +2,27 @@ import logging
 import os
 import time
 import traceback
-from moviepy.editor import AudioFileClip, VideoFileClip, CompositeAudioClip, CompositeVideoClip
 
-from karaoke.domain.render_config import VOLUME_VOCAL, ALTO_VIDEO, MARXE_INFERIOR_SUBTITULO
-from karaoke.infra.audio_processing import video_to_mp3, separate_stems_cli, transcribe_with_faster_whisper
-from karaoke.infra.whisperx_client import call_whisperx_endpoint, call_whisperx_endpoint_manual
-from karaoke.infra.video_processing import normalize_video
-from karaoke.domain.srt_processing import parse_word_srt, group_word_segments, group_word_segments_automatic
-from karaoke.domain.text_processing import normalize_manual_lyrics
+from moviepy.editor import AudioFileClip, CompositeAudioClip, CompositeVideoClip, VideoFileClip
+
 from karaoke.domain.karaoke_rendering import create_karaoke_text_clip
-from karaoke.infra.utils import remove_previous_srt, clean_abnormal_segments, sanitize_filename
+from karaoke.domain.render_config import ALTO_VIDEO, MARXE_INFERIOR_SUBTITULO, VOLUME_VOCAL
+from karaoke.domain.srt_processing import (
+    group_word_segments,
+    group_word_segments_automatic,
+    parse_word_srt,
+)
+from karaoke.domain.text_processing import normalize_manual_lyrics
+from karaoke.infra.audio_processing import (
+    separate_stems_cli,
+    transcribe_with_faster_whisper,
+    video_to_mp3,
+)
 from karaoke.infra.database import save_song_to_database
 from karaoke.infra.metadata_utils import generate_song_metadata
+from karaoke.infra.utils import remove_previous_srt, sanitize_filename
+from karaoke.infra.video_processing import normalize_video
+from karaoke.infra.whisperx_client import call_whisperx_endpoint, call_whisperx_endpoint_manual
 
 logger = logging.getLogger(__name__)
 
@@ -450,7 +459,7 @@ def generate_instrumental(video_path: str, source_type: str = "upload", source_u
                 audio_clip = AudioFileClip(ruta_saida)
                 duration = audio_clip.duration
                 audio_clip.close()
-            except:
+            except Exception:
                 duration = None
 
             song_data = {

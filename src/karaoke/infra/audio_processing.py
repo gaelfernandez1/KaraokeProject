@@ -1,9 +1,11 @@
-import os
 import logging
-import subprocess
+import os
 import shutil
+import subprocess
+
 import torch
 from moviepy.editor import AudioFileClip
+
 from karaoke.infra.gpu_utils import detect_gpu_capability, get_optimal_demucs_args
 
 logger = logging.getLogger(__name__)

@@ -1,10 +1,11 @@
-import os
 import logging
+import os
 import traceback
+
 from celery import current_task
-from karaoke.workers.celery_app import celery, active_processes
+
 from karaoke.domain.karaoke_generator import create, create_with_manual_lyrics, generate_instrumental
-import signal
+from karaoke.workers.celery_app import active_processes, celery
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def check_if_cancelled():
             task_result = celery.AsyncResult(current_task.request.id)
             if task_result.state == 'REVOKED':
                 raise ProcessingCancelledException("Tarefa cancelada")
-        except:
+        except Exception:
             pass
 
 

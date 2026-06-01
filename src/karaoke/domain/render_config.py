@@ -1,6 +1,6 @@
-import platform
-import os
 import logging
+import os
+import platform
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,12 @@
+import json
 import logging
 import os
 import subprocess
-import json
 from typing import Dict, Optional
+
 from moviepy.editor import VideoFileClip
-from karaoke.domain.render_config import ANCHO_VIDEO, ALTO_VIDEO, FPS_VIDEO
+
+from karaoke.domain.render_config import ALTO_VIDEO, ANCHO_VIDEO, FPS_VIDEO
 
 logger = logging.getLogger(__name__)
 
@@ -255,7 +257,7 @@ def normalize_video(video_path: str) -> str:
                             resized_clip.close()
                         if 'final_clip' in locals():
                             final_clip.close()
-                    except:
+                    except Exception:
                         pass
                     continue
             else:

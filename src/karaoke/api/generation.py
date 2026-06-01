@@ -1,11 +1,15 @@
 import logging
 import os
-import yt_dlp
-from flask import Blueprint, request, render_template, redirect, url_for, session, abort, g
 
+import yt_dlp
+from flask import Blueprint, abort, g, redirect, render_template, request, session, url_for
 from werkzeug.utils import secure_filename
 
-from karaoke.workers.celery_tasks import process_automatic_karaoke, process_manual_lyrics_karaoke, process_instrumental_only
+from karaoke.workers.celery_tasks import (
+    process_automatic_karaoke,
+    process_instrumental_only,
+    process_manual_lyrics_karaoke,
+)
 
 logger = logging.getLogger(__name__)
 

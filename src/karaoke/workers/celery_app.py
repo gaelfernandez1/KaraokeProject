@@ -1,10 +1,11 @@
-import os
 import logging
-import time
-from celery import Celery
-from celery.signals import task_prerun, task_postrun, task_failure, task_revoked
+import os
 import signal
+import time
+
 import psutil
+from celery import Celery
+from celery.signals import task_failure, task_postrun, task_prerun, task_revoked
 
 from karaoke.logging_config import _task_id_var
 

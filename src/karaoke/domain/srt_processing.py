@@ -1,8 +1,8 @@
 import logging
 import os
 import re
-from karaoke.infra.utils import time_str_to_sec, clean_abnormal_segments
-from karaoke.domain.text_processing import normalize_manual_lyrics
+
+from karaoke.infra.utils import clean_abnormal_segments, time_str_to_sec
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,7 @@
 import logging
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, abort
+
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from karaoke.infra.database import (
     get_all_songs, get_database_stats, get_songs_by_search,

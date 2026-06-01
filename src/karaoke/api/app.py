@@ -1,15 +1,16 @@
+import logging
 import os
 import pathlib
 import uuid
-import logging
+
 from flask import Flask, g
 from pydantic import ValidationError
 
-from karaoke.config import Settings
-from karaoke.logging_config import configure_logging, _request_id_var
 from karaoke.api.errors import register_error_handlers
-from karaoke.infra.gpu_utils import print_system_summary
+from karaoke.config import Settings
 from karaoke.infra.database import init_database
+from karaoke.infra.gpu_utils import print_system_summary
+from karaoke.logging_config import _request_id_var, configure_logging
 from karaoke.security import setup_security
 
 _ROOT = pathlib.Path(__file__).parents[3]
@@ -34,11 +35,13 @@ def create_app() -> Flask:
     flask_app.config["APP_SETTINGS"] = settings
 
     from karaoke.api.generation import bp as generation_bp
+    from karaoke.api.health import bp as health_bp
     from karaoke.api.library import bp as library_bp
     from karaoke.api.player import bp as player_bp
     from karaoke.api.tasks import bp as tasks_bp
 
     flask_app.register_blueprint(generation_bp)
+    flask_app.register_blueprint(health_bp)
     flask_app.register_blueprint(library_bp)
     flask_app.register_blueprint(player_bp)
     flask_app.register_blueprint(tasks_bp)

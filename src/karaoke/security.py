@@ -1,5 +1,6 @@
 #hai q meter certas configuracions de seguridade para o acceso publico
 import os
+
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 

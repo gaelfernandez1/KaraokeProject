@@ -1,6 +1,7 @@
 import logging
 import os
-from flask import Blueprint, render_template, send_file, abort
+
+from flask import Blueprint, abort, render_template, send_file
 from werkzeug.utils import secure_filename
 
 logger = logging.getLogger(__name__)

@@ -1,8 +1,9 @@
 import os
 import re
-from moviepy.editor import VideoFileClip
 from typing import Dict, Optional
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs, urlparse
+
+from moviepy.editor import VideoFileClip
 
 #extrae un titulo limpo do nome do archivo
 def extract_title_from_filename(filename: str) -> str:
@@ -21,7 +22,7 @@ def extract_title_from_filename(filename: str) -> str:
 def extract_youtube_title_from_url(url: str) -> Optional[str]:
     try:
         return None
-    except:
+    except Exception:
         return None
 
 def get_video_duration(video_path: str) -> Optional[float]:
@@ -34,7 +35,7 @@ def get_video_duration(video_path: str) -> Optional[float]:
 def get_file_size(file_path: str) -> int:
     try:
         return os.path.getsize(file_path)
-    except:
+    except Exception:
         return 0
 
 def clean_youtube_url(url: str) -> str:
@@ -50,7 +51,7 @@ def clean_youtube_url(url: str) -> str:
                 return f"https://www.youtube.com/watch?v={video_id}"
         
         return url
-    except:
+    except Exception:
         return url
 
 def generate_song_metadata(
