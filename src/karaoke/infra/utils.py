@@ -1,8 +1,11 @@
+import logging
 import os
 import re
 import unicodedata
 import math
 import glob
+
+logger = logging.getLogger(__name__)
 
 
 #Convirte segundos a formato de timecode SRT
@@ -36,7 +39,7 @@ def sanitize_filename(filename: str) -> str:
     filename = re.sub(r'[^a-zA-Z0-9._-]', '', filename)
     filename = re.sub(r'_+', '_', filename)
     filename = filename.strip('_')
-    
+
     return filename
 
 
@@ -45,14 +48,14 @@ def remove_previous_srt():
 
     srt_files = glob.glob("/data/*")
     if srt_files:
-        print(f" Borrando SRT anteriores => {srt_files}")
+        logger.info(f"Borrando SRT anteriores => {srt_files}")
         for path in srt_files:
             try:
                 os.remove(path)
             except Exception as e:
-                print(f"   error ao eliminar {path}: {e}")
+                logger.warning(f"error ao eliminar {path}: {e}")
     else:
-        print("non habia srts anteriores en /data.")
+        logger.debug("non habia srts anteriores en /data.")
 
 
 #Esta funcion esta feita para correxir o erro de que a última frase que se cantou se quede en pantalla cando empeza un solo de instrumental. #HAI QUE REVISAR OUTRA SOLUCION!!!
@@ -60,21 +63,17 @@ def clean_abnormal_segments(word_segments, max_word_duration=3.0):
 
     if not word_segments:
         return word_segments
-    
+
     cleaned_segments = []
-    
+
     for i, segment in enumerate(word_segments):
         duration = segment["end"] - segment["start"]
-        
+
         if duration > max_word_duration:
-            #print(f"segmento largo detectado '{segment['word']}' dura {duration:.1f}s")
-            
             corrected_segment = segment.copy()
             corrected_segment["end"] = segment["start"] + max_word_duration
-            
-            #print(f"corrixir a duracion a: {max_word_duration}s")
             cleaned_segments.append(corrected_segment)
         else:
             cleaned_segments.append(segment)
-    
+
     return cleaned_segments

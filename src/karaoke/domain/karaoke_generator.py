@@ -1,9 +1,10 @@
+import logging
 import os
 import time
 import traceback
 from moviepy.editor import AudioFileClip, VideoFileClip, CompositeAudioClip, CompositeVideoClip
 
-from karaoke.config import VOLUME_VOCAL, ALTO_VIDEO, MARXE_INFERIOR_SUBTITULO
+from karaoke.domain.render_config import VOLUME_VOCAL, ALTO_VIDEO, MARXE_INFERIOR_SUBTITULO
 from karaoke.infra.audio_processing import video_to_mp3, separate_stems_cli, transcribe_with_faster_whisper
 from karaoke.infra.whisperx_client import call_whisperx_endpoint, call_whisperx_endpoint_manual
 from karaoke.infra.video_processing import normalize_video
@@ -14,6 +15,7 @@ from karaoke.infra.utils import remove_previous_srt, clean_abnormal_segments, sa
 from karaoke.infra.database import save_song_to_database
 from karaoke.infra.metadata_utils import generate_song_metadata
 
+logger = logging.getLogger(__name__)
 
 
 #Este é o create para a version automática. WhisperX transcribe él mismo, despois parsease o SRT en tokens
@@ -35,7 +37,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
             progress_callback("Normalizando vídeo...", 10)
         video_path = normalize_video(video_path)
     except Exception as erro_normalizacion:
-        print(f" Error na normalización: {erro_normalizacion}, continuando co video original")
+        logger.warning(f"Error na normalización: {erro_normalizacion}, continuando co video original")
 
     if progress_callback:
         progress_callback("Extraendo audio...", 15)
@@ -73,11 +75,11 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         tempo_esperado += 1
 
     if not os.path.exists(archivoSRT):
-        print(f"Error: Nnn se xerou o arquivo SRT despois d {tempo_maximo}s")    #se non encontra o srt despois do tempo ese, return ""
+        logger.error(f"Error: non se xerou o arquivo SRT despois de {tempo_maximo}s")
         return ""
 
     if os.path.getsize(archivoSRT) == 0:  #Esto é para asegurar que o srt non esta vacio
-        print("error: O arquivo SRT está vacio")
+        logger.error("error: O arquivo SRT está vacio")
         return ""
 
     if progress_callback:
@@ -88,7 +90,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
     if not grupos_texto:
         return ""
 
-    print(f"Creados {len(grupos_texto)} grupos de frases (debug) ")
+    logger.debug(f"Creados {len(grupos_texto)} grupos de frases")
 
     if progress_callback:
         progress_callback("Creando vídeo final...", 80)
@@ -98,13 +100,13 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         audio_voces = AudioFileClip(ruta_voz).volumex(VOLUME_VOCAL).set_fps(44100)
         audio_mesturado = CompositeAudioClip([audio_musica, audio_voces])
     except Exception as erro_audio:
-        print(f"Error cargando audio {erro_audio}")
+        logger.error(f"Error cargando audio {erro_audio}")
         return ""
 
     try:
         video_fondo = VideoFileClip(video_path).set_duration(audio_mesturado.duration).set_fps(30)
     except Exception as erro_video:
-        print(f"Error cargando video {erro_video}")
+        logger.error(f"Error cargando video {erro_video}")
         return ""
 
     video_escurecido = video_fondo.fl_image(lambda img: (img*0.3).astype("uint8"))
@@ -142,15 +144,14 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         video_final.write_videofile(ruta_saida, fps=30, threads=4)
 
         if os.path.exists(ruta_saida) and os.path.getsize(ruta_saida) > 0:
-            print(f" Video generado correctamente: {ruta_saida}")
+            logger.info(f"Video generado correctamente: {ruta_saida}")
         else:
-            print("O archivo non se creou ben")
+            logger.error("O archivo non se creou ben")
             return ""
 
     except Exception as errorEscritura:
         #logs para verificar errores. Moitos problemas aqui. MOSTRAR TRACEBACK enteiro
-        print(f" error de escritura de video => {errorEscritura}")
-        print(f" Traceback completo: {traceback.format_exc()}")
+        logger.exception(f"error de escritura de video => {errorEscritura}")
         return ""
 
     #Aqui gardo os archivos separados para o tema do reprodutor web
@@ -168,7 +169,7 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
         shutil.copy2(ruta_musica, ruta_instrumental_output)
 
     except Exception as e:
-        print(f"Erro cos archivos separados: {e}")
+        logger.warning(f"Erro cos archivos separados: {e}")
 
     #gardar na base de datos se está habilitado
     if save_to_db:
@@ -185,9 +186,9 @@ def create(video_path: str, enable_diarization: bool = False, hf_token: str = No
                 output_dir="./output"
             )
             song_id = save_song_to_database(metadata)
-            print(f"Canción gardada na base de datos con ID: {song_id}")
+            logger.info(f"Canción gardada na base de datos con ID: {song_id}")
         except Exception as e:
-            print(f"Erro gardando na base de datos: {e}")
+            logger.error(f"Erro gardando na base de datos: {e}")
 
     return nome_saida
 
@@ -212,10 +213,8 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         ruta_normalizada = normalize_video(video_path)
         if ruta_normalizada != video_path:
             video_path = ruta_normalizada
-        else:
-            print("")
     except Exception as erro_norm:
-        print(f"error na normalización: {erro_norm}, continuando co video orixinal")
+        logger.warning(f"error na normalización: {erro_norm}, continuando co video orixinal")
 
     if progress_callback:
         progress_callback("Extraendo audio...", 15)
@@ -227,7 +226,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         progress_callback("Separando voces e instrumental...", 25)
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
     if not ruta_voz or not ruta_musica:
-        print(" Falta ou vocals ou music")
+        logger.error("Falta ou vocals ou music")
         return ""
 
     if progress_callback:
@@ -244,7 +243,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         tempo_transcorrido += 1
 
     if not os.path.exists(archivoSRT):
-        print(f"non se encontrou o srt {tempo_limite}s ")
+        logger.error(f"non se encontrou o srt en {tempo_limite}s")
         return ""
 
     if os.path.getsize(archivoSRT) == 0:
@@ -256,7 +255,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
     segmento_palabras = parse_word_srt(archivoSRT)
     grupos_manuais = group_word_segments(letras_normalizadas, segmento_palabras)
     if not grupos_manuais:
-        print("error na agrupacion")
+        logger.error("error na agrupacion")
         return ""
 
     if progress_callback:
@@ -266,14 +265,12 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         audio_musica = AudioFileClip(ruta_musica).set_fps(44100)
         audio_voces = AudioFileClip(ruta_voz).volumex(VOLUME_VOCAL).set_fps(44100)
         audio_mesturado = CompositeAudioClip([audio_musica, audio_voces])
-        #print(f"audio combinado OK, dura: {audio_mesturado.duration}s")
     except Exception as erro_audio:
-        print(f"error cargando audio {erro_audio}")
+        logger.error(f"error cargando audio {erro_audio}")
         return ""
 
     try:
         video_fondo = VideoFileClip(video_path).set_duration(audio_mesturado.duration).set_fps(30)
-        #print(f" Video OK, dura: {video_fondo.duration}s, e ocupa: {video_fondo.size}")
     except Exception as erro_video:
 
         # Intentase co video original se onormalizado falla
@@ -281,7 +278,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
             try:
                 video_fondo = VideoFileClip(ruta_video_orixinal).set_duration(audio_mesturado.duration).set_fps(30)
             except Exception as erro_video2:
-                print(f"fallo tamen co video orixinal {erro_video2}")
+                logger.error(f"fallo tamen co video orixinal {erro_video2}")
                 return ""
         else:
             return ""
@@ -327,15 +324,13 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         video_final.write_videofile(ruta_saida, fps=30, threads=4)
 
         if os.path.exists(ruta_saida) and os.path.getsize(ruta_saida) > 0:
-            print(f" Video generado correctamente: {ruta_saida}")
+            logger.info(f"Video generado correctamente: {ruta_saida}")
         else:
-            print("non se creou o archivo de salida")
+            logger.error("non se creou o archivo de salida")
             return ""
 
     except Exception as errorEscritura:
-        print(f"error de escritura => {errorEscritura}")
-        # O mismo que no automatico, mostramos mais info do error debido a varios problemas
-        print(f"Traceback completo: {traceback.format_exc()}")
+        logger.exception(f"error de escritura => {errorEscritura}")
         return ""
 
     #Aqui gardo os archivos separados para o tema do reprodutor web
@@ -353,7 +348,7 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
         shutil.copy2(ruta_musica, ruta_instrumental_output)
 
     except Exception as e:
-        print(f"Error cos arquivos separados: {e}")
+        logger.warning(f"Error cos arquivos separados: {e}")
 
     #Gardar na base de datos
     if save_to_db:
@@ -372,9 +367,9 @@ def create_with_manual_lyrics(video_path: str, manual_lyrics: str, language=None
                 output_dir="./output"
             )
             song_id = save_song_to_database(metadata)
-            print(f"canción con letras manuais gardada na base de datos con ID: {song_id}")
+            logger.info(f"canción con letras manuais gardada na base de datos con ID: {song_id}")
         except Exception as e:
-            print(f"Erro gardando na base de datos: {e}")
+            logger.error(f"Erro gardando na base de datos: {e}")
 
     return nombreArchivo
 
@@ -391,7 +386,7 @@ def generate_instrumental(video_path: str, source_type: str = "upload", source_u
                 progress_callback("Normalizando vídeo...", 15)
             video_path = normalize_video(video_path)
         except Exception as erro_normalizacion:
-            print(f"Error na normalización: {erro_normalizacion}, continuando co video orixinal")
+            logger.warning(f"Error na normalización: {erro_normalizacion}, continuando co video orixinal")
 
     if progress_callback:
         progress_callback("Extraendo audio...", 25)
@@ -403,7 +398,7 @@ def generate_instrumental(video_path: str, source_type: str = "upload", source_u
         progress_callback("Separando instrumental...", 50)
     ruta_voz, ruta_musica = separate_stems_cli(ruta_audio)
     if not ruta_musica:
-        print("Error separando a instrumental ")
+        logger.error("Error separando a instrumental")
         return ""
 
     nome_video_base = os.path.basename(video_path).replace("_normalized", "")
@@ -429,7 +424,7 @@ def generate_instrumental(video_path: str, source_type: str = "upload", source_u
         shutil.copy2(ruta_musica, ruta_saida)
 
         if os.path.exists(ruta_saida) and os.path.getsize(ruta_saida) > 0:
-            print(f"Instrumental xerada. {ruta_saida}")
+            logger.info(f"Instrumental xerada. {ruta_saida}")
         else:
             return ""
 
@@ -478,6 +473,6 @@ def generate_instrumental(video_path: str, source_type: str = "upload", source_u
             song_id = save_song_to_database(song_data)
 
         except Exception as e:
-            print(f"Erro gardando instrumental na bd: {e}")
+            logger.error(f"Erro gardando instrumental na bd: {e}")
 
     return nome_saida

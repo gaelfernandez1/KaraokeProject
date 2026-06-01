@@ -1,11 +1,14 @@
+import logging
 import os
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, abort
 
 from karaoke.infra.database import (
     get_all_songs, get_database_stats, get_songs_by_search,
     get_song_by_id, update_last_played, delete_song
 )
 from karaoke.infra.metadata_utils import format_file_size, format_duration
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('library', __name__)
 
@@ -23,8 +26,9 @@ def biblioteca_cancions():
             song['formatted_duration'] = format_duration(song['duration'])
 
         return render_template("library.html", songs=songs, stats=stats)
-    except Exception as e:
-        return f"erro cargando biblioteca: {e}", 500
+    except Exception:
+        logger.exception("erro cargando biblioteca")
+        abort(500)
 
 
 @bp.route("/library/search")
@@ -41,8 +45,9 @@ def buscar_cancions():
             song['formatted_duration'] = format_duration(song['duration'])
 
         return render_template("library.html", songs=songs, search_query=query)
-    except Exception as e:
-        return f"Error buscando cancións: {e}", 500
+    except Exception:
+        logger.exception("Error buscando cancións")
+        abort(500)
 
 
 @bp.route("/library/play/<int:song_id>")
@@ -59,8 +64,9 @@ def reproducir_dende_biblioteca(song_id):
         update_last_played(song_id)
         return redirect(url_for('player.reproductor_karaoke', filename=song['karaoke_filename']))
 
-    except Exception as e:
-        return f"Error reproducindo canción: {e}", 500
+    except Exception:
+        logger.exception(f"Error reproducindo canción {song_id}")
+        abort(500)
 
 
 @bp.route("/library/delete/<int:song_id>", methods=["POST"])
@@ -87,15 +93,16 @@ def borrar_cancion_biblioteca(song_id):
                 if os.path.exists(arquivo):
                     os.remove(arquivo)
                     arquivos_borrados += 1
-                    print(f"Arquivo borrado: {arquivo}")
-            except Exception as e:
-                print(f"Erro borrando arquivo {arquivo}: {e}")
+                    logger.info(f"Arquivo borrado: {arquivo}")
+            except Exception:
+                logger.warning(f"Erro borrando arquivo {arquivo}")
 
         if delete_song(song_id):
-            print(f"Canción {song['title']} borrada da biblioteca (ID: {song_id})")
+            logger.info(f"Canción {song['title']} borrada da biblioteca (ID: {song_id})")
             return redirect(url_for('library.biblioteca_cancions'))
         else:
             return "error borrando canción", 500
 
-    except Exception as e:
-        return f"Erro borrando canción: {e}", 500
+    except Exception:
+        logger.exception(f"Erro borrando canción {song_id}")
+        abort(500)

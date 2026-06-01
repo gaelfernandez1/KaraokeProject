@@ -1,7 +1,10 @@
+import logging
 import os
-from flask import Blueprint, render_template, jsonify, session, redirect, url_for, send_file
+from flask import Blueprint, render_template, jsonify, session, redirect, url_for, send_file, abort
 
 from karaoke.workers.celery_app import celery
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('tasks', __name__)
 
@@ -58,11 +61,9 @@ def estado_tarea(task_id):
 
         return jsonify(response)
 
-    except Exception as e:
-        return jsonify({
-            'state': 'ERROR',
-            'status': f'Error obtendo estado: {str(e)}'
-        }), 500
+    except Exception:
+        logger.exception("Error obtendo estado da tarefa")
+        abort(500)
 
 @bp.route("/api/cancel_task/<task_id>", methods=["POST"])
 def cancelar_tarea(task_id):
@@ -79,11 +80,9 @@ def cancelar_tarea(task_id):
             'message': 'Tarefa cancelada'
         })
 
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': f'Error cancelando: {str(e)}'
-        }), 500
+    except Exception:
+        logger.exception(f"Error cancelando tarefa {task_id}")
+        abort(500)
 
 @bp.route("/api/download_result/<task_id>")
 def descargar_resultado_tarea(task_id):
@@ -110,5 +109,6 @@ def descargar_resultado_tarea(task_id):
         else:
             return jsonify({'error': 'Tipo de tarefa descoñecido'}), 400
 
-    except Exception as e:
-        return jsonify({'error': f'Erro descargando resultado: {str(e)}'}), 500
+    except Exception:
+        logger.exception(f"Erro descargando resultado da tarefa {task_id}")
+        abort(500)

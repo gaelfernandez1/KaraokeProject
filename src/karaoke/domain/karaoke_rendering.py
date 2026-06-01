@@ -1,7 +1,8 @@
+import logging
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from moviepy.editor import VideoClip
-from karaoke.config import (
+from karaoke.domain.render_config import (
     TEXT_CLIP_WIDTH, FONTE, TAMAÑO_FONTE, TAMAÑO_FONTE_MIN, COR_TEXTO, COR_RESALTADO,
     GROSOR_CONTORNO_TEXTO, COR_CONTORNO_TEXTO, COR_FONDO_TEXTO, PADDING_FONDO_TEXTO,
     COR_LIÑA_SEGUINTE, ALPHA_LIÑA_SEGUINTE, FACTOR_FONTE_LIÑA_SEGUINTE, ESPACIADO_LIÑAS,
@@ -9,6 +10,8 @@ from karaoke.config import (
     PESO_PROGRESO_SEGMENTO, UMBRAL_ACELERACION, FACTOR_ACELERACION_MAX
 )
 from karaoke.domain.text_processing import dic_pyphen
+
+logger = logging.getLogger(__name__)
 
 
 # Función auxiliar para obter a cor dun speaker específico
@@ -44,7 +47,7 @@ def render_line_image(line_info: dict, t_offset: float, clip_width: int = TEXT_C
     try:
         fonte = ImageFont.truetype(font_path, tamaño_fonte_dinamico)
     except Exception as e:
-        print(f"Non se puido cargar a fonte {e}")
+        logger.warning(f"Non se puido cargar a fonte {e}")
         fonte = ImageFont.load_default()
 
     #axustes visuales varios:
@@ -323,7 +326,7 @@ def render_next_line_image(line_info: dict, clip_width: int = TEXT_CLIP_WIDTH,
     try:
         fonte = ImageFont.truetype(font_path, tamaño_fonte_dinamico)
     except Exception as e:
-        print(f"fallo cargando a fonte {e}")
+        logger.warning(f"fallo cargando a fonte {e}")
         fonte = ImageFont.load_default()
 
     lineasAjustadas = []

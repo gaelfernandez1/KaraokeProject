@@ -1,10 +1,12 @@
 import os
-import time
+import logging
 import traceback
 from celery import current_task
 from karaoke.workers.celery_app import celery, active_processes
 from karaoke.domain.karaoke_generator import create, create_with_manual_lyrics, generate_instrumental
 import signal
+
+logger = logging.getLogger(__name__)
 
 
 class ProcessingCancelledException(Exception):
@@ -64,8 +66,11 @@ def process_automatic_karaoke(self, video_path, enable_diarization=False, hf_tok
     except Exception as e:
         error_msg = str(e)
         traceback_str = traceback.format_exc()
-        print(f" Error en process_automatic_karaoke: {error_msg}")
-        print(f" Traceback: {traceback_str}")
+        logger.error(
+            f"Error en process_automatic_karaoke: {error_msg}",
+            extra={"task_id": task_id}
+        )
+        logger.debug(f"Traceback: {traceback_str}", extra={"task_id": task_id})
 
         self.update_state(state='FAILURE', meta={
             'status': f'Error: {error_msg}',
@@ -112,7 +117,11 @@ def process_manual_lyrics_karaoke(self, video_path, manual_lyrics, language=None
     except Exception as e:
         error_msg = str(e)
         traceback_str = traceback.format_exc()
-        print(f"Traceback: {traceback_str}")
+        logger.error(
+            f"Error en process_manual_lyrics_karaoke: {error_msg}",
+            extra={"task_id": task_id}
+        )
+        logger.debug(f"Traceback: {traceback_str}", extra={"task_id": task_id})
 
         self.update_state(state='FAILURE', meta={
             'status': f'Error: {error_msg}',
@@ -157,7 +166,7 @@ def process_instrumental_only(self, video_path, source_type="upload", source_url
     except Exception as e:
         error_msg = str(e)
         traceback_str = traceback.format_exc()
-        print(f"Error en process_instrumental_only: {error_msg}")
+        logger.error(f"Error en process_instrumental_only: {error_msg}", extra={"task_id": task_id})
 
         self.update_state(state='FAILURE', meta={
             'status': f'Error: {error_msg}',
@@ -227,7 +236,7 @@ def generate_instrumental_with_cancellation_check(task, video_path, source_type=
 def cleanup_partial_files(video_path):
 
     try:
-        print(f"Limpando archivos parciales  {video_path}")
+        logger.info(f"Limpando archivos parciales {video_path}")
 
         base_name = os.path.splitext(os.path.basename(video_path))[0]
 
@@ -262,9 +271,9 @@ def cleanup_partial_files(video_path):
                                 os.remove(file_path)
                                 files_deleted += 1
                         except Exception as e:
-                            print(f" Erro eliminando {file_path}: {e}")
+                            logger.warning(f"Erro eliminando {file_path}: {e}")
 
-        print(f"Limpeza completada: {files_deleted} archivos eliminados")
+        logger.info(f"Limpeza completada: {files_deleted} archivos eliminados")
 
     except Exception as e:
-        print(f"Erro na limpeza: {e}")
+        logger.error(f"Erro na limpeza: {e}")

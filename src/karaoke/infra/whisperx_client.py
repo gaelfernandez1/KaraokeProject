@@ -1,4 +1,7 @@
+import logging
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 # Esto chama ao endpoint de  whisperx para facer a transcripción automatica
@@ -21,10 +24,10 @@ def call_whisperx_endpoint(vocals_path: str, enable_diarization: bool = False, h
             datos = resposta.json()
             return datos  # Devolver datos para acceder a speaker_info
         else:
-            print("WhisperX alignment Error:", resposta.text)
+            logger.error(f"WhisperX alignment Error: {resposta.text}")
             return None
     except Exception as e:
-        print(f"error ao chamar ao endpoint: {e}")
+        logger.exception(f"error ao chamar ao endpoint: {e}")
         return None
 
 
@@ -52,8 +55,8 @@ def call_whisperx_endpoint_manual(vocals_path: str, manual_lyrics: str, language
             datos = resposta.json()
             return datos
         else:
-            print("Fallo do alineamento forzado:", resposta.text)
+            logger.error(f"Fallo do alineamento forzado: {resposta.text}")
             return None
     except Exception as e:
-        print(f"error co endpoint da letra manual {e}")
+        logger.exception(f"error co endpoint da letra manual {e}")
         return None

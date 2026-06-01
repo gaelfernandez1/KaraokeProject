@@ -1,9 +1,12 @@
 import os
+import logging
 import subprocess
 import shutil
 import torch
 from moviepy.editor import AudioFileClip
 from karaoke.infra.gpu_utils import detect_gpu_capability, get_optimal_demucs_args
+
+logger = logging.getLogger(__name__)
 
 #añador esto para detectas as capacidades da gpu en general, non solo do meu equipo
 GPU_INFO = detect_gpu_capability()
@@ -16,7 +19,7 @@ def video_to_mp3(video_path: str) -> str:
         if os.path.exists(video_path):
             return video_path
         else:
-            print(f"Archivo MP3 non encontrado: {video_path}")
+            logger.warning(f"Archivo MP3 non encontrado: {video_path}")
             return ""
 
     ruta_audio = video_path.replace(".mp4", ".mp3")
@@ -27,7 +30,7 @@ def video_to_mp3(video_path: str) -> str:
         clip_audio = AudioFileClip(video_path)
         clip_audio.write_audiofile(ruta_audio, logger="bar")
     except Exception as e:
-        print(f" error ao convertir video a mp3: {e}")
+        logger.error(f"error ao convertir video a mp3: {e}")
         return ""
 
     return ruta_audio
@@ -38,7 +41,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
 
 
     if GPU_INFO['has_cuda']:
-        print(f"GPU detectada: {GPU_INFO['gpu_name']} ({GPU_INFO['gpu_memory']:.1f}GB)")
+        logger.info(f"GPU detectada: {GPU_INFO['gpu_name']} ({GPU_INFO['gpu_memory']:.1f}GB)")
 
     directorio_saida = "./separated"
     if not os.path.exists("./stems"):
@@ -48,21 +51,20 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     nombreBase = os.path.splitext(nombreArchivo)[0]
 
     cmd = ["demucs"] + DEMUCS_ARGS + [audio_file_path]
-    #print(f"Comando demucs: {' '.join(cmd)}")
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print("separaronse os stems sin problemas")
+        logger.info("separaronse os stems sin problemas")
     except subprocess.CalledProcessError as e:
-        print(f"Stderr: {e.stderr}")
+        logger.error(f"Stderr: {e.stderr}")
 
         if GPU_INFO['recommended_device'] == 'cuda':
-            print("problemas con gpu, vaise seguir con cpu")
+            logger.warning("problemas con gpu, vaise seguir con cpu")
             try:
                 cmd_cpu = ["demucs", "--device", "cpu", "--two-stems=vocals", "--jobs", "2", audio_file_path]
                 result = subprocess.run(cmd_cpu, check=True, capture_output=True, text=True)
             except subprocess.CalledProcessError as e2:
-                print(f"error tamen con cpu: {e2}")
+                logger.error(f"error tamen con cpu: {e2}")
                 return "", ""
         else:
             return "", ""
@@ -94,7 +96,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
             except subprocess.CalledProcessError as e:
                 return "", ""
         else:
-            print("Falta algun dos stems?")
+            logger.warning("Falta algun dos stems?")
             return "", ""
 
     if not os.path.exists(vocals_wav) or not os.path.exists(instrumental_wav):
@@ -125,12 +127,12 @@ def transcribe_with_faster_whisper(audio_path: str, model_size: str = "tiny") ->
         try:
             model = WhisperModel(model_size, device=device, compute_type=compute_type)
         except Exception as e:
-            print(f"Erro cargando modelo {model_size}: {e}")
+            logger.error(f"Erro cargando modelo {model_size}: {e}")
             raise
 
         segments, info = model.transcribe(audio_path, language=None)
 
-        print(f"Idioma detectado: {info.language}")
+        logger.info(f"Idioma detectado: {info.language}")
 
         transcribed_text = ""
         for segment in segments:
@@ -139,11 +141,10 @@ def transcribe_with_faster_whisper(audio_path: str, model_size: str = "tiny") ->
         del model
 
         transcribed_text = transcribed_text.strip()
-        print(f"Transcricion: {len(transcribed_text)} caracteres")
+        logger.info(f"Transcricion: {len(transcribed_text)} caracteres")
 
         return transcribed_text
 
     except Exception as e:
-        import traceback
-        print(f"Traceback: {traceback.format_exc()}")
+        logger.exception(f"Traceback transcribe_with_faster_whisper")
         return None

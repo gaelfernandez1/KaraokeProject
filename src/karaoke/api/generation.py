@@ -1,9 +1,13 @@
+import logging
 import os
 import yt_dlp
-from flask import Blueprint, request, render_template, redirect, url_for, session
+from flask import Blueprint, request, render_template, redirect, url_for, session, abort, g
+
 from werkzeug.utils import secure_filename
 
 from karaoke.workers.celery_tasks import process_automatic_karaoke, process_manual_lyrics_karaoke, process_instrumental_only
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('generation', __name__)
 
@@ -69,8 +73,9 @@ def xerar_karaoke():
             return "Debes mandar ou un mp4 ou un link de Youtube", 400
         try:
             ruta_video = descargar_video_youtube(url_youtube)
-        except Exception as e:
-            return f"Error descargando vídeo: {e}", 500
+        except Exception:
+            logger.exception("Error descargando vídeo de YouTube")
+            abort(500)
 
     enable_diarization = request.form.get("enable_diarization") == "true"
     hf_token = request.form.get("hf_token", "").strip() if enable_diarization else None
@@ -108,8 +113,9 @@ def procesar_letras_manuales():
             return "Tes que subir un mp4 ou un link de Youtube", 400
         try:
             ruta_video = descargar_video_youtube(url_youtube)
-        except Exception as e:
-            return f"Erro descargando vídeo: {e}", 500
+        except Exception:
+            logger.exception("Erro descargando vídeo de YouTube para letras manuais")
+            abort(500)
 
     letra_manual = request.form.get("manual_lyrics", "").strip()
     if not letra_manual:
@@ -147,8 +153,9 @@ def xerar_instrumental():
             return "Tes que mandar un mp4/mp3 ou un link de YouTube", 400
         try:
             ruta_video = descargar_video_youtube(url_youtube)
-        except Exception as e:
-            return f"Erro descargando vídeo: {e}", 500
+        except Exception:
+            logger.exception("Erro descargando vídeo de YouTube para instrumental")
+            abort(500)
 
     source_type = "upload" if arquivo_subido else "youtube"
     source_url = url_youtube if not arquivo_subido else None

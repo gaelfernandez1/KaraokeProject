@@ -1,9 +1,10 @@
+import logging
 import os
 import re
 from karaoke.infra.utils import time_str_to_sec, clean_abnormal_segments
 from karaoke.domain.text_processing import normalize_manual_lyrics
-import logging
 
+logger = logging.getLogger(__name__)
 
 
 # Parsea o srt e para cada bloque si hai varias lineas distribuense no intervalo. Devolvese unha lista de dicionarios: { "start": float, "end": float, "word": str }
@@ -11,7 +12,7 @@ def parse_word_srt(srt_path: str) -> list:
 
     segmentos = []
     if not os.path.exists(srt_path):
-        print(f"non se atopou o srt {srt_path}")
+        logger.error(f"non se atopou o srt {srt_path}")
         return segmentos
     with open(srt_path, "r", encoding="utf-8") as f:
         liñas = f.readlines()
@@ -27,7 +28,7 @@ def parse_word_srt(srt_path: str) -> list:
                     inicio_bloque = time_str_to_sec(inicio_str)
                     fin_bloque = time_str_to_sec(fin_str)
                 except Exception as e:
-                    print(f"Error parseando os tempos: {e}")
+                    logger.warning(f"Error parseando os tempos: {e}")
                     indice += 1
                     continue
                 indice += 1

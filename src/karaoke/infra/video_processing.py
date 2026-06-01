@@ -1,9 +1,12 @@
+import logging
 import os
 import subprocess
 import json
 from typing import Dict, Optional
 from moviepy.editor import VideoFileClip
-from karaoke.config import ANCHO_VIDEO, ALTO_VIDEO, FPS_VIDEO
+from karaoke.domain.render_config import ANCHO_VIDEO, ALTO_VIDEO, FPS_VIDEO
+
+logger = logging.getLogger(__name__)
 
 #Conten arreglo Pillow e mais cousas. Chequear o commit mais a web onde se arreglaba
 
@@ -78,7 +81,7 @@ def normalize_video(video_path: str) -> str:
         try:
             os.remove(normalized_path)
         except Exception as e:
-            print(f"error ao eliminar o archivo previo {e}")
+            logger.warning(f"error ao eliminar o archivo previo {e}")
 
 
 
@@ -88,7 +91,7 @@ def normalize_video(video_path: str) -> str:
     requires_reencoding = needs_reencoding(video_path)
 
     if requires_reencoding or video_codec == 'av01':
-        print("Usando estratexias de recodificación para codec problemático")
+        logger.info("Usando estratexias de recodificación para codec problemático")
         strategies = [
             {
                 "name": "recodificacion_av1_libaom",
@@ -141,7 +144,7 @@ def normalize_video(video_path: str) -> str:
             }
         ]
     else:
-        print("Usando estratexias de escalado simple para codec compatible")
+        logger.info("Usando estratexias de escalado simple para codec compatible")
         strategies = [
             {
                 "name": "escalado_simple",
@@ -239,11 +242,11 @@ def normalize_video(video_path: str) -> str:
                         final_clip.close()
 
                     if os.path.exists(normalized_path) and os.path.getsize(normalized_path) > 0:
-                        print(f"Video normalizado correctamente con MoviePy")
+                        logger.info("Video normalizado correctamente con MoviePy")
                         return normalized_path
 
                 except Exception as e:
-                    print(f" Error con MoviePy: {e}")
+                    logger.error(f"Error con MoviePy: {e}")
 
                     try:
                         if 'video_clip' in locals():
@@ -265,13 +268,13 @@ def normalize_video(video_path: str) -> str:
                     text=True)
 
                 if os.path.exists(normalized_path) and os.path.getsize(normalized_path) > 0:
-                    print(f"Video normalizado correctamente con estrategia: {strategy['name']}")
+                    logger.info(f"Video normalizado correctamente con estrategia: {strategy['name']}")
                     return normalized_path
 
         except subprocess.CalledProcessError as e:
-            print(f"fallou: {strategy['name']}: {e}")
+            logger.warning(f"fallou: {strategy['name']}: {e}")
             if e.stderr:
-                print(f" Error ffmpeg: {e.stderr}")
+                logger.warning(f"Error ffmpeg: {e.stderr}")
 
-    print(f" Todas as estrategias fallaron. Usando video original: {video_path}")
+    logger.warning(f"Todas as estrategias fallaron. Usando video original: {video_path}")
     return video_path

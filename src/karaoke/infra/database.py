@@ -1,8 +1,11 @@
+import logging
 import sqlite3
 import os
 from datetime import datetime
 from typing import List, Dict, Optional
 import json
+
+logger = logging.getLogger(__name__)
 
 DB_DIR = os.path.join("db")
 os.makedirs(DB_DIR, exist_ok=True)
@@ -14,7 +17,7 @@ def init_database():
 
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
-    
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS songs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,26 +40,26 @@ def init_database():
             last_played TIMESTAMP
         )
     ''')
-    
+
     try:
         cursor.execute("ALTER TABLE songs ADD COLUMN whisper_model TEXT DEFAULT 'small'")
     except sqlite3.OperationalError as e:
-        
+
         if "duplicate column name" not in str(e).lower():
-            print(f"Error en migración whisper_model: {e}")
+            logger.error(f"Error en migración whisper_model: {e}")
         else:
-            print("Columna whisper_model xa existe - saltando migración")
-    
+            logger.debug("Columna whisper_model xa existe - saltando migración")
+
     conn.commit()
     conn.close()
 
 def save_song_to_database(song_data: Dict) -> int:
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
-    
+
     whisper_model = song_data.get('whisper_model', 'small')
-    print(f"debug: Gardando canción con whisper_model = '{whisper_model}'")
-    
+    logger.debug(f"Gardando canción con whisper_model = '{whisper_model}'")
+
     cursor.execute('''
         INSERT INTO songs (
             title, original_filename, karaoke_filename, video_only_filename,
@@ -82,116 +85,116 @@ def save_song_to_database(song_data: Dict) -> int:
         song_data.get('duration'),
         datetime.now().isoformat()
     ))
-    
+
     song_id = cursor.lastrowid
     conn.commit()
     conn.close()
-    
+
     return song_id
 
 def get_all_songs() -> List[Dict]:
     conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
+
     cursor.execute('''
-        SELECT * FROM songs 
+        SELECT * FROM songs
         ORDER BY created_at DESC
     ''')
-    
+
     songs = [dict(row) for row in cursor.fetchall()]
     conn.close()
-    
+
     return songs
 
 def get_song_by_id(song_id: int) -> Optional[Dict]:
     conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
+
     cursor.execute('SELECT * FROM songs WHERE id = ?', (song_id,))
     row = cursor.fetchone()
-    
+
     song = dict(row) if row else None
     conn.close()
-    
+
     return song
 
 def get_song_by_filename(filename: str) -> Optional[Dict]:
     conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
+
     cursor.execute('SELECT * FROM songs WHERE karaoke_filename = ?', (filename,))
     row = cursor.fetchone()
-    
+
     song = dict(row) if row else None
     conn.close()
-    
+
     return song
 
 def update_last_played(song_id: int):
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
-    
+
     cursor.execute('''
-        UPDATE songs 
-        SET last_played = ? 
+        UPDATE songs
+        SET last_played = ?
         WHERE id = ?
     ''', (datetime.now().isoformat(), song_id))
-    
+
     conn.commit()
     conn.close()
 
 def delete_song(song_id: int) -> bool:
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
-    
+
     cursor.execute('DELETE FROM songs WHERE id = ?', (song_id,))
     deleted = cursor.rowcount > 0
-    
+
     conn.commit()
     conn.close()
-    
+
     return deleted
 
 def get_songs_by_search(query: str) -> List[Dict]:
     conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
+
     cursor.execute('''
-        SELECT * FROM songs 
-        WHERE title LIKE ? 
+        SELECT * FROM songs
+        WHERE title LIKE ?
         ORDER BY created_at DESC
     ''', (f'%{query}%',))
-    
+
     songs = [dict(row) for row in cursor.fetchall()]
     conn.close()
-    
+
     return songs
 
 def get_database_stats() -> Dict:
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
-    
+
     cursor.execute('SELECT COUNT(*) as total_songs FROM songs')
     total_songs = cursor.fetchone()[0]
-    
+
     cursor.execute('SELECT COUNT(*) as automatic_songs FROM songs WHERE processing_type = ?', ('automatic',))
     automatic_songs = cursor.fetchone()[0]
-    
+
     cursor.execute('SELECT COUNT(*) as manual_songs FROM songs WHERE processing_type = ?', ('manual_lyrics',))
     manual_songs = cursor.fetchone()[0]
-    
+
     cursor.execute('SELECT COUNT(*) as instrumental_songs FROM songs WHERE processing_type = ?', ('instrumental',))
     instrumental_songs = cursor.fetchone()[0]
-    
+
     cursor.execute('SELECT SUM(file_size) as total_size FROM songs')
     total_size = cursor.fetchone()[0] or 0
-    
+
     conn.close()
-    
+
     return {
         'total_songs': total_songs,
         'automatic_songs': automatic_songs,

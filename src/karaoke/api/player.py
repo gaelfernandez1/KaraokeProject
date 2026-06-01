@@ -1,6 +1,9 @@
+import logging
 import os
-from flask import Blueprint, render_template, send_file
+from flask import Blueprint, render_template, send_file, abort
 from werkzeug.utils import secure_filename
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('player', __name__)
 
@@ -79,5 +82,6 @@ def descargar_archivo(filename):
 
         response.headers["Content-Length"] = str(tamano_ficheiro)
         return response
-    except Exception as e:
-        return f"Errro enviando archivo: {e}", 500
+    except Exception:
+        logger.exception(f"Erro enviando archivo {safe_name}")
+        abort(500)
