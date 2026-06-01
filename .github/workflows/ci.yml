@@ -24,7 +24,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pip-lint-
 
       - name: Install ruff
-        run: pip install "ruff>=0.4.0"
+        run: pip install "ruff==0.4.4"
 
       - name: Check formatting
         run: ruff format --check src/ tests/
@@ -49,7 +49,7 @@ jobs:
           restore-keys: ${{ runner.os }}-pip-typecheck-
 
       - name: Install core deps + mypy
-        run: pip install -e ".[core]" "mypy>=1.10.0" "types-requests>=2.32.0"
+        run: pip install -e ".[core]" "mypy==1.10.0" "types-requests>=2.32.0"
 
       - name: Run mypy on domain and metadata_utils
         run: mypy src/karaoke/domain src/karaoke/infra/metadata_utils.py

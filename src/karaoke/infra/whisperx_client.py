@@ -41,9 +41,9 @@ def call_whisperx_endpoint(
 def call_whisperx_endpoint_manual(
     vocals_path: str,
     manual_lyrics: str,
-    language=None,
+    language: str | None = None,
     enable_diarization: bool = False,
-    hf_token: str = None,
+    hf_token: str | None = None,
     whisper_model: str = "small",
 ):
     url = "http://whisperx:5001/align"

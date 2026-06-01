@@ -48,6 +48,7 @@ def clean_youtube_url(url: str) -> str:
     try:
         parsed = urlparse(url)
         if "youtube.com" in parsed.netloc or "youtu.be" in parsed.netloc:
+            video_id: str | None
             if "youtu.be" in parsed.netloc:
                 video_id = parsed.path[1:]  # quitar a barra inicial
             else:

@@ -5,6 +5,7 @@ import os
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from karaoke.domain.errors import (
     AlignmentError,
@@ -244,7 +245,7 @@ class KaraokeJob:
 
     def _write_secondary_outputs(
         self,
-        video_darkened: object,
+        video_darkened: Any,
         output_path: Path,
         output_filename: str,
         safe_name: str,
@@ -253,7 +254,7 @@ class KaraokeJob:
             video_only_path = output_path.with_name(
                 output_filename.replace(".mp4", "_video_only.mp4")
             )
-            video_darkened.write_videofile(str(video_only_path), fps=30, threads=4, audio=False)  # type: ignore[union-attr]
+            video_darkened.write_videofile(str(video_only_path), fps=30, threads=4, audio=False)
         except Exception as e:
             logger.warning(f"Failed to write video-only file: {e}")
 

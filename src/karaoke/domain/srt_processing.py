@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 # Parsea o srt e para cada bloque si hai varias lineas distribuense no intervalo. Devolvese unha lista de dicionarios: { "start": float, "end": float, "word": str }
 def parse_word_srt(srt_path: str) -> list:
 
-    segmentos = []
+    segmentos: list = []
     if not os.path.exists(srt_path):
         logger.error(f"non se atopou o srt {srt_path}")
         return segmentos
@@ -108,7 +108,7 @@ def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
     proporcional = [(cnt / total_esperado) * total_real for cnt in contador_tokens_manual]
 
     asignados = []
-    for cnt_esperado, prop in zip(contador_tokens_manual, proporcional):
+    for cnt_esperado, prop in zip(contador_tokens_manual, proporcional, strict=False):
         crudo = int(round(prop))
         if cnt_esperado > 0:
             # se a linea ten polo menos unha palabra, forzamos polo menos 1 token
@@ -138,7 +138,7 @@ def group_word_segments(manual_lyrics: str, word_segments: list) -> list:
     # cortanse os segmentos segun os asignados e contruese o resultado
     agrupados = []
     actual = 0
-    for liña, cantidad in zip(liñas, asignados):
+    for liña, cantidad in zip(liñas, asignados, strict=False):
         segmentos_parciais = word_segments[actual : actual + cantidad]
         actual += cantidad
         if segmentos_parciais:

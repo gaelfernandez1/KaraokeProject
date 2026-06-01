@@ -120,6 +120,12 @@ ignore = [
 [tool.ruff.lint.isort]
 known-first-party = ["karaoke"]
 
+[tool.ruff.lint.per-file-ignores]
+# TFG-era modules keep their original camelCase locals (carpetaSeparado, etc.).
+# Renaming them is an out-of-scope mass rewrite per CLAUDE.md, so silence N806 here.
+"src/karaoke/domain/karaoke_rendering.py" = ["N806"]
+"src/karaoke/infra/audio_processing.py" = ["N806"]
+
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true

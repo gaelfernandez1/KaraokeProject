@@ -284,11 +284,10 @@ def normalize_video(video_path: str) -> str:
                     continue
             else:
                 # Estrategias normales con ffmpeg
-                result = subprocess.run(
+                subprocess.run(
                     strategy["cmd"],
                     check=True,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
+                    capture_output=True,
                     text=True,
                 )
 
