@@ -53,7 +53,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
     cmd = ["demucs"] + DEMUCS_ARGS + [audio_file_path]
 
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
         logger.info("separaronse os stems sin problemas")
     except subprocess.CalledProcessError as e:
         logger.error(f"Stderr: {e.stderr}")
@@ -70,7 +70,7 @@ def separate_stems_cli(audio_file_path: str) -> tuple[str, str]:
                     "2",
                     audio_file_path,
                 ]
-                result = subprocess.run(cmd_cpu, check=True, capture_output=True, text=True)
+                subprocess.run(cmd_cpu, check=True, capture_output=True, text=True)
             except subprocess.CalledProcessError as e2:
                 logger.error(f"error tamen con cpu: {e2}")
                 return "", ""

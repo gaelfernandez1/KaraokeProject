@@ -1,7 +1,5 @@
-import glob
 import logging
 import math
-import os
 import re
 import unicodedata
 
@@ -43,21 +41,6 @@ def sanitize_filename(filename: str) -> str:
     return filename
 
 
-def remove_previous_srt():
-    """Elimina archivos SRT anteriores de /data para evitar conflictos, agora non deberia haber problema pero manteñoa"""
-
-    srt_files = glob.glob("/data/*")
-    if srt_files:
-        logger.info(f"Borrando SRT anteriores => {srt_files}")
-        for path in srt_files:
-            try:
-                os.remove(path)
-            except Exception as e:
-                logger.warning(f"error ao eliminar {path}: {e}")
-    else:
-        logger.debug("non habia srts anteriores en /data.")
-
-
 # Esta funcion esta feita para correxir o erro de que a última frase que se cantou se quede en pantalla cando empeza un solo de instrumental. #HAI QUE REVISAR OUTRA SOLUCION!!!
 def clean_abnormal_segments(word_segments, max_word_duration=3.0):
 
@@ -66,7 +49,7 @@ def clean_abnormal_segments(word_segments, max_word_duration=3.0):
 
     cleaned_segments = []
 
-    for i, segment in enumerate(word_segments):
+    for _i, segment in enumerate(word_segments):
         duration = segment["end"] - segment["start"]
 
         if duration > max_word_duration:

@@ -272,7 +272,7 @@ def render_line_image(
                     indice_silaba += 1
                 else:
                     # se é divisible -> renderizase silaba por silaba
-                    for idx_sil, sil in enumerate(silabas_palabra):
+                    for _idx_sil, sil in enumerate(silabas_palabra):
                         cor = get_speaker_color(word_info, indice_silaba < silabas_para_resaltar)
                         debuxar.text(
                             (x, y),
@@ -489,7 +489,7 @@ def render_next_line_image(
 # CHEQUEAR A REF EN INTERNET, esta explicado mais ou menos
 def create_karaoke_text_clip(
     line_info: dict,
-    next_line_info: dict = None,
+    next_line_info: dict | None = None,
     advance: float = 0.5,
     duration_padding: float = 0.5,
 ):
