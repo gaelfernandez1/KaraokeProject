@@ -152,5 +152,8 @@ def align_endpoint():
 
 
 if __name__ == "__main__":
-    # Levantamos en modo debug e en CPU
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    debug = os.environ.get("WHISPERX_DEBUG", "false").lower() in ("1", "true", "yes")
+    # The Werkzeug reloader walks sys.modules calling getattr(module, "__file__"),
+    # which forces speechbrain's lazy k2 import (k2 isn't installed) and crash-loops
+    # the container. Keep the reloader off regardless of debug.
+    app.run(host="0.0.0.0", port=5001, debug=debug, use_reloader=False)
