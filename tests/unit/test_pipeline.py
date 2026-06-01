@@ -225,8 +225,8 @@ class TestCancellation:
 
 class TestPipelineErrors:
     def test_preparation_error_on_missing_audio(self, monkeypatch, tmp_path):
-        monkeypatch.setattr("karaoke.domain.pipeline.normalize_video", lambda p: p)
-        monkeypatch.setattr("karaoke.domain.pipeline.video_to_mp3", lambda p: "")
+        monkeypatch.setattr("karaoke.infra.video_processing.normalize_video", lambda p: p)
+        monkeypatch.setattr("karaoke.infra.audio_processing.video_to_mp3", lambda p: "")
 
         config = make_config(tmp_path)
         job = KaraokeJob(
@@ -236,11 +236,11 @@ class TestPipelineErrors:
             job.run()
 
     def test_audio_separation_error_on_demucs_failure(self, monkeypatch, tmp_path):
-        monkeypatch.setattr("karaoke.domain.pipeline.normalize_video", lambda p: p)
+        monkeypatch.setattr("karaoke.infra.video_processing.normalize_video", lambda p: p)
         monkeypatch.setattr(
-            "karaoke.domain.pipeline.video_to_mp3", lambda p: str(tmp_path / "audio.mp3")
+            "karaoke.infra.audio_processing.video_to_mp3", lambda p: str(tmp_path / "audio.mp3")
         )
-        monkeypatch.setattr("karaoke.domain.pipeline.separate_stems_cli", lambda p: ("", ""))
+        monkeypatch.setattr("karaoke.infra.audio_processing.separate_stems_cli", lambda p: ("", ""))
 
         config = make_config(tmp_path)
         job = KaraokeJob(
@@ -258,11 +258,11 @@ class TestPipelineErrors:
 
         monkeypatch.setattr(KaraokeJob, "_separate", _separate)
         monkeypatch.setattr(
-            "karaoke.domain.strategies.transcribe_with_faster_whisper",
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
             lambda path, model: "hello",
         )
         monkeypatch.setattr(
-            "karaoke.domain.strategies.call_whisperx_endpoint_manual",
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
             lambda *a, **kw: None,
         )
 
@@ -284,11 +284,11 @@ class TestAlignmentStrategies:
         transcription_calls: list[str] = []
 
         monkeypatch.setattr(
-            "karaoke.domain.strategies.transcribe_with_faster_whisper",
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
             lambda path, model: transcription_calls.append(path) or "hello world",
         )
         monkeypatch.setattr(
-            "karaoke.domain.strategies.call_whisperx_endpoint_manual",
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
             lambda *a, **kw: {"srt_content": "1\n00:00:00,000 --> 00:00:01,000\nhello\n\n"},
         )
 
@@ -303,11 +303,11 @@ class TestAlignmentStrategies:
         transcription_calls: list = []
 
         monkeypatch.setattr(
-            "karaoke.domain.strategies.transcribe_with_faster_whisper",
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
             lambda *a: transcription_calls.append("called") or "",
         )
         monkeypatch.setattr(
-            "karaoke.domain.strategies.call_whisperx_endpoint_manual",
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
             lambda *a, **kw: {"srt_content": "1\n00:00:00,000 --> 00:00:01,000\nhello\n\n"},
         )
 
@@ -320,7 +320,7 @@ class TestAlignmentStrategies:
 
     def test_automatic_raises_on_empty_transcription(self, monkeypatch):
         monkeypatch.setattr(
-            "karaoke.domain.strategies.transcribe_with_faster_whisper",
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
             lambda *a: "",
         )
 
@@ -331,11 +331,11 @@ class TestAlignmentStrategies:
 
     def test_automatic_raises_when_whisperx_returns_none(self, monkeypatch):
         monkeypatch.setattr(
-            "karaoke.domain.strategies.transcribe_with_faster_whisper",
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
             lambda *a: "lyrics",
         )
         monkeypatch.setattr(
-            "karaoke.domain.strategies.call_whisperx_endpoint_manual",
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
             lambda *a, **kw: None,
         )
 
