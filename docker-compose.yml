@@ -8,6 +8,24 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_container
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-karaoke}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secret}
+      - POSTGRES_DB=${POSTGRES_DB:-karaoke}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-karaoke} -d ${POSTGRES_DB:-karaoke}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   #CAMBIO. ahora si que se nota
   demucs:
     build:
@@ -20,10 +38,13 @@ services:
       - shared_data:/data
       - shared_input:/KaraokeProject/input
       - shared_output:/KaraokeProject/output
-      - shared_db:/KaraokeProject/db
     depends_on:
-      - redis
-      - whisperx
+      redis:
+        condition: service_started
+      whisperx:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     #ahora funciona con ou sin gpu
     deploy:
       resources:
@@ -40,6 +61,7 @@ services:
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
       - FLASK_DEBUG=${FLASK_DEBUG:-false}
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://karaoke:secret@postgres:5432/karaoke}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     restart: unless-stopped
 
@@ -52,10 +74,13 @@ services:
       - shared_data:/data
       - shared_input:/KaraokeProject/input
       - shared_output:/KaraokeProject/output
-      - shared_db:/KaraokeProject/db
     depends_on:
-      - redis
-      - whisperx
+      redis:
+        condition: service_started
+      whisperx:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     deploy:
       resources:
         reservations:
@@ -68,6 +93,7 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://karaoke:secret@postgres:5432/karaoke}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     command: celery -A karaoke.workers.celery_app worker --loglevel=info
     restart: unless-stopped
@@ -112,9 +138,9 @@ volumes:
     driver: local
   redis_data:
     driver: local
+  postgres_data:
+    driver: local
   shared_input:
     driver: local
   shared_output:
-    driver: local
-  shared_db:
     driver: local
