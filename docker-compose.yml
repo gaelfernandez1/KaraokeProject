@@ -6,6 +6,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     restart: unless-stopped
 
   postgres:
@@ -26,36 +31,23 @@ services:
       retries: 5
     restart: unless-stopped
 
-  #CAMBIO. ahora si que se nota
-  demucs:
+  # Thin Flask app. No GPU, no /data — it only enqueues jobs and serves results.
+  web:
     build:
       context: .
-      dockerfile: Dockerfile.A
-    container_name: demucs_container
+      dockerfile: Dockerfile.web
+    container_name: web_container
     ports:
       - "5000:5000"
     volumes:
-      - shared_data:/data
       - shared_input:/KaraokeProject/input
       - shared_output:/KaraokeProject/output
     depends_on:
       redis:
-        condition: service_started
-      whisperx:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
-    #ahora funciona con ou sin gpu
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
@@ -68,7 +60,7 @@ services:
   celery_worker:
     build:
       context: .
-      dockerfile: Dockerfile.A
+      dockerfile: Dockerfile.worker
     container_name: celery_worker_container
     volumes:
       - shared_data:/data
@@ -76,9 +68,9 @@ services:
       - shared_output:/KaraokeProject/output
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       whisperx:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
     deploy:
@@ -93,22 +85,24 @@ services:
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # The pipeline instantiates Settings(), which requires FLASK_SECRET_KEY even
+      # though the worker never signs cookies. Pass it instead of baking .env in.
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+      - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://karaoke:secret@postgres:5432/karaoke}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     command: celery -A karaoke.workers.celery_app worker --loglevel=info
     restart: unless-stopped
 
-  #ahora vai con calquera gpu
   whisperx:
     build:
       context: .
-      dockerfile: Dockerfile.B
+      dockerfile: Dockerfile.whisperx
     container_name: whisperx_container
     ports:
       - "5001:5001"
     volumes:
       - shared_data:/data
-    #pode ser opcional a GPU
     deploy:
       resources:
         reservations:
@@ -124,13 +118,13 @@ services:
   ngrok:
     image: ngrok/ngrok:latest
     container_name: ngrok_container
-    command: http demucs:5000 --log stdout
+    command: http web:5000 --log stdout
     ports:
-      - "4040:4040"  
+      - "4040:4040"
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTH_TOKEN}
     depends_on:
-      - demucs
+      - web
     restart: unless-stopped
 
 volumes:

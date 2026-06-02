@@ -31,6 +31,11 @@ def get_duration(audio_file):
     return librosa.get_duration(filename=audio_file)
 
 
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
+
+
 # Esperase un json, si existe a letra manual, faise forced aligment.
 # si language non está no payload autodetectase o idioma
 # podense probar varios modelos pero notase unha diferencia escasa polo menos nas cancions en galego que estou probando. Pode ser un error?

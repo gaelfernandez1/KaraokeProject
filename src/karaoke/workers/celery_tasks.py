@@ -25,6 +25,12 @@ def process_automatic_karaoke(
     reporter = CeleryProgressReporter(self)
     reporter.report("Iniciando procesamento automático...", 0)
 
+    if source_type == "youtube":
+        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
+
+        reporter.report("Descargando vídeo de YouTube...", 2)
+        video_path = download_youtube(source_url)
+
     config = JobConfig(
         video_path=Path(video_path),
         task_id=task_id,
@@ -66,6 +72,12 @@ def process_manual_lyrics_karaoke(
     reporter = CeleryProgressReporter(self)
     reporter.report("Iniciando procesamento con letras manuais...", 0)
 
+    if source_type == "youtube":
+        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
+
+        reporter.report("Descargando vídeo de YouTube...", 2)
+        video_path = download_youtube(source_url)
+
     config = JobConfig(
         video_path=Path(video_path),
         task_id=task_id,
@@ -106,6 +118,12 @@ def process_instrumental_only(
     task_id = self.request.id
     reporter = CeleryProgressReporter(self)
     reporter.report("Xerando instrumental...", 0)
+
+    if source_type == "youtube":
+        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
+
+        reporter.report("Descargando vídeo de YouTube...", 2)
+        video_path = download_youtube(source_url)
 
     config = JobConfig(
         video_path=Path(video_path),

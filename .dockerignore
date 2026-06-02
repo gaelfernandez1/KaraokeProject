@@ -1,0 +1,67 @@
+# Keep the build context small and reproducible. The worker/whisperx images
+# use `COPY . /KaraokeProject`, so anything not excluded here ends up in them.
+
+# Version control and CI
+.git
+.github
+.gitignore
+.pre-commit-config.yaml
+
+# Python caches and build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+ENV/
+
+# Local env and secrets
+.env
+.env.*
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Docs and project meta not needed at runtime
+docs/
+Memoria/
+README.md
+CLAUDE.md
+CONTRIBUTING.md
+
+# Test suite (runs in CI, not inside runtime images)
+tests/
+fixtures/
+
+# Local data and generated media
+db/
+input/
+output/
+separated/
+stems/
+*.mp4
+*.mp3
+*.wav
+*.srt
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Claude tooling
+.claude/

@@ -21,10 +21,7 @@ core = [
     "celery==5.3.4",
     "redis==5.0.1",
     "flask-limiter==3.5.0",
-    "yt-dlp==2024.8.6",
-    "numpy==1.26.4",
     "requests==2.32.3",
-    "Pillow==10.0.1",
     "pyphen==0.14.0",
     "setuptools==69.5.1",
     "wheel==0.43.0",
@@ -36,9 +33,21 @@ core = [
     "psycopg[binary]>=3.1",
 ]
 
-# Demucs/Celery worker container: GPU, audio separation, video rendering
+# Thin web container: Flask app server on top of the shared core layer.
+# gunicorn lives here only — the worker runs Celery, not an HTTP server.
+web = [
+    "karaoke[core]",
+    "gunicorn==22.0.0",
+]
+
+# Demucs/Celery worker container: GPU, audio separation, video rendering.
+# numpy/Pillow/yt-dlp live here, not in core: the thin web image never imports
+# them (yt-dlp downloads run in the worker, which has ffmpeg).
 worker = [
     "karaoke[core]",
+    "yt-dlp==2024.8.6",
+    "numpy==1.26.4",
+    "Pillow==10.0.1",
     "torch==2.3.0",
     "torchaudio==2.3.0",
     "torchvision==0.18.0",

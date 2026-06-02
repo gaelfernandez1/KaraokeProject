@@ -1,0 +1,52 @@
+# Thin web image: Flask API + Celery client. No torch/demucs/moviepy/ffmpeg/yt-dlp.
+# Those live in the worker (YouTube download included), so this stays small.
+#
+# Two stages: the builder carries compilers for any sdist-only deps; the runtime
+# only ships ca-certificates plus the site-packages copied from the builder.
+
+FROM python:3.10-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /KaraokeProject
+
+# Install the third-party deps against an empty package stub so editing source
+# code doesn't bust this (expensive) layer — only a pyproject.toml change does.
+COPY pyproject.toml ./
+RUN mkdir -p src/karaoke && touch src/karaoke/__init__.py
+RUN pip install -e ".[web]"
+
+
+FROM python:3.10-slim AS runtime
+
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /KaraokeProject
+
+# Bring over the installed packages and console scripts (gunicorn). The editable
+# .pth points at /KaraokeProject/src, which the COPY below fills with real code.
+COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+COPY pyproject.toml ./
+COPY src/ ./src/
+COPY templates/ ./templates/
+COPY static/ ./static/
+
+RUN mkdir -p input output
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=4).read()" || exit 1
+
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "-w", "2", "--timeout", "120", "karaoke.api.app:app"]

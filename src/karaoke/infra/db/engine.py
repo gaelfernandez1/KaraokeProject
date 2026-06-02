@@ -7,6 +7,7 @@ from functools import lru_cache
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import OperationalError, ProgrammingError
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -61,4 +62,9 @@ def init_db() -> None:
     Alembic owns schema migrations; this is a dev/test convenience that is a
     no-op once the tables exist (checkfirst). Production runs `alembic upgrade head`.
     """
-    Base.metadata.create_all(bind=get_engine())
+    try:
+        Base.metadata.create_all(bind=get_engine())
+    except (OperationalError, ProgrammingError):
+        # gunicorn boots several workers at once; checkfirst isn't atomic across
+        # processes, so whoever loses the create race just finds the tables there.
+        logger.info("init_db: tables already present (concurrent worker boot)")

@@ -1,7 +1,5 @@
 import logging
 
-import torch
-
 logger = logging.getLogger(__name__)
 
 
@@ -16,6 +14,13 @@ def detect_gpu_capability():
         "cuda_version": None,
         "gpu_name": "Unknown",
     }
+
+    try:
+        import torch  # noqa: PLC0415
+    except ImportError:
+        # The slim web image ships without torch; treat it as a CPU-only host.
+        logger.info("torch not installed, assuming CPU-only host")
+        return gpu_info
 
     try:
         gpu_info["cuda_available"] = torch.cuda.is_available()
@@ -68,6 +73,8 @@ def get_optimal_demucs_args(gpu_info):
 def test_cuda_functionality():
 
     try:
+        import torch  # noqa: PLC0415
+
         if torch.cuda.is_available():
             x = torch.randn(100, 100).cuda()
             y = torch.matmul(x, x)
@@ -87,9 +94,16 @@ def get_system_info():
 
     gpu_info = detect_gpu_capability()
 
+    try:
+        import torch  # noqa: PLC0415
+
+        pytorch_version = torch.__version__
+    except ImportError:
+        pytorch_version = None
+
     system_info = {
         "gpu_info": gpu_info,
-        "pytorch_version": torch.__version__,
+        "pytorch_version": pytorch_version,
         "cuda_test_passed": False,
     }
 
