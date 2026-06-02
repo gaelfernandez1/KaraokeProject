@@ -29,6 +29,7 @@ def save_song(session: Session, song_data: dict[str, Any]) -> int:
         file_size=song_data.get("file_size"),
         duration=song_data.get("duration"),
         user_id=song_data.get("user_id"),
+        storage_key=song_data.get("storage_key"),
     )
     session.add(song)
     session.flush()

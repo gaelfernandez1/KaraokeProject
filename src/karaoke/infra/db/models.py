@@ -44,6 +44,9 @@ class Song(Base):
     last_played: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     # Becomes a real FK to users.id in Fase 10; nullable plain column for now.
     user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    # Storage key in the configured backend (e.g. "karaoke/{task_id}/{filename}").
+    # NULL for rows created before Fase 8.
+    storage_key: Mapped[str | None] = mapped_column(String, nullable=True)
 
     def to_dict(self) -> dict[str, Any]:
         return {
