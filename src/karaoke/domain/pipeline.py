@@ -35,6 +35,7 @@ class JobConfig:
     hf_token: str | None = None
     whisper_model: str = "small"
     save_to_db: bool = True
+    user_id: str | None = None
     language: str | None = None
     output_dir: Path = field(default_factory=lambda: Path("./output"))
     work_dir: Path = field(default_factory=lambda: Path("/data"))
@@ -336,6 +337,7 @@ class KaraokeJob:
             return
         try:
             metadata["storage_key"] = storage_key
+            metadata["user_id"] = self.config.user_id
             with session_scope() as session:
                 song_id = save_song(session, metadata)
             logger.info(f"Song saved to database with ID: {song_id}")
@@ -487,6 +489,7 @@ class InstrumentalJob:
                 "file_size": file_size,
                 "duration": duration,
                 "storage_key": storage_key,
+                "user_id": self.config.user_id,
             }
             with session_scope() as session:
                 save_song(session, song_data)

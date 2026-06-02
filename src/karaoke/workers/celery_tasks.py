@@ -22,6 +22,7 @@ def process_automatic_karaoke(
     source_type: str = "upload",
     source_url: str | None = None,
     save_to_db: bool = True,
+    user_id: str | None = None,
 ):
     task_id = self.request.id
     reporter = CeleryProgressReporter(self)
@@ -42,6 +43,7 @@ def process_automatic_karaoke(
         hf_token=hf_token,
         whisper_model=whisper_model,
         save_to_db=save_to_db,
+        user_id=user_id,
         work_dir=Path("/data"),
         storage=get_storage(Settings()),
     )
@@ -70,6 +72,7 @@ def process_manual_lyrics_karaoke(
     source_type: str = "upload",
     source_url: str | None = None,
     save_to_db: bool = True,
+    user_id: str | None = None,
 ):
     task_id = self.request.id
     reporter = CeleryProgressReporter(self)
@@ -90,6 +93,7 @@ def process_manual_lyrics_karaoke(
         hf_token=hf_token,
         whisper_model=whisper_model,
         save_to_db=save_to_db,
+        user_id=user_id,
         work_dir=Path("/data"),
         storage=get_storage(Settings()),
     )
@@ -118,6 +122,7 @@ def process_instrumental_only(
     source_type: str = "upload",
     source_url: str | None = None,
     save_to_db: bool = True,
+    user_id: str | None = None,
 ):
     task_id = self.request.id
     reporter = CeleryProgressReporter(self)
@@ -135,6 +140,7 @@ def process_instrumental_only(
         source_type=source_type,
         source_url=source_url,
         save_to_db=save_to_db,
+        user_id=user_id,
         work_dir=Path("/data"),
         storage=get_storage(Settings()),
     )

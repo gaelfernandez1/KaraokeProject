@@ -235,8 +235,8 @@
             <i class="fas fa-list"></i> {% trans %}Ver toda a biblioteca{% endtrans %}
         </a>
     {% else %}
-        <h3>{% trans %}A biblioteca está baleira{% endtrans %}</h3>
-        <p class="text-muted">{% trans %}Aínda non tes cancións gardadas. Crea a túa primeira canción de karaoke!{% endtrans %}</p>
+        <h3>{% trans %}Aínda non tes cancións{% endtrans %}</h3>
+        <p class="text-muted">{% trans %}Benvido/a! Aínda non gardaches ningunha canción. Crea a túa primeira canción de karaoke!{% endtrans %}</p>
         <a href="{{ url_for('generation.inicio') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> {% trans %}Crear Karaoke{% endtrans %}
         </a>
@@ -251,6 +251,7 @@
 </div>
 
 <form id="deleteForm" method="POST" style="display: none;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="_method" value="POST">
 </form>
 

@@ -512,6 +512,40 @@ class TestInstrumentalJob:
 
 
 # ---------------------------------------------------------------------------
+# Owner attribution
+# ---------------------------------------------------------------------------
+
+
+class TestPersistUserId:
+    def test_persist_attaches_user_id_to_saved_song(self, monkeypatch, tmp_path):
+        captured: dict = {}
+        monkeypatch.setattr(
+            "karaoke.domain.pipeline.save_song",
+            lambda session, metadata: captured.update(metadata) or 1,
+        )
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        (output_dir / "karaoke_small_song.mp4").write_bytes(b"video")
+
+        config = JobConfig(
+            video_path=tmp_path / "song.mp4",
+            task_id="persist-1",
+            output_dir=output_dir,
+            work_dir=tmp_path,
+            user_id="user-xyz",
+        )
+        job = KaraokeJob(
+            config=config, strategy=AutomaticAlignment(), reporter=NoopProgressReporter()
+        )
+        job.artifacts.karaoke_filename = "karaoke_small_song.mp4"
+        job.artifacts.video_path = tmp_path / "song.mp4"
+
+        job._persist()
+
+        assert captured["user_id"] == "user-xyz"
+
+
+# ---------------------------------------------------------------------------
 # Syllabification language resolution
 # ---------------------------------------------------------------------------
 

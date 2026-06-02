@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
 from karaoke.infra.db import session_scope
 from karaoke.infra.db.repository import (
@@ -57,11 +58,12 @@ def _delete_song_artifacts(settings, song) -> None:
 
 
 @bp.route("/library")
+@login_required
 def biblioteca_cancions():
     try:
         with session_scope() as session:
-            songs = [s.to_dict() for s in get_all_songs(session)]
-            stats = get_database_stats(session)
+            songs = [s.to_dict() for s in get_all_songs(session, user_id=current_user.id)]
+            stats = get_database_stats(session, user_id=current_user.id)
 
         for song in songs:
             song["formatted_file_size"] = format_file_size(song["file_size"] or 0)
@@ -74,6 +76,7 @@ def biblioteca_cancions():
 
 
 @bp.route("/library/search")
+@login_required
 def buscar_cancions():
     query = request.args.get("q", "").strip()
     if not query:
@@ -81,7 +84,9 @@ def buscar_cancions():
 
     try:
         with session_scope() as session:
-            songs = [s.to_dict() for s in get_songs_by_search(session, query)]
+            songs = [
+                s.to_dict() for s in get_songs_by_search(session, query, user_id=current_user.id)
+            ]
 
         for song in songs:
             song["formatted_file_size"] = format_file_size(song["file_size"] or 0)
@@ -94,6 +99,7 @@ def buscar_cancions():
 
 
 @bp.route("/library/play/<int:song_id>")
+@login_required
 def reproducir_dende_biblioteca(song_id):
     settings = current_app.config["APP_SETTINGS"]
     try:
@@ -101,6 +107,8 @@ def reproducir_dende_biblioteca(song_id):
             song = get_song_by_id(session, song_id)
             if not song:
                 return "Canción non encontrada", 404
+            if song.user_id != current_user.id:
+                abort(403)
 
             karaoke_filename = song.karaoke_filename
             if settings.storage_backend == "r2":
@@ -120,6 +128,7 @@ def reproducir_dende_biblioteca(song_id):
 
 
 @bp.route("/library/delete/<int:song_id>", methods=["POST"])
+@login_required
 def borrar_cancion_biblioteca(song_id):
     settings = current_app.config["APP_SETTINGS"]
     try:
@@ -127,6 +136,8 @@ def borrar_cancion_biblioteca(song_id):
             song = get_song_by_id(session, song_id)
             if not song:
                 return "Canción non encontrada na bib", 404
+            if song.user_id != current_user.id:
+                abort(403)
 
             title = song.title
             _delete_song_artifacts(settings, song)

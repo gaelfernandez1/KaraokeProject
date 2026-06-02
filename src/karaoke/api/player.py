@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Blueprint, abort, current_app, redirect, render_template, send_file
+from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,17 @@ logger = logging.getLogger(__name__)
 bp = Blueprint("player", __name__)
 
 DIRECTORIO_SAIDA = "output"
+
+
+def _require_owns_file(filename: str) -> None:
+    """403 unless the current user owns the song that any of whose artifacts is filename."""
+    from karaoke.infra.db import session_scope  # noqa: PLC0415
+    from karaoke.infra.db.repository import get_song_owning_file  # noqa: PLC0415
+
+    with session_scope() as session:
+        song = get_song_owning_file(session, filename)
+        if song is None or song.user_id != current_user.id:
+            abort(403)
 
 
 def _signed_url_for(settings, filename: str) -> str | None:
@@ -45,7 +57,9 @@ def _local_path(filename: str) -> str | None:
 
 
 @bp.route("/player/<filename>")
+@login_required
 def reproductor_karaoke(filename):
+    _require_owns_file(filename)
     settings = current_app.config["APP_SETTINGS"]
     if settings.storage_backend == "r2":
         if _signed_url_for(settings, filename) is None:
@@ -64,7 +78,9 @@ def reproductor_karaoke(filename):
 
 
 @bp.route("/serve_video/<filename>")
+@login_required
 def servir_video(filename):
+    _require_owns_file(filename)
     settings = current_app.config["APP_SETTINGS"]
     if settings.storage_backend == "r2":
         url = _signed_url_for(settings, filename)
@@ -79,7 +95,9 @@ def servir_video(filename):
 
 
 @bp.route("/serve_audio/<filename>")
+@login_required
 def servir_audio(filename):
+    _require_owns_file(filename)
     settings = current_app.config["APP_SETTINGS"]
     if settings.storage_backend == "r2":
         url = _signed_url_for(settings, filename)
@@ -94,7 +112,9 @@ def servir_audio(filename):
 
 
 @bp.route("/download/<filename>")
+@login_required
 def descargar_archivo(filename):
+    _require_owns_file(filename)
     settings = current_app.config["APP_SETTINGS"]
     if settings.storage_backend == "r2":
         url = _signed_url_for(settings, filename)
