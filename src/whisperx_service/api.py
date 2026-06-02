@@ -1,4 +1,3 @@
-import math
 import os
 import ssl
 
@@ -12,19 +11,11 @@ from whisperx_service.speaker_diarization import (
     merge_transcription_with_speakers,
     perform_speaker_diarization,
 )
+from whisperx_service.srt_builder import build_word_srt
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 app = Flask(__name__)
-
-
-def sec2tc(sec_float):
-    ms = int(math.floor(sec_float * 1000))
-    hh = ms // 3600000
-    mm = (ms % 3600000) // 60000
-    ss = (ms % 60000) // 1000
-    ms = ms % 1000
-    return f"{hh:02}:{mm:02}:{ss:02},{ms:03}"
 
 
 def get_duration(audio_file):
@@ -124,29 +115,12 @@ def align_endpoint():
             print(f"Error en speaker diarization: {e}")
             # Continuar sin diarization
 
-    # Crear srt final a nivel de palabra (con speaker info se hai)
+    # Crear srt final a nivel de palabra (con speaker info se hai). Saltanse as
+    # palabras que whisperx non puido aliñar (sen start/end) en lugar de petar.
+    srt_content = build_word_srt(segmentos_palabras, speaker_colors)
     ruta_srt = ruta_audio.replace(".wav", f"_whisperx_{whisper_model}.srt")
-    srt_blocks: list[str] = []
     with open(ruta_srt, "w", encoding="utf-8") as f:
-        indice = 1
-        for seg in segmentos_palabras:
-            if "word" not in seg:
-                continue
-            texto = seg["word"].strip()
-            inicio = seg["start"]
-            fin = seg["end"]
-
-            if "speaker" in seg and speaker_colors:
-                speaker_id = seg["speaker"]
-                color = speaker_colors.get(speaker_id, "#FFFFFF")
-                texto = f"{speaker_id}|{color}|{texto}"
-
-            bloque = f"{indice}\n{sec2tc(inicio)} --> {sec2tc(fin)}\n{texto}\n\n"
-            f.write(bloque)
-            srt_blocks.append(bloque)
-            indice += 1
-
-    srt_content = "".join(srt_blocks)
+        f.write(srt_content)
     response_data = {
         "srt_content": srt_content,
         "detected_language": codigo_idioma,
