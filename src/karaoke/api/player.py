@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Blueprint, abort, render_template, send_file
+from flask import Blueprint, abort, redirect, render_template, send_file
 from werkzeug.utils import secure_filename
 
 logger = logging.getLogger(__name__)
@@ -30,6 +30,22 @@ def reproductor_karaoke(filename):
 
 @bp.route("/serve_video/<filename>")
 def servir_video(filename):
+    from flask import current_app  # noqa: PLC0415
+
+    settings = current_app.config["APP_SETTINGS"]
+
+    if settings.storage_backend == "r2":
+        from karaoke.infra.db import session_scope  # noqa: PLC0415
+        from karaoke.infra.db.repository import get_song_by_filename  # noqa: PLC0415
+        from karaoke.infra.storage import get_storage  # noqa: PLC0415
+
+        with session_scope() as session:
+            song = get_song_by_filename(session, filename)
+        if song is None or song.storage_key is None:
+            abort(404)
+        signed_url = get_storage(settings).get_signed_url(song.storage_key)
+        return redirect(signed_url, 302)
+
     safe_name = secure_filename(filename)
     if not safe_name:
         return "Arquivo non encontrado", 404
@@ -44,6 +60,7 @@ def servir_video(filename):
 
 @bp.route("/serve_audio/<filename>")
 def servir_audio(filename):
+    # TODO F8+: redirect to R2 signed URL when stems are uploaded to storage backend
     safe_name = secure_filename(filename)
     if not safe_name:
         return "Arquivo non encontrado", 404
@@ -58,6 +75,7 @@ def servir_audio(filename):
 
 @bp.route("/download/<filename>")
 def descargar_archivo(filename):
+    # TODO F8+: redirect to R2 signed URL when all output files are uploaded to storage backend
     safe_name = secure_filename(filename)
     if not safe_name:
         return "Arquivo non encontrado", 404

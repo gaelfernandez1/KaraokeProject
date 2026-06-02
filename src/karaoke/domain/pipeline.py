@@ -18,6 +18,7 @@ from karaoke.domain.srt_processing import parse_word_srt
 from karaoke.domain.strategies import AlignmentStrategy
 from karaoke.infra.db import session_scope
 from karaoke.infra.db.repository import save_song
+from karaoke.infra.storage import LocalStorage, Storage
 from karaoke.infra.utils import sanitize_filename
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class JobConfig:
     save_to_db: bool = True
     output_dir: Path = field(default_factory=lambda: Path("./output"))
     work_dir: Path = field(default_factory=lambda: Path("/data"))
+    storage: Storage = field(default_factory=LocalStorage)
 
 
 @dataclass
@@ -279,10 +281,18 @@ class KaraokeJob:
     def _persist(self) -> None:
         from karaoke.infra.metadata_utils import generate_song_metadata  # noqa: PLC0415
 
-        if not self.config.save_to_db:
-            return
         assert self.artifacts.karaoke_filename is not None
         assert self.artifacts.video_path is not None
+
+        local_path = self.config.output_dir / self.artifacts.karaoke_filename
+        storage_key = f"karaoke/{self.config.task_id}/{self.artifacts.karaoke_filename}"
+        try:
+            self.config.storage.upload(local_path, storage_key)
+        except Exception as e:
+            logger.error(f"Storage upload failed (non-fatal): {e}")
+
+        if not self.config.save_to_db:
+            return
         try:
             processing_type = "manual_lyrics" if self.strategy.is_manual_lyrics else "automatic"
             manual_lyrics = (
@@ -305,6 +315,7 @@ class KaraokeJob:
                 whisper_model=self.config.whisper_model,
                 output_dir=str(self.config.output_dir),
             )
+            metadata["storage_key"] = storage_key
             with session_scope() as session:
                 song_id = save_song(session, metadata)
             logger.info(f"Song saved to database with ID: {song_id}")

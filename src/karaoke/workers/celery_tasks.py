@@ -1,9 +1,11 @@
 import logging
 from pathlib import Path
 
+from karaoke.config import Settings
 from karaoke.domain.errors import JobCancelled, PipelineError
 from karaoke.domain.pipeline import InstrumentalJob, JobConfig, KaraokeJob
 from karaoke.domain.strategies import AutomaticAlignment, ManualLyricsAlignment
+from karaoke.infra.storage import get_storage
 from karaoke.workers.celery_app import celery
 from karaoke.workers.progress import CeleryProgressReporter
 
@@ -41,6 +43,7 @@ def process_automatic_karaoke(
         whisper_model=whisper_model,
         save_to_db=save_to_db,
         work_dir=Path("/data"),
+        storage=get_storage(Settings()),
     )
     job = KaraokeJob(config=config, strategy=AutomaticAlignment(), reporter=reporter)
 
@@ -88,6 +91,7 @@ def process_manual_lyrics_karaoke(
         whisper_model=whisper_model,
         save_to_db=save_to_db,
         work_dir=Path("/data"),
+        storage=get_storage(Settings()),
     )
     strategy = ManualLyricsAlignment(lyrics=manual_lyrics, language=language)
     job = KaraokeJob(config=config, strategy=strategy, reporter=reporter)
@@ -132,6 +136,7 @@ def process_instrumental_only(
         source_url=source_url,
         save_to_db=save_to_db,
         work_dir=Path("/data"),
+        storage=get_storage(Settings()),
     )
     job = InstrumentalJob(config=config, reporter=reporter)
 
