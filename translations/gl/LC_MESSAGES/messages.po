@@ -1,0 +1,190 @@
+# Galician translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-06-02 16:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: gl\n"
+"Language-Team: gl <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: templates/templates/base.html:30
+msgid "Inicio"
+msgstr "Inicio"
+
+#: templates/templates/base.html:33 templates/templates/index.html:103
+msgid "Letra Manual"
+msgstr "Letra Manual"
+
+#: templates/templates/base.html:36
+msgid "Biblioteca"
+msgstr "Biblioteca"
+
+#: templates/templates/base.html:59
+msgid "Creación automática de vídeos de karaoke con IA"
+msgstr "Creación automática de vídeos de karaoke con IA"
+
+#: templates/templates/base.html:67
+msgid "Procesando a túa solicitude..."
+msgstr "Procesando a túa solicitude..."
+
+#: templates/templates/index.html:5
+msgid "Creación Automática de Karaoke"
+msgstr "Creación Automática de Karaoke"
+
+#: templates/templates/index.html:6
+msgid "Xera vídeos de karaoke utilizando intelixencia artificial para transcribir e sincronizar letras"
+msgstr "Xera vídeos de karaoke utilizando intelixencia artificial para transcribir e sincronizar letras"
+
+#: templates/templates/index.html:12
+msgid "Transcrición Automática"
+msgstr "Transcrición Automática"
+
+#: templates/templates/index.html:19 templates/templates/index.html:138
+msgid "URL de YouTube"
+msgstr "URL de YouTube"
+
+#: templates/templates/index.html:29
+msgid "ou"
+msgstr "ou"
+
+#: templates/templates/index.html:31
+msgid "Subir vídeo MP4"
+msgstr "Subir vídeo MP4"
+
+#: templates/templates/index.html:49
+msgid "Modelo de Whisper para transcrición"
+msgstr "Modelo de Whisper para transcrición"
+
+#: templates/templates/index.html:69
+msgid "Diferenciación de voces (Speaker Diarization)"
+msgstr "Diferenciación de voces (Speaker Diarization)"
+
+#: templates/templates/index.html:73
+msgid "Detectar distintos cantantes e colorealos de forma diferente"
+msgstr "Detectar distintos cantantes e colorealos de forma diferente"
+
+#: templates/templates/index.html:94
+msgid "Procesar Automáticamente"
+msgstr "Procesar Automáticamente"
+
+#: templates/templates/index.html:106
+msgid "Xa tes a letra da canción? Proporciona o texto e o sistema encargarase de sincronizalo co audio para crear un karaoke perfecto."
+msgstr "Xa tes a letra da canción? Proporciona o texto e o sistema encargarase de sincronizalo co audio para crear un karaoke perfecto."
+
+#: templates/templates/index.html:110
+msgid "Ideal para cancións en idiomas menos comúns"
+msgstr "Ideal para cancións en idiomas menos comúns"
+
+#: templates/templates/index.html:115
+msgid "Usar Letra Manual"
+msgstr "Usar Letra Manual"
+
+#: templates/templates/index.html:129
+msgid "Obtén a Instrumental"
+msgstr "Obtén a Instrumental"
+
+#: templates/templates/index.html:132
+msgid "Extrae únicamente a parte instrumental dunha canción"
+msgstr "Extrae únicamente a parte instrumental dunha canción"
+
+#: templates/templates/index.html:171
+msgid "Xerar Instrumental"
+msgstr "Xerar Instrumental"
+
+#: templates/templates/library.html:6
+msgid "Biblioteca de cancións"
+msgstr "Biblioteca de cancións"
+
+#: templates/templates/library.html:7
+msgid "Tódas as túas cancións de karaoke gardadas"
+msgstr "Tódas as túas cancións de karaoke gardadas"
+
+#: templates/templates/library.html:62
+msgid "Buscar cancións por título..."
+msgstr "Buscar cancións por título..."
+
+#: templates/templates/library.html:66
+msgid "Buscar"
+msgstr "Buscar"
+
+#: templates/templates/library.html:232
+msgid "Non se encontraron cancións"
+msgstr "Non se encontraron cancións"
+
+#: templates/templates/library.html:233
+msgid "Non hai cancións que coincidan coa búsqueda."
+msgstr "Non hai cancións que coincidan coa búsqueda."
+
+#: templates/templates/library.html:235
+msgid "Ver toda a biblioteca"
+msgstr "Ver toda a biblioteca"
+
+#: templates/templates/library.html:238
+msgid "A biblioteca está baleira"
+msgstr "A biblioteca está baleira"
+
+#: templates/templates/library.html:239
+msgid "Aínda non tes cancións gardadas. Crea a túa primeira canción de karaoke!"
+msgstr "Aínda non tes cancións gardadas. Crea a túa primeira canción de karaoke!"
+
+#: templates/templates/library.html:241
+msgid "Crear Karaoke"
+msgstr "Crear Karaoke"
+
+#: templates/templates/library.html:249
+msgid "Volver ao inicio"
+msgstr "Volver ao inicio"
+
+#: templates/templates/manual_lyrics_form.html:5
+msgid "Karaoke con Letra Manual"
+msgstr "Karaoke con Letra Manual"
+
+#: templates/templates/manual_lyrics_form.html:6
+msgid "Proporciona a letra da canción"
+msgstr "Proporciona a letra da canción"
+
+#: templates/templates/manual_lyrics_form.html:124
+msgid "Crear Vídeo de Karaoke"
+msgstr "Crear Vídeo de Karaoke"
+
+#: templates/templates/manual_lyrics_form.html:136
+#: templates/templates/player.html:90 templates/templates/progress.html:43
+msgid "Volver ao Inicio"
+msgstr "Volver ao Inicio"
+
+#: templates/templates/player.html:5
+msgid "Reproductor de Karaoke"
+msgstr "Reproductor de Karaoke"
+
+#: templates/templates/player.html:6
+msgid "Controla o volume das voces"
+msgstr "Controla o volume das voces"
+
+#: templates/templates/progress.html:6
+msgid "Procesando canción"
+msgstr "Procesando canción"
+
+#: templates/templates/progress.html:7
+msgid "Agarda mentres se crea o teu karaoke..."
+msgstr "Agarda mentres se crea o teu karaoke..."
+
+#: templates/templates/progress.html:35
+msgid "Cancelar procesamento"
+msgstr "Cancelar procesamento"
+
+#: templates/templates/progress.html:39
+msgid "Ir ó Resultado"
+msgstr "Ir ó Resultado"
+

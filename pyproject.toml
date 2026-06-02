@@ -21,6 +21,7 @@ core = [
     "celery==5.3.4",
     "redis==5.0.1",
     "flask-limiter==3.5.0",
+    "flask-babel>=3.0",
     "requests==2.32.3",
     "pyphen==0.14.0",
     "setuptools==69.5.1",

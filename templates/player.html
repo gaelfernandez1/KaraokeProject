@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+  {# TODO(F9): i18n remaining strings (volume labels, download buttons, JS confirms) #}
   <div class="page-header text-center">
-    <h1>Reproductor de Karaoke</h1>
-    <p class="lead"> Controla o volume das voces</p>
+    <h1>{% trans %}Reproductor de Karaoke{% endtrans %}</h1>
+    <p class="lead"> {% trans %}Controla o volume das voces{% endtrans %}</p>
   </div>
 
   <div class="row">
@@ -86,7 +87,7 @@
 
   <div class="text-center mt-4">
     <a href="{{ url_for('generation.inicio') }}" class="btn btn-outline-dark" id="backToHomeBtn">
-      <i class="fas fa-home"></i> Volver ao Inicio
+      <i class="fas fa-home"></i> {% trans %}Volver ao Inicio{% endtrans %}
     </a>
   </div>
 

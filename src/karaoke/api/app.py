@@ -41,12 +41,17 @@ def create_app() -> Flask:
 
     from karaoke.api.generation import bp as generation_bp
     from karaoke.api.health import bp as health_bp
+    from karaoke.api.i18n import bp as i18n_bp
+    from karaoke.api.i18n import configure_babel
     from karaoke.api.library import bp as library_bp
     from karaoke.api.player import bp as player_bp
     from karaoke.api.tasks import bp as tasks_bp
 
+    configure_babel(flask_app)
+
     flask_app.register_blueprint(generation_bp)
     flask_app.register_blueprint(health_bp)
+    flask_app.register_blueprint(i18n_bp)
     flask_app.register_blueprint(library_bp)
     flask_app.register_blueprint(player_bp)
     flask_app.register_blueprint(tasks_bp)
