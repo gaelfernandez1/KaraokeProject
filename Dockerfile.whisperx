@@ -1,4 +1,8 @@
-# O dockerfile para a parte de whisperx. Actualizado con dependencias fijas. Teño documentado o por qué de cada versión, por se fose necesario para a memoria
+# WhisperX service image: transcription + forced alignment over HTTP on :5001.
+# Teño documentado o por qué de cada versión, por se fose necesario para a memoria.
+#
+# Layer order matters: third-party deps install against an empty package stub, so a
+# code change only busts the final `COPY .` — never the expensive dependency layers.
 FROM pytorch/pytorch:2.3.0-cuda11.8-cudnn8-devel
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -23,8 +27,12 @@ RUN pip install --no-cache-dir --upgrade \
     setuptools==69.5.1 \
     wheel==0.43.0
 
+# Only pyproject.toml + an empty package stub before the dependency install, so
+# editing source code below doesn't invalidate the conda/av/pip layers. The real
+# code arrives with `COPY .` at the end; the editable install picks it up.
 COPY pyproject.toml /KaraokeProject/
-COPY src/ /KaraokeProject/src/
+RUN mkdir -p src/karaoke src/whisperx_service \
+    && touch src/karaoke/__init__.py src/whisperx_service/__init__.py
 
 # faster-whisper 1.0.1 hard-pins av==11.*, and PyAV 11 ships no wheel for
 # cp310, so pip must build it from source. PyAV 11 also needs FFmpeg >= 5
@@ -48,4 +56,8 @@ COPY . /KaraokeProject
 RUN mkdir -p /data
 
 EXPOSE 5001
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5001/health', timeout=4).read()" || exit 1
+
 CMD ["python", "-m", "whisperx_service.api"]

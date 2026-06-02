@@ -3,8 +3,6 @@ import re
 from typing import Dict
 from urllib.parse import parse_qs, urlparse
 
-from moviepy.editor import VideoFileClip
-
 
 # extrae un titulo limpo do nome do archivo
 def extract_title_from_filename(filename: str) -> str:
@@ -30,6 +28,10 @@ def extract_youtube_title_from_url(url: str) -> str | None:
 
 
 def get_video_duration(video_path: str) -> float | None:
+    # moviepy lives only in the worker image; import lazily so the slim web
+    # image can import this module for format_duration/format_file_size.
+    from moviepy.editor import VideoFileClip  # noqa: PLC0415
+
     try:
         with VideoFileClip(video_path) as video:
             return video.duration

@@ -2,7 +2,6 @@ import logging
 import os
 import time
 
-import psutil
 from celery import Celery
 from celery.signals import task_failure, task_postrun, task_prerun, task_revoked
 
@@ -68,6 +67,9 @@ def task_failure_handler(task_id, exception, einfo, *args, **kwargs):
 
 @task_revoked.connect
 def task_revoked_handler(task_id, *args, **kwargs):
+    # psutil lives in the worker image only; this handler only ever fires there.
+    import psutil  # noqa: PLC0415
+
     logger.info(f"Tarefa cancelada {task_id}", extra={"task_id": task_id})
     if task_id in active_processes:
         try:

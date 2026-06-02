@@ -90,8 +90,6 @@ stems/
 *.log
 logs/
 
-.dockerignore
-
 temp-audio.m4a
 *.tmp
 *.temp

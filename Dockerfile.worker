@@ -1,8 +1,10 @@
-# Dockerfile para demucs basicamente.
+# Celery worker image: Demucs source separation + MoviePy rendering + faster-whisper.
 #ESENCIAL. Hai masivos problemas de compatibilidad entre as ferramentas usadas. Incompatibilidades con docker, cuda, demucs, whisperx...
 #Tuven que aislar dependencias e facer un monton de combinacions hasta encontrar unha que funcionara. Quizais se poda simplificar.
-
-# Dockerfile para demucs. Actualizado con fijacion de dependencias
+#
+# Layer order matters: third-party deps (conda ffmpeg, av, pip) install against an
+# empty package stub, so a code change only busts the final `COPY .` — never the
+# expensive dependency layers.
 FROM pytorch/pytorch:2.3.0-cuda11.8-cudnn8-devel
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -10,8 +12,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV MKL_SERVICE_FORCE_INTEL=1
 ENV MKL_THREADING_LAYER=INTEL
 ENV OMP_NUM_THREADS=1
-
-ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -40,7 +40,7 @@ RUN add-apt-repository ppa:savoury1/ffmpeg4 -y || true && \
         pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
-#Esto parchea policy.xml de imagemagick. Necesario porque daba error. 
+#Esto parchea policy.xml de imagemagick. Necesario porque daba error.
 #https://legacy.imagemagick.org/discourse-server/viewtopic.php?t=26801
 RUN sed -i 's|<policy domain="path" rights="none" pattern="@\*"/>|<!-- <policy domain="path" rights="none" pattern="@*"/> -->|' /etc/ImageMagick-6/policy.xml || true
 
@@ -51,8 +51,12 @@ RUN pip install --no-cache-dir --upgrade \
     setuptools==69.5.1 \
     wheel==0.43.0
 
+# Only pyproject.toml + an empty package stub before the dependency install, so
+# editing source code below doesn't invalidate the conda/av/pip layers. The real
+# code arrives with `COPY .` at the end; the editable install picks it up.
 COPY pyproject.toml /KaraokeProject/
-COPY src/ /KaraokeProject/src/
+RUN mkdir -p src/karaoke src/whisperx_service \
+    && touch src/karaoke/__init__.py src/whisperx_service/__init__.py
 
 # The worker pulls faster-whisper==1.0.1, which hard-pins av==11.*. PyAV 11
 # ships no cp310 wheel, so pip builds it from source, and it needs FFmpeg >= 5
@@ -60,7 +64,7 @@ COPY src/ /KaraokeProject/src/
 # old. The base image's default conda channels already ship ffmpeg 6.1.1, so
 # install from there (not conda-forge, whose huge repodata OOMs Docker Desktop
 # when images build in parallel) and build av against it before the editable
-# install picks it up. Same approach as Dockerfile.B.
+# install picks it up. Same approach as Dockerfile.whisperx.
 RUN conda install --solver=libmamba "ffmpeg=6" -y && conda clean -a -y
 RUN PKG_CONFIG_PATH=/opt/conda/lib/pkgconfig \
     pip install --no-cache-dir "av==11.*"
@@ -71,5 +75,9 @@ COPY . /KaraokeProject
 
 RUN mkdir -p /data /KaraokeProject/input /KaraokeProject/output /KaraokeProject/separated
 
-EXPOSE 5000
-CMD ["python", "-m", "karaoke.api.app"]
+# The MainProcess answers control pings even while the pool is busy, so this stays
+# green during long jobs. Generous start period: importing the worker is slow.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD celery -A karaoke.workers.celery_app inspect ping --timeout 8.0 || exit 1
+
+CMD ["celery", "-A", "karaoke.workers.celery_app", "worker", "--loglevel=info"]
