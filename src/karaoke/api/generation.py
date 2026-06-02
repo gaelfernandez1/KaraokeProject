@@ -1,8 +1,10 @@
 import os
 
 from flask import Blueprint, redirect, render_template, request, session, url_for
+from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
+from karaoke.infra.task_ownership import record_task_owner
 from karaoke.workers.celery_tasks import (
     process_automatic_karaoke,
     process_instrumental_only,
@@ -47,6 +49,7 @@ def inicio():
 
 # asincronia
 @bp.route("/generate", methods=["POST"])
+@login_required
 def xerar_karaoke():
     arquivo_subido = request.files.get("video_file")
     if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
@@ -68,9 +71,17 @@ def xerar_karaoke():
     ).strip()  # para poder elixir modelo de whisper na interface
 
     task = process_automatic_karaoke.delay(
-        ruta_video, enable_diarization, hf_token, whisper_model, source_type, source_url, True
+        ruta_video,
+        enable_diarization,
+        hf_token,
+        whisper_model,
+        source_type,
+        source_url,
+        True,
+        current_user.id,
     )
 
+    record_task_owner(task.id, current_user.id)
     session["current_task_id"] = task.id
     session["task_type"] = "automatic"
 
@@ -83,6 +94,7 @@ def formulario_letras_manuales():
 
 
 @bp.route("/process_manual_lyrics", methods=["POST"])
+@login_required
 def procesar_letras_manuales():
     arquivo_subido = request.files.get("video_file")
     if arquivo_subido and arquivo_subido.filename and archivo_permitido(arquivo_subido.filename):
@@ -117,8 +129,10 @@ def procesar_letras_manuales():
         source_type,
         source_url,
         True,
+        current_user.id,
     )
 
+    record_task_owner(task.id, current_user.id)
     session["current_task_id"] = task.id
     session["task_type"] = "manual_lyrics"
 
@@ -126,6 +140,7 @@ def procesar_letras_manuales():
 
 
 @bp.route("/generate_instrumental", methods=["POST"])
+@login_required
 def xerar_instrumental():
     arquivo_subido = request.files.get("video_file")
     if (
@@ -144,8 +159,11 @@ def xerar_instrumental():
         source_type = "youtube"
         source_url = url_youtube
 
-    task = process_instrumental_only.delay(ruta_video, source_type, source_url, True)
+    task = process_instrumental_only.delay(
+        ruta_video, source_type, source_url, True, current_user.id
+    )
 
+    record_task_owner(task.id, current_user.id)
     session["current_task_id"] = task.id
     session["task_type"] = "instrumental"
 

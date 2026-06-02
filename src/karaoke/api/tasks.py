@@ -2,7 +2,9 @@ import logging
 import os
 
 from flask import Blueprint, abort, jsonify, redirect, render_template, send_file, session, url_for
+from flask_login import current_user, login_required
 
+from karaoke.infra.task_ownership import get_task_owner
 from karaoke.workers.celery_app import celery
 
 logger = logging.getLogger(__name__)
@@ -12,16 +14,24 @@ bp = Blueprint("tasks", __name__)
 DIRECTORIO_SAIDA = "output"
 
 
+def _require_task_owner(task_id: str) -> None:
+    if get_task_owner(task_id) != current_user.id:
+        abort(403)
+
+
 # hai q meter novos endpoints para as tareas asincronas
 
 
 @bp.route("/progress/<task_id>")
+@login_required
 def mostrar_progreso(task_id):
     return render_template("progress.html", task_id=task_id)
 
 
 @bp.route("/api/task_status/<task_id>")
+@login_required
 def estado_tarea(task_id):
+    _require_task_owner(task_id)
     try:
         task_result = celery.AsyncResult(task_id)
 
@@ -71,7 +81,9 @@ def estado_tarea(task_id):
 
 
 @bp.route("/api/cancel_task/<task_id>", methods=["POST"])
+@login_required
 def cancelar_tarea(task_id):
+    _require_task_owner(task_id)
     try:
         # revocar a tarea en celery
         celery.control.revoke(task_id, terminate=True, signal="SIGKILL")
@@ -88,7 +100,9 @@ def cancelar_tarea(task_id):
 
 
 @bp.route("/api/download_result/<task_id>")
+@login_required
 def descargar_resultado_tarea(task_id):
+    _require_task_owner(task_id)
     try:
         task_result = celery.AsyncResult(task_id)
 

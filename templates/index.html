@@ -15,6 +15,7 @@
           <p>O sistema utiliza <strong>WhisperX</strong> para analizar e transcribir automáticamente a letra de calquera canción e crear un vídeo de karaoke.</p>
           
           <form action="/generate" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
               <label for="youtube_url" class="form-label"><i class="fab fa-youtube"></i> {% trans %}URL de YouTube{% endtrans %}</label>
               <input
@@ -132,6 +133,7 @@
           <p>{% trans %}Extrae únicamente a parte instrumental dunha canción{% endtrans %}</p>
           
           <form action="/generate_instrumental" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
