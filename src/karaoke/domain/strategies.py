@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 @runtime_checkable
 class AlignmentStrategy(Protocol):
     is_manual_lyrics: bool
+    detected_language: str | None
 
     def align(self, vocal_path: Path, work_dir: Path, config: JobConfig) -> str: ...
     def group_segments(self, segments: list) -> list: ...
@@ -24,6 +25,7 @@ class AlignmentStrategy(Protocol):
 
 class AutomaticAlignment:
     is_manual_lyrics: bool = False
+    detected_language: str | None = None
 
     def align(self, vocal_path: Path, work_dir: Path, config: JobConfig) -> str:
         from karaoke.infra.audio_processing import transcribe_with_faster_whisper  # noqa: PLC0415
@@ -43,6 +45,7 @@ class AutomaticAlignment:
         )
         if not response or not response.get("srt_content"):
             raise AlignmentError("WhisperX returned no srt_content")
+        self.detected_language = response.get("detected_language")
         return response["srt_content"]
 
     def group_segments(self, segments: list) -> list:
@@ -55,6 +58,7 @@ class ManualLyricsAlignment:
     def __init__(self, lyrics: str, language: str | None = None) -> None:
         self.normalized_lyrics = normalize_manual_lyrics(lyrics)
         self.language = language
+        self.detected_language: str | None = None
 
     def align(self, vocal_path: Path, work_dir: Path, config: JobConfig) -> str:
         from karaoke.infra.whisperx_client import call_whisperx_endpoint_manual  # noqa: PLC0415
@@ -69,6 +73,7 @@ class ManualLyricsAlignment:
         )
         if not response or not response.get("srt_content"):
             raise AlignmentError("WhisperX returned no srt_content")
+        self.detected_language = response.get("detected_language")
         return response["srt_content"]
 
     def group_segments(self, segments: list) -> list:

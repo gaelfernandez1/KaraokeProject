@@ -344,6 +344,56 @@ class TestAlignmentStrategies:
         with pytest.raises(AlignmentError, match="no srt_content"):
             strategy.align(Path("/fake/vocals.wav"), Path("/tmp/t"), config)
 
+    def test_automatic_captures_detected_language(self, monkeypatch):
+        monkeypatch.setattr(
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
+            lambda path, model: "hello world",
+        )
+        monkeypatch.setattr(
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
+            lambda *a, **kw: {
+                "srt_content": "1\n00:00:00,000 --> 00:00:01,000\nhello\n\n",
+                "detected_language": "gl",
+            },
+        )
+
+        config = make_config(Path("/tmp"), task_id="t")
+        strategy = AutomaticAlignment()
+        strategy.align(Path("/fake/vocals.wav"), Path("/tmp/t"), config)
+
+        assert strategy.detected_language == "gl"
+
+    def test_manual_captures_detected_language(self, monkeypatch):
+        monkeypatch.setattr(
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
+            lambda *a, **kw: {
+                "srt_content": "1\n00:00:00,000 --> 00:00:01,000\nhello\n\n",
+                "detected_language": "pt",
+            },
+        )
+
+        config = make_config(Path("/tmp"), task_id="t")
+        strategy = ManualLyricsAlignment(lyrics="hello world")
+        strategy.align(Path("/fake/vocals.wav"), Path("/tmp/t"), config)
+
+        assert strategy.detected_language == "pt"
+
+    def test_detected_language_absent_defaults_to_none(self, monkeypatch):
+        monkeypatch.setattr(
+            "karaoke.infra.audio_processing.transcribe_with_faster_whisper",
+            lambda path, model: "hi",
+        )
+        monkeypatch.setattr(
+            "karaoke.infra.whisperx_client.call_whisperx_endpoint_manual",
+            lambda *a, **kw: {"srt_content": "1\n00:00:00,000 --> 00:00:01,000\nhi\n\n"},
+        )
+
+        config = make_config(Path("/tmp"), task_id="t")
+        strategy = AutomaticAlignment()
+        strategy.align(Path("/fake/vocals.wav"), Path("/tmp/t"), config)
+
+        assert strategy.detected_language is None
+
     def test_manual_uses_normalized_lyrics_for_grouping(self, sample_srt_path):
         from karaoke.domain.srt_processing import parse_word_srt
 
@@ -459,3 +509,48 @@ class TestInstrumentalJob:
         job = InstrumentalJob(config=config, reporter=NoopProgressReporter())
         result = job.run()
         assert result == expected_prefix
+
+
+# ---------------------------------------------------------------------------
+# Syllabification language resolution
+# ---------------------------------------------------------------------------
+
+
+class TestLanguageResolution:
+    class _FakeStrategy:
+        is_manual_lyrics = False
+
+        def __init__(self, detected=None, language=None):
+            self.detected_language = detected
+            self.language = language
+
+        def align(self, vocal_path, work_dir, config):
+            return "1\n00:00:00,000 --> 00:00:01,000\nhola\n\n"
+
+        def group_segments(self, segments):
+            return [{"start": 0.0, "end": 1.0, "line_text": "hola", "words": []}]
+
+    def _resolve(self, tmp_path, strategy, config_language=None):
+        config = JobConfig(
+            video_path=tmp_path / "song.mp4",
+            task_id="lang",
+            work_dir=tmp_path,
+            language=config_language,
+        )
+        job = KaraokeJob(config=config, strategy=strategy, reporter=NoopProgressReporter())
+        job._job_work_dir.mkdir(parents=True, exist_ok=True)
+        job.artifacts.vocal_path = tmp_path / "vocals.wav"
+        job._align()
+        return job._language
+
+    def test_uses_detected_language(self, tmp_path):
+        assert self._resolve(tmp_path, self._FakeStrategy(detected="gl")) == "gl"
+
+    def test_config_language_overrides_detected(self, tmp_path):
+        assert self._resolve(tmp_path, self._FakeStrategy(detected="gl"), "en") == "en"
+
+    def test_falls_back_to_strategy_language(self, tmp_path):
+        assert self._resolve(tmp_path, self._FakeStrategy(language="ca")) == "ca"
+
+    def test_defaults_to_es_when_nothing_known(self, tmp_path):
+        assert self._resolve(tmp_path, self._FakeStrategy()) == "es"

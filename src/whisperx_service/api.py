@@ -147,7 +147,11 @@ def align_endpoint():
             indice += 1
 
     srt_content = "".join(srt_blocks)
-    response_data = {"srt_content": srt_content, "message": "Alignment done"}
+    response_data = {
+        "srt_content": srt_content,
+        "detected_language": codigo_idioma,
+        "message": "Alignment done",
+    }
 
     if speaker_info:
         response_data["speaker_info"] = speaker_info

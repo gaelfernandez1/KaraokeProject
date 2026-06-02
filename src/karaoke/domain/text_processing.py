@@ -1,10 +1,5 @@
 import re
 
-import pyphen
-
-# pyhen é o que uso para o silabeador
-dic_pyphen = pyphen.Pyphen(lang="es_ES")
-
 
 def normalize_manual_lyrics(lyrics: str) -> str:
     """
