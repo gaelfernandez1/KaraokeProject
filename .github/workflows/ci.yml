@@ -56,7 +56,7 @@ jobs:
 
   test:
     name: Tests (pytest)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -69,6 +69,15 @@ jobs:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-test-${{ hashFiles('pyproject.toml') }}
           restore-keys: ${{ runner.os }}-pip-test-
+
+      - name: Install FFmpeg dev libraries
+        # faster-whisper pulls PyAV 11, which has no cp310 wheel and builds from
+        # source against FFmpeg's headers. ubuntu-24.04 ships FFmpeg 6.1.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pkg-config \
+            libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev \
+            libavfilter-dev libswscale-dev libswresample-dev
 
       - name: Install worker + dev deps
         run: pip install -e ".[dev,worker]"
