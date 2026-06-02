@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+  {# TODO(F9): i18n remaining strings (form labels, model hints, help text) #}
   <div class="page-header text-center">
-    <h1>Karaoke con Letra Manual</h1>
-    <p class="lead">Proporciona a letra da canción</p>
+    <h1>{% trans %}Karaoke con Letra Manual{% endtrans %}</h1>
+    <p class="lead">{% trans %}Proporciona a letra da canción{% endtrans %}</p>
   </div>
 
   <div class="row">
@@ -120,7 +121,7 @@
             
             <div class="text-center mt-3">
               <button type="submit" class="btn btn-primary btn-lg">
-                <i class="fas fa-magic"></i> Crear Vídeo de Karaoke
+                <i class="fas fa-magic"></i> {% trans %}Crear Vídeo de Karaoke{% endtrans %}
               </button>
             </div>
           </form>
@@ -132,7 +133,7 @@
 
   <div class="row">
     <div class="col text-center">
-      <a href="/" class="btn btn-outline-light"><i class="fas fa-arrow-left"></i> Volver ao Inicio</a>
+      <a href="/" class="btn btn-outline-light"><i class="fas fa-arrow-left"></i> {% trans %}Volver ao Inicio{% endtrans %}</a>
     </div>
   </div>
 

@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
+  {# TODO(F9): i18n remaining strings (model option hints, badges, help text) #}
   <div class="page-header text-center">
-    <h1>Creación Automática de Karaoke</h1>
-    <p class="lead">Xera vídeos de karaoke utilizando intelixencia artificial para transcribir e sincronizar letras</p>
+    <h1>{% trans %}Creación Automática de Karaoke{% endtrans %}</h1>
+    <p class="lead">{% trans %}Xera vídeos de karaoke utilizando intelixencia artificial para transcribir e sincronizar letras{% endtrans %}</p>
   </div>
 
   <div class="row">
     <div class="col-lg-6 mb-4">
       <div class="feature-card">        <div class="card-header">
-          <h2><i class="fas fa-robot"></i> Transcrición Automática</h2>
+          <h2><i class="fas fa-robot"></i> {% trans %}Transcrición Automática{% endtrans %}</h2>
         </div>
         <div class="card-body">
           <p>O sistema utiliza <strong>WhisperX</strong> para analizar e transcribir automáticamente a letra de calquera canción e crear un vídeo de karaoke.</p>
           
           <form action="/generate" method="post" enctype="multipart/form-data">
             <div class="mb-3">
-              <label for="youtube_url" class="form-label"><i class="fab fa-youtube"></i> URL de YouTube</label>
+              <label for="youtube_url" class="form-label"><i class="fab fa-youtube"></i> {% trans %}URL de YouTube{% endtrans %}</label>
               <input
                 type="text"
                 class="form-control"
@@ -24,10 +25,10 @@
                 placeholder="https://www.youtube.com/watch?v=..."
               >
             </div>
-            
-            <p class="text-center my-2">- ou -</p>
+
+            <p class="text-center my-2">- {% trans %}ou{% endtrans %} -</p>
               <div class="mb-3">
-              <label for="video_file" class="form-label"><i class="fas fa-file-video"></i> Subir vídeo MP4</label>
+              <label for="video_file" class="form-label"><i class="fas fa-file-video"></i> {% trans %}Subir vídeo MP4{% endtrans %}</label>
               <div class="file-input-wrapper">
                 <input
                   type="file"
@@ -45,7 +46,7 @@
             
             <div class="mb-3">
               <label for="whisper_model" class="form-label">
-                <i class="fas fa-brain"></i> Modelo de Whisper para transcrición
+                <i class="fas fa-brain"></i> {% trans %}Modelo de Whisper para transcrición{% endtrans %}
               </label>
               <select class="form-control" id="whisper_model" name="whisper_model">
                 <option value="tiny">Tiny - (~39MB, ~1GB VRAM)</option>
@@ -65,11 +66,11 @@
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="enable_diarization" name="enable_diarization" value="true">
                 <label class="form-check-label" for="enable_diarization">
-                  <i class="fas fa-users"></i> Diferenciación de voces (Speaker Diarization)
+                  <i class="fas fa-users"></i> {% trans %}Diferenciación de voces (Speaker Diarization){% endtrans %}
                 </label>
               </div>
               <small class="form-text text-muted">
-                Detectar distintos cantantes e colorealos de forma diferente
+                {% trans %}Detectar distintos cantantes e colorealos de forma diferente{% endtrans %}
               </small>
             </div>
             
@@ -90,7 +91,7 @@
             </div>
             
             <div class="text-center">
-              <button type="submit" class="btn btn-primary"><i class="fas fa-play-circle"></i> Procesar Automáticamente</button>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-play-circle"></i> {% trans %}Procesar Automáticamente{% endtrans %}</button>
             </div>
           </form>
         </div>
@@ -99,19 +100,19 @@
 
     <div class="col-lg-6 mb-4">
       <div class="feature-card">        <div class="card-header">
-          <h2><i class="fas fa-pen-fancy"></i> Letra Manual</h2>
+          <h2><i class="fas fa-pen-fancy"></i> {% trans %}Letra Manual{% endtrans %}</h2>
         </div>
         <div class="card-body">
-          <p>Xa tes a letra da canción? Proporciona o texto e o sistema encargarase de sincronizalo co audio para crear un karaoke perfecto.</p>
+          <p>{% trans %}Xa tes a letra da canción? Proporciona o texto e o sistema encargarase de sincronizalo co audio para crear un karaoke perfecto.{% endtrans %}</p>
           
           <div class="mb-4">
             <ul class="list-unstyled">
-              <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Ideal para cancións en idiomas menos comúns</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success"></i> {% trans %}Ideal para cancións en idiomas menos comúns{% endtrans %}</li>
             </ul>
           </div>
           
           <div class="text-center">
-            <a href="/manual_lyrics_form" class="btn btn-secondary"><i class="fas fa-edit"></i> Usar Letra Manual</a>
+            <a href="/manual_lyrics_form" class="btn btn-secondary"><i class="fas fa-edit"></i> {% trans %}Usar Letra Manual{% endtrans %}</a>
           </div>
         </div>
       </div>
@@ -125,16 +126,16 @@
     <div class="col-lg-8 mx-auto">
       <div class="feature-card">
         <div class="card-header">
-          <h2><i class="fas fa-music"></i> Obtén a Instrumental</h2>
+          <h2><i class="fas fa-music"></i> {% trans %}Obtén a Instrumental{% endtrans %}</h2>
         </div>
         <div class="card-body">
-          <p>Extrae únicamente a parte instrumental dunha canción</p>
+          <p>{% trans %}Extrae únicamente a parte instrumental dunha canción{% endtrans %}</p>
           
           <form action="/generate_instrumental" method="post" enctype="multipart/form-data">
             <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
-                  <label for="youtube_url_instrumental" class="form-label"><i class="fab fa-youtube"></i> URL de YouTube</label>
+                  <label for="youtube_url_instrumental" class="form-label"><i class="fab fa-youtube"></i> {% trans %}URL de YouTube{% endtrans %}</label>
                   <input
                     type="text"
                     class="form-control"
@@ -167,7 +168,7 @@
             <p class="text-center my-2 text-muted">Escolle unha opción (URL, vídeo MP4 ou audio MP3)</p>
             
             <div class="text-center">
-              <button type="submit" class="btn btn-success"><i class="fas fa-download"></i> Xerar Instrumental</button>
+              <button type="submit" class="btn btn-success"><i class="fas fa-download"></i> {% trans %}Xerar Instrumental{% endtrans %}</button>
               <small class="form-text text-muted d-block mt-2">
                 Descargarase un arquivo WAV coa parte instrumental da canción
               </small>

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+{# TODO(F9): i18n remaining strings (stats labels, song badges, dropdown items, delete modal) #}
 <div class="page-header text-center">
-    <h1><i class="fas fa-music"></i> Biblioteca de cancións</h1>
-    <p class="lead">Tódas as túas cancións de karaoke gardadas</p>
+    <h1><i class="fas fa-music"></i> {% trans %}Biblioteca de cancións{% endtrans %}</h1>
+    <p class="lead">{% trans %}Tódas as túas cancións de karaoke gardadas{% endtrans %}</p>
 </div>
 
 {% if stats %}
@@ -58,11 +59,11 @@
                 type="text" 
                 name="q" 
                 class="form-control me-2" 
-                placeholder="Buscar cancións por título..." 
+                placeholder="{{ _('Buscar cancións por título...') }}"
                 value="{{ search_query or '' }}"
             >
             <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search"></i> Buscar
+                <i class="fas fa-search"></i> {% trans %}Buscar{% endtrans %}
             </button>
             {% if search_query %}
             <a href="{{ url_for('library.biblioteca_cancions') }}" class="btn btn-secondary ms-2">
@@ -228,16 +229,16 @@
 <div class="text-center py-5">
     <i class="fas fa-music-slash fa-4x text-muted mb-3"></i>
     {% if search_query %}
-        <h3>Non se encontraron cancións</h3>
-        <p class="text-muted">Non hai cancións que coincidan coa búsqueda.</p>
+        <h3>{% trans %}Non se encontraron cancións{% endtrans %}</h3>
+        <p class="text-muted">{% trans %}Non hai cancións que coincidan coa búsqueda.{% endtrans %}</p>
         <a href="{{ url_for('library.biblioteca_cancions') }}" class="btn btn-primary">
-            <i class="fas fa-list"></i> Ver toda a biblioteca
+            <i class="fas fa-list"></i> {% trans %}Ver toda a biblioteca{% endtrans %}
         </a>
     {% else %}
-        <h3>A biblioteca está baleira</h3>
-        <p class="text-muted">Aínda non tes cancións gardadas. Crea a túa primeira canción de karaoke!</p>
+        <h3>{% trans %}A biblioteca está baleira{% endtrans %}</h3>
+        <p class="text-muted">{% trans %}Aínda non tes cancións gardadas. Crea a túa primeira canción de karaoke!{% endtrans %}</p>
         <a href="{{ url_for('generation.inicio') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Crear Karaoke
+            <i class="fas fa-plus"></i> {% trans %}Crear Karaoke{% endtrans %}
         </a>
     {% endif %}
 </div>
@@ -245,7 +246,7 @@
 
 <div class="text-center mt-4">
     <a href="{{ url_for('generation.inicio') }}" class="btn btn-outline-primary">
-        <i class="fas fa-home"></i> Volver ao inicio
+        <i class="fas fa-home"></i> {% trans %}Volver ao inicio{% endtrans %}
     </a>
 </div>
 

@@ -27,15 +27,21 @@
       </button>        <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/"><i class="fas fa-home"></i> Inicio</a>
+            <a class="nav-link" href="/"><i class="fas fa-home"></i> {% trans %}Inicio{% endtrans %}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/manual_lyrics_form"><i class="fas fa-pen"></i> Letra Manual</a>
+            <a class="nav-link" href="/manual_lyrics_form"><i class="fas fa-pen"></i> {% trans %}Letra Manual{% endtrans %}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/library"><i class="fas fa-music"></i> Biblioteca</a>
+            <a class="nav-link" href="/library"><i class="fas fa-music"></i> {% trans %}Biblioteca{% endtrans %}</a>
           </li>
         </ul>
+        <div class="navbar-nav language-selector ms-lg-3">
+          {% for code in languages %}
+          <a class="nav-link px-2{% if current_locale == code %} active fw-bold text-warning{% endif %}"
+             href="/set-language/{{ code }}">{{ code|upper }}</a>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </nav>
@@ -50,7 +56,7 @@
           <p>&copy; 2025 KaraokeIA - Proxecto de TFG - Gael Fernández</p>
         </div>
         <div class="col-md-6 text-md-end">
-          <p>Creación automática de vídeos de karaoke con IA</p>
+          <p>{% trans %}Creación automática de vídeos de karaoke con IA{% endtrans %}</p>
         </div>
       </div>
     </div>
@@ -58,7 +64,7 @@
   <div id="loading" class="loading">
     <div class="loading-content">
       <img src="{{ url_for('static', filename='img/spinner.svg') }}" alt="Cargando..." class="loading-spinner">
-      <p>Procesando a túa solicitude...</p>
+      <p>{% trans %}Procesando a túa solicitude...{% endtrans %}</p>
     </div>
   </div>
 
