@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
@@ -13,6 +15,11 @@ class Settings(BaseSettings):
     ngrok_auth_token: str | None = None
     huggingface_token: str | None = None
     log_level: str = "INFO"
+    storage_backend: Literal["local", "r2"] = "local"
+    r2_account_id: str | None = None
+    r2_bucket: str | None = None
+    r2_access_key_id: str | None = None
+    r2_secret_access_key: str | None = None
 
     model_config = {"env_file": ".env", "case_sensitive": False}
 
