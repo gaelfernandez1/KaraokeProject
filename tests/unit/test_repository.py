@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy.exc import IntegrityError
 
 from karaoke.infra.db import repository as repo
 
@@ -194,6 +195,73 @@ class TestToDict:
         )
         d = repo.get_song_by_id(db_session, song_id).to_dict()
         assert d["storage_key"] == "karaoke/task-1/karaoke_test.mp4"
+
+
+class TestUserRepository:
+    def test_create_user_assigns_uuid_and_defaults(self, db_session):
+        user = repo.create_user(db_session, "alice@example.com")
+        assert isinstance(user.id, str)
+        assert len(user.id) == 36
+        assert user.email == "alice@example.com"
+        assert user.is_active is True
+
+    def test_get_user_by_email_found(self, db_session):
+        created = repo.create_user(db_session, "bob@example.com")
+        found = repo.get_user_by_email(db_session, "bob@example.com")
+        assert found is not None
+        assert found.id == created.id
+
+    def test_get_user_by_email_missing_returns_none(self, db_session):
+        assert repo.get_user_by_email(db_session, "nobody@example.com") is None
+
+    def test_get_user_by_id_found(self, db_session):
+        created = repo.create_user(db_session, "carol@example.com")
+        found = repo.get_user_by_id(db_session, created.id)
+        assert found is not None
+        assert found.email == "carol@example.com"
+
+    def test_get_user_by_id_missing_returns_none(self, db_session):
+        assert repo.get_user_by_id(db_session, "00000000-0000-0000-0000-000000000000") is None
+
+    def test_email_must_be_unique(self, db_session):
+        repo.create_user(db_session, "dup@example.com")
+        with pytest.raises(IntegrityError):
+            repo.create_user(db_session, "dup@example.com")
+
+
+class TestPerUserSongQueries:
+    def test_get_all_songs_filters_by_user(self, db_session):
+        a = repo.create_user(db_session, "a@example.com")
+        b = repo.create_user(db_session, "b@example.com")
+        repo.save_song(db_session, _sample_song(title="A song", user_id=a.id))
+        repo.save_song(db_session, _sample_song(title="B song", user_id=b.id))
+        a_songs = repo.get_all_songs(db_session, user_id=a.id)
+        assert len(a_songs) == 1
+        assert a_songs[0].title == "A song"
+
+    def test_get_all_songs_without_user_returns_all(self, db_session):
+        a = repo.create_user(db_session, "a2@example.com")
+        repo.save_song(db_session, _sample_song(user_id=a.id))
+        repo.save_song(db_session, _sample_song())  # legacy NULL owner
+        assert len(repo.get_all_songs(db_session)) == 2
+
+    def test_search_filters_by_user(self, db_session):
+        a = repo.create_user(db_session, "a3@example.com")
+        b = repo.create_user(db_session, "b3@example.com")
+        repo.save_song(db_session, _sample_song(title="Shared", user_id=a.id))
+        repo.save_song(db_session, _sample_song(title="Shared", user_id=b.id))
+        results = repo.get_songs_by_search(db_session, "Shared", user_id=a.id)
+        assert len(results) == 1
+
+    def test_stats_scoped_to_user(self, db_session):
+        a = repo.create_user(db_session, "a4@example.com")
+        b = repo.create_user(db_session, "b4@example.com")
+        repo.save_song(db_session, _sample_song(processing_type="automatic", user_id=a.id))
+        repo.save_song(db_session, _sample_song(processing_type="manual_lyrics", user_id=b.id))
+        stats = repo.get_database_stats(db_session, user_id=a.id)
+        assert stats["total_songs"] == 1
+        assert stats["automatic_songs"] == 1
+        assert stats["manual_songs"] == 0
 
 
 if __name__ == "__main__":
