@@ -63,6 +63,9 @@ def flask_app():
 
     app = create_app()
     app.config["TESTING"] = True
+    # CSRFProtect is on in create_app; disable it under the test client so POST
+    # helpers don't have to thread tokens through every request.
+    app.config["WTF_CSRF_ENABLED"] = False
     return app
 
 
