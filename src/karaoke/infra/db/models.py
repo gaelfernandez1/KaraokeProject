@@ -69,4 +69,5 @@ class Song(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "last_played": self.last_played.isoformat() if self.last_played else None,
             "user_id": self.user_id,
+            "storage_key": self.storage_key,
         }
