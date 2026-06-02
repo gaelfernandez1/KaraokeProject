@@ -4,11 +4,14 @@ import pathlib
 import uuid
 
 from flask import Flask, g
+from flask_login import LoginManager
+from flask_wtf import CSRFProtect
 from pydantic import ValidationError
 
 from karaoke.api.errors import register_error_handlers
 from karaoke.config import Settings
-from karaoke.infra.db import init_db
+from karaoke.infra.db import init_db, session_scope
+from karaoke.infra.db.repository import get_user_by_id
 from karaoke.infra.gpu_utils import print_system_summary
 from karaoke.logging_config import _request_id_var, configure_logging
 from karaoke.security import setup_security
@@ -16,6 +19,17 @@ from karaoke.security import setup_security
 _ROOT = pathlib.Path(__file__).parents[3]
 
 logger = logging.getLogger(__name__)
+
+
+def _setup_login(flask_app: Flask) -> None:
+    login_manager = LoginManager()
+    login_manager.init_app(flask_app)
+    login_manager.login_view = "auth.login"
+
+    @login_manager.user_loader
+    def load_user(user_id: str):
+        with session_scope() as session:
+            return get_user_by_id(session, user_id)
 
 
 def create_app() -> Flask:
@@ -38,7 +52,12 @@ def create_app() -> Flask:
     )
     flask_app.config["MAX_CONTENT_LENGTH"] = settings.max_file_size_mb * 1024 * 1024
     flask_app.config["APP_SETTINGS"] = settings
+    # Flask-Login sessions, CSRF and the magic-link serializer all sign with this,
+    # so it must be set before the extensions init (the test fixture only calls
+    # create_app, not setup_security, which also sets it for the prod entrypoint).
+    flask_app.secret_key = settings.flask_secret_key
 
+    from karaoke.api.auth import bp as auth_bp
     from karaoke.api.generation import bp as generation_bp
     from karaoke.api.health import bp as health_bp
     from karaoke.api.i18n import bp as i18n_bp
@@ -48,7 +67,10 @@ def create_app() -> Flask:
     from karaoke.api.tasks import bp as tasks_bp
 
     configure_babel(flask_app)
+    _setup_login(flask_app)
+    CSRFProtect(flask_app)
 
+    flask_app.register_blueprint(auth_bp)
     flask_app.register_blueprint(generation_bp)
     flask_app.register_blueprint(health_bp)
     flask_app.register_blueprint(i18n_bp)

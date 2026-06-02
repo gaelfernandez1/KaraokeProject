@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     r2_bucket: str | None = None
     r2_access_key_id: str | None = None
     r2_secret_access_key: str | None = None
+    # Magic-link email (Resend). Optional so dev boots without it; production must set it.
+    resend_api_key: str | None = None
+    resend_from_email: str = "KaraokeIA <onboarding@resend.dev>"
+    app_base_url: str = "http://localhost:8000"
 
     model_config = {"env_file": ".env", "case_sensitive": False}
 

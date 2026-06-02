@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card feature-card">
+      <div class="card-body">
+        <h1 class="h4 mb-3 text-center">
+          <i class="fas fa-right-to-bracket"></i> {% trans %}Entrar{% endtrans %}
+        </h1>
+
+        {% if error %}
+        <div class="alert alert-danger">
+          {% trans %}O enlace non é válido ou caducou. Pide un novo máis abaixo.{% endtrans %}
+        </div>
+        {% endif %}
+
+        {% if sent %}
+        <div class="alert alert-success">
+          <i class="fas fa-envelope-circle-check"></i>
+          {% trans %}Se ese correo existe, enviámosche un enlace de acceso. Revisa a túa bandeja de entrada.{% endtrans %}
+        </div>
+        {% else %}
+        <p class="text-muted">
+          {% trans %}Introduce o teu correo e enviámosche un enlace para entrar. Sen contrasinais.{% endtrans %}
+        </p>
+        <form action="{{ url_for('auth.login') }}" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="mb-3">
+            <label for="email" class="form-label">{% trans %}Correo electrónico{% endtrans %}</label>
+            <input type="email" class="form-control" id="email" name="email" required autofocus>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-paper-plane"></i> {% trans %}Enviar enlace{% endtrans %}
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
