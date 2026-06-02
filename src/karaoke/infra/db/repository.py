@@ -6,6 +6,7 @@ from typing import Any
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
+from karaoke.domain.user import User
 from karaoke.infra.db.models import Song
 
 _DEFAULT_ORDER = (Song.created_at.desc(), Song.id.desc())
@@ -36,8 +37,26 @@ def save_song(session: Session, song_data: dict[str, Any]) -> int:
     return song.id
 
 
-def get_all_songs(session: Session) -> list[Song]:
-    return list(session.scalars(select(Song).order_by(*_DEFAULT_ORDER)))
+def get_user_by_email(session: Session, email: str) -> User | None:
+    return session.scalars(select(User).where(User.email == email)).first()
+
+
+def get_user_by_id(session: Session, user_id: str) -> User | None:
+    return session.get(User, user_id)
+
+
+def create_user(session: Session, email: str) -> User:
+    user = User(email=email)
+    session.add(user)
+    session.flush()
+    return user
+
+
+def get_all_songs(session: Session, user_id: str | None = None) -> list[Song]:
+    stmt = select(Song)
+    if user_id is not None:
+        stmt = stmt.where(Song.user_id == user_id)
+    return list(session.scalars(stmt.order_by(*_DEFAULT_ORDER)))
 
 
 def get_song_by_id(session: Session, song_id: int) -> Song | None:
@@ -76,24 +95,31 @@ def delete_song(session: Session, song_id: int) -> bool:
     return True
 
 
-def get_songs_by_search(session: Session, query: str) -> list[Song]:
-    stmt = select(Song).where(Song.title.ilike(f"%{query}%")).order_by(*_DEFAULT_ORDER)
-    return list(session.scalars(stmt))
+def get_songs_by_search(session: Session, query: str, user_id: str | None = None) -> list[Song]:
+    stmt = select(Song).where(Song.title.ilike(f"%{query}%"))
+    if user_id is not None:
+        stmt = stmt.where(Song.user_id == user_id)
+    return list(session.scalars(stmt.order_by(*_DEFAULT_ORDER)))
 
 
-def get_database_stats(session: Session) -> dict[str, int]:
+def get_database_stats(session: Session, user_id: str | None = None) -> dict[str, int]:
+    def _scoped(stmt):
+        return stmt.where(Song.user_id == user_id) if user_id is not None else stmt
+
     def _count(processing_type: str) -> int:
         return (
             session.scalar(
-                select(func.count())
-                .select_from(Song)
-                .where(Song.processing_type == processing_type)
+                _scoped(
+                    select(func.count())
+                    .select_from(Song)
+                    .where(Song.processing_type == processing_type)
+                )
             )
             or 0
         )
 
-    total_songs = session.scalar(select(func.count()).select_from(Song)) or 0
-    total_size = session.scalar(select(func.coalesce(func.sum(Song.file_size), 0))) or 0
+    total_songs = session.scalar(_scoped(select(func.count()).select_from(Song))) or 0
+    total_size = session.scalar(_scoped(select(func.coalesce(func.sum(Song.file_size), 0)))) or 0
 
     return {
         "total_songs": total_songs,

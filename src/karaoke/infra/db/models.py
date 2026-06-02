@@ -7,6 +7,7 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     Float,
+    ForeignKey,
     Integer,
     String,
     Text,
@@ -42,8 +43,10 @@ class Song(Base):
         DateTime, nullable=False, server_default=func.now()
     )
     last_played: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    # Becomes a real FK to users.id in Fase 10; nullable plain column for now.
-    user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    # FK to the song's owner (Fase 10). NULL for rows created before auth existed.
+    user_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=True, index=True
+    )
     # Storage key in the configured backend (e.g. "karaoke/{task_id}/{filename}").
     # NULL for rows created before Fase 8.
     storage_key: Mapped[str | None] = mapped_column(String, nullable=True)
