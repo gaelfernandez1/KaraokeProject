@@ -10,6 +10,7 @@ from typing import Any
 from karaoke.domain.errors import (
     AlignmentError,
     AudioSeparationError,
+    PersistenceError,
     PreparationError,
     RenderError,
 )
@@ -37,6 +38,12 @@ class JobConfig:
     output_dir: Path = field(default_factory=lambda: Path("./output"))
     work_dir: Path = field(default_factory=lambda: Path("/data"))
     storage: Storage = field(default_factory=LocalStorage)
+
+    def __post_init__(self) -> None:
+        # Keep the default LocalStorage pointed at output_dir so local runs write
+        # where the caller expects; injected backends (R2, fakes) are left as-is.
+        if isinstance(self.storage, LocalStorage):
+            object.__setattr__(self, "storage", LocalStorage(self.output_dir))
 
 
 @dataclass
@@ -240,17 +247,17 @@ class KaraokeJob:
 
         logger.info(f"Video generated: {output_path}")
 
-        # Secondary outputs (non-fatal if they fail)
-        self._write_secondary_outputs(video_darkened, output_path, output_filename, safe_name)
+        # Video-only render (non-fatal if it fails). The separated stems are
+        # uploaded straight from the work dir in _persist.
+        self._write_video_only(video_darkened, output_path, output_filename)
 
         self.artifacts.karaoke_filename = output_filename
 
-    def _write_secondary_outputs(
+    def _write_video_only(
         self,
         video_darkened: Any,
         output_path: Path,
         output_filename: str,
-        safe_name: str,
     ) -> None:
         try:
             video_only_path = output_path.with_name(
@@ -260,67 +267,77 @@ class KaraokeJob:
         except Exception as e:
             logger.warning(f"Failed to write video-only file: {e}")
 
-        name_no_ext = safe_name.replace(".mp4", "")
-        try:
-            shutil.copy2(
-                str(self.artifacts.vocal_path),
-                str(
-                    self.config.output_dir / f"vocal_{self.config.whisper_model}_{name_no_ext}.wav"
-                ),
-            )
-            shutil.copy2(
-                str(self.artifacts.instrumental_path),
-                str(
-                    self.config.output_dir
-                    / f"instrumental_{self.config.whisper_model}_{name_no_ext}.wav"
-                ),
-            )
-        except Exception as e:
-            logger.warning(f"Failed to copy separated stems to output: {e}")
-
     def _persist(self) -> None:
         from karaoke.infra.metadata_utils import generate_song_metadata  # noqa: PLC0415
 
         assert self.artifacts.karaoke_filename is not None
         assert self.artifacts.video_path is not None
 
-        local_path = self.config.output_dir / self.artifacts.karaoke_filename
-        storage_key = f"karaoke/{self.config.task_id}/{self.artifacts.karaoke_filename}"
+        task_prefix = f"karaoke/{self.config.task_id}"
+        karaoke_filename = self.artifacts.karaoke_filename
+        storage_key = f"{task_prefix}/{karaoke_filename}"
+
+        # The karaoke video is the primary artifact: if its upload fails there is
+        # nothing to serve, so fail the job rather than record a dangling key.
+        main_local = self.config.output_dir / karaoke_filename
         try:
-            self.config.storage.upload(local_path, storage_key)
+            self.config.storage.upload(main_local, storage_key)
         except Exception as e:
-            logger.error(f"Storage upload failed (non-fatal): {e}")
+            raise PersistenceError(f"Failed to upload karaoke video: {e}") from e
+
+        processing_type = "manual_lyrics" if self.strategy.is_manual_lyrics else "automatic"
+        manual_lyrics = (
+            getattr(self.strategy, "normalized_lyrics", None)
+            if self.strategy.is_manual_lyrics
+            else None
+        )
+        language = (
+            getattr(self.strategy, "language", None) if self.strategy.is_manual_lyrics else None
+        )
+        metadata = generate_song_metadata(
+            original_filename=os.path.basename(str(self.artifacts.video_path)),
+            karaoke_filename=karaoke_filename,
+            source_type=self.config.source_type,
+            source_url=self.config.source_url,
+            processing_type=processing_type,
+            manual_lyrics=manual_lyrics,
+            language=language,
+            enable_diarization=self.config.enable_diarization,
+            whisper_model=self.config.whisper_model,
+            output_dir=str(self.config.output_dir),
+        )
+
+        # Secondary artifacts (video-only and the separated stems) are best-effort;
+        # the stems come straight from the work dir but land under the same prefix.
+        self._upload_secondary(
+            self.config.output_dir / metadata["video_only_filename"],
+            f"{task_prefix}/{metadata['video_only_filename']}",
+        )
+        self._upload_secondary(
+            self.artifacts.vocal_path, f"{task_prefix}/{metadata['vocal_filename']}"
+        )
+        self._upload_secondary(
+            self.artifacts.instrumental_path,
+            f"{task_prefix}/{metadata['instrumental_filename']}",
+        )
 
         if not self.config.save_to_db:
             return
         try:
-            processing_type = "manual_lyrics" if self.strategy.is_manual_lyrics else "automatic"
-            manual_lyrics = (
-                getattr(self.strategy, "normalized_lyrics", None)
-                if self.strategy.is_manual_lyrics
-                else None
-            )
-            language = (
-                getattr(self.strategy, "language", None) if self.strategy.is_manual_lyrics else None
-            )
-            metadata = generate_song_metadata(
-                original_filename=os.path.basename(str(self.artifacts.video_path)),
-                karaoke_filename=self.artifacts.karaoke_filename,
-                source_type=self.config.source_type,
-                source_url=self.config.source_url,
-                processing_type=processing_type,
-                manual_lyrics=manual_lyrics,
-                language=language,
-                enable_diarization=self.config.enable_diarization,
-                whisper_model=self.config.whisper_model,
-                output_dir=str(self.config.output_dir),
-            )
             metadata["storage_key"] = storage_key
             with session_scope() as session:
                 song_id = save_song(session, metadata)
             logger.info(f"Song saved to database with ID: {song_id}")
         except Exception as e:
             logger.error(f"Failed to save to database (non-fatal): {e}")
+
+    def _upload_secondary(self, local_path: Path | None, key: str) -> None:
+        if local_path is None or not local_path.exists():
+            return
+        try:
+            self.config.storage.upload(local_path, key)
+        except Exception as e:
+            logger.warning(f"Failed to upload {key}: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -395,6 +412,10 @@ class InstrumentalJob:
 
         self.reporter.report("Copiando arquivo final...", 85)
 
+        src = self.artifacts.instrumental_path
+        if not src.exists() or src.stat().st_size == 0:
+            raise RenderError(f"Instrumental missing or empty: {src}")
+
         base = os.path.basename(str(self.artifacts.video_path)).replace("_normalized", "")
         safe_name = sanitize_filename(base)
 
@@ -405,24 +426,19 @@ class InstrumentalJob:
         else:
             output_filename = f"instrumental_{safe_name}.wav"
 
-        self.config.output_dir.mkdir(parents=True, exist_ok=True)
-        output_path = self.config.output_dir / output_filename
-
+        storage_key = f"karaoke/{self.config.task_id}/{output_filename}"
         try:
-            shutil.copy2(str(self.artifacts.instrumental_path), str(output_path))
+            self.config.storage.upload(src, storage_key)
         except Exception as e:
-            raise RenderError(f"Failed to copy instrumental to output: {e}") from e
+            raise RenderError(f"Failed to upload instrumental: {e}") from e
 
-        if not output_path.exists() or output_path.stat().st_size == 0:
-            raise RenderError(f"Instrumental output missing or empty: {output_path}")
-
-        logger.info(f"Instrumental generated: {output_path}")
+        logger.info(f"Instrumental generated: {output_filename}")
         self.artifacts.karaoke_filename = output_filename
 
         if self.config.save_to_db:
-            self._save_to_db(output_path, output_filename)
+            self._save_to_db(src, output_filename, storage_key)
 
-    def _save_to_db(self, output_path: Path, output_filename: str) -> None:
+    def _save_to_db(self, src_path: Path, output_filename: str, storage_key: str) -> None:
         assert self.artifacts.video_path is not None
         try:
             original_name = os.path.basename(str(self.artifacts.video_path))
@@ -433,12 +449,12 @@ class InstrumentalJob:
                     break
             title = f"[Instrumental] {title}"
 
-            file_size = output_path.stat().st_size
+            file_size = src_path.stat().st_size
             duration: float | None = None
             try:
                 from moviepy.editor import AudioFileClip  # noqa: PLC0415
 
-                clip = AudioFileClip(str(output_path))
+                clip = AudioFileClip(str(src_path))
                 duration = clip.duration
                 clip.close()
             except Exception:
@@ -459,6 +475,7 @@ class InstrumentalJob:
                 "enable_diarization": False,
                 "file_size": file_size,
                 "duration": duration,
+                "storage_key": storage_key,
             }
             with session_scope() as session:
                 save_song(session, song_data)

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from karaoke.infra.db.models import Song
@@ -46,6 +46,19 @@ def get_song_by_id(session: Session, song_id: int) -> Song | None:
 
 def get_song_by_filename(session: Session, filename: str) -> Song | None:
     return session.scalars(select(Song).where(Song.karaoke_filename == filename)).first()
+
+
+def get_song_owning_file(session: Session, filename: str) -> Song | None:
+    """Find the song that references filename in any of its artifact columns."""
+    stmt = select(Song).where(
+        or_(
+            Song.karaoke_filename == filename,
+            Song.video_only_filename == filename,
+            Song.vocal_filename == filename,
+            Song.instrumental_filename == filename,
+        )
+    )
+    return session.scalars(stmt).first()
 
 
 def update_last_played(session: Session, song_id: int) -> None:

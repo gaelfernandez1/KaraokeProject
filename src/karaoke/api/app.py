@@ -25,13 +25,9 @@ def create_app() -> Flask:
         raise RuntimeError(f"Configuration error: {exc}") from exc
 
     if settings.storage_backend == "r2":
-        missing = [
-            f
-            for f in ["r2_account_id", "r2_bucket", "r2_access_key_id", "r2_secret_access_key"]
-            if not getattr(settings, f)
-        ]
-        if missing:
-            raise RuntimeError(f"storage_backend=r2 requires: {', '.join(missing)}")
+        from karaoke.infra.storage import validate_r2_settings
+
+        validate_r2_settings(settings)
 
     configure_logging(settings.log_level)
 

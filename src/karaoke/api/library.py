@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Blueprint, abort, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
 
 from karaoke.infra.db import session_scope
 from karaoke.infra.db.repository import (
@@ -19,6 +19,41 @@ logger = logging.getLogger(__name__)
 bp = Blueprint("library", __name__)
 
 DIRECTORIO_SAIDA = "output"
+
+
+def _delete_song_artifacts(settings, song) -> None:
+    """Remove a song's files from the active backend (R2 objects or local files)."""
+    filenames = [
+        song.karaoke_filename,
+        song.video_only_filename,
+        song.vocal_filename,
+        song.instrumental_filename,
+    ]
+    if settings.storage_backend == "r2":
+        if not song.storage_key:
+            return
+        from karaoke.infra.storage import derive_key, get_storage
+
+        storage = get_storage(settings)
+        for name in filenames:
+            if not name:
+                continue
+            try:
+                storage.delete(derive_key(song.storage_key, name))
+            except Exception:
+                logger.warning(f"Erro borrando do storage: {name}")
+        return
+
+    for name in filenames:
+        if not name:
+            continue
+        path = os.path.join(DIRECTORIO_SAIDA, name)
+        try:
+            if os.path.exists(path):
+                os.remove(path)
+                logger.info(f"Arquivo borrado: {path}")
+        except Exception:
+            logger.warning(f"Erro borrando arquivo {path}")
 
 
 @bp.route("/library")
@@ -60,6 +95,7 @@ def buscar_cancions():
 
 @bp.route("/library/play/<int:song_id>")
 def reproducir_dende_biblioteca(song_id):
+    settings = current_app.config["APP_SETTINGS"]
     try:
         with session_scope() as session:
             song = get_song_by_id(session, song_id)
@@ -67,8 +103,11 @@ def reproducir_dende_biblioteca(song_id):
                 return "Canción non encontrada", 404
 
             karaoke_filename = song.karaoke_filename
-            ruta_video = os.path.join(DIRECTORIO_SAIDA, karaoke_filename)
-            if not os.path.exists(ruta_video):
+            if settings.storage_backend == "r2":
+                available = song.storage_key is not None
+            else:
+                available = os.path.exists(os.path.join(DIRECTORIO_SAIDA, karaoke_filename))
+            if not available:
                 return "Arquivo de video non encontrado", 404
 
             update_last_played(session, song_id)
@@ -82,6 +121,7 @@ def reproducir_dende_biblioteca(song_id):
 
 @bp.route("/library/delete/<int:song_id>", methods=["POST"])
 def borrar_cancion_biblioteca(song_id):
+    settings = current_app.config["APP_SETTINGS"]
     try:
         with session_scope() as session:
             song = get_song_by_id(session, song_id)
@@ -89,28 +129,7 @@ def borrar_cancion_biblioteca(song_id):
                 return "Canción non encontrada na bib", 404
 
             title = song.title
-            arquivos_para_borrar = []
-
-            if song.karaoke_filename:
-                arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song.karaoke_filename))
-            if song.video_only_filename:
-                arquivos_para_borrar.append(
-                    os.path.join(DIRECTORIO_SAIDA, song.video_only_filename)
-                )
-            if song.vocal_filename:
-                arquivos_para_borrar.append(os.path.join(DIRECTORIO_SAIDA, song.vocal_filename))
-            if song.instrumental_filename:
-                arquivos_para_borrar.append(
-                    os.path.join(DIRECTORIO_SAIDA, song.instrumental_filename)
-                )
-
-            for arquivo in arquivos_para_borrar:
-                try:
-                    if os.path.exists(arquivo):
-                        os.remove(arquivo)
-                        logger.info(f"Arquivo borrado: {arquivo}")
-                except Exception:
-                    logger.warning(f"Erro borrando arquivo {arquivo}")
+            _delete_song_artifacts(settings, song)
 
             deleted = delete_song(session, song_id)
 

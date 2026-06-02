@@ -53,7 +53,9 @@ class R2Storage:
         access_key_id: str,
         secret_access_key: str,
     ) -> None:
-        import boto3  # lazy import — not installed in the web container
+        # boto3 ships in the core deps, so it's present in every image. The import
+        # stays lazy only to avoid paying for it when the local backend is used.
+        import boto3
 
         self._bucket = bucket
         self._client = boto3.client(
@@ -78,15 +80,29 @@ class R2Storage:
         self._client.delete_object(Bucket=self._bucket, Key=key)
 
     def exists(self, key: str) -> bool:
+        from botocore.exceptions import ClientError
+
         try:
             self._client.head_object(Bucket=self._bucket, Key=key)
             return True
-        except Exception:
+        except ClientError:
             return False
+
+
+def validate_r2_settings(settings: Settings) -> None:
+    """Raise if the R2 backend is selected but any credential is missing."""
+    missing = [
+        name
+        for name in ("r2_account_id", "r2_bucket", "r2_access_key_id", "r2_secret_access_key")
+        if not getattr(settings, name)
+    ]
+    if missing:
+        raise RuntimeError(f"storage_backend=r2 requires: {', '.join(missing)}")
 
 
 def get_storage(settings: Settings) -> Storage:
     if settings.storage_backend == "r2":
+        validate_r2_settings(settings)
         return R2Storage(
             account_id=settings.r2_account_id,  # type: ignore[arg-type]
             bucket=settings.r2_bucket,  # type: ignore[arg-type]
@@ -94,3 +110,13 @@ def get_storage(settings: Settings) -> Storage:
             secret_access_key=settings.r2_secret_access_key,  # type: ignore[arg-type]
         )
     return LocalStorage()
+
+
+def derive_key(base_key: str, filename: str) -> str:
+    """Build the storage key for a sibling artifact sharing base_key's task prefix.
+
+    All artifacts of a song live under ``karaoke/{task_id}/``, so given the song's
+    stored key we can locate any of its files by swapping the trailing filename.
+    """
+    prefix, sep, _ = base_key.rpartition("/")
+    return f"{prefix}/{filename}" if sep else filename

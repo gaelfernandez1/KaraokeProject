@@ -96,6 +96,28 @@ class TestGetSongByFilename:
         assert repo.get_song_by_filename(db_session, "missing.mp4") is None
 
 
+class TestGetSongOwningFile:
+    def test_finds_by_karaoke_filename(self, db_session):
+        repo.save_song(db_session, _sample_song(karaoke_filename="karaoke_x.mp4"))
+        assert repo.get_song_owning_file(db_session, "karaoke_x.mp4") is not None
+
+    def test_finds_by_video_only_filename(self, db_session):
+        repo.save_song(db_session, _sample_song(video_only_filename="karaoke_x_video_only.mp4"))
+        assert repo.get_song_owning_file(db_session, "karaoke_x_video_only.mp4") is not None
+
+    def test_finds_by_vocal_filename(self, db_session):
+        repo.save_song(db_session, _sample_song(vocal_filename="vocal_x.wav"))
+        assert repo.get_song_owning_file(db_session, "vocal_x.wav") is not None
+
+    def test_finds_by_instrumental_filename(self, db_session):
+        repo.save_song(db_session, _sample_song(instrumental_filename="instrumental_x.wav"))
+        assert repo.get_song_owning_file(db_session, "instrumental_x.wav") is not None
+
+    def test_no_match_returns_none(self, db_session):
+        repo.save_song(db_session, _sample_song())
+        assert repo.get_song_owning_file(db_session, "nope.mp4") is None
+
+
 class TestUpdateLastPlayed:
     def test_sets_last_played(self, db_session):
         song_id = repo.save_song(db_session, _sample_song())
@@ -165,6 +187,13 @@ class TestToDict:
         d = repo.get_song_by_id(db_session, song_id).to_dict()
         assert isinstance(d["created_at"], str)
         assert isinstance(d["last_played"], str)
+
+    def test_includes_storage_key(self, db_session):
+        song_id = repo.save_song(
+            db_session, _sample_song(storage_key="karaoke/task-1/karaoke_test.mp4")
+        )
+        d = repo.get_song_by_id(db_session, song_id).to_dict()
+        assert d["storage_key"] == "karaoke/task-1/karaoke_test.mp4"
 
 
 if __name__ == "__main__":
