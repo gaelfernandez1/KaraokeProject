@@ -35,6 +35,7 @@ class JobConfig:
     hf_token: str | None = None
     whisper_model: str = "small"
     save_to_db: bool = True
+    language: str | None = None
     output_dir: Path = field(default_factory=lambda: Path("./output"))
     work_dir: Path = field(default_factory=lambda: Path("/data"))
     storage: Storage = field(default_factory=LocalStorage)
@@ -70,6 +71,7 @@ class KaraokeJob:
         self.reporter = reporter or NoopProgressReporter()
         self.artifacts = JobArtifacts()
         self._job_work_dir = config.work_dir / config.task_id
+        self._language: str = "es"
 
     def run(self) -> str:
         self._job_work_dir.mkdir(parents=True, exist_ok=True)
@@ -136,6 +138,11 @@ class KaraokeJob:
         )
         if not srt_content.strip():
             raise AlignmentError("WhisperX returned empty SRT content")
+
+        detected = getattr(self.strategy, "detected_language", None)
+        manual = getattr(self.strategy, "language", None)  # set only for manual lyrics
+        self._language = self.config.language or detected or manual or "es"
+        logger.info("Resolved syllabification language: %s", self._language)
 
         srt_path = self._job_work_dir / f"vocals_whisperx_{self.config.whisper_model}.srt"
         srt_path.write_text(srt_content, encoding="utf-8")
@@ -216,7 +223,11 @@ class KaraokeJob:
                 else None
             )
             clip = create_karaoke_text_clip(
-                group, next_line_info=next_line, advance=0.5, duration_padding=0.5
+                group,
+                next_line_info=next_line,
+                advance=0.5,
+                duration_padding=0.5,
+                language=self._language,
             )
             clip = clip.set_start(start).set_duration(duration)
             clip = clip.set_position(("center", ALTO_VIDEO - MARXE_INFERIOR_SUBTITULO))

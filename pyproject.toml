@@ -143,6 +143,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
     "karaoke.domain.srt_processing",
+    "karaoke.domain.syllabification",
     "karaoke.domain.text_processing",
     "karaoke.infra.metadata_utils",
 ]

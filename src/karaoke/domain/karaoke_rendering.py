@@ -27,7 +27,7 @@ from karaoke.domain.render_config import (
     TEXT_CLIP_WIDTH,
     UMBRAL_ACELERACION,
 )
-from karaoke.domain.text_processing import dic_pyphen
+from karaoke.domain.syllabification import syllabify
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,7 @@ def render_line_image(
     font_size: int = TAMAÑO_FONTE,
     normal_color: str = COR_TEXTO,
     highlight_color: str = COR_RESALTADO,
+    language: str = "es",
 ) -> np.ndarray:
 
     texto_completo = line_info["line_text"]
@@ -196,7 +197,7 @@ def render_line_image(
         info_todas_silabas = []  # Lista de [silaba, es_final_de_palabra]
 
         for palabra in texto_completo.split():
-            silabas_palabra = dic_pyphen.inserted(palabra).split("-")
+            silabas_palabra = syllabify(palabra, language)
 
             if len(silabas_palabra) <= 1:  # Palabra non divisible
                 info_todas_silabas.append((palabra, True))
@@ -250,7 +251,7 @@ def render_line_image(
                                 word_info = test_word
                                 break
 
-                silabas_palabra = dic_pyphen.inserted(palabra).split("-")
+                silabas_palabra = syllabify(palabra, language)
 
                 if len(silabas_palabra) <= 1:
                     # se a palabra é non divisible -> renderizar completa
@@ -492,6 +493,7 @@ def create_karaoke_text_clip(
     next_line_info: dict | None = None,
     advance: float = 0.5,
     duration_padding: float = 0.5,
+    language: str = "es",
 ):
 
     duracion_liña = line_info["end"] - line_info["start"]
@@ -503,7 +505,7 @@ def create_karaoke_text_clip(
 
         t_efectivo = max(t - offset_visualizacion, 0)  # t seria o tempo transcurrido no clip
 
-        frameActual = render_line_image(line_info, t_efectivo)
+        frameActual = render_line_image(line_info, t_efectivo, language=language)
 
         if MOSTRAR_LIÑA_SEGUINTE and next_line_info:
             frame_seguinte = render_next_line_image(next_line_info)
