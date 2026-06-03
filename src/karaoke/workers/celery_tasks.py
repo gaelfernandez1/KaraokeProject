@@ -1,4 +1,5 @@
 import logging
+from dataclasses import replace
 from pathlib import Path
 
 from karaoke.config import Settings
@@ -10,6 +11,27 @@ from karaoke.workers.celery_app import celery
 from karaoke.workers.progress import CeleryProgressReporter
 
 logger = logging.getLogger(__name__)
+
+
+def _maybe_dispatch_to_modal(
+    config: JobConfig, strategy_spec: dict, reporter: CeleryProgressReporter
+) -> str | None:
+    """Offload the GPU pipeline to the Modal worker; return its result, or None to run local.
+
+    The deployed function is looked up by name rather than imported: modal/karaoke_worker.py
+    lives outside the package and its top-level ``modal`` name would shadow the client.
+    Off by default — do not enable in production without confirming input staging and the
+    WhisperX endpoint are reachable from Modal.
+    """
+    if not Settings().modal_dispatch:
+        return None
+    import modal  # noqa: PLC0415
+
+    reporter.report("Despachando o procesamento á GPU (Modal)...", 5)
+    run_karaoke_job = modal.Function.from_name("karaoke-gpu", "run_karaoke_job")
+    payload = config.to_transport_dict()
+    payload["strategy"] = strategy_spec
+    return run_karaoke_job.remote(config.task_id, payload)
 
 
 @celery.task(bind=True, name="process_automatic_karaoke")
@@ -28,14 +50,8 @@ def process_automatic_karaoke(
     reporter = CeleryProgressReporter(self)
     reporter.report("Iniciando procesamento automático...", 0)
 
-    if source_type == "youtube":
-        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
-
-        reporter.report("Descargando vídeo de YouTube...", 2)
-        video_path = download_youtube(source_url)
-
     config = JobConfig(
-        video_path=Path(video_path),
+        video_path=Path(video_path or ""),
         task_id=task_id,
         source_type=source_type,
         source_url=source_url,
@@ -47,6 +63,18 @@ def process_automatic_karaoke(
         work_dir=Path("/data"),
         storage=get_storage(Settings()),
     )
+
+    dispatched = _maybe_dispatch_to_modal(config, {"kind": "automatic"}, reporter)
+    if dispatched is not None:
+        return {"status": "completed", "result": dispatched, "message": "Karaoke automático xerado"}
+
+    # Local path: this worker has yt-dlp + ffmpeg, so fetch the youtube source here.
+    if source_type == "youtube":
+        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
+
+        reporter.report("Descargando vídeo de YouTube...", 2)
+        config = replace(config, video_path=Path(download_youtube(source_url)))
+
     job = KaraokeJob(config=config, strategy=AutomaticAlignment(), reporter=reporter)
 
     try:
@@ -78,14 +106,8 @@ def process_manual_lyrics_karaoke(
     reporter = CeleryProgressReporter(self)
     reporter.report("Iniciando procesamento con letras manuais...", 0)
 
-    if source_type == "youtube":
-        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
-
-        reporter.report("Descargando vídeo de YouTube...", 2)
-        video_path = download_youtube(source_url)
-
     config = JobConfig(
-        video_path=Path(video_path),
+        video_path=Path(video_path or ""),
         task_id=task_id,
         source_type=source_type,
         source_url=source_url,
@@ -97,6 +119,22 @@ def process_manual_lyrics_karaoke(
         work_dir=Path("/data"),
         storage=get_storage(Settings()),
     )
+
+    strategy_spec = {"kind": "manual", "lyrics": manual_lyrics, "language": language}
+    dispatched = _maybe_dispatch_to_modal(config, strategy_spec, reporter)
+    if dispatched is not None:
+        return {
+            "status": "completed",
+            "result": dispatched,
+            "message": "Karaoke con letras manuais xerado",
+        }
+
+    if source_type == "youtube":
+        from karaoke.infra.youtube import download_youtube  # noqa: PLC0415
+
+        reporter.report("Descargando vídeo de YouTube...", 2)
+        config = replace(config, video_path=Path(download_youtube(source_url)))
+
     strategy = ManualLyricsAlignment(lyrics=manual_lyrics, language=language)
     job = KaraokeJob(config=config, strategy=strategy, reporter=reporter)
 

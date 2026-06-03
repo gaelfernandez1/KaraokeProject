@@ -70,6 +70,9 @@ worker = [
     # psutil is used directly in celery_app signal handlers; pulled transitively
     # by celery but listed here so the direct dependency is explicit
     "psutil",
+    # Dispatch client. Imported lazily, only when MODAL_DISPATCH=true, so the
+    # default local path never touches it.
+    "modal>=0.73",
 ]
 
 # WhisperX service container: transcription + forced alignment

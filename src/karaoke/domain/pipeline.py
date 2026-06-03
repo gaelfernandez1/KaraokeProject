@@ -47,6 +47,52 @@ class JobConfig:
         if isinstance(self.storage, LocalStorage):
             object.__setattr__(self, "storage", LocalStorage(self.output_dir))
 
+    def to_transport_dict(self) -> dict[str, Any]:
+        """JSON-serializable view for handing a job to a remote worker (Modal).
+
+        The Storage object is dropped — the remote rebuilds its own backend from
+        its own secrets — and Paths become strings. JobConfig is a dataclass, so
+        this is the hand-rolled stand-in for the pydantic ``model_dump`` the
+        original deploy spec assumed.
+        """
+        return {
+            "video_path": str(self.video_path),
+            "task_id": self.task_id,
+            "source_type": self.source_type,
+            "source_url": self.source_url,
+            "enable_diarization": self.enable_diarization,
+            "hf_token": self.hf_token,
+            "whisper_model": self.whisper_model,
+            "save_to_db": self.save_to_db,
+            "user_id": self.user_id,
+            "language": self.language,
+            "output_dir": str(self.output_dir),
+            "work_dir": str(self.work_dir),
+        }
+
+    @classmethod
+    def from_transport_dict(cls, data: dict[str, Any], storage: Storage) -> JobConfig:
+        """Rebuild a JobConfig from to_transport_dict, injecting the remote storage.
+
+        Extra keys (e.g. the strategy descriptor the dispatcher tacks on) are
+        ignored, so the dict can carry more than the config needs.
+        """
+        return cls(
+            video_path=Path(data["video_path"]),
+            task_id=data["task_id"],
+            source_type=data.get("source_type", "upload"),
+            source_url=data.get("source_url"),
+            enable_diarization=data.get("enable_diarization", False),
+            hf_token=data.get("hf_token"),
+            whisper_model=data.get("whisper_model", "small"),
+            save_to_db=data.get("save_to_db", True),
+            user_id=data.get("user_id"),
+            language=data.get("language"),
+            output_dir=Path(data.get("output_dir", "./output")),
+            work_dir=Path(data.get("work_dir", "/data")),
+            storage=storage,
+        )
+
 
 @dataclass
 class JobArtifacts:

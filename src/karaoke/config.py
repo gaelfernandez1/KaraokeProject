@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # Sentry error tracking. Optional: unset means observability is simply off,
     # so dev and CI boot without a DSN. Production sets it via fly secrets.
     sentry_dsn: str | None = None
+    # Offload the GPU pipeline to the Modal worker instead of running it in this
+    # process. Off by default — never flip it on in production without confirming
+    # the input staging and WhisperX endpoint are reachable from Modal.
+    modal_dispatch: bool = False
 
     model_config = {"env_file": ".env", "case_sensitive": False}
 
