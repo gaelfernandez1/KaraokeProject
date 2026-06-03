@@ -41,6 +41,11 @@ COPY pyproject.toml ./
 COPY src/ ./src/
 COPY templates/ ./templates/
 COPY static/ ./static/
+# Ship Alembic so migrations run in production — via Fly's release_command or a
+# manual `fly ssh console --command "alembic upgrade head"`. alembic is already in
+# the core deps; env.py reads DATABASE_URL through Settings (alembic.ini url is empty).
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
 
 RUN mkdir -p input output
 

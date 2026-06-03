@@ -27,3 +27,25 @@ class TestCeleryTasksRegistered:
         assert callable(process_automatic_karaoke)
         assert callable(process_manual_lyrics_karaoke)
         assert callable(process_instrumental_only)
+
+
+class TestCeleryBrokerConfig:
+    def test_broker_and_backend_fall_back_to_redis_url(self, monkeypatch):
+        from karaoke.workers.celery_app import make_celery
+
+        monkeypatch.delenv("CELERY_BROKER_URL", raising=False)
+        monkeypatch.delenv("CELERY_RESULT_BACKEND", raising=False)
+        monkeypatch.setenv("REDIS_URL", "redis://example:6379/2")
+        celery = make_celery()
+        assert celery.conf.broker_url == "redis://example:6379/2"
+        assert celery.conf.result_backend == "redis://example:6379/2"
+
+    def test_explicit_celery_vars_override_redis_url(self, monkeypatch):
+        from karaoke.workers.celery_app import make_celery
+
+        monkeypatch.setenv("CELERY_BROKER_URL", "redis://broker:6379/0")
+        monkeypatch.setenv("CELERY_RESULT_BACKEND", "redis://backend:6379/1")
+        monkeypatch.setenv("REDIS_URL", "redis://example:6379/2")
+        celery = make_celery()
+        assert celery.conf.broker_url == "redis://broker:6379/0"
+        assert celery.conf.result_backend == "redis://backend:6379/1"
