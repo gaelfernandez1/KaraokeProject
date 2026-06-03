@@ -3,7 +3,13 @@ import os
 import time
 
 from celery import Celery
-from celery.signals import task_failure, task_postrun, task_prerun, task_revoked
+from celery.signals import (
+    task_failure,
+    task_postrun,
+    task_prerun,
+    task_revoked,
+    worker_process_init,
+)
 
 from karaoke.logging_config import _task_id_var
 
@@ -38,6 +44,16 @@ def make_celery():
 celery = make_celery()
 
 active_processes = {}
+
+
+@worker_process_init.connect
+def init_sentry_worker(**kwargs):
+    # Each prefork child gets its own Sentry client. Building Settings here (not at
+    # import) keeps the web and tests, which import this module, from needing a DSN.
+    from karaoke.config import Settings  # noqa: PLC0415
+    from karaoke.observability import init_sentry  # noqa: PLC0415
+
+    init_sentry(Settings())
 
 
 @task_prerun.connect

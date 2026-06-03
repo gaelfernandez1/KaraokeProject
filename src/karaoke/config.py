@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     resend_api_key: str | None = None
     resend_from_email: str = "KaraokeIA <onboarding@resend.dev>"
     app_base_url: str = "http://localhost:5000"
+    # Sentry error tracking. Optional: unset means observability is simply off,
+    # so dev and CI boot without a DSN. Production sets it via fly secrets.
+    sentry_dsn: str | None = None
 
     model_config = {"env_file": ".env", "case_sensitive": False}
 

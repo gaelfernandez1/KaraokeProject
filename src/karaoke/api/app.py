@@ -14,6 +14,7 @@ from karaoke.infra.db import init_db, session_scope
 from karaoke.infra.db.repository import get_user_by_id
 from karaoke.infra.gpu_utils import print_system_summary
 from karaoke.logging_config import _request_id_var, configure_logging
+from karaoke.observability import init_sentry
 from karaoke.security import setup_security
 
 _ROOT = pathlib.Path(__file__).parents[3]
@@ -44,6 +45,7 @@ def create_app() -> Flask:
         validate_r2_settings(settings)
 
     configure_logging(settings.log_level)
+    init_sentry(settings)
 
     flask_app = Flask(
         __name__,
