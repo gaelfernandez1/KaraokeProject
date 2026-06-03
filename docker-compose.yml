@@ -55,6 +55,12 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=${DATABASE_URL:-postgresql+psycopg://karaoke:secret@postgres:5432/karaoke}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Magic-link email. Without RESEND_API_KEY the login endpoint logs a warning
+      # and skips the send, so no mail goes out. APP_BASE_URL must match the URL you
+      # open the app at, or the verify link in the email points nowhere.
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - "RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL:-KaraokeIA <onboarding@resend.dev>}"
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:5000}
     restart: unless-stopped
 
   celery_worker:
