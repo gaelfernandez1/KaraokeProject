@@ -13,6 +13,11 @@ from karaoke.workers.celery_tasks import (
 
 bp = Blueprint("generation", __name__)
 
+# TODO(F11): cap input duration to bound GPU cost. It can't live here — the thin
+# web image has no ffmpeg to probe the file — so enforce max_upload_seconds in the
+# worker's _prepare step instead. MAX_FILE_SIZE_MB already caps upload size as a
+# rough proxy in the meantime.
+
 DIRECTORIO_ENTRADA = "input"
 DIRECTORIO_SAIDA = "output"
 EXTENSIONES_PERMITIDAS = {"mp4"}

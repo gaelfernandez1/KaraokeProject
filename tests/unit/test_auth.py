@@ -34,6 +34,38 @@ class TestLogin:
         resend_send.assert_not_called()
 
 
+class TestAllowlist:
+    def test_open_registration_sends_to_anyone(self, flask_app, client, resend_send):
+        flask_app.config["APP_SETTINGS"].resend_api_key = "re_test"
+        flask_app.config["APP_SETTINGS"].allowed_emails = []
+        resp = client.post("/auth/login", data={"email": "stranger@example.com"})
+        assert resp.status_code == 200
+        resend_send.assert_called_once()
+
+    def test_allowlisted_email_gets_link_case_insensitively(self, flask_app, client, resend_send):
+        flask_app.config["APP_SETTINGS"].resend_api_key = "re_test"
+        flask_app.config["APP_SETTINGS"].allowed_emails = ["alice@example.com"]
+        resp = client.post("/auth/login", data={"email": "Alice@Example.com"})
+        assert resp.status_code == 200
+        resend_send.assert_called_once()
+
+    def test_non_allowlisted_email_gets_no_link(self, flask_app, client, resend_send):
+        flask_app.config["APP_SETTINGS"].resend_api_key = "re_test"
+        flask_app.config["APP_SETTINGS"].allowed_emails = ["alice@example.com"]
+        resp = client.post("/auth/login", data={"email": "bob@example.com"})
+        assert resp.status_code == 200
+        resend_send.assert_not_called()
+
+    def test_rejected_and_accepted_are_indistinguishable(self, flask_app, client, resend_send):
+        settings = flask_app.config["APP_SETTINGS"]
+        settings.resend_api_key = "re_test"
+        settings.allowed_emails = ["alice@example.com"]
+        accepted = client.post("/auth/login", data={"email": "alice@example.com"})
+        rejected = client.post("/auth/login", data={"email": "mallory@example.com"})
+        assert accepted.status_code == rejected.status_code == 200
+        assert accepted.data == rejected.data
+
+
 class TestVerify:
     def test_valid_token_logs_in_and_creates_user(self, flask_app, client):
         token = _serializer(flask_app).dumps("carol@example.com")
