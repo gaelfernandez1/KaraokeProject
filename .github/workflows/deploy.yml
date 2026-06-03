@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  # Deploy the web tier only after the CI workflow goes green on main.
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  # Manual trigger for the Modal GPU worker (deliberate, never on a push).
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy-web:
+    name: Deploy web to Fly.io
+    runs-on: ubuntu-latest
+    # Auto-deploy only when CI passed. Skipped on manual dispatch (that's for Modal);
+    # redeploy the web by hand with `flyctl deploy` — see docs/05-runbook.md.
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Deploy the exact commit that passed CI, not whatever is newest on main.
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+  deploy-modal:
+    name: Deploy GPU worker to Modal
+    runs-on: ubuntu-latest
+    # Manual only: pushing the heavy worker image and turning MODAL_DISPATCH on is a
+    # deliberate decision, so this is gated behind a "Run workflow" click.
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install Modal and the karaoke package
+        # `modal deploy` reads pyproject.toml for the worker deps and needs
+        # `import karaoke` to resolve add_local_python_source. -e . pulls no heavy deps.
+        run: |
+          pip install modal
+          pip install -e .
+      - run: modal deploy modal/karaoke_worker.py
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
