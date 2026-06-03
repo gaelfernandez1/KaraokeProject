@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # Magic-link email (Resend). Optional so dev boots without it; production must set it.
     resend_api_key: str | None = None
     resend_from_email: str = "KaraokeIA <onboarding@resend.dev>"
-    app_base_url: str = "http://localhost:8000"
+    app_base_url: str = "http://localhost:5000"
 
     model_config = {"env_file": ".env", "case_sensitive": False}
 
