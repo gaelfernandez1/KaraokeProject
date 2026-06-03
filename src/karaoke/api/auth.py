@@ -20,6 +20,13 @@ def _serializer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(current_app.secret_key, salt=_SALT)
 
 
+def _mask_email(email: str) -> str:
+    """First char + domain, so a rejected attempt is logged without the full address."""
+    local, _, domain = email.partition("@")
+    shown = local[0] if local else ""
+    return f"{shown}***@{domain}" if domain else f"{shown}***"
+
+
 def _send_magic_link(email: str, link: str) -> None:
     settings = current_app.config["APP_SETTINGS"]
     if not settings.resend_api_key:
@@ -47,13 +54,22 @@ def login():
     email = request.form.get("email", "").strip().lower()
     if email:
         settings = current_app.config["APP_SETTINGS"]
-        token = _serializer().dumps(email)
-        link = f"{settings.app_base_url.rstrip('/')}/auth/verify/{token}"
-        try:
-            _send_magic_link(email, link)
-        except Exception:
-            # Never surface send failures (or whether the address exists) to the client.
-            logger.exception("Failed to send magic-link email")
+        # Private-beta gate: an empty allowlist leaves registration open. When it's
+        # set, a non-listed address gets the same generic page below but no link, so
+        # the response never reveals whether an address is authorized or exists.
+        if settings.allowed_emails and email not in settings.allowed_emails:
+            logger.info(
+                "Rejected magic-link request for non-allowlisted address",
+                extra={"email_hint": _mask_email(email)},
+            )
+        else:
+            token = _serializer().dumps(email)
+            link = f"{settings.app_base_url.rstrip('/')}/auth/verify/{token}"
+            try:
+                _send_magic_link(email, link)
+            except Exception:
+                # Never surface send failures (or whether the address exists) to the client.
+                logger.exception("Failed to send magic-link email")
     # Generic confirmation regardless of whether the email exists or the send worked.
     return render_template("login.html", sent=True)
 
