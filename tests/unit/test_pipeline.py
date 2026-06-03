@@ -550,6 +550,69 @@ class TestPersistUserId:
 # ---------------------------------------------------------------------------
 
 
+class TestJobConfigTransport:
+    class _FakeStorage:
+        """Not a LocalStorage, so JobConfig.__post_init__ leaves it untouched."""
+
+        def upload(self, local_path, key):
+            return key
+
+        def get_signed_url(self, key, expires_in=3600):
+            return ""
+
+        def delete(self, key):
+            pass
+
+        def exists(self, key):
+            return False
+
+    def test_round_trip_preserves_fields(self, tmp_path):
+        import json
+
+        config = JobConfig(
+            video_path=tmp_path / "song.mp4",
+            task_id="t-1",
+            source_type="youtube",
+            source_url="https://youtu.be/x",
+            enable_diarization=True,
+            hf_token="hf",
+            whisper_model="medium",
+            save_to_db=False,
+            user_id="u-1",
+            language="gl",
+            output_dir=tmp_path / "out",
+            work_dir=tmp_path / "data",
+        )
+
+        data = config.to_transport_dict()
+        json.dumps(data)  # must be JSON-serializable
+        assert "storage" not in data
+        assert data["video_path"] == str(tmp_path / "song.mp4")
+
+        sentinel = self._FakeStorage()
+        rebuilt = JobConfig.from_transport_dict(data, storage=sentinel)
+
+        assert rebuilt.video_path == config.video_path
+        assert rebuilt.task_id == "t-1"
+        assert rebuilt.source_type == "youtube"
+        assert rebuilt.source_url == "https://youtu.be/x"
+        assert rebuilt.enable_diarization is True
+        assert rebuilt.hf_token == "hf"
+        assert rebuilt.whisper_model == "medium"
+        assert rebuilt.save_to_db is False
+        assert rebuilt.user_id == "u-1"
+        assert rebuilt.language == "gl"
+        assert rebuilt.work_dir == config.work_dir
+        assert rebuilt.storage is sentinel
+
+    def test_from_transport_dict_ignores_extra_strategy_key(self, tmp_path):
+        config = JobConfig(video_path=tmp_path / "s.mp4", task_id="t", work_dir=tmp_path)
+        data = config.to_transport_dict()
+        data["strategy"] = {"kind": "manual", "lyrics": "la la", "language": None}
+        rebuilt = JobConfig.from_transport_dict(data, storage=self._FakeStorage())
+        assert rebuilt.task_id == "t"
+
+
 class TestLanguageResolution:
     class _FakeStrategy:
         is_manual_lyrics = False
