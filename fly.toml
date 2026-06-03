@@ -1,0 +1,50 @@
+# Fly.io config for the KaraokeProject web tier (thin Flask + Celery client).
+#
+# IMPORTANT: this deploys ONLY the web box. A shared-cpu-1x/256MB machine cannot
+# run Demucs/torch, so it does not render karaokes — it enqueues jobs and serves
+# signed R2 URLs. Processing needs either MODAL_DISPATCH=true (GPU on Modal) or a
+# separate worker. See docs/05-runbook.md "Worker topology".
+#
+# Rename `app` to your own globally-unique name and update APP_BASE_URL to match.
+# Generate/refresh from scratch with: fly launch --no-deploy  (keep this file when
+# it offers to overwrite).
+
+app = "karaoke-web"
+primary_region = "mad"  # Madrid; cdg/fra are nearby alternatives
+
+[build]
+  dockerfile = "Dockerfile.web"
+
+[deploy]
+  # Run migrations on a throwaway machine before the new release goes live, so the
+  # schema is migrated and alembic-stamped before any app machine boots (init_db's
+  # create_all then finds the tables present and no-ops). Fails the deploy if the
+  # migration fails. alembic reads DATABASE_URL via Settings (alembic.ini url is empty).
+  release_command = "alembic upgrade head"
+
+# Non-secret config. Secrets (DATABASE_URL, REDIS_URL, R2_*, etc.) go through
+# `fly secrets set` — never commit them. See docs/05-runbook.md.
+[env]
+  STORAGE_BACKEND = "r2"
+  APP_BASE_URL = "https://karaoke-web.fly.dev"
+
+[http_service]
+  internal_port = 5000  # the image's gunicorn + healthcheck already bind 5000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0  # scale to zero when idle (private beta = low traffic)
+
+  # No [mounts]: with STORAGE_BACKEND=r2 outputs live in R2 and the web box keeps
+  # no local state, so it needs no volume. A mount would only matter for local storage.
+
+  [[http_service.checks]]
+    method = "get"
+    path = "/health"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

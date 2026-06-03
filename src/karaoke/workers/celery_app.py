@@ -17,8 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 def make_celery():
-    broker_url = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
-    result_backend = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+    # One Redis is enough in production: REDIS_URL (Upstash on Fly) is the default
+    # for both broker and backend, with CELERY_BROKER_URL/CELERY_RESULT_BACKEND left
+    # as explicit overrides (docker-compose still sets them). This lets the Fly web
+    # enqueue jobs with a single REDIS_URL secret.
+    redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
+    broker_url = os.getenv("CELERY_BROKER_URL", redis_url)
+    result_backend = os.getenv("CELERY_RESULT_BACKEND", redis_url)
 
     celery = Celery(
         "karaoke_tasks",
