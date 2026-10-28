@@ -74,3 +74,51 @@ def test_compare_two_runs(demo_bench: BenchPaths, capsys: pytest.CaptureFixture[
 
     assert code == 0
     assert out.read_text(encoding="utf-8").startswith("# Comparación")
+
+
+def _fake_draft_pipeline(tmp_path: Path) -> Path:
+    path = tmp_path / "draft.toml"
+    path.write_text(
+        'name = "draft"\n[steps.aligner]\ntarget = "karaoke_bench.fakes:EvenSplitAligner"\n',
+        encoding="utf-8",
+    )
+    return path
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_draft_refuses_to_overwrite_reviewed_reference(
+    demo_bench: BenchPaths, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    base = ["--bench-dir", str(demo_bench.root)]
+    pipeline = str(_fake_draft_pipeline(tmp_path))
+    ref_path = demo_bench.data / "private" / "demo" / "reference.json"
+    before = ref_path.read_text(encoding="utf-8")
+
+    refused = main([*base, "draft", "private/demo", "--pipeline", pipeline])
+    forced = main([*base, "draft", "private/demo", "--pipeline", pipeline, "--force"])
+
+    assert refused == 1
+    assert "--force" in capsys.readouterr().err
+    assert forced == 0
+    assert ref_path.read_text(encoding="utf-8") != before
+    assert '"status": "draft"' in ref_path.read_text(encoding="utf-8")
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_realign_marks_fixed_lines_for_review(demo_bench: BenchPaths, tmp_path: Path) -> None:
+    from karaoke_bench.reference import dump_reference, load_reference
+
+    ref_path = demo_bench.data / "private" / "demo" / "reference.json"
+    ref = load_reference(ref_path)
+    ref.lines[2].status = "wrong"
+    dump_reference(ref, ref_path)
+
+    code = main(
+        ["--bench-dir", str(demo_bench.root), "realign", "private/demo", "--pipeline",
+         str(_fake_draft_pipeline(tmp_path))]
+    )  # fmt: skip
+
+    fixed = load_reference(ref_path)
+    assert code == 0
+    assert fixed.lines[2].status == "draft"
+    assert fixed.lines[2].revised
