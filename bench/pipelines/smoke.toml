@@ -1,0 +1,17 @@
+# Fake steps that exercise the whole bench without models. The even split aligner is also the
+# dumbest possible baseline: any real aligner must beat it.
+name = "smoke"
+description = "Fake steps that exercise the bench without models"
+
+[steps.separator]
+target = "karaoke_bench.fakes:PassthroughSeparator"
+
+[steps.transcriber]
+target = "karaoke_bench.fakes:FixedTranscriber"
+params = { text = "ola mar" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.fakes:EvenSplitAligner"
