@@ -1,4 +1,4 @@
-.PHONY: setup lint format typecheck test contracts web ci
+.PHONY: setup lint format typecheck test contracts web check-env ci
 
 setup:
 	uv sync
@@ -29,5 +29,8 @@ web:
 	pnpm --dir web check
 	pnpm --dir web test
 	pnpm --dir web build
+
+check-env:
+	uv run python scripts/check_env.py
 
 ci: lint typecheck test web
