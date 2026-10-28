@@ -1,0 +1,17 @@
+# A plain modern default: Demucs, Whisper large-v3-turbo with the language the user chose, and
+# the default per-language CTC aligner.
+name = "base-turbo"
+description = "Demucs + Whisper large-v3-turbo (language given) + default CTC aligner"
+
+[steps.separator]
+target = "karaoke_bench.baseline.separation:DemucsSeparator"
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "large-v3-turbo" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"

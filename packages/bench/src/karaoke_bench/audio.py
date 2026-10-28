@@ -2,6 +2,7 @@
 
 import hashlib
 import subprocess
+import wave
 from pathlib import Path
 
 import numpy as np
@@ -48,6 +49,19 @@ def cut(path: Path, start: float, end: float, dest: Path) -> Path:
          "-i", str(path), "-ac", "1", "-ar", str(SAMPLE_RATE), str(dest)],
     )  # fmt: skip
     return dest
+
+
+def write_wav(path: Path, samples: npt.NDArray[np.floating], rate: int) -> Path:
+    """Writes (channels, frames) float samples in [-1, 1] as 16-bit PCM, clipping overshoots."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frames = np.atleast_2d(samples)
+    pcm = (np.clip(frames, -1.0, 1.0) * 32767).astype("<i2").T.copy()
+    with wave.open(str(path), "wb") as out:
+        out.setnchannels(frames.shape[0])
+        out.setsampwidth(2)
+        out.setframerate(rate)
+        out.writeframes(pcm.tobytes())
+    return path
 
 
 def peaks(samples: Samples, rate: int = 100) -> tuple[list[float], list[float]]:
