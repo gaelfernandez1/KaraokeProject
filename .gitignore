@@ -50,11 +50,6 @@ web/build/
 web/test-results/
 web/playwright-report/
 
-# Claude Code and agent scratch space
-.claude/settings.local.json
-.claude/worktrees/
-.superpowers/
-
 # Old planning docs, kept locally only
 docs/archivo/
 

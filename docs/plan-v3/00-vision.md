@@ -1,22 +1,21 @@
 # Plan v3 · Visión, arquitectura y contratos
 
 > Fuente de verdad del plan v3 del KaraokeProject (escrito el 28/10/2026). Sustituye a todo lo
-> anterior: plan v2, `docs/00–10`, `docs/planning/STATE.md` y las secciones del CLAUDE.md antiguo
-> que hablan de fases V1–V8. Si algo de aquí cambia, se cambia con una decisión escrita
+> anterior: plan v2, `docs/00–10`, `docs/planning/STATE.md` y las notas antiguas de
+> fases V1–V8. Si algo de aquí cambia, se cambia con una decisión escrita
 > (`decisiones/`, ver §10) y se actualiza este documento en el mismo PR.
 
 ## 0. Cómo se usa
 
-- Cada área de mejora se trabaja en una conversación de Claude Code distinta (C1–C10, §8). Sus
-  prompts están en `01-conversaciones.md`.
+- El trabajo se divide en diez áreas (C1–C10, §8) que se abordan por separado, cada una en su rama.
 - Todas leen este documento, `ESTADO.md` y `decisiones/` al empezar. Así el resultado de todas
   encaja.
-- Lo marcado como **decisión inicial** lo eligió la conversación de planificación. La conversación
-  dueña puede cambiarlo si lo justifica en una decisión escrita.
+- Lo marcado como **decisión inicial** se decidió en la planificación. El área dueña puede
+  cambiarlo si lo justifica en una decisión escrita.
 
 ## 1. Objetivo
 
-Con palabras del usuario (28/10/2026, resumidas): una mejora masiva de todo el proyecto (backend,
+Una mejora masiva de todo el proyecto (backend,
 frontend, herramientas, código y forma de trabajar), con libertad total para cambiar cómo se hace
 mientras se mantenga el objetivo: **un karaoke que funcione en muchos idiomas pero sobre todo en
 gallego, bien transcrito, con subtítulos animados que vayan al mismo tiempo que se canta**. Debe
@@ -48,7 +47,7 @@ Qué significa éxito (metas **provisionales**; C2 las fija tras medir la línea
   Sentry. Nada desplegado. Rama `feature/f13-deploy` con 5 commits sin mergear.
 - **Entorno**: Python 3.10 (fin de soporte en octubre de 2026). En WSL no hay docker, uv, gh ni
   ffmpeg; la GPU sí se ve (`nvidia-smi`).
-- `docs/` y `CLAUDE.md` están en `.gitignore` (C1 lo cambia para que el plan se versione).
+- `docs/` está en `.gitignore` (C1 lo cambia para que el plan se versione).
 
 ## 3. Principios
 
@@ -60,7 +59,7 @@ Qué significa éxito (metas **provisionales**; C2 las fija tras medir la línea
 3. **Un único documento de letra.** El motor produce `karaoke.json`; el reproductor web y la
    exportación MP4 lo consumen. La letra se sincroniza una vez y se pinta en dos sitios.
 4. **El reproductor web es la experiencia principal.** El MP4 es una exportación.
-5. **Local primero y a coste cero.** El portátil del usuario procesa con su GPU y sirve la web.
+5. **Local primero y a coste cero.** El portátil del propietario procesa con su GPU y sirve la web.
    La nube es opcional y gratuita si se usa.
 6. **Automático, pero corregible.** Siempre se puede arreglar a mano una palabra o un tiempo.
 7. **Pocas piezas.** Cada servicio, cola o dependencia debe ganarse su sitio.
@@ -208,7 +207,7 @@ REST + WebSocket o SSE para progreso, descrita en OpenAPI; el cliente TS se gene
 
 ## 7. Pistas de la investigación (28/10/2026)
 
-Punto de partida para cada conversación; comprobar versiones y licencias antes de usar.
+Punto de partida para cada área; comprobar versiones y licencias antes de usar.
 
 - **Separación.** [audio-separator](https://pypi.org/project/audio-separator/) 0.47.1
   (19/10/2026) con BS-RoFormer o Mel-Band RoFormer, que lideran
@@ -248,12 +247,12 @@ Punto de partida para cada conversación; comprobar versiones y licencias antes 
   palabra). Para gallego con licencia CC: Jamendo, Internet Archive y Wikimedia Commons; no hay
   tiempos publicados, hay que crearlos y validarlos de oído.
 
-## 8. Reparto en conversaciones
+## 8. Reparto en áreas de trabajo
 
-| Conv. | Área | Misión | Dueña de |
+| Id | Área | Misión | Dueña de |
 |---|---|---|---|
-| C1 | Arquitectura, repo y cimientos | dejar el terreno listo para trabajar en paralelo sin pisarse | estructura, herramientas, CI base, contratos v0, CLAUDE.md, git |
-| C2 | Banco de pruebas y métricas | medir con números transcripción, sincronía y velocidad | conjuntos de prueba, métricas, runner, skill `probar-karaoke` |
+| C1 | Arquitectura, repo y cimientos | dejar el terreno listo para trabajar en paralelo sin pisarse | estructura, herramientas, CI base, contratos v0, guía de desarrollo, git |
+| C2 | Banco de pruebas y métricas | medir con números transcripción, sincronía y velocidad | conjuntos de prueba, métricas, comando `karaoke-bench` |
 | C3 | Audio: separación y sonido | mejor separación en 4 GB y sonido que funcione en todo | ingesta de audio, separación, normalización, formatos, motor de audio web |
 | C4 | Transcripción y sincronización | letra correcta y tiempos reales, gallego primero | idioma, normalización de letra, ASR, alineación, líneas, subunidades |
 | C5 | Subtítulos animados | letra bonita y en sincronía, igual en web y MP4 | diseño del movimiento, temas, componente de letra web, generador ASS |
@@ -264,7 +263,7 @@ Punto de partida para cada conversación; comprobar versiones y licencias antes 
 | C10 | Proyecto profesional | repo open source serio | README, documentación, releases, licencias, comunidad |
 
 La mejora del código va al final porque casi todo el código viejo se sustituye: limpiarlo antes
-sería trabajo tirado. Las reglas de calidad se fijan desde C1 y cada conversación las cumple.
+sería trabajo tirado. Las reglas de calidad se fijan desde C1 y cada área las cumple.
 
 ## 9. Orden y dependencias
 
@@ -276,21 +275,20 @@ Ola 4:  C6 (tras el ASS de C5) · C8 (tras la CLI del motor) · C5/C7 se integra
 Ola 5:  C9 → C10
 ```
 
-- Hasta que C1 termine, una sola conversación a la vez y sin worktrees (`docs/` aún no se versiona).
-- Después, como mucho dos conversaciones a la vez, cada una en su rama y su worktree.
-- Una conversación puede necesitar varias sesiones: se retoma con el mismo prompt y `ESTADO.md`.
+- C1 va sola. Después, como mucho dos áreas a la vez, cada una en su rama.
+- Un área puede necesitar varias sesiones de trabajo: `ESTADO.md` dice por dónde iba.
 
 ## 10. Mecanismos de coherencia
 
-- **`ESTADO.md`**: tablero con una fila por conversación (estado, rama, último hito, interfaces que
+- **`ESTADO.md`**: tablero con una fila por área (estado, rama, último hito, interfaces que
   expone, pendiente para otras). Se actualiza tras cada hito, no solo al final.
 - **`decisiones/NNN-titulo.md`**: decisiones cortas (contexto, decisión, consecuencias, a quién
   afecta). Obligatorias para cambiar algo de este documento o de un contrato.
 - **Contratos en código** con fixtures y tests de contrato: cada consumidor valida contra el JSON
   Schema.
-- **Ramas** `v3/cN-tema`, PR a `main`, `/code-review` antes de pedir el OK. `main` siempre verde.
-- **Banco común** (`probar-karaoke`) con informes fechados en `bench/results/`.
-- **Límites de área**: una conversación no edita el área de otra salvo un cambio mínimo
+- **Ramas** `v3/cN-tema` y PR a `main` con revisión de código antes del merge. `main` siempre verde.
+- **Banco común** (`karaoke-bench`) con informes fechados en `bench/results/`.
+- **Límites de área**: un área no edita otra salvo un cambio mínimo
   documentado. Cuando dos áreas se encuentran (p. ej. C5 y C7 en el reproductor), la que llega
   segunda hace la integración y la prueba de extremo a extremo.
 
@@ -299,29 +297,26 @@ Ola 5:  C9 → C10
 - **Hardware**: RTX 3050 Laptop 4 GB VRAM, Ryzen 7 5800H, 16 GB RAM (WSL ve unos 7–8 GB), SSD
   512 GB. Un modelo en GPU a la vez; int8/float16; modelos descargados una vez y cacheados.
 - **Presupuesto**: ~0 €/mes. Nada de APIs de pago por defecto.
-- **Claude**: siempre Opus, también en subagentes. Si se acaba la cuota, se espera.
-- **Autenticaciones**: si algo necesita login, token o sudo, se para y se pide al usuario, que se
-  autentica a mano.
-- **Derechos**: el repo no contiene audio con copyright. Las canciones del usuario solo en local;
+- **Credenciales**: los logins y tokens los pone el propietario a mano y nunca se guardan en el
+  repo.
+- **Derechos**: el repo no contiene audio con copyright. Las canciones propias, solo en local;
   las de prueba públicas son CC y se descargan con un script.
 - **Privacidad**: todo local; nada se envía a servicios externos sin decirlo.
 - **Sin monetización** (decisión firme de julio de 2026, sigue vigente).
-- **Git**: commits en inglés con tono humano; nunca commit ni push sin el OK explícito del usuario;
-  nunca force-push a `main`.
+- **Git**: commits en inglés con tono humano; nada llega a `main` sin revisión y nunca con
+  force-push.
 
-## 12. Lo que decide cada conversación
+## 12. Lo que decide cada área
 
 Todo lo que no fija este documento: nombres de módulos, librerías concretas, modelos (con datos del
-banco), diseño visual, formatos exactos, y si las sílabas se usan o no. Cada conversación hace un
-brainstorming corto con el usuario sobre lo específico de su área antes de planificar.
+banco), diseño visual, formatos exactos, y si las sílabas se usan o no. Cada área empieza aclarando
+lo específico de su parte antes de planificar.
 
-## 13. Acciones del usuario previstas
+## 13. Pasos manuales previstos
 
-- **C1**: `sudo apt install ffmpeg` (y lo que haga falta en WSL); `gh auth login` o arreglar el
-  token del MCP de GitHub (falla con "Authorization header is badly formatted"); aprobar los MCPs
-  recomendados (Context7, Playwright).
+- **C1**: `sudo apt install ffmpeg` (y lo que haga falta en WSL); `gh auth login`.
 - **C2**: cuenta gratuita de Jamendo si su API la pide; validar de oído las referencias en gallego.
 - **C3/C4**: token de Hugging Face solo si algún modelo es restringido (p. ej. pyannote para dúos).
-- **C7**: probar en su móvil y en su tele.
+- **C7**: probar en un móvil, un portátil y una tele reales.
 - **C8**: Tailscale o Cloudflare si quiere acceso desde fuera de casa.
 - **C10**: ajustes del repo en GitHub (descripción, temas, protección de rama, releases).

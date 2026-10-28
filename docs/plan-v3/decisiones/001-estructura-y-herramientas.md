@@ -2,7 +2,7 @@
 
 - **Fecha**: 28/10/2026
 - **Estado**: aceptada (C1)
-- **Afecta a**: todas las conversaciones
+- **Afecta a**: todas las áreas
 
 ## Contexto
 
@@ -33,10 +33,8 @@ herramientas para que C2–C10 trabajen igual.
 - **CI** en GitHub Actions: tres trabajos (Python, web, contratos sincronizados) sin GPU ni torch.
 - **El sistema v2** queda en `legacy/` sin lint ni CI y etiquetado como `v2-final`. Las ramas viejas
   se archivaron como etiquetas `archive/*`.
-- **Docs**: se versionan `docs/plan-v3/`, `docs/desarrollo.md`, `docs/tfg/` y `CLAUDE.md`. Los
-  planes viejos viven solo en local en `docs/archivo/`.
-- **Claude Code**: un hook PostToolUse formatea al editar; `.mcp.json` ofrece Context7 y Playwright
-  (headless).
+- **Docs**: se versionan `docs/plan-v3/`, `docs/desarrollo.md` y `docs/tfg/`. Los planes viejos
+  y las notas de trabajo personales viven solo en local.
 
 ## Consecuencias
 
