@@ -1,0 +1,451 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gaelfernandez1/KaraokeProject/schemas/karaoke.schema.json",
+  "$defs": {
+    "AudioRefs": {
+      "properties": {
+        "instrumental": {
+          "minLength": 1,
+          "title": "Instrumental",
+          "type": "string"
+        },
+        "vocals": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vocals"
+        },
+        "loudness_lufs": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Loudness Lufs"
+        }
+      },
+      "required": [
+        "instrumental",
+        "vocals",
+        "loudness_lufs"
+      ],
+      "title": "AudioRefs",
+      "type": "object"
+    },
+    "LanguageFallback": {
+      "description": "Records that a step could not use a resource for the requested language.",
+      "properties": {
+        "step": {
+          "minLength": 1,
+          "title": "Step",
+          "type": "string"
+        },
+        "requested": {
+          "minLength": 1,
+          "title": "Requested",
+          "type": "string"
+        },
+        "used": {
+          "minLength": 1,
+          "title": "Used",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step",
+        "requested",
+        "used",
+        "reason"
+      ],
+      "title": "LanguageFallback",
+      "type": "object"
+    },
+    "Line": {
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "start": {
+          "description": "Seconds from the start of the song audio.",
+          "minimum": 0,
+          "title": "Start",
+          "type": "number"
+        },
+        "end": {
+          "description": "Seconds from the start of the song audio.",
+          "minimum": 0,
+          "title": "End",
+          "type": "number"
+        },
+        "singer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Singer"
+        },
+        "words": {
+          "items": {
+            "$ref": "#/$defs/Word"
+          },
+          "minItems": 1,
+          "title": "Words",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "start",
+        "end",
+        "singer",
+        "words"
+      ],
+      "title": "Line",
+      "type": "object"
+    },
+    "Part": {
+      "description": "A sub-unit of a word (a syllable or a group of letters) with its own timing.",
+      "properties": {
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "start": {
+          "description": "Seconds from the start of the song audio.",
+          "minimum": 0,
+          "title": "Start",
+          "type": "number"
+        },
+        "end": {
+          "description": "Seconds from the start of the song audio.",
+          "minimum": 0,
+          "title": "End",
+          "type": "number"
+        }
+      },
+      "required": [
+        "text",
+        "start",
+        "end"
+      ],
+      "title": "Part",
+      "type": "object"
+    },
+    "Provenance": {
+      "properties": {
+        "lyrics_source": {
+          "enum": [
+            "user",
+            "asr",
+            "lrclib"
+          ],
+          "title": "Lyrics Source",
+          "type": "string"
+        },
+        "separation_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Separation Model"
+        },
+        "asr_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Asr Model"
+        },
+        "align_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Align Model"
+        },
+        "engine_version": {
+          "minLength": 1,
+          "title": "Engine Version",
+          "type": "string"
+        },
+        "language_fallbacks": {
+          "items": {
+            "$ref": "#/$defs/LanguageFallback"
+          },
+          "title": "Language Fallbacks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "lyrics_source",
+        "separation_model",
+        "asr_model",
+        "align_model",
+        "engine_version",
+        "language_fallbacks"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Singer": {
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        },
+        "color": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Color"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "color"
+      ],
+      "title": "Singer",
+      "type": "object"
+    },
+    "VideoRefs": {
+      "properties": {
+        "background": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Background"
+        }
+      },
+      "required": [
+        "background"
+      ],
+      "title": "VideoRefs",
+      "type": "object"
+    },
+    "Word": {
+      "properties": {
+        "text": {
+          "description": "Text as displayed, with its original spelling.",
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "start": {
+          "description": "Seconds from the start of the song audio.",
+          "minimum": 0,
+          "title": "Start",
+          "type": "number"
+        },
+        "end": {
+          "description": "Seconds from the start of the song audio.",
+          "minimum": 0,
+          "title": "End",
+          "type": "number"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "parts": {
+          "description": "Optional sub-units; when present their texts concatenate to the word text.",
+          "items": {
+            "$ref": "#/$defs/Part"
+          },
+          "title": "Parts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "start",
+        "end",
+        "confidence",
+        "parts"
+      ],
+      "title": "Word",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "artist": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Artist"
+    },
+    "language": {
+      "pattern": "^[a-z]{2,3}$",
+      "title": "Language",
+      "type": "string"
+    },
+    "duration": {
+      "exclusiveMinimum": 0,
+      "title": "Duration",
+      "type": "number"
+    },
+    "audio": {
+      "$ref": "#/$defs/AudioRefs"
+    },
+    "video": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VideoRefs"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "cover": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cover"
+    },
+    "singers": {
+      "items": {
+        "$ref": "#/$defs/Singer"
+      },
+      "title": "Singers",
+      "type": "array"
+    },
+    "lines": {
+      "items": {
+        "$ref": "#/$defs/Line"
+      },
+      "title": "Lines",
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "edited": {
+      "default": false,
+      "title": "Edited",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "artist",
+    "language",
+    "duration",
+    "audio",
+    "video",
+    "cover",
+    "singers",
+    "lines",
+    "provenance",
+    "edited"
+  ],
+  "title": "KaraokeDoc",
+  "type": "object"
+}

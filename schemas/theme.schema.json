@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gaelfernandez1/KaraokeProject/schemas/theme.schema.json",
+  "$defs": {
+    "ThemeAnimation": {
+      "properties": {
+        "fill": {
+          "default": "wipe",
+          "enum": [
+            "wipe",
+            "word"
+          ],
+          "title": "Fill",
+          "type": "string"
+        },
+        "countdown_min_gap": {
+          "default": 5.0,
+          "description": "Instrumental gap (s) that triggers a countdown; 0 = off.",
+          "minimum": 0,
+          "title": "Countdown Min Gap",
+          "type": "number"
+        }
+      },
+      "required": [
+        "fill",
+        "countdown_min_gap"
+      ],
+      "title": "ThemeAnimation",
+      "type": "object"
+    },
+    "ThemeColors": {
+      "properties": {
+        "sung": {
+          "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "title": "Sung",
+          "type": "string"
+        },
+        "unsung": {
+          "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "title": "Unsung",
+          "type": "string"
+        },
+        "outline": {
+          "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+          "title": "Outline",
+          "type": "string"
+        },
+        "shadow": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shadow"
+        },
+        "box": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Box"
+        }
+      },
+      "required": [
+        "sung",
+        "unsung",
+        "outline",
+        "shadow",
+        "box"
+      ],
+      "title": "ThemeColors",
+      "type": "object"
+    },
+    "ThemeFont": {
+      "properties": {
+        "family": {
+          "minLength": 1,
+          "title": "Family",
+          "type": "string"
+        },
+        "weight": {
+          "default": 700,
+          "maximum": 900,
+          "minimum": 100,
+          "title": "Weight",
+          "type": "integer"
+        },
+        "file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Font file bundled with the theme, if any.",
+          "title": "File"
+        }
+      },
+      "required": [
+        "family",
+        "weight",
+        "file"
+      ],
+      "title": "ThemeFont",
+      "type": "object"
+    },
+    "ThemeLayout": {
+      "properties": {
+        "visible_lines": {
+          "default": 2,
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Visible Lines",
+          "type": "integer"
+        },
+        "position": {
+          "default": "bottom",
+          "enum": [
+            "bottom",
+            "center",
+            "top"
+          ],
+          "title": "Position",
+          "type": "string"
+        },
+        "font_size": {
+          "default": 0.06,
+          "description": "Fraction of screen height.",
+          "maximum": 0.2,
+          "minimum": 0.02,
+          "title": "Font Size",
+          "type": "number"
+        },
+        "line_spacing": {
+          "default": 1.3,
+          "exclusiveMinimum": 0,
+          "title": "Line Spacing",
+          "type": "number"
+        }
+      },
+      "required": [
+        "visible_lines",
+        "position",
+        "font_size",
+        "line_spacing"
+      ],
+      "title": "ThemeLayout",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "pattern": "^1\\.\\d+\\.\\d+$",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "font": {
+      "$ref": "#/$defs/ThemeFont"
+    },
+    "colors": {
+      "$ref": "#/$defs/ThemeColors"
+    },
+    "layout": {
+      "$ref": "#/$defs/ThemeLayout"
+    },
+    "animation": {
+      "$ref": "#/$defs/ThemeAnimation"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "name",
+    "font",
+    "colors",
+    "layout",
+    "animation"
+  ],
+  "title": "Theme",
+  "type": "object"
+}

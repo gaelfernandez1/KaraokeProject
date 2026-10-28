@@ -14,10 +14,19 @@ from karaoke_contracts.doc import (
     dump_doc,
     load_doc,
 )
+from karaoke_contracts.theme import (
+    THEME_SCHEMA_VERSION,
+    Theme,
+    ThemeAnimation,
+    ThemeColors,
+    ThemeFont,
+    ThemeLayout,
+)
 from karaoke_contracts.validate import TIME_EPS, Issue, validate_doc, validate_package
 
 __all__ = [
     "SCHEMA_VERSION",
+    "THEME_SCHEMA_VERSION",
     "TIME_EPS",
     "AudioRefs",
     "Issue",
@@ -27,6 +36,11 @@ __all__ = [
     "Part",
     "Provenance",
     "Singer",
+    "Theme",
+    "ThemeAnimation",
+    "ThemeColors",
+    "ThemeFont",
+    "ThemeLayout",
     "VideoRefs",
     "Word",
     "dump_doc",
