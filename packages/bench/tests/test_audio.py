@@ -59,3 +59,17 @@ def test_file_sha256(tmp_path: Path) -> None:
     path.write_bytes(b"abc")
 
     assert file_sha256(path).startswith("ba7816bf")
+
+
+def test_write_wav_stereo_roundtrip(tmp_path: Path) -> None:
+    import numpy as np
+
+    from karaoke_bench.audio import write_wav
+
+    samples = np.zeros((2, 44_100), dtype=np.float32)
+    samples[0, :100] = 2.0  # clipped, not wrapped
+
+    path = write_wav(tmp_path / "out" / "x.wav", samples, 44_100)
+
+    assert duration(path) == pytest.approx(1.0, abs=0.01)
+    assert float(load_mono16k(path).max()) <= 1.0
