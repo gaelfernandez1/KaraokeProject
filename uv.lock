@@ -223,6 +223,7 @@ version = "0.1.0"
 source = { editable = "packages/engine" }
 dependencies = [
     { name = "karaoke-contracts" },
+    { name = "pydantic" },
 ]
 
 [package.optional-dependencies]
@@ -233,6 +234,7 @@ ml = [
 [package.metadata]
 requires-dist = [
     { name = "karaoke-contracts", editable = "packages/contracts" },
+    { name = "pydantic", specifier = ">=2.12" },
     { name = "torch", marker = "extra == 'ml'", specifier = ">=2.8", index = "https://download.pytorch.org/whl/cu130" },
 ]
 provides-extras = ["ml"]
