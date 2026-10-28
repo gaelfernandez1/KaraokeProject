@@ -15,6 +15,7 @@ from karaoke_bench.sets import Song
 from karaoke_bench.stage import StageItem, run_stage
 from karaoke_bench.textnorm import lyrics_lines
 from karaoke_contracts import Line
+from karaoke_engine.steps import Stems
 
 # An anchor marks where the user heard the line start; leave a little room before it.
 ANCHOR_MARGIN = 0.2
@@ -119,13 +120,18 @@ def realign_reference(
 
 def separated_vocals(song: Song, pipeline: Pipeline, paths: BenchPaths) -> Path:
     """The separated vocals (from the cache when the draft already computed them)."""
+    return separated_stems(song, pipeline, paths).vocals
+
+
+def separated_stems(song: Song, pipeline: Pipeline, paths: BenchPaths) -> Stems:
     if "separator" not in pipeline.steps:
-        return song.audio
+        return Stems(vocals=song.audio, instrumental=song.audio)
     item = StageItem(song.song_id, {"audio": str(song.audio)}, file_sha256(song.audio))
     result = run_stage(pipeline.steps["separator"], [item], paths).items[song.song_id]
     if result.error or result.output is None:
         raise DraftError(f"separating {song.song_id}: {result.error}")
-    return Path(result.output.vocals)
+    stems: Stems = result.output
+    return stems
 
 
 def _ref_line(text: str, line: Line, offset: float, status: str) -> RefLine:

@@ -41,21 +41,26 @@ class WordPair:
     hyp_end: float
 
 
+def align_keys(a: Sequence[str], b: Sequence[str]) -> list[tuple[int, int]]:
+    """Index pairs of equal keys on the Levenshtein alignment of two key sequences."""
+    if not a or not b:
+        return []
+    output = jiwer.process_words(" ".join(a), " ".join(b))
+    pairs = []
+    for chunk in output.alignments[0]:
+        if chunk.type == "equal":
+            for offset in range(chunk.ref_end_idx - chunk.ref_start_idx):
+                pairs.append((chunk.ref_start_idx + offset, chunk.hyp_start_idx + offset))
+    return pairs
+
+
 def pair_words(ref_words: Sequence[RefWord], hyp_words: Sequence[Word]) -> list[WordPair]:
     refs = [(key, word) for word in ref_words if (key := match_key(word.text))]
     hyps = [(key, word) for word in hyp_words if (key := match_key(word.text))]
-    if not refs or not hyps:
-        return []
-    output = jiwer.process_words(" ".join(k for k, _ in refs), " ".join(k for k, _ in hyps))
-    pairs = []
-    for chunk in output.alignments[0]:
-        if chunk.type != "equal":
-            continue
-        for offset in range(chunk.ref_end_idx - chunk.ref_start_idx):
-            ref = refs[chunk.ref_start_idx + offset][1]
-            hyp = hyps[chunk.hyp_start_idx + offset][1]
-            pairs.append(WordPair(ref=ref, hyp_start=hyp.start, hyp_end=hyp.end))
-    return pairs
+    return [
+        WordPair(ref=refs[i][1], hyp_start=hyps[j][1].start, hyp_end=hyps[j][1].end)
+        for i, j in align_keys([k for k, _ in refs], [k for k, _ in hyps])
+    ]
 
 
 class TimingErrors(BaseModel):
