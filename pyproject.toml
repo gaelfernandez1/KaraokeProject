@@ -1,0 +1,51 @@
+[project]
+name = "karaoke-workspace"
+version = "0.0.0"
+description = "Workspace root for the v3 karaoke generator (Galician first)"
+requires-python = ">=3.12,<3.13"
+dependencies = ["karaoke-contracts", "karaoke-engine"]
+
+[project.optional-dependencies]
+# GPU stack for the engine. Kept out of the default sync so CI and the web
+# side never download torch.
+ml = ["karaoke-engine[ml]"]
+
+[dependency-groups]
+dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7"]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+karaoke-contracts = { workspace = true }
+karaoke-engine = { workspace = true }
+torch = { index = "pytorch-cu130" }
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["legacy", "web"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PT"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["karaoke_contracts", "karaoke_engine"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["packages/contracts/src", "packages/engine/src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --import-mode=importlib"
+testpaths = ["packages"]

@@ -1,0 +1,19 @@
+[project]
+name = "karaoke-engine"
+version = "0.1.0"
+description = "Karaoke engine: audio, lyrics alignment, packaging and rendering"
+requires-python = ">=3.12,<3.13"
+dependencies = ["karaoke-contracts"]
+
+[project.optional-dependencies]
+ml = ["torch>=2.8"]
+
+[project.scripts]
+karaoke = "karaoke_engine.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+karaoke-contracts = { workspace = true }
