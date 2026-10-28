@@ -22,3 +22,13 @@ def test_karaoke_schema_marks_defaulted_fields_required(tmp_path: Path) -> None:
 
     assert {"schema_version", "singers", "lines", "edited"} <= set(schema["required"])
     assert schema["$id"].endswith("/schemas/karaoke.schema.json")
+
+
+def test_properties_carry_no_titles(tmp_path: Path) -> None:
+    # Per-field titles make json2ts emit one type alias per field (Start1, Id2...).
+    export_schemas(tmp_path)
+    schema = json.loads((tmp_path / "karaoke.schema.json").read_text(encoding="utf-8"))
+
+    word = schema["$defs"]["Word"]
+    assert word["title"] == "Word"
+    assert all("title" not in prop for prop in word["properties"].values())
