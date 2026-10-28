@@ -1,3 +1,6 @@
+> **En reconstrución (plan v3).** O sistema anterior está en [`legacy/`](legacy/) e na etiqueta `v2-final`;
+> as instrucións de abaixo corresponden a esa versión e deixarán de valer ao longo da reconstrución.
+
 # 🎤 Karaoke con IA - Proxecto TFG - Gael Fernández
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
