@@ -50,6 +50,11 @@ strict = true
 plugins = ["pydantic.mypy"]
 files = ["packages/contracts/src", "packages/engine/src", "packages/bench/src"]
 
+# Libraries without type information used by the bench (the optional ones live in the ml extra).
+[[tool.mypy.overrides]]
+module = ["pynvml", "faster_whisper.*", "demucs.*", "ctranslate2.*"]
+ignore_missing_imports = true
+
 # The contract models accept unknown fields at runtime (forward compatibility); mypy still
 # flags misspelled keyword arguments when our own code builds them.
 [tool.pydantic-mypy]
