@@ -45,7 +45,7 @@ def test_run_stage_runs_fake_aligner_in_subprocess(tmp_path: Path, make_tone: To
 
 
 def test_run_stage_isolates_failures(tmp_path: Path, make_tone: ToneMaker) -> None:
-    spec = StepSpec("aligner", "karaoke_bench.fakes:FailingAligner", {"fail_on": "b"})
+    spec = StepSpec("aligner", "karaoke_bench.fakes:FailingAligner", {"fail_on": "b.wav"})
 
     outcome = run_stage(spec, _items(make_tone), BenchPaths(tmp_path / "bench"))
 
