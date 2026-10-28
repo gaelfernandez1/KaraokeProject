@@ -1,6 +1,7 @@
 """The `karaoke-bench` command."""
 
 import argparse
+import shlex
 import sys
 from collections.abc import Sequence
 from pathlib import Path
@@ -180,14 +181,14 @@ def _package(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> i
         raise DraftError(f"{song.song_id} has no reference")
     meta_path = song.audio.parent / "meta.toml"
     meta = read_meta(meta_path) if meta_path.is_file() else {}
-    credits = _credits(song, meta)
+    credits = _credits(song, meta, pipeline_path)
     stems = separated_stems(song, load_pipeline(pipeline_path), paths)
     doc = build_package(song, ref, stems, out, credits)
     print(f"{out}: {len(doc.lines)} lines")
     return 0
 
 
-def _credits(song: Song, meta: dict[str, str]) -> str:
+def _credits(song: Song, meta: dict[str, str], pipeline_path: Path) -> str:
     lines = [
         f"Song: {song.title}" + (f" by {song.artist}" if song.artist else ""),
         f"Licence: {meta.get('license', 'see source')}",
@@ -198,6 +199,11 @@ def _credits(song: Song, meta: dict[str, str]) -> str:
             "",
             "Word timings: JamendoLyrics MultiLang (Durand, Stoller and Ewert, ICASSP 2023).",
             "Lyrics text and line timings: Jam-ALT (Cífka et al., 2023 and 2025).",
-            "The audio (vocals.wav, instrumental.wav) is generated locally and never versioned.",
         ]
+    lines += [
+        "",
+        "The audio (vocals.wav, instrumental.wav) is never versioned. To rebuild it:",
+        f"  uv run karaoke-bench package {shlex.quote(f'{song.set_name}/{song.song_id}')}"
+        f" --pipeline {shlex.quote(str(pipeline_path))} --out <this folder>",
+    ]
     return "\n".join(lines) + "\n"

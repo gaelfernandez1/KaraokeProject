@@ -142,4 +142,23 @@ def test_package_command_builds_a_valid_package(demo_bench: BenchPaths, tmp_path
 
     assert code == 0
     assert validate_package(out) == []
-    assert "Demo" in (out / "LICENSE").read_text(encoding="utf-8")
+    credits = (out / "LICENSE").read_text(encoding="utf-8")
+    assert "Demo" in credits
+    # Says where the audio comes from, so anyone can rebuild it with the same command.
+    assert "karaoke-bench package private/demo" in credits
+
+
+def test_package_credits_quote_the_song_id() -> None:
+    import shlex
+
+    from karaoke_bench.cli import _credits
+    from karaoke_bench.sets import Song
+
+    song = Song(
+        "jamendo", "Mère_nature_-_Law'", "Mère nature", "Law'", "fr", Path("a.mp3"), None, None
+    )
+
+    credits = _credits(song, {}, Path("bench/pipelines/base-turbo.toml"))
+
+    command = next(line for line in credits.splitlines() if "karaoke-bench package" in line)
+    assert shlex.split(command)[4] == "jamendo/Mère_nature_-_Law'"
