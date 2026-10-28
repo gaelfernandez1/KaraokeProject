@@ -30,3 +30,31 @@ def test_fetch_empty_manifest_set(tmp_path: Path, capsys: pytest.CaptureFixture[
 
     assert code == 0
     assert "gl: 0 songs" in capsys.readouterr().out
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_run_both_modes_prints_two_reports(
+    demo_bench: BenchPaths, capsys: pytest.CaptureFixture[str]
+) -> None:
+    smoke = Path(__file__).resolve().parents[3] / "bench" / "pipelines" / "smoke.toml"
+
+    code = main(
+        ["--bench-dir", str(demo_bench.root), "run", "--pipeline", str(smoke), "--set", "private",
+         "--mode", "both"]
+    )  # fmt: skip
+
+    printed = capsys.readouterr().out.split()
+    assert code == 0
+    assert [Path(p).name.rsplit("-", 1)[-1] for p in printed if p.endswith(("lyrics", "asr"))] == [
+        "lyrics",
+        "asr",
+    ]
+
+
+def test_run_reports_unknown_set(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    smoke = Path(__file__).resolve().parents[3] / "bench" / "pipelines" / "smoke.toml"
+
+    code = main(["--bench-dir", str(tmp_path), "run", "--pipeline", str(smoke), "--set", "nada"])
+
+    assert code == 1
+    assert "unknown set" in capsys.readouterr().err

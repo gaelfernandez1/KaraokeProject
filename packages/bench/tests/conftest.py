@@ -7,6 +7,11 @@ from pathlib import Path
 
 import pytest
 
+from karaoke_bench.paths import BenchPaths
+from karaoke_bench.reference import dump_reference, reference_from_doc
+from karaoke_contracts import load_doc
+from karaoke_engine.demo import synthesize_package_audio
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEMO_DIR = REPO_ROOT / "fixtures" / "packages" / "demo-sintetico"
 
@@ -44,3 +49,33 @@ def make_tone(tmp_path: Path) -> ToneMaker:
         return path
 
     return make
+
+
+DemoSongAdder = Callable[[BenchPaths, str], None]
+
+
+@pytest.fixture
+def add_demo_song(demo_json: Path) -> DemoSongAdder:
+    """Adds a private song made from the synthetic demo package (beeps on every syllable)."""
+
+    def add(paths: BenchPaths, song_id: str) -> None:
+        package = paths.root.parent / f"pkg-{song_id}"
+        package.mkdir(parents=True)
+        shutil.copy(demo_json, package / "karaoke.json")
+        synthesize_package_audio(package)
+        song_dir = paths.data / "private" / song_id
+        song_dir.mkdir(parents=True)
+        shutil.copy(package / "vocals.wav", song_dir / "audio.wav")
+        (song_dir / "meta.toml").write_text('title = "Demo"\nlanguage = "gl"\n', encoding="utf-8")
+        reference = reference_from_doc(load_doc(demo_json), "manual")
+        dump_reference(reference, song_dir / "reference.json")
+
+    return add
+
+
+@pytest.fixture
+def demo_bench(tmp_path: Path, add_demo_song: DemoSongAdder) -> BenchPaths:
+    """A bench folder with one private song, `demo`."""
+    paths = BenchPaths(tmp_path / "bench")
+    add_demo_song(paths, "demo")
+    return paths

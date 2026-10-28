@@ -53,7 +53,7 @@ class EvenSplitAligner:
 
 
 class FailingAligner(EvenSplitAligner):
-    """Fails on songs whose audio file name contains `fail_on`, to test error isolation."""
+    """Fails on songs whose audio path contains `fail_on`, to test error isolation."""
 
     name = "failing"
 
@@ -61,6 +61,15 @@ class FailingAligner(EvenSplitAligner):
         self.fail_on = fail_on
 
     def align(self, vocals: Path, lyrics_lines: Sequence[str], language: str) -> list[Line]:
-        if self.fail_on in vocals.name:
-            raise RuntimeError(f"failing on purpose for {vocals.name}")
+        if self.fail_on in str(vocals):
+            raise RuntimeError(f"failing on purpose for {vocals}")
         return super().align(vocals, lyrics_lines, language)
+
+
+class DropLastLineAligner(EvenSplitAligner):
+    """Returns one line fewer than it was given, like a buggy aligner would."""
+
+    name = "drop-last-line"
+
+    def align(self, vocals: Path, lyrics_lines: Sequence[str], language: str) -> list[Line]:
+        return super().align(vocals, lyrics_lines, language)[:-1]
