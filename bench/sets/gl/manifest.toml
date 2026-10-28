@@ -1,0 +1,6 @@
+# Galician songs with free licences. Audio is downloaded by `karaoke-bench fetch --set gl` and
+# checked against sha256; lyrics, references and licence notes live next to this file.
+# Fields per song: id, title, artist, language, style, license, license_url, source, audio_url,
+# sha256.
+
+songs = []
