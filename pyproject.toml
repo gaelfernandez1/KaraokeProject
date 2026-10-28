@@ -48,6 +48,12 @@ strict = true
 plugins = ["pydantic.mypy"]
 files = ["packages/contracts/src", "packages/engine/src"]
 
+# The contract models accept unknown fields at runtime (forward compatibility); mypy still
+# flags misspelled keyword arguments when our own code builds them.
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+
 [tool.pytest.ini_options]
 addopts = "-ra --import-mode=importlib"
-testpaths = ["packages"]
+testpaths = ["packages", "scripts"]

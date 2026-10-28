@@ -1,12 +1,11 @@
 """The `karaoke` command. Later conversations add `make` (engine) and `render` (video)."""
 
 import argparse
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from pydantic import ValidationError
-
-from karaoke_contracts import Issue, load_doc, validate_doc, validate_package
+from karaoke_contracts import validate_file, validate_package
 from karaoke_engine.demo import synthesize_package_audio
 
 
@@ -27,19 +26,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.command == "validate":
         return _validate(args.path)
-    synthesize_package_audio(args.package)
+    try:
+        synthesize_package_audio(args.package)
+    except (OSError, ValueError) as exc:  # ValueError covers pydantic's ValidationError
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
     print(f"Synthetic audio written to {args.package}")
     return 0
 
 
 def _validate(path: Path) -> int:
-    if path.is_dir():
-        issues = validate_package(path)
-    else:
-        try:
-            issues = validate_doc(load_doc(path))
-        except ValidationError as exc:
-            issues = [Issue(".".join(map(str, e["loc"])), e["msg"]) for e in exc.errors()]
+    issues = validate_package(path) if path.is_dir() else validate_file(path)
     for issue in issues:
         print(f"{issue.path}: {issue.message}")
     if issues:

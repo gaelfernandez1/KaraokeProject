@@ -32,3 +32,12 @@ def test_properties_carry_no_titles(tmp_path: Path) -> None:
     word = schema["$defs"]["Word"]
     assert word["title"] == "Word"
     assert all("title" not in prop for prop in word["properties"].values())
+
+
+def test_schemas_do_not_spell_out_additional_properties(tmp_path: Path) -> None:
+    # "additionalProperties": true is the JSON Schema default; written out, it makes json2ts
+    # add an index signature to every TS interface.
+    export_schemas(tmp_path)
+
+    for path in tmp_path.glob("*.schema.json"):
+        assert '"additionalProperties"' not in path.read_text(encoding="utf-8"), path.name

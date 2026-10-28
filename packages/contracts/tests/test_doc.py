@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any
 
@@ -41,3 +42,25 @@ def test_major_2_is_rejected(demo_data: dict[str, Any]) -> None:
 
     with pytest.raises(ValidationError):
         KaraokeDoc.model_validate(demo_data)
+
+
+@pytest.mark.parametrize("token", ["Infinity", "NaN", "-Infinity"])
+def test_non_finite_numbers_are_rejected(demo_json: Path, token: str) -> None:
+    raw = demo_json.read_text(encoding="utf-8").replace('"duration": 32.0', f'"duration": {token}')
+
+    with pytest.raises(ValidationError):
+        KaraokeDoc.model_validate_json(raw)
+
+
+def test_unknown_fields_survive_a_round_trip(demo_data: dict[str, Any], tmp_path: Path) -> None:
+    # A newer minor version may add fields; an older reader must not drop them on save.
+    demo_data["schema_version"] = "1.3.0"
+    demo_data["mood"] = "morriña"
+    demo_data["lines"][0]["words"][0]["emphasis"] = True
+    out = tmp_path / "karaoke.json"
+
+    dump_doc(KaraokeDoc.model_validate(demo_data), out)
+
+    saved = json.loads(out.read_text(encoding="utf-8"))
+    assert saved["mood"] == "morriña"
+    assert saved["lines"][0]["words"][0]["emphasis"] is True

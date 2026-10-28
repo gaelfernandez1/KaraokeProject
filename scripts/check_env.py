@@ -13,34 +13,44 @@ from collections.abc import Callable
 Check = tuple[str, bool, Callable[[], tuple[bool, str]]]
 
 
-def _run(*cmd: str) -> str:
+def _run(*cmd: str) -> tuple[int, str]:
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=False)
-    return result.stdout + result.stderr
+    return result.returncode, (result.stdout + result.stderr).strip()
+
+
+def _first_line(text: str) -> str:
+    return text.splitlines()[0] if text else ""
 
 
 def _tool(name: str, *version_args: str) -> Callable[[], tuple[bool, str]]:
     def check() -> tuple[bool, str]:
         if shutil.which(name) is None:
             return False, "not installed"
-        return True, _run(name, *version_args).strip().splitlines()[0]
+        code, output = _run(name, *version_args)
+        # A tool that is installed but broken (e.g. nvidia-smi without a driver) is not OK.
+        return code == 0, _first_line(output) or f"exit code {code}"
 
     return check
+
+
+def node_version_ok(version: str) -> bool:
+    major = version.lstrip("v").split(".")[0]
+    return major.isdigit() and int(major) >= 22
 
 
 def _node() -> tuple[bool, str]:
     if shutil.which("node") is None:
         return False, "not installed"
-    version = _run("node", "--version").strip()
-    return version.startswith("v22") or version.startswith("v24"), version
+    _code, version = _run("node", "--version")
+    return node_version_ok(version), version
 
 
 def _ffmpeg_feature(flag: str, name: str) -> Callable[[], tuple[bool, str]]:
     def check() -> tuple[bool, str]:
         if shutil.which("ffmpeg") is None:
             return False, "ffmpeg not installed"
-        found = any(
-            name in line.split() for line in _run("ffmpeg", "-hide_banner", flag).splitlines()
-        )
+        _code, output = _run("ffmpeg", "-hide_banner", flag)
+        found = any(name in line.split() for line in output.splitlines())
         return found, "available" if found else f"ffmpeg built without {name}"
 
     return check

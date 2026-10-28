@@ -26,3 +26,5 @@ Tablero compartido entre conversaciones. Cada conversación actualiza **su fila*
   exige torch 2.8; si lo usáis, cambiad versión e índice en una decisión.
 - C1 → C5/C7: Playwright necesitará navegadores (`pnpm exec playwright install chromium`) y quizá
   librerías del sistema con sudo; pedídselo al usuario.
+- C1 → C7: `web/src/app.html` aún dice `lang="en"`; la interfaz va en gallego por defecto (y por
+  idioma cuando haya i18n).

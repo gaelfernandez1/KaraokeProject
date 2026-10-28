@@ -68,5 +68,13 @@ jobs:
       - run: uv sync --locked
       - run: pnpm --dir web install --frozen-lockfile
       - run: make contracts
-      - name: Fail if generated files are stale
-        run: git diff --exit-code schemas web/src/lib/contracts/generated
+      - name: Fail if generated files are stale or missing
+        # git status also catches newly generated files that were never committed.
+        run: |
+          changes=$(git status --porcelain -- schemas web/src/lib/contracts/generated)
+          if [ -n "$changes" ]; then
+            echo "$changes"
+            git diff -- schemas web/src/lib/contracts/generated
+            echo "::error::Generated contracts are out of date; run 'make contracts' and commit."
+            exit 1
+          fi

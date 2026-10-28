@@ -16,9 +16,15 @@ MediaRef = Annotated[str, StringConstraints(min_length=1)]
 
 
 class _Model(BaseModel):
-    # Unknown fields are ignored so a newer minor version still loads. Fields with defaults are
-    # always written, so the serialization schema marks them required (handy for TS consumers).
-    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+    # Unknown fields are kept, so an older reader can load and re-save a newer minor version
+    # without losing data. Infinity and NaN are refused: they break every time rule and are not
+    # valid JSON for browsers. Fields with defaults are always written, so the serialization
+    # schema marks them required (handy for TS consumers).
+    model_config = ConfigDict(
+        extra="allow",
+        allow_inf_nan=False,
+        json_schema_serialization_defaults_required=True,
+    )
 
 
 class Part(_Model):

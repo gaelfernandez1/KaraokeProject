@@ -7,9 +7,9 @@ so anyone can hear whether a player or an export keeps the lyrics in sync. Stdli
 import math
 import wave
 from array import array
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
-from karaoke_contracts import KaraokeDoc, load_doc
+from karaoke_contracts import KaraokeDoc, load_doc, resolve_media
 
 SAMPLE_RATE = 22_050
 _FADE_SECONDS = 0.01
@@ -20,17 +20,20 @@ _PAD_HZ = (220.0, 277.18, 329.63)
 
 def synthesize_package_audio(package_dir: Path) -> None:
     doc = load_doc(package_dir / "karaoke.json")
+    # Resolve every target before writing anything, so a bad reference leaves no half-done package.
+    instrumental = _media_path(package_dir, doc.audio.instrumental)
+    vocals = _media_path(package_dir, doc.audio.vocals) if doc.audio.vocals else None
     total = round(doc.duration * SAMPLE_RATE)
-    _write_wav(_media_path(package_dir, doc.audio.instrumental), _pad(total))
-    if doc.audio.vocals is not None:
-        _write_wav(_media_path(package_dir, doc.audio.vocals), _beeps(doc, total))
+    _write_wav(instrumental, _pad(total))
+    if vocals is not None:
+        _write_wav(vocals, _beeps(doc, total))
 
 
 def _media_path(package_dir: Path, ref: str) -> Path:
-    pure = PurePosixPath(ref)
-    if pure.is_absolute() or ".." in pure.parts or pure.suffix != ".wav":
-        raise ValueError(f"demo audio must be a relative .wav path inside the package: {ref!r}")
-    return package_dir / pure
+    target = resolve_media(package_dir, ref)
+    if target.suffix != ".wav":
+        raise ValueError(f"demo audio must be .wav files, got {ref!r}")
+    return target
 
 
 def _pad(total: int) -> array[int]:
