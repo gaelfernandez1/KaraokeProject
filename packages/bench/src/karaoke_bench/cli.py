@@ -6,12 +6,19 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from karaoke_bench.compare import compare_runs
+from karaoke_bench.drafting import (
+    DraftError,
+    draft_reference,
+    realign_reference,
+    reference_path,
+)
 from karaoke_bench.fetch import FetchError, fetch_jamendo, fetch_manifest_set
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.pipeline import Mode, PipelineError, load_pipeline
+from karaoke_bench.reference import dump_reference, load_reference
 from karaoke_bench.results import load_results
 from karaoke_bench.runner import RunOptions, run
-from karaoke_bench.sets import SetError
+from karaoke_bench.sets import SetError, Song, load_set
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -38,6 +45,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     compare.add_argument("run_b", type=Path)
     compare.add_argument("--out", type=Path, help="write the comparison here instead of stdout")
 
+    draft = commands.add_parser("draft", help="draft a song's reference timings with an aligner")
+    draft.add_argument("song", help="set/song, e.g. gl/some-song")
+    draft.add_argument("--pipeline", type=Path, required=True)
+    draft.add_argument("--force", action="store_true", help="overwrite a reviewed reference")
+
+    realign = commands.add_parser("realign", help="realign the lines flagged wrong in a review")
+    realign.add_argument("song", help="set/song")
+    realign.add_argument("--pipeline", type=Path, required=True)
+
+    review = commands.add_parser("review", help="open the review page for a song's reference")
+    review.add_argument("song", help="set/song")
+    review.add_argument("--port", type=int, default=8765)
+    review.add_argument("--pipeline", type=Path, help="pipeline whose separator gives the vocals")
+
     args = parser.parse_args(argv)
     paths = BenchPaths(args.bench_dir)
     try:
@@ -45,8 +66,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _fetch(paths, args.set_name)
         if args.command == "compare":
             return _compare(args.run_a, args.run_b, args.out)
+        if args.command == "draft":
+            return _draft(paths, _one_song(args.song, paths), args.pipeline, args.force)
+        if args.command == "realign":
+            return _realign(paths, _one_song(args.song, paths), args.pipeline)
+        if args.command == "review":
+            return _review(paths, _one_song(args.song, paths), args.port, args.pipeline)
         return _run(paths, args)
-    except (FetchError, PipelineError, SetError, OSError) as exc:
+    except (FetchError, PipelineError, SetError, DraftError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
@@ -79,4 +106,56 @@ def _compare(run_a: Path, run_b: Path, out: Path | None) -> int:
         print(text, end="")
     else:
         out.write_text(text, encoding="utf-8")
+    return 0
+
+
+def _one_song(name: str, paths: BenchPaths) -> Song:
+    if "/" not in name:
+        raise SetError(f"give the song as set/song, got '{name}'")
+    return load_set(name, paths)[0]
+
+
+def _draft(paths: BenchPaths, song: Song, pipeline_path: Path, force: bool) -> int:
+    target = reference_path(song, paths)
+    if target.is_file() and not force:
+        reviewed = [line for line in load_reference(target).lines if line.status != "draft"]
+        if reviewed:
+            print(
+                f"error: {target} has {len(reviewed)} reviewed lines; use --force to replace it",
+                file=sys.stderr,
+            )
+            return 1
+    dump_reference(draft_reference(song, load_pipeline(pipeline_path), paths), target)
+    print(target)
+    return 0
+
+
+def _realign(paths: BenchPaths, song: Song, pipeline_path: Path) -> int:
+    target = reference_path(song, paths)
+    ref = load_reference(target)
+    fixed = realign_reference(song, ref, load_pipeline(pipeline_path), paths)
+    dump_reference(fixed, target)
+    changed = sum(
+        line.revised and not old.revised for line, old in zip(fixed.lines, ref.lines, strict=True)
+    )
+    print(f"{target}: {changed} lines realigned, listen to them again")
+    return 0
+
+
+def _review(paths: BenchPaths, song: Song, port: int, pipeline_path: Path | None) -> int:
+    from karaoke_bench.drafting import separated_vocals
+    from karaoke_bench.review.server import make_server
+
+    target = reference_path(song, paths)
+    if not target.is_file():
+        raise DraftError(f"{target} does not exist; run `karaoke-bench draft` first")
+    vocals = separated_vocals(song, load_pipeline(pipeline_path), paths) if pipeline_path else None
+    server = make_server(song, target, vocals, port)
+    print(f"Review page: http://localhost:{server.server_address[1]}  (Ctrl+C to stop)")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        server.server_close()
     return 0
