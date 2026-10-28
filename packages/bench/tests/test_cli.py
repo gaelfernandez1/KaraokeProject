@@ -20,3 +20,13 @@ def test_bench_paths_layout() -> None:
     assert paths.runs == Path("/x/data/runs")
     assert paths.sets == Path("/x/sets")
     assert paths.results == Path("/x/results")
+
+
+def test_fetch_empty_manifest_set(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    (tmp_path / "sets" / "gl").mkdir(parents=True)
+    (tmp_path / "sets" / "gl" / "manifest.toml").write_text("songs = []\n", encoding="utf-8")
+
+    code = main(["--bench-dir", str(tmp_path), "fetch", "--set", "gl"])
+
+    assert code == 0
+    assert "gl: 0 songs" in capsys.readouterr().out

@@ -1,0 +1,10 @@
+# Upstream revisions of the public set (JamendoLyrics MultiLang word timings and the Jam-ALT
+# revised lyrics with line timings). Change them on purpose only: every score depends on them.
+
+[jamendolyrics]
+repo = "jamendolyrics/jamendolyrics"
+revision = "de188c963fd4539bc769b3feb83582e5a9595e36"
+
+[jamalt]
+repo = "jamendolyrics/jam-alt"
+revision = "28302224954ef050fe752d1628dd9bac4fc8c02b"
