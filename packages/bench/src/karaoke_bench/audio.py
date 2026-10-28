@@ -51,6 +51,17 @@ def cut(path: Path, start: float, end: float, dest: Path) -> Path:
     return dest
 
 
+def trim(path: Path, start: float, end: float, dest: Path) -> Path:
+    """Keeps [start, end] of `path` at its own rate and channels, losslessly as FLAC."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    _run(
+        path,
+        ["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", f"{start:.3f}", "-to", f"{end:.3f}",
+         "-i", str(path), "-c:a", "flac", str(dest)],
+    )  # fmt: skip
+    return dest
+
+
 def write_wav(path: Path, samples: npt.NDArray[np.floating], rate: int) -> Path:
     """Writes (channels, frames) float samples in [-1, 1] as 16-bit PCM, clipping overshoots."""
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from karaoke_bench.audio import file_sha256
+from karaoke_bench.audio import duration, file_sha256
 from karaoke_bench.fetch import (
     FetchError,
     convert_jamendo_song,
@@ -140,3 +140,19 @@ def test_dataset_url_quotes_non_ascii_paths() -> None:
     assert url == (
         "https://huggingface.co/datasets/a/b/resolve/abc/subsets/de/mp3/Stra%C3%9Fe%20%26%20Co.mp3"
     )
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_manifest_clip_keeps_only_the_song(tmp_path: Path, make_tone: ToneMaker) -> None:
+    paths = BenchPaths(tmp_path / "bench")
+    tone = make_tone("tone.wav", 3.0)
+    _manifest(paths, file_sha256(tone))
+    manifest = paths.sets / "gl" / "manifest.toml"
+    manifest.write_text(manifest.read_text(encoding="utf-8") + "clip = [0.5, 2.0]\n", "utf-8")
+
+    fetch_manifest_set("gl", paths, download=lambda url, dest: shutil.copy(tone, dest))
+    fetch_manifest_set("gl", paths, download=lambda url, dest: pytest.fail("cached"))
+
+    [song] = load_set("gl/proba", paths)
+    assert song.audio.name == "audio.flac"
+    assert duration(song.audio) == pytest.approx(1.5, abs=0.02)

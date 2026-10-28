@@ -14,7 +14,7 @@ from typing import Any
 from urllib.parse import quote, urlparse
 
 from karaoke_bench import __version__
-from karaoke_bench.audio import duration, file_sha256
+from karaoke_bench.audio import duration, file_sha256, trim
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.reference import Reference, RefLine, RefWord, dump_reference
 from karaoke_bench.sets import write_meta
@@ -130,23 +130,30 @@ def convert_jamendo_song(
 def fetch_manifest_set(
     name: str, paths: BenchPaths, download: Downloader = http_download
 ) -> list[str]:
-    """Downloads the audio of a manifest set (e.g. gl) and checks every sha256."""
+    """Downloads the audio of a manifest set (e.g. gl) and checks every sha256.
+
+    A `clip = [start, end]` entry keeps only that stretch (a song inside a longer recording),
+    saved losslessly as audio.flac next to the checked download.
+    """
     with (paths.sets / name / "manifest.toml").open("rb") as handle:
         entries = tomllib.load(handle).get("songs", [])
     ids = []
     for entry in entries:
-        suffix = PurePosixPath(urlparse(entry["audio_url"]).path).suffix
+        suffix = PurePosixPath(urlparse(entry["audio_url"]).path).suffix.lower()
         if not suffix:
             raise FetchError(f"{entry['id']}: audio_url has no file extension")
-        dest = paths.data / name / entry["id"] / f"audio{suffix.lower()}"
+        song_dir = paths.data / name / entry["id"]
+        clip = entry.get("clip")
+        source = song_dir / (f"source{suffix}" if clip else f"audio{suffix}")
         ids.append(entry["id"])
-        if dest.is_file() and file_sha256(dest) == entry["sha256"]:
-            continue
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        download(entry["audio_url"], dest)
-        if file_sha256(dest) != entry["sha256"]:
-            dest.unlink()
-            raise FetchError(f"{entry['id']}: sha256 mismatch for {entry['audio_url']}")
+        if not (source.is_file() and file_sha256(source) == entry["sha256"]):
+            song_dir.mkdir(parents=True, exist_ok=True)
+            download(entry["audio_url"], source)
+            if file_sha256(source) != entry["sha256"]:
+                source.unlink()
+                raise FetchError(f"{entry['id']}: sha256 mismatch for {entry['audio_url']}")
+        if clip and not (song_dir / "audio.flac").is_file():
+            trim(source, float(clip[0]), float(clip[1]), song_dir / "audio.flac")
     return ids
 
 
