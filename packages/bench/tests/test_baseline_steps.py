@@ -40,6 +40,22 @@ def test_demucs_separator_writes_two_stems(tmp_path: Path) -> None:
 
 
 @pytest.mark.usefixtures("ffmpeg")
+def test_demucs_separator_is_deterministic(tmp_path: Path) -> None:
+    _needs_gpu()
+    pytest.importorskip("demucs")
+    mix = DEMO / "instrumental.wav"
+    if not mix.is_file():
+        pytest.skip("run `uv run karaoke demo fixtures/packages/demo-sintetico` first")
+    separator = DemucsSeparator()
+    separator.load()
+
+    first = separator.separate(mix, tmp_path / "a")
+    second = separator.separate(mix, tmp_path / "b")
+
+    assert first.vocals.read_bytes() == second.vocals.read_bytes()
+
+
+@pytest.mark.usefixtures("ffmpeg")
 def test_whisper_reports_language(tmp_path: Path) -> None:
     _needs_gpu()
     pytest.importorskip("faster_whisper")
