@@ -5,9 +5,11 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from karaoke_bench.compare import compare_runs
 from karaoke_bench.fetch import FetchError, fetch_jamendo, fetch_manifest_set
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.pipeline import Mode, PipelineError, load_pipeline
+from karaoke_bench.results import load_results
 from karaoke_bench.runner import RunOptions, run
 from karaoke_bench.sets import SetError
 
@@ -31,11 +33,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     run_cmd.add_argument("--songs", nargs="+", help="only these song ids")
     run_cmd.add_argument("--no-cache", action="store_true", help="recompute every step")
 
+    compare = commands.add_parser("compare", help="compare two runs (folders or results.json)")
+    compare.add_argument("run_a", type=Path)
+    compare.add_argument("run_b", type=Path)
+    compare.add_argument("--out", type=Path, help="write the comparison here instead of stdout")
+
     args = parser.parse_args(argv)
     paths = BenchPaths(args.bench_dir)
     try:
         if args.command == "fetch":
             return _fetch(paths, args.set_name)
+        if args.command == "compare":
+            return _compare(args.run_a, args.run_b, args.out)
         return _run(paths, args)
     except (FetchError, PipelineError, SetError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -61,4 +70,13 @@ def _run(paths: BenchPaths, args: argparse.Namespace) -> int:
     for mode in modes:
         options = RunOptions(pipeline, args.set_name, mode, args.songs, not args.no_cache)
         print(run(options, paths))
+    return 0
+
+
+def _compare(run_a: Path, run_b: Path, out: Path | None) -> int:
+    text = compare_runs(load_results(run_a), load_results(run_b))
+    if out is None:
+        print(text, end="")
+    else:
+        out.write_text(text, encoding="utf-8")
     return 0
