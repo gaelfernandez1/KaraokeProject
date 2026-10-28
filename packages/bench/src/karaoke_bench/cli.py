@@ -13,6 +13,7 @@ from karaoke_bench.drafting import (
     reference_path,
 )
 from karaoke_bench.fetch import FetchError, fetch_jamendo, fetch_manifest_set
+from karaoke_bench.package import PackageError, build_package
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.pipeline import Mode, PipelineError, load_pipeline
 from karaoke_bench.reference import dump_reference, load_reference
@@ -59,6 +60,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     review.add_argument("--port", type=int, default=8765)
     review.add_argument("--pipeline", type=Path, help="pipeline whose separator gives the vocals")
 
+    package = commands.add_parser("package", help="build a karaoke package from a reference")
+    package.add_argument("song", help="set/song")
+    package.add_argument(
+        "--pipeline", type=Path, required=True, help="its separator makes the stems"
+    )
+    package.add_argument("--out", type=Path, required=True)
+
     args = parser.parse_args(argv)
     paths = BenchPaths(args.bench_dir)
     try:
@@ -70,10 +78,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _draft(paths, _one_song(args.song, paths), args.pipeline, args.force)
         if args.command == "realign":
             return _realign(paths, _one_song(args.song, paths), args.pipeline)
+        if args.command == "package":
+            return _package(paths, _one_song(args.song, paths), args.pipeline, args.out)
         if args.command == "review":
             return _review(paths, _one_song(args.song, paths), args.port, args.pipeline)
         return _run(paths, args)
-    except (FetchError, PipelineError, SetError, DraftError, OSError) as exc:
+    except (FetchError, PipelineError, SetError, DraftError, PackageError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
@@ -159,3 +169,35 @@ def _review(paths: BenchPaths, song: Song, port: int, pipeline_path: Path | None
     finally:
         server.server_close()
     return 0
+
+
+def _package(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> int:
+    from karaoke_bench.drafting import separated_stems
+    from karaoke_bench.sets import read_meta
+
+    ref = song.load_reference()
+    if ref is None:
+        raise DraftError(f"{song.song_id} has no reference")
+    meta_path = song.audio.parent / "meta.toml"
+    meta = read_meta(meta_path) if meta_path.is_file() else {}
+    credits = _credits(song, meta)
+    stems = separated_stems(song, load_pipeline(pipeline_path), paths)
+    doc = build_package(song, ref, stems, out, credits)
+    print(f"{out}: {len(doc.lines)} lines")
+    return 0
+
+
+def _credits(song: Song, meta: dict[str, str]) -> str:
+    lines = [
+        f"Song: {song.title}" + (f" by {song.artist}" if song.artist else ""),
+        f"Licence: {meta.get('license', 'see source')}",
+        f"Source: {meta.get('source', '-')}",
+    ]
+    if song.set_name == "jamendo":
+        lines += [
+            "",
+            "Word timings: JamendoLyrics MultiLang (Durand, Stoller and Ewert, ICASSP 2023).",
+            "Lyrics text and line timings: Jam-ALT (Cífka et al., 2023 and 2025).",
+            "The audio (vocals.wav, instrumental.wav) is generated locally and never versioned.",
+        ]
+    return "\n".join(lines) + "\n"

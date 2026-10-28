@@ -122,3 +122,24 @@ def test_realign_marks_fixed_lines_for_review(demo_bench: BenchPaths, tmp_path: 
     assert code == 0
     assert fixed.lines[2].status == "draft"
     assert fixed.lines[2].revised
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_package_command_builds_a_valid_package(demo_bench: BenchPaths, tmp_path: Path) -> None:
+    from karaoke_contracts import validate_package
+
+    pipeline = tmp_path / "sep.toml"
+    pipeline.write_text(
+        'name = "sep"\n[steps.separator]\ntarget = "karaoke_bench.fakes:PassthroughSeparator"\n',
+        encoding="utf-8",
+    )
+    out = tmp_path / "pkg"
+
+    code = main(
+        ["--bench-dir", str(demo_bench.root), "package", "private/demo", "--pipeline",
+         str(pipeline), "--out", str(out)]
+    )  # fmt: skip
+
+    assert code == 0
+    assert validate_package(out) == []
+    assert "Demo" in (out / "LICENSE").read_text(encoding="utf-8")
