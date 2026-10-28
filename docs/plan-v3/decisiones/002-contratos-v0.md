@@ -25,8 +25,12 @@
   - medios con ruta relativa dentro del paquete y que existen.
 
   Tolerancia de 1 ms (`TIME_EPS`).
-- **Versionado**: `schema_version` semver con major 1. Los campos desconocidos se ignoran, así que
-  una versión menor nueva carga en un consumidor viejo; un major 2 se rechaza.
+- **Versionado**: `schema_version` semver con major 1. Los campos desconocidos se **conservan**
+  (`extra="allow"`): una versión menor nueva carga en un consumidor viejo y, si este la guarda, no
+  pierde nada. Un major 2 se rechaza. `Infinity` y `NaN` se rechazan. mypy (plugin de pydantic con
+  `init_forbid_extra`) sigue cazando erratas en los argumentos al construir modelos.
+- **Rutas de medios**: `resolve_media(paquete, ref)` es la única comprobación de rutas (resuelve
+  enlaces simbólicos); la usan el validador y quien escriba medios en un paquete.
 - **Texto**: `text` lleva la ortografía original (también reintegracionista o dialectal) con la
   puntuación pegada; si hay `parts`, la puntuación va en la última parte. JSON en UTF-8 sin escapes
   (`dump_doc`).

@@ -1,7 +1,9 @@
 .PHONY: setup lint format typecheck test contracts web check-env ci
 
+# --inexact keeps packages that are already installed, so torch from `uv sync --extra ml`
+# survives a later `make setup` on the GPU machine.
 setup:
-	uv sync
+	uv sync --inexact
 	uv run pre-commit install
 	pnpm --dir web install
 
@@ -33,4 +35,5 @@ web:
 check-env:
 	uv run python scripts/check_env.py
 
-ci: lint typecheck test web
+# Regenerates the contracts first so a stale schema or TS type shows up locally, as in CI.
+ci: contracts lint typecheck test web

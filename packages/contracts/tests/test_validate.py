@@ -3,7 +3,14 @@ from typing import Any
 
 import pytest
 
-from karaoke_contracts import Issue, KaraokeDoc, validate_doc, validate_package
+from karaoke_contracts import (
+    Issue,
+    KaraokeDoc,
+    resolve_media,
+    validate_doc,
+    validate_file,
+    validate_package,
+)
 
 
 def issues_for(data: dict[str, Any]) -> list[Issue]:
@@ -147,3 +154,40 @@ def test_schema_errors_are_reported_not_raised(demo_package: Path) -> None:
     issues = validate_package(demo_package)
 
     assert [i.path for i in issues] == ["schema_version"]
+
+
+def test_symlinked_media_outside_package_is_rejected(demo_package: Path) -> None:
+    outside = demo_package.parent / "outside.wav"
+    outside.write_bytes(b"")
+    (demo_package / "vocals.wav").unlink()
+    (demo_package / "vocals.wav").symlink_to(outside)
+
+    issues = validate_package(demo_package)
+
+    assert [i.path for i in issues] == ["audio.vocals"]
+
+
+def test_resolve_media_returns_the_file_inside_the_package(demo_package: Path) -> None:
+    assert resolve_media(demo_package, "vocals.wav") == (demo_package / "vocals.wav").resolve()
+
+
+@pytest.mark.parametrize("ref", ["../escape.wav", "/etc/escape.wav", "a\\b.wav"])
+def test_resolve_media_refuses_paths_outside_the_package(demo_package: Path, ref: str) -> None:
+    with pytest.raises(ValueError, match="inside the package"):
+        resolve_media(demo_package, ref)
+
+
+def test_validate_file_reports_a_missing_file(tmp_path: Path) -> None:
+    issues = validate_file(tmp_path / "nope.json")
+
+    assert [i.path for i in issues] == ["nope.json"]
+
+
+def test_validate_file_reports_broken_json(tmp_path: Path) -> None:
+    broken = tmp_path / "karaoke.json"
+    broken.write_text("{ not json", encoding="utf-8")
+
+    issues = validate_file(broken)
+
+    assert len(issues) == 1
+    assert issues[0].path == "karaoke.json"

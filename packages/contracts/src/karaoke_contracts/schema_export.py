@@ -5,7 +5,8 @@ import sys
 from pathlib import Path
 
 from pydantic import BaseModel
-from pydantic.json_schema import GenerateJsonSchema
+from pydantic.json_schema import GenerateJsonSchema, JsonSchemaValue
+from pydantic_core import core_schema
 
 from karaoke_contracts.doc import KaraokeDoc
 from karaoke_contracts.theme import Theme
@@ -19,6 +20,14 @@ class _ModelTitlesOnly(GenerateJsonSchema):
 
     def field_title_should_be_set(self, schema: object) -> bool:
         return False
+
+    def model_schema(self, schema: core_schema.ModelSchema) -> JsonSchemaValue:
+        # extra="allow" writes "additionalProperties": true, which is already the JSON Schema
+        # default; dropping it keeps json2ts from adding index signatures.
+        json_schema = super().model_schema(schema)
+        if json_schema.get("additionalProperties") is True:
+            del json_schema["additionalProperties"]
+        return json_schema
 
 
 def export_schemas(out_dir: Path) -> list[Path]:

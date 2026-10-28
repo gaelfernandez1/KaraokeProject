@@ -31,8 +31,8 @@ Referencia: el portátil del proyecto (Windows 11 + WSL2 con Ubuntu 26.04, RTX 3
    make setup                 # Python (sin GPU), hooks de pre-commit y la web
    uv sync --extra ml         # además torch con CUDA (unos GB), solo en el equipo con GPU
    ```
-   Ojo: un `uv sync` sin `--extra ml` desinstala torch. En el equipo con GPU, sincroniza
-   siempre con `--extra ml`.
+   Ojo: un `uv sync` a mano sin `--extra ml` desinstala torch (`make setup` no, porque usa
+   `--inexact`). En el equipo con GPU, sincroniza a mano siempre con `--extra ml`.
 5. **Comprobar que todo está bien:**
    ```bash
    make check-env

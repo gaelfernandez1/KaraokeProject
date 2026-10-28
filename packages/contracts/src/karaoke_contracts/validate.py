@@ -44,13 +44,17 @@ def validate_doc(doc: KaraokeDoc) -> list[Issue]:
     return issues
 
 
+def validate_file(path: Path) -> list[Issue]:
+    """Validates a bare karaoke.json: load errors become issues instead of exceptions."""
+    loaded = _load(path)
+    return loaded if isinstance(loaded, list) else validate_doc(loaded)
+
+
 def validate_package(package_dir: Path) -> list[Issue]:
-    try:
-        doc = load_doc(package_dir / "karaoke.json")
-    except FileNotFoundError:
-        return [Issue("karaoke.json", "missing karaoke.json")]
-    except ValidationError as exc:
-        return [Issue(".".join(map(str, err["loc"])), err["msg"]) for err in exc.errors()]
+    loaded = _load(package_dir / "karaoke.json")
+    if isinstance(loaded, list):
+        return loaded
+    doc = loaded
 
     issues = validate_doc(doc)
     refs = {
@@ -112,14 +116,39 @@ def _check_parts(word_path: str, word: Word, issues: list[Issue]) -> None:
         prev_start = part.start
 
 
-def _check_media(package_dir: Path, path: str, ref: str) -> list[Issue]:
+def resolve_media(package_dir: Path, ref: str) -> Path:
+    """The real path of a media reference, refusing anything that ends up outside the package.
+
+    Symlinks are resolved first, so a link pointing outside the package is refused too.
+    """
     pure = PurePosixPath(ref)
     if pure.is_absolute() or ".." in pure.parts or "\\" in ref:
-        return [Issue(path, f"'{ref}' must be a relative path inside the package")]
+        raise ValueError(f"'{ref}' must be a relative path inside the package")
     root = package_dir.resolve()
     target = (root / pure).resolve()
     if not target.is_relative_to(root):
-        return [Issue(path, f"'{ref}' points outside the package")]
+        raise ValueError(f"'{ref}' points outside the package, but must stay inside the package")
+    return target
+
+
+def _load(path: Path) -> KaraokeDoc | list[Issue]:
+    try:
+        return load_doc(path)
+    except FileNotFoundError:
+        return [Issue(path.name, f"{path.name} not found")]
+    except OSError as exc:
+        return [Issue(path.name, f"cannot read {path.name}: {exc.strerror}")]
+    except ValidationError as exc:
+        return [
+            Issue(".".join(map(str, err["loc"])) or path.name, err["msg"]) for err in exc.errors()
+        ]
+
+
+def _check_media(package_dir: Path, path: str, ref: str) -> list[Issue]:
+    try:
+        target = resolve_media(package_dir, ref)
+    except ValueError as exc:
+        return [Issue(path, str(exc))]
     if not target.is_file():
         return [Issue(path, f"file '{ref}' not found in the package")]
     return []

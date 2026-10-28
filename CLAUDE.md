@@ -34,7 +34,7 @@ Llegarán `packages/bench` (C2) y `packages/server` (C8).
 ```bash
 make setup                 # deps de Python (sin GPU), hooks de pre-commit y web
 uv sync --extra ml         # además torch con CUDA, en el equipo con GPU
-make ci                    # lint + tipos + tests de Python y de la web (como la CI)
+make ci                    # contratos + lint + tipos + tests de Python y web (como la CI)
 make format                # ruff format + fix
 make contracts             # regenera schemas/ y los tipos TS tras tocar un contrato
 make check-env             # comprueba uv, node, pnpm, ffmpeg (libass, NVENC) y torch+CUDA
@@ -64,7 +64,7 @@ pnpm --dir web dev
 
 ## Detalles que muerden
 
-- Un `uv sync` sin `--extra ml` desinstala torch.
+- Un `uv sync` a mano sin `--extra ml` desinstala torch (`make setup` no: usa `--inexact`).
 - pnpm está fijado en 10.33.0: el corepack de Ubuntu 26.04 no sabe instalar pnpm 11 o superior.
 - La GPU es una RTX 3050 de 4 GB: un modelo en la GPU a la vez, en int8/float16. WSL ve unos 7–8 GB
   de RAM.

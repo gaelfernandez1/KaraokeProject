@@ -22,7 +22,14 @@ from karaoke_contracts.theme import (
     ThemeFont,
     ThemeLayout,
 )
-from karaoke_contracts.validate import TIME_EPS, Issue, validate_doc, validate_package
+from karaoke_contracts.validate import (
+    TIME_EPS,
+    Issue,
+    resolve_media,
+    validate_doc,
+    validate_file,
+    validate_package,
+)
 
 __all__ = [
     "SCHEMA_VERSION",
@@ -45,6 +52,8 @@ __all__ = [
     "Word",
     "dump_doc",
     "load_doc",
+    "resolve_media",
     "validate_doc",
+    "validate_file",
     "validate_package",
 ]
