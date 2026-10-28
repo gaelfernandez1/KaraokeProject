@@ -36,6 +36,8 @@ extend-exclude = ["legacy", "web"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PT"]
+# Lyrics legitimately use typographic apostrophes and accents.
+allowed-confusables = ["’", "‘", "´"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["karaoke_contracts", "karaoke_engine"]
