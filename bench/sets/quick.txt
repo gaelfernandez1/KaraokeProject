@@ -1,0 +1,26 @@
+# Quick set: 20 JamendoLyrics songs, 5 per language, as many genres as possible, with some
+# polyphonic or overlapping vocals. Change it on purpose only: quick runs compare against it.
+# en
+Kinematic_-_Peyote
+Wordsmith_-_The_Statement
+The_Rinn_-_Voices__2017_Version_
+Ridgway_-_Fire_Inside
+Cortez_-_Feel__Stripped_
+# es
+10._Disparan_-_criatura
+Baila_-_Alfonso_Lugo
+Esencia_-_NandoMalo_
+Te_Recuerdo_-_Wilson_Way
+Háblame_-_(Talk_to_me)_-_Brunela_Crochenci
+# de
+1_Freak_-_Automatisch_Gekommen
+Der_Musiker_-_d-music
+Cafe_Jenseitz_Bebelstraße_-_kangaroo.musique
+Keine_Lust_-_Jonny_M
+Sehnsucht-Unplugged_-_REH-TORTE
+# fr
+Capotes_à_un_Franc_-_elmanu
+Confession_-_Quesabe
+Mère_nature_-_Law'
+Pas_que_tes_pas_-_AZUL
+Le_musée_d'air_contemporain_-_KPTN

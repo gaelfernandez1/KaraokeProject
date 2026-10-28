@@ -129,3 +129,14 @@ def test_manifest_set_downloads_and_loads(tmp_path: Path, make_tone: ToneMaker) 
     assert song.audio == paths.data / "gl" / "proba" / "audio.ogg"
     assert song.lyrics_text() == "Ola mar\n"
     assert song.reference is None
+
+
+def test_dataset_url_quotes_non_ascii_paths() -> None:
+    from karaoke_bench.fetch import dataset_url
+
+    url = dataset_url({"repo": "a/b", "revision": "abc"}, "subsets/de/mp3/Straße & Co.mp3")
+
+    assert url.isascii()
+    assert url == (
+        "https://huggingface.co/datasets/a/b/resolve/abc/subsets/de/mp3/Stra%C3%9Fe%20%26%20Co.mp3"
+    )
