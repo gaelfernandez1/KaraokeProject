@@ -51,6 +51,12 @@ Referencia: el portátil del proyecto (Windows 11 + WSL2 con Ubuntu 26.04, RTX 3
 | Regenerar JSON Schema y tipos TS tras tocar un contrato | `make contracts` |
 | Validar un paquete de karaoke | `uv run karaoke validate <carpeta>` |
 | Audio sintético para el paquete de ejemplo | `uv run karaoke demo fixtures/packages/demo-sintetico` |
+| Descargar las canciones del banco (una vez) | `uv run karaoke-bench fetch --set all` |
+| Medir un cambio del motor (prueba rápida) | `uv run karaoke-bench run --pipeline bench/pipelines/<x>.toml --set quick` |
+| Comparar dos mediciones | `uv run karaoke-bench compare bench/results/<a> bench/results/<b>` |
+| Revisar de oído una referencia gallega | `uv run karaoke-bench review gl/<id> --pipeline bench/pipelines/draft-gl.toml` |
+
+El banco de pruebas tiene su propia guía: [`docs/banco.md`](banco.md).
 
 ## Problemas conocidos
 
