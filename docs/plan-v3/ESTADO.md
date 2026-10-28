@@ -5,7 +5,7 @@ Tablero compartido entre conversaciones. Cada conversación actualiza **su fila*
 
 | Conv. | Área | Estado | Rama | Último hito | Interfaces que expone | Pendiente para otras |
 |---|---|---|---|---|---|---|
-| C1 | Arquitectura, repo y cimientos | hecho (pendiente de PR) | `v3/c1-cimientos` | workspace uv, contratos v0, web SvelteKit, CI, entorno GPU comprobado | `karaoke_contracts` (`KaraokeDoc`, `Theme`, `validate_doc`, `validate_package`, `load_doc`, `dump_doc`); `schemas/*.schema.json`; `#lib/contracts` (tipos TS + `PlaybackClock`); `karaoke_engine.steps` (`Separator`, `Transcriber`, `Segmenter`, `Aligner`); CLI `karaoke validate|demo`; `fixtures/packages/demo-sintetico`; `fixtures/themes/basico.json`; `make ci|contracts|check-env` | C2: crear `packages/bench` y la skill `probar-karaoke`; C5/C7: pueden empezar con el demo sintético |
+| C1 | Arquitectura, repo y cimientos | hecho | `v3/c1-cimientos` (PR #1) | workspace uv, contratos v0, web SvelteKit, CI, entorno GPU comprobado | `karaoke_contracts` (`KaraokeDoc`, `Theme`, `validate_doc`, `validate_package`, `load_doc`, `dump_doc`); `schemas/*.schema.json`; `#lib/contracts` (tipos TS + `PlaybackClock`); `karaoke_engine.steps` (`Separator`, `Transcriber`, `Segmenter`, `Aligner`); CLI `karaoke validate|demo`; `fixtures/packages/demo-sintetico`; `fixtures/themes/basico.json`; `make ci|contracts|check-env` | C2: crear `packages/bench` y la skill `probar-karaoke`; C5/C7: pueden empezar con el demo sintético |
 | C2 | Banco de pruebas y métricas | sin empezar | — | — | — | — |
 | C3 | Audio: separación y sonido | sin empezar | — | — | — | — |
 | C4 | Transcripción y sincronización | sin empezar | — | — | — | — |
