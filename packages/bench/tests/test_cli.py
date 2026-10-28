@@ -58,3 +58,19 @@ def test_run_reports_unknown_set(tmp_path: Path, capsys: pytest.CaptureFixture[s
 
     assert code == 1
     assert "unknown set" in capsys.readouterr().err
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_compare_two_runs(demo_bench: BenchPaths, capsys: pytest.CaptureFixture[str]) -> None:
+    smoke = Path(__file__).resolve().parents[3] / "bench" / "pipelines" / "smoke.toml"
+    base = ["--bench-dir", str(demo_bench.root)]
+    run_args = ["run", "--pipeline", str(smoke), "--set", "private", "--mode", "lyrics"]
+    main([*base, *run_args])
+    main([*base, *run_args])
+    first, second = capsys.readouterr().out.split()
+    out = demo_bench.root / "cmp.md"
+
+    code = main([*base, "compare", first, second, "--out", str(out)])
+
+    assert code == 0
+    assert out.read_text(encoding="utf-8").startswith("# Comparación")
