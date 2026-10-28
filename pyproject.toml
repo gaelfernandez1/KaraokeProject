@@ -3,12 +3,12 @@ name = "karaoke-workspace"
 version = "0.0.0"
 description = "Workspace root for the v3 karaoke generator (Galician first)"
 requires-python = ">=3.12,<3.13"
-dependencies = ["karaoke-contracts", "karaoke-engine"]
+dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench"]
 
 [project.optional-dependencies]
 # GPU stack for the engine. Kept out of the default sync so CI and the web
 # side never download torch.
-ml = ["karaoke-engine[ml]"]
+ml = ["karaoke-engine[ml]", "karaoke-bench[ml]"]
 
 [dependency-groups]
 dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7"]
@@ -22,7 +22,9 @@ members = ["packages/*"]
 [tool.uv.sources]
 karaoke-contracts = { workspace = true }
 karaoke-engine = { workspace = true }
+karaoke-bench = { workspace = true }
 torch = { index = "pytorch-cu130" }
+torchaudio = { index = "pytorch-cu130" }
 
 [[tool.uv.index]]
 name = "pytorch-cu130"
@@ -40,13 +42,13 @@ select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PT"]
 allowed-confusables = ["’", "‘", "´"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["karaoke_contracts", "karaoke_engine"]
+known-first-party = ["karaoke_contracts", "karaoke_engine", "karaoke_bench"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
-files = ["packages/contracts/src", "packages/engine/src"]
+files = ["packages/contracts/src", "packages/engine/src", "packages/bench/src"]
 
 # The contract models accept unknown fields at runtime (forward compatibility); mypy still
 # flags misspelled keyword arguments when our own code builds them.
