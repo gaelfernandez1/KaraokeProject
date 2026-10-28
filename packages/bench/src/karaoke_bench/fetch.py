@@ -11,7 +11,7 @@ import urllib.request
 from collections.abc import Callable
 from pathlib import Path, PurePosixPath
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 from karaoke_bench import __version__
 from karaoke_bench.audio import duration, file_sha256
@@ -41,12 +41,11 @@ def fetch_jamendo(paths: BenchPaths, download: Downloader = http_download) -> li
     """Downloads JamendoLyrics audio and builds a reference per song. Safe to re-run."""
     with (paths.sets / "jamendo.toml").open("rb") as handle:
         upstream = tomllib.load(handle)
-    timings = _hf_base(upstream["jamendolyrics"])
-    lyrics = _hf_base(upstream["jamalt"])
+    timings, lyrics = upstream["jamendolyrics"], upstream["jamalt"]
     work = paths.data / "jamendo" / "_upstream"
     work.mkdir(parents=True, exist_ok=True)
 
-    download(f"{timings}/JamendoLyrics.csv", work / "JamendoLyrics.csv")
+    download(dataset_url(timings, "JamendoLyrics.csv"), work / "JamendoLyrics.csv")
     rows = list(csv.DictReader(io.StringIO((work / "JamendoLyrics.csv").read_text("utf-8"))))
     ids = []
     for row in rows:
@@ -58,12 +57,12 @@ def fetch_jamendo(paths: BenchPaths, download: Downloader = http_download) -> li
             continue
         audio = song_dir / "audio.mp3"
         song_dir.mkdir(parents=True, exist_ok=True)
-        download(f"{timings}/subsets/{language}/mp3/{song_id}.mp3", audio)
+        download(dataset_url(timings, f"subsets/{language}/mp3/{song_id}.mp3"), audio)
         words_txt, words_csv = work / f"{song_id}.words.txt", work / f"{song_id}.csv"
         alignment = work / f"{song_id}.json"
-        download(f"{timings}/lyrics/{song_id}.words.txt", words_txt)
-        download(f"{timings}/annotations/words/{song_id}.csv", words_csv)
-        download(f"{lyrics}/alignment/{song_id}.json", alignment)
+        download(dataset_url(timings, f"lyrics/{song_id}.words.txt"), words_txt)
+        download(dataset_url(timings, f"annotations/words/{song_id}.csv"), words_csv)
+        download(dataset_url(lyrics, f"alignment/{song_id}.json"), alignment)
         ref = convert_jamendo_song(
             song_id,
             language,
@@ -160,8 +159,10 @@ def _nearest_line(spans: list[tuple[float, float, str]], t: float) -> int:
     return best
 
 
-def _hf_base(source: dict[str, str]) -> str:
-    return f"https://huggingface.co/datasets/{source['repo']}/resolve/{source['revision']}"
+def dataset_url(source: dict[str, str], path: str) -> str:
+    """URL of a file in a Hugging Face dataset at a fixed revision, safe for any file name."""
+    base = f"https://huggingface.co/datasets/{source['repo']}/resolve/{source['revision']}"
+    return f"{base}/{quote(path)}"
 
 
 def _load_json(path: Path) -> dict[str, Any]:

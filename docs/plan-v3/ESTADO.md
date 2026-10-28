@@ -6,7 +6,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | Conv. | Área | Estado | Rama | Último hito | Interfaces que expone | Pendiente para otras |
 |---|---|---|---|---|---|---|
 | C1 | Arquitectura, repo y cimientos | hecho | `v3/c1-cimientos` (PR #1) | workspace uv, contratos v0, web SvelteKit, CI, entorno GPU comprobado | `karaoke_contracts` (`KaraokeDoc`, `Theme`, `validate_doc`, `validate_package`, `load_doc`, `dump_doc`); `schemas/*.schema.json`; `#lib/contracts` (tipos TS + `PlaybackClock`); `karaoke_engine.steps` (`Separator`, `Transcriber`, `Segmenter`, `Aligner`); CLI `karaoke validate|demo`; `fixtures/packages/demo-sintetico`; `fixtures/themes/basico.json`; `make ci|contracts|check-env` | C2: crear `packages/bench` y su comando; C5/C7: pueden empezar con el demo sintético |
-| C2 | Banco de pruebas y métricas | sin empezar | — | — | — | — |
+| C2 | Banco de pruebas y métricas | en curso | `v3/c2-banco` | núcleo del banco listo: conjuntos (JamendoLyrics 79 y rápido 20), métricas, runner por subprocesos con caché, informes y comparación | `karaoke-bench fetch\|run\|compare`; pipelines TOML en `bench/pipelines/` (cualquier clase que cumpla `karaoke_engine.steps`) | — |
 | C3 | Audio: separación y sonido | sin empezar | — | — | — | — |
 | C4 | Transcripción y sincronización | sin empezar | — | — | — | — |
 | C5 | Subtítulos animados | sin empezar | — | — | — | — |
