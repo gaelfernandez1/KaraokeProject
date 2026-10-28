@@ -1,4 +1,4 @@
-.PHONY: setup lint format typecheck test ci
+.PHONY: setup lint format typecheck test contracts ci
 
 setup:
 	uv sync
@@ -17,5 +17,8 @@ typecheck:
 
 test:
 	uv run pytest -q
+
+contracts:
+	uv run python -m karaoke_contracts.schema_export schemas
 
 ci: lint typecheck test
