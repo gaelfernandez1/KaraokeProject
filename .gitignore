@@ -1,124 +1,67 @@
-
-# gitignore generico sacado de internet mezclado con ignores do meu proyecto.
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-*.so
-.CLAUDE
-CLAUDE.md
-docs/
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+.venv/
+build/
+dist/
 
-*.manifest
-*.spec
-
-pip-log.txt
-pip-delete-this-directory.txt
-
-htmlcov/
-.tox/
-.nox/
+# Tool caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 .coverage
 .coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+htmlcov/
+.cache/
 
+# Secrets and local config
 .env
-.env.local
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+.env.*
+!.env.example
+!legacy/.env.example
 
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
+# Media and generated artifacts (songs never go into the repo)
+*.mp4
+*.mp3
+*.wav
+*.m4a
+*.ogg
+*.flac
+*.srt
+!legacy/fixtures/*.srt
 input/
 output/
 separated/
 stems/
-*.mp4
-*.mp3
-*.wav
-*.srt
-# But track test fixtures regardless of the *.srt rule above
-!fixtures/*.srt
+bench/data/
 
-# Only the top-level SQLite data dir; not the src/karaoke/infra/db package.
+# Local databases and logs
 /db/
 *.db
 *.sqlite
 *.sqlite3
-
 *.log
-logs/
 
-temp-audio.m4a
-*.tmp
-*.temp
+# Web
+node_modules/
+web/.svelte-kit/
+web/build/
+web/test-results/
+web/playwright-report/
 
-.cache/
-*.pth
-*.pt
+# Claude Code and agent scratch space
+.claude/settings.local.json
+.claude/worktrees/
+.superpowers/
 
-.huggingface/
+# Old planning docs, kept locally only
+docs/archivo/
 
-
-celerybeat-schedule
-celerybeat.pid
-
-dump.rdb
-
-.ipynb_checkpoints
-
-.python-version
-
-Pipfile.lock
-
-poetry.lock
-
-__pypackages__/
-
-.env.development
-.env.testing
-.env.production
-
-local_settings.py
-config_local.py
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
