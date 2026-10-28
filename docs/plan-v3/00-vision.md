@@ -191,13 +191,16 @@ conecta el reproductor (C7). C1 define el tipo TS.
 
 C1 define las interfaces de los pasos (protocolos de Python, p. ej. `Separator`, `Transcriber`,
 `Aligner`, `Segmenter`, con sus tipos de entrada y salida) para que el banco (C2) pueda probar
-cualquier combinación y C3/C4 las implementen. CLI orientativa:
+cualquier combinación y C3/C4 las implementen. CLI orientativa (una por paquete; ver
+`decisiones/001`):
 
 ```
 karaoke make <entrada> [--lang gl] [--lyrics letra.txt] [--out dir]   → paquete
 karaoke render <paquete> [--theme x] [--aspect 16:9|9:16]             → mp4
-karaoke bench [--set gl] [--compare baseline]                          → informe
+karaoke-bench [--set gl] [--compare baseline]                          → informe
 ```
+
+Ya existen `karaoke validate` y `karaoke demo` (C1).
 
 ### 6.6 API
 
