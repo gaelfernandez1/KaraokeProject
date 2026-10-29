@@ -128,8 +128,9 @@ Con las dos validadas (624 palabras):
 | `c4-default` | 98,6 % | 0,038 s |
 
 - La meta (≥ 95 %) se cumple.
-- Frente a `base-turbo` es un empate (una palabra). Esa medida favorece a las líneas base: usan
-  el mismo modelo que uno de los tres validadores, que además es uno de ellos.
+- Frente a `base-turbo` es un empate (una palabra). Ninguna medida es del todo independiente:
+  `base-turbo` es uno de los tres validadores y `sep-melkim-8s` usa su mismo modelo, mientras que
+  `c4-default` comparte el Viterbi y el separador con otros dos.
 - Las líneas dudosas (las únicas que alguien tendría que escuchar) las lista el comando. Las
   canciones sin validar siguen fuera de la sincronía.
 
