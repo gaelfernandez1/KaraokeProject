@@ -16,6 +16,7 @@ frame from the compact matrix, so a long song needs no frames-by-states matrix o
 """
 
 import itertools
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 
@@ -35,6 +36,9 @@ class Segment:
     tokens: tuple[int, ...]  # column indices into the compact emission matrix
     owner: tuple[int, ...]  # word index inside the line per token, -1 for delimiters
     skip_penalty: float  # cost of leaving the whole line out (inf = never)
+    # Cost of leaving it out when the path starts after it or ends before it: lyrics that run
+    # past the audio (a radio edit, a clip) lose lines at the edges, not in the middle.
+    edge_skip_penalty: float = math.inf
 
 
 @dataclass(frozen=True)
@@ -62,9 +66,13 @@ def align_segments(
     )
 
     size = layout.size
+    edges = np.array([s.edge_skip_penalty for s in segments], dtype=np.float64)
+    leading = np.concatenate([[0.0], np.cumsum(edges)])  # start at filler k: drop lines 1..k
+    trailing = np.concatenate([np.cumsum(edges[::-1])[::-1], [0.0]])  # end at k: drop k+1..
     back = np.zeros((frames, size), dtype=np.int8)
     score = np.full(size, -np.inf)
-    score[0] = _emit(lp, penalty, layout, filler_penalty, 0)[0]
+    first_emit = _emit(lp, penalty, layout, filler_penalty, 0)
+    score[layout.fillers] = first_emit[layout.fillers] - leading
     candidates = np.full((4, size), -np.inf)
     columns = np.arange(size)
     jump_cost = np.array([s.skip_penalty for s in segments], dtype=np.float64)
@@ -78,7 +86,7 @@ def align_segments(
         back[t] = choice
 
     path = np.empty(frames, dtype=np.int64)
-    state = layout.fillers[-1]
+    state = int(layout.fillers[int(np.argmax(score[layout.fillers] - trailing))])
     for t in range(frames - 1, -1, -1):
         path[t] = state
         move = back[t, state]

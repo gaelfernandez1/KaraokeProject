@@ -171,3 +171,48 @@ def test_delimiters_pay_no_silence_cost() -> None:
     [path] = align_segments(_finish(lp), [segment], filler_penalty=3.0, token_penalty=penalty)
 
     assert (path.spans or [])[1][0] == 30
+
+
+def _edge_segment(columns: list[int], edge: float) -> Segment:
+    return Segment(
+        tokens=tuple(columns),
+        owner=tuple(range(len(columns))),
+        skip_penalty=math.inf,
+        edge_skip_penalty=edge,
+    )
+
+
+def test_lyrics_past_the_audio_end_drop_from_the_end() -> None:
+    lp = _emissions(40, 8)
+    for frame, column in [(10, 2), (12, 3), (25, 4), (27, 5)]:
+        _peak(lp, frame, column)
+    segments = [_edge_segment([2, 3], 2.0), _edge_segment([4, 5], 2.0), _edge_segment([6, 7], 2.0)]
+
+    paths = align_segments(_finish(lp), segments, filler_penalty=3.0)
+
+    assert [span[0] for span in paths[0].spans or []] == [10, 12]
+    assert [span[0] for span in paths[1].spans or []] == [25, 27]
+    assert paths[2].spans is None
+
+
+def test_lyrics_before_the_audio_start_drop_from_the_start() -> None:
+    lp = _emissions(40, 8)
+    for frame, column in [(10, 4), (12, 5), (25, 6), (27, 7)]:
+        _peak(lp, frame, column)
+    segments = [_edge_segment([2, 3], 2.0), _edge_segment([4, 5], 2.0), _edge_segment([6, 7], 2.0)]
+
+    paths = align_segments(_finish(lp), segments, filler_penalty=3.0)
+
+    assert paths[0].spans is None
+    assert [span[0] for span in paths[1].spans or []] == [10, 12]
+
+
+def test_edge_lines_are_kept_when_they_are_sung() -> None:
+    lp = _emissions(40, 6)
+    for frame, column in [(10, 2), (12, 3), (25, 4), (27, 5)]:
+        _peak(lp, frame, column)
+    segments = [_edge_segment([2, 3], 2.0), _edge_segment([4, 5], 2.0)]
+
+    paths = align_segments(_finish(lp), segments, filler_penalty=3.0)
+
+    assert all(path.spans is not None for path in paths)
