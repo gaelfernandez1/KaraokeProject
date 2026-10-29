@@ -6,6 +6,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from karaoke_bench.audio import AudioError
 from karaoke_bench.compare import compare_runs
 from karaoke_bench.drafting import (
     DraftError,
@@ -84,7 +85,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "review":
             return _review(paths, _one_song(args.song, paths), args.port, args.pipeline)
         return _run(paths, args)
-    except (FetchError, PipelineError, SetError, DraftError, PackageError, OSError) as exc:
+    except (
+        FetchError,
+        PipelineError,
+        SetError,
+        DraftError,
+        PackageError,
+        AudioError,
+        OSError,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
