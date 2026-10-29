@@ -4,6 +4,7 @@ Only the columns the lyrics need leave the GPU (plus the blank and the best othe
 model with ten thousand symbols costs no more memory than one with forty.
 """
 
+import contextlib
 import json
 import unicodedata
 from collections.abc import Sequence
@@ -76,6 +77,19 @@ def compact(
     return out
 
 
+def compact_tensor(log_probs: Any, blank: int, ids: Sequence[int]) -> npt.NDArray[np.float32]:
+    """compact() on a torch tensor, so only the needed columns leave the GPU."""
+    import torch
+
+    others = log_probs.clone()
+    others[:, blank] = -torch.inf
+    columns = [log_probs[:, blank : blank + 1], others.max(dim=1, keepdim=True).values]
+    if ids:
+        columns.append(log_probs[:, list(ids)])
+    out: npt.NDArray[np.float32] = torch.cat(columns, dim=1).float().cpu().numpy()
+    return out
+
+
 class EmissionModel:
     def __init__(
         self,
@@ -142,16 +156,17 @@ class EmissionModel:
             per_sample = logits.shape[0] / (right - left)
             first = round((start - left) * per_sample)
             last = round((stop - left) * per_sample)
-            window_lp = logits[first:last].log_softmax(dim=-1).cpu().numpy()
-            parts.append(compact(window_lp, blank, ids))
+            parts.append(compact_tensor(logits[first:last].log_softmax(dim=-1), blank, ids))
         log_probs = np.concatenate(parts) if parts else np.zeros((0, 2 + len(ids)), np.float32)
         frame_seconds = len(samples) / SAMPLE_RATE / max(log_probs.shape[0], 1)
         return Emissions(log_probs, frame_seconds)
 
     def unload(self) -> None:
+        """Frees the model, on the GPU and in RAM, before another one loads."""
         import gc
 
         self._net = None
+        self._features = None
         gc.collect()
         try:
             import torch
@@ -160,6 +175,18 @@ class EmissionModel:
                 torch.cuda.empty_cache()
         except ImportError:
             pass
+        _give_memory_back()
+
+
+def _give_memory_back() -> None:
+    """Returns freed heap to the system (glibc keeps it otherwise), so models do not pile up."""
+    import ctypes
+    import ctypes.util
+
+    name = ctypes.util.find_library("c")
+    if name:
+        with contextlib.suppress(OSError, AttributeError):
+            ctypes.CDLL(name).malloc_trim(0)
 
 
 def _base(ch: str) -> str:

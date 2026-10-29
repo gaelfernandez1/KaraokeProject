@@ -85,3 +85,28 @@ def test_emissions_cover_the_audio() -> None:
     seconds = emissions.log_probs.shape[0] * emissions.frame_seconds
     assert seconds == pytest.approx(len(samples) / 16000, abs=0.05)
     assert emissions.log_probs.shape[1] == 2 + len(ids)
+
+
+def test_compact_tensor_matches_compact() -> None:
+    torch = pytest.importorskip("torch")
+    from karaoke_engine.align.emissions import compact_tensor
+
+    rng = np.random.default_rng(0)
+    logits = torch.from_numpy(rng.normal(size=(50, 12)).astype(np.float32))
+    log_probs = logits.log_softmax(dim=-1)
+
+    out = compact_tensor(log_probs, blank=3, ids=[5, 0, 11])
+
+    np.testing.assert_allclose(out, compact(log_probs.numpy(), blank=3, ids=[5, 0, 11]), rtol=1e-6)
+
+
+def test_unload_drops_the_model_and_features() -> None:
+    from karaoke_engine.align.emissions import EmissionModel
+
+    model = EmissionModel(MODELS["nos-xlsr-300m-gl"])
+    model._net, model._features = object(), object()
+
+    model.unload()
+
+    assert model._net is None
+    assert model._features is None

@@ -71,7 +71,7 @@ el silencio. Fuera de voz pasó del 6–7 % al 0,1 %.
 | gallego | Nós wav2vec2 XLS-R 300M | en las 2 canciones privadas, todos los candidatos quedan a ±2 palabras de 100: Nós XLS-R 73,4 / 79,2 %, Nós w2v-BERT 75,8 / 81,2 %, Omnilingual 1B 75,8 / 84,2 % con 79 % de cobertura, ifrz 71,0 / 77,1 %; w2v-BERT pasa de 4,6 GB de RAM y Omnilingual 1B de 6 GB |
 | inglés | `facebook/wav2vec2-large-960h-lv60-self` | 97,6 % en las 20 inglesas de jamendo, frente al 95,0 % del modelo base que heredó la línea base y el 94,2 % de XLS-R inglés |
 | castellano, francés, alemán, portugués | XLS-R de jonatasgrosman | los de la línea base, que ya pasan del 98 % |
-| cualquier otro | Omnilingual CTC 300M | cubre unos 1600 idiomas, pero alinea peor (91,4 % en `quick`, 71 % de cobertura): solo de respaldo, anotado en `provenance` |
+| cualquier otro | Omnilingual CTC 300M | cubre unos 1600 idiomas, pero alinea peor (91,4 % en `quick`, 71 % de cobertura): solo de respaldo (anotarlo en `provenance` queda para `karaoke make`) |
 
 ## Cifras finales (`c4-default`, commit de este PR)
 
@@ -84,7 +84,7 @@ el silencio. Fuera de voz pasó del 6–7 % al 0,1 %.
 | stress (24): ≤ 0,3 s · media | 98,0 % · 0,124 s | **99,2 % · 0,068 s** | — |
 | Fuera de voz (stress) | 8,8 % | 0,1 % | — |
 | Canción de 4 min, con letra (con cargas) | 60 s | 59 s | ≤ 2 min ✓ |
-| Alinear: VRAM pico / RAM pico | 1,6 / 4,8 GB | 1,6 / 2,7 GB con un modelo (4,4 GB si el banco carga cuatro idiomas seguidos) | ≤ 3 / ≤ 4 GB ✓ |
+| Alinear: VRAM pico / RAM pico | 1,6 / 4,8 GB | 1,6 / 2,7 GB con un modelo; 4,4 GB si un proceso carga cuatro idiomas seguidos | ≤ 3 / ≤ 4 GB: VRAM ✓; RAM ✓ con un modelo, ✗ con varios (arreglo pendiente de medir) |
 
 - **Mediana**: no baja de 0,03 s porque el modelo inglés grande pone los inicios unos 7 ms más
   tarde. La línea base tampoco la cumplía (0,033 s); la media y el % sí mejoran.
