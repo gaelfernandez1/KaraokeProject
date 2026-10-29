@@ -60,6 +60,7 @@ def display_words(line: RefLine) -> list[Word] | None:
 def build_package(
     song: Song, ref: Reference, stems: Stems, out_dir: Path, credits: str
 ) -> KaraokeDoc:
+    """A package with the reference timings (the hand-made ones for public songs)."""
     lines: list[Line] = []
     for line in ref.lines:
         words = display_words(line)
@@ -74,20 +75,38 @@ def build_package(
                 words=words,
             )
         )
-    separated = stems.vocals != song.audio
+    align_model = "manual (JamendoLyrics MultiLang)" if ref.timing == "manual" else None
+    separation = "htdemucs (bench baseline)" if stems.vocals != song.audio else None
+    return write_package(
+        song, lines, ref.duration, stems, out_dir, credits, separation, align_model
+    )
+
+
+def write_package(
+    song: Song,
+    lines: list[Line],
+    duration: float,
+    stems: Stems,
+    out_dir: Path,
+    credits: str,
+    separation_model: str | None,
+    align_model: str | None,
+) -> KaraokeDoc:
+    """Writes karaoke.json, both stems and the credits, and checks the package."""
+    sung = [line.model_copy(update={"singer": line.singer or "s1"}) for line in lines]
     doc = KaraokeDoc(
         id=slug(song.song_id),
         title=song.title,
         artist=song.artist,
         language=song.language,
-        duration=ref.duration,
+        duration=duration,
         audio=AudioRefs(instrumental="instrumental.wav", vocals="vocals.wav"),
         singers=[Singer(id="s1")],
-        lines=lines,
+        lines=sung,
         provenance=Provenance(
             lyrics_source="user",
-            separation_model="htdemucs (bench baseline)" if separated else None,
-            align_model="manual (JamendoLyrics MultiLang)" if ref.timing == "manual" else None,
+            separation_model=separation_model,
+            align_model=align_model,
             engine_version=f"karaoke-bench {__version__}",
         ),
     )
