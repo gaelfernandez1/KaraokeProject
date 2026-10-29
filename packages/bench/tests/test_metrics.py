@@ -130,3 +130,13 @@ def test_line_start_errors_none_when_counts_differ() -> None:
     hyp = [_hyp_line(1.0), _hyp_line(2.0), _hyp_line(3.0)]
 
     assert line_start_errors([_ref_line(1.0), _ref_line(2.0)], hyp) is None
+
+
+def test_start_within_wide_uses_half_a_second() -> None:
+    errors = TimingErrors(start=[0.4, -0.6], end=[0.0, 0.0], ref_words=2)
+
+    stats = timing_stats([errors])
+
+    assert stats is not None
+    assert stats.start_within == 0.0
+    assert stats.start_within_wide == pytest.approx(0.5)

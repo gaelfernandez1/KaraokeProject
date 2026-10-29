@@ -39,6 +39,7 @@ class SongResult(BaseModel):
     scored_share: float | None = None
     # None for manual references; for semiautomatic ones, whether they were validated by ear.
     reference_validated: bool | None = None
+    reference_timing: str | None = None
     line_start_median: float | None = None
     language_reported: str | None = None
     language_switch: bool | None = None

@@ -37,8 +37,9 @@ def render_report(results: RunResults) -> str:
         "## Resumen",
         "",
         "| Grupo | Canciones | Fallos | WER | CER | Inicio mediana | Inicio media | ≤ 0,3 s "
-        "| Fin mediana | Sesgo | Cobertura | Línea mediana | Cambios de idioma | 4 min (s) |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| ≤ 0,5 s | Fin mediana | Sesgo | Cobertura | Línea mediana | Cambios de idioma "
+        "| 4 min (s) |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         *(_summary_row(name, group) for name, group in _ordered(results.summary)),
         "",
         "## Etapas",
@@ -54,9 +55,9 @@ def render_report(results: RunResults) -> str:
         "",
         "## Por canción",
         "",
-        "| Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | Cobertura "
+        "| Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | ≤ 0,5 s | Cobertura "
         "| Referencia | Idioma devuelto | Tiempo (s) | Error |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|",
         *(_song_row(song) for song in results.songs),
         "",
         "## Peores casos",
@@ -86,6 +87,7 @@ def _summary_row(name: str, g: GroupSummary) -> str:
         _num(_stat(t, "start_median")),
         _num(_stat(t, "start_mean")),
         _pct(_stat(t, "start_within")),
+        _pct(_stat(t, "start_within_wide")),
         _num(_stat(t, "end_median")),
         _num(_stat(t, "start_bias")),
         _pct(_stat(t, "coverage")),
@@ -108,6 +110,7 @@ def _song_row(s: SongResult) -> str:
         _pct(s.wer),
         _num(_stat(t, "start_median")),
         _pct(_stat(t, "start_within")),
+        _pct(_stat(t, "start_within_wide")),
         _pct(_stat(t, "coverage")),
         _reference_cell(s),
         s.language_reported or "—",
@@ -149,6 +152,12 @@ def _notes(results: RunResults) -> list[str]:
             "unos ±0,1 s, así que ahí manda el % ≤ 0,3 s más que la mediana. Solo cuentan las "
             "líneas marcadas «bien» (columna Referencia)."
         )
+    approximate = [s.song_id for s in results.songs if s.reference_timing == "approximate"]
+    if approximate:
+        notes.append(
+            f"- Referencia aproximada (subtítulos hechos a mano) en {', '.join(approximate)}: "
+            "fiable a unas décimas de segundo, así que ahí cuenta más el % ≤ 0,5 s."
+        )
     if pending:
         notes.append(
             f"- Referencia sin validar de oído en {', '.join(pending)}: no cuenta para la "
@@ -162,6 +171,8 @@ def _notes(results: RunResults) -> list[str]:
 
 
 def _reference_cell(s: SongResult) -> str:
+    if s.reference_timing == "approximate":
+        return "aproximada"
     if s.reference_validated is None:
         return "manual" if s.scored_share is not None else "—"
     if not s.reference_validated:
@@ -170,13 +181,19 @@ def _reference_cell(s: SongResult) -> str:
 
 
 def _reference_kinds(results: RunResults) -> str:
-    kinds = {"manual": "manual", "semiautomatic": "semiautomática", "mixed": "mixta"}
+    kinds = {
+        "manual": "manual",
+        "semiautomatic": "semiautomática",
+        "approximate": "aproximada",
+        "mixed": "mixta",
+    }
     items = [f"{lang} {kinds.get(kind, kind)}" for lang, kind in results.reference_kind.items()]
     return ", ".join(items) or "—"
 
 
 def _stat(stats: TimingStats | None, name: str) -> float | None:
-    return None if stats is None else float(getattr(stats, name))
+    value = None if stats is None else getattr(stats, name)
+    return None if value is None else float(value)
 
 
 def _num(value: float | None, digits: int = 3) -> str:

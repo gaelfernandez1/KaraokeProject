@@ -184,6 +184,17 @@ referencia con líneas ya revisadas salvo con `--force`.
 - `reference.json` si tienes los tiempos. Un `karaoke.json` corregido a mano también sirve: se
   convierte con `karaoke_bench.reference.reference_from_doc`.
 
+Si tienes los tiempos en un subtítulo `.srt` hecho a mano palabra a palabra (una entrada por
+palabra; vale que alguna lleve dos palabras o que una palabra vaya partida en sílabas), crea antes
+el `lyrics.txt` con las líneas de la canción y conviértelo:
+
+```bash
+uv run karaoke-bench import-srt private/<id> mis-tiempos.srt
+```
+
+La referencia queda como **aproximada**: un subtítulo hecho a mano es fiable a unas décimas de
+segundo, así que en esas canciones el informe da también el % de palabras a ≤ 0,5 s.
+
 Sin referencia, el banco solo mide velocidad, memoria e idioma. Con `draft` y `review` puedes
 crearla igual que para el conjunto gallego.
 
@@ -192,7 +203,7 @@ crearla igual que para el conjunto gallego.
 ```json
 {
   "song_id": "…", "language": "gl", "duration": 215.3,
-  "timing": "manual | semiautomatic", "approved": true,
+  "timing": "manual | semiautomatic | approximate", "approved": true,
   "lines": [
     { "text": "Vou-te ver, d'aquí", "start": 12.3, "end": 15.8,
       "status": "draft | ok | wrong | unsure", "anchor": null, "note": null, "revised": false,

@@ -6,7 +6,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from karaoke_bench.audio import AudioError
+from karaoke_bench.audio import AudioError, duration
 from karaoke_bench.compare import compare_runs
 from karaoke_bench.drafting import (
     DraftError,
@@ -22,6 +22,8 @@ from karaoke_bench.reference import dump_reference, load_reference
 from karaoke_bench.results import load_results
 from karaoke_bench.runner import RunOptions, run
 from karaoke_bench.sets import SetError, Song, load_set
+from karaoke_bench.srt import parse_srt, reference_from_srt
+from karaoke_bench.textnorm import lyrics_lines
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -69,6 +71,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     package.add_argument("--out", type=Path, required=True)
 
+    import_srt = commands.add_parser(
+        "import-srt", help="make a private song's reference from word-timed subtitles"
+    )
+    import_srt.add_argument("song", help="private/song")
+    import_srt.add_argument("srt", type=Path, help="subtitle file with one entry per word")
+
     args = parser.parse_args(argv)
     paths = BenchPaths(args.bench_dir)
     try:
@@ -82,6 +90,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _realign(paths, _one_song(args.song, paths), args.pipeline)
         if args.command == "package":
             return _package(paths, _one_song(args.song, paths), args.pipeline, args.out)
+        if args.command == "import-srt":
+            return _import_srt(paths, args.song, args.srt)
         if args.command == "review":
             return _review(paths, _one_song(args.song, paths), args.port, args.pipeline)
         return _run(paths, args)
@@ -194,6 +204,28 @@ def _package(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> i
     stems = separated_stems(song, load_pipeline(pipeline_path), paths)
     doc = build_package(song, ref, stems, out, credits)
     print(f"{out}: {len(doc.lines)} lines")
+    return 0
+
+
+def _import_srt(paths: BenchPaths, name: str, srt: Path) -> int:
+    if not name.startswith("private/"):
+        raise SetError(
+            f"subtitle timings are approximate: only private songs take them, not {name}"
+        )
+    song = _one_song(name, paths)
+    if song.lyrics is None:
+        raise SetError(f"{song.song_id} needs a lyrics.txt with the lines of the song")
+    try:
+        entries = parse_srt(srt.read_text(encoding="utf-8"))
+        ref = reference_from_srt(
+            entries, lyrics_lines(song.lyrics_text() or ""), song.song_id, song.language,
+            duration(song.audio),
+        )  # fmt: skip
+    except ValueError as exc:
+        raise SetError(f"{srt}: {exc}") from exc
+    target = song.audio.parent / "reference.json"
+    dump_reference(ref, target)
+    print(f"{target}: {len(ref.lines)} lines, {len(ref.scored_words())} words")
     return 0
 
 
