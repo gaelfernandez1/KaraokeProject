@@ -109,6 +109,46 @@ tarda 70 s en total, cargas incluidas (unos 85 s para 4 min, meta ≤ 2 min ✓)
 de 3,8 GB (meta ≤ 4 GB ✓). Las palabras de dos o más sílabas llevan `parts` con tiempo (las de esa
 canción, 65 de 123).
 
+## Sin letra
+
+`karaoke make` sin `--lyrics` transcribe la voz separada con faster-whisper, siempre en el idioma
+pedido. Quita los trozos donde la voz calla (Whisper los rellena con frases hechas) y las
+repeticiones en bucle, fija la semilla y corta el texto en líneas por frases y cada nueve palabras
+más o menos; luego lo alinea como una letra pegada.
+
+| Transcriptor (WER) | Gallego, 2 con letra publicada (690 palabras) | Gallego, 2 privadas (172) |
+|---|---|---|
+| `base-turbo` (Demucs) | 35,9 % | — |
+| `sep-melkim-8s` (Kim, sin salvaguardas) | 40,6 % | 61,0 % |
+| large-v3-turbo con salvaguardas | 28,4 % | 50,0 % |
+| Nós turbo gallego | 35,1 % | 50,6 % |
+| **HiTZ large-v3 gallego (elegido)** | **27,8 %** | **40,1 %** |
+| BSC large-v3 LoS | 49,0 % | 79,7 % |
+| votación ROVER (HiTZ + turbo + Nós) | 26,5 % | 41,3 % |
+
+- **Gallego**: HiTZ `whisper-large-v3-gl` (Apache-2.0), convertido una vez a CTranslate2 en 8 bits.
+  La conversión llega a 6,7 GB de RAM, así que va en un proceso propio y `make` la hace antes de
+  cargar nada. Transcribiendo, su VRAM llega a 3,3 GB en las canciones largas: pasa de los 3 GB de la
+  meta, aunque funciona en la tarjeta de 4 GB. Si diera problemas, large-v3-turbo queda a 0,6
+  puntos en las públicas, pero a 10 en las privadas.
+- **Resto de idiomas**: large-v3-turbo con las mismas salvaguardas.
+- **Posprocesado**:
+  - La votación ROVER no compensa: ±1,3 puntos, dentro del ruido, por el triple de tiempo.
+  - Tampoco el LLM local: los errores de los tres modelos van juntos, y un LLM que «corrige» el
+    gallego tiende a normalizar la gheada y el seseo, justo lo que no se quiere.
+  - Cuando la letra existe, `--lrclib` la trae.
+
+| Sin letra | Línea base | Nuevo (`c4-default`) | Meta (003) |
+|---|---|---|---|
+| WER jamendo (79) | 33,7 % (`base-turbo`) | **22,9 %** | ≤ 30 % ✓ |
+| WER gallego (2 con letra publicada) | 35,9 % | 27,8 % (0,77×) | ≤ 0,7× (25 %) ✗ |
+| Cambios de idioma (jamendo y gallego) | 0 | 0 | 0 ✓ |
+| Canción de 4 min sin letra (jamendo / gallego) | 40 s | 66 / 90 s | ≤ 2 min ✓ |
+
+El gallego se queda a 2,8 puntos de la meta. Son dos canciones (690 palabras) y el ruido por idioma
+es de ±5,6 puntos. Lo que más ayudó no fue el modelo, sino quitar lo que Whisper inventa donde la
+voz calla.
+
 ## Validación automática del gallego
 
 Los borradores de las 5 canciones gallegas con licencia libre se validaron con `triangulate`, sin
