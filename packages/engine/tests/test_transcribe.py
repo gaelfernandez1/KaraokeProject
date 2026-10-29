@@ -215,3 +215,14 @@ def test_a_long_chant_where_the_voice_sounds_is_cut_to_one_line(tmp_path: Path) 
     transcript, _ = _transcribe(tmp_path, segments, [(0, 8)])
 
     assert [s.text for s in transcript.segments] == [" ".join(["Abater!"] * 8)]
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_temperatures_reach_whisper(tmp_path: Path) -> None:
+    whisper = FakeWhisper([FakeSegment(0.5, 1.5, "Ola")])
+
+    WhisperTranscriber(whisper=whisper, temperatures=(0.0, 0.5)).transcribe(
+        _vocals(tmp_path, [(0, 2)]), "gl"
+    )
+
+    assert whisper.calls[0]["temperature"] == [0.0, 0.5]

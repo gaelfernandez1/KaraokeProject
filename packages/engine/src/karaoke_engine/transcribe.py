@@ -87,6 +87,7 @@ class WhisperTranscriber:
         vad: bool = True,
         seed: int = 0,
         beam_size: int = 1,
+        temperatures: tuple[float, ...] = (0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
         compute_type: str = "int8_float16",
         device: str = "cuda",
         whisper: Any = None,
@@ -97,6 +98,7 @@ class WhisperTranscriber:
         self.vad = vad
         self.seed = seed
         self.beam_size = beam_size
+        self.temperatures = temperatures
         self.compute_type = compute_type
         self.device = device
         self._injected = whisper
@@ -131,6 +133,7 @@ class WhisperTranscriber:
             samples,
             language=language,
             beam_size=self.beam_size,
+            temperature=list(self.temperatures),
             vad_filter=self.vad,
             condition_on_previous_text=False,
             compression_ratio_threshold=2.4,
