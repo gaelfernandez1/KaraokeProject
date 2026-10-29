@@ -7,79 +7,79 @@
   "lines": [
     {
       "text": "Tiña unha paixón que agora non teño:",
-      "start": 25.618373833692196,
-      "end": 29.741330872552034,
+      "start": 25.598,
+      "end": 29.761,
       "words": [
         {
           "text": "Tiña",
-          "start": 25.618373833692196,
-          "end": 25.898574797498206
+          "start": 25.598,
+          "end": 25.939
         },
         {
           "text": "unha",
-          "start": 26.138747052189068,
-          "end": 26.338890597764788
+          "start": 26.059,
+          "end": 26.339
         },
         {
           "text": "paixón",
-          "start": 26.579062852455653,
-          "end": 27.259550907413104
+          "start": 26.559,
+          "end": 27.24
         },
         {
           "text": "que",
-          "start": 27.359622680200964,
-          "end": 27.459694452988824
+          "start": 27.34,
+          "end": 27.46
         },
         {
           "text": "agora",
-          "start": 27.73989541679483,
-          "end": 28.400369117194707
+          "start": 27.6,
+          "end": 28.32
         },
         {
           "text": "non",
-          "start": 28.600512662770427,
-          "end": 28.760627499231006
+          "start": 28.601,
+          "end": 28.761
         },
         {
           "text": "teño:",
-          "start": 28.840684917461292,
-          "end": 29.741330872552034
+          "start": 28.861,
+          "end": 29.761
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "coleccionaba aqueles coches pequenos.",
-      "start": 31.802809391981953,
-      "end": 36.546211422126525,
+      "start": 31.783,
+      "end": 36.586,
       "words": [
         {
           "text": "coleccionaba",
-          "start": 31.802809391981953,
-          "end": 33.083728083666564
+          "start": 31.783,
+          "end": 33.104
         },
         {
           "text": "aqueles",
-          "start": 33.203814211011995,
-          "end": 34.06443145698759
+          "start": 33.264,
+          "end": 34.064
         },
         {
           "text": "coches",
-          "start": 34.18451758433302,
-          "end": 34.86500563929047
+          "start": 34.2,
+          "end": 34.885
         },
         {
           "text": "pequenos.",
-          "start": 34.985091766635904,
-          "end": 36.546211422126525
+          "start": 35.0,
+          "end": 36.586
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -153,227 +153,227 @@
           "end": 48.95511124782118
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "Era simple e agora é complexo, pero un recordo non é un lamento.",
-      "start": 51.31680508561468,
-      "end": 57.30109709832872,
+      "start": 51.277,
+      "end": 57.321,
       "words": [
         {
           "text": "Era",
-          "start": 51.31680508561468,
-          "end": 51.53696298574797
+          "start": 51.277,
+          "end": 51.557
         },
         {
           "text": "simple",
-          "start": 51.81716394955398,
-          "end": 52.317522813493284
+          "start": 51.797,
+          "end": 52.298
         },
         {
           "text": "e",
-          "start": 52.437608940838714,
-          "end": 52.45762329539629
+          "start": 52.32,
+          "end": 52.36
         },
         {
           "text": "agora",
-          "start": 52.477637649953856,
-          "end": 53.05805393212345
+          "start": 52.498,
+          "end": 53.098
         },
         {
           "text": "é",
-          "start": 53.238183123141596,
-          "end": 53.25819747769917
+          "start": 53.238,
+          "end": 53.258
         },
         {
           "text": "complexo,",
-          "start": 53.35826925048703,
-          "end": 54.0187429508869
+          "start": 53.358,
+          "end": 54.079
         },
         {
           "text": "pero",
-          "start": 54.19887214190505,
-          "end": 54.43904439659592
+          "start": 54.199,
+          "end": 54.459
         },
         {
           "text": "un",
-          "start": 54.57914487849892,
-          "end": 54.65920229672921
+          "start": 54.559,
+          "end": 54.64
         },
         {
           "text": "recordo",
-          "start": 54.819317133189784,
-          "end": 55.51981954270481
+          "start": 54.799,
+          "end": 55.54
         },
         {
           "text": "non",
-          "start": 55.84004921562596,
-          "end": 56.100235824874396
+          "start": 55.84,
+          "end": 56.14
         },
         {
           "text": "é",
-          "start": 56.34040807956526,
-          "end": 56.36042243412283
+          "start": 56.24,
+          "end": 56.26
         },
         {
           "text": "un",
-          "start": 56.48050856146826,
-          "end": 56.54055162514098
+          "start": 56.46,
+          "end": 56.521
         },
         {
           "text": "lamento.",
-          "start": 56.60059468881369,
-          "end": 57.30109709832872
+          "start": 56.601,
+          "end": 57.321
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Sempre pensei que de maior ía ter ao meu servizo un motor,",
-      "start": 63.98589152055777,
-      "end": 68.88940838716292,
+      "start": 63.966,
+      "end": 68.909,
       "words": [
         {
           "text": "Sempre",
-          "start": 63.98589152055777,
-          "end": 64.24607812980621
+          "start": 63.966,
+          "end": 64.266
         },
         {
           "text": "pensei",
-          "start": 64.38617861170921,
-          "end": 64.8264944119758
+          "start": 64.366,
+          "end": 64.867
         },
         {
           "text": "que",
-          "start": 65.00662360299395,
-          "end": 65.06666666666666
+          "start": 64.987,
+          "end": 65.087
         },
         {
           "text": "de",
-          "start": 65.20676714856967,
-          "end": 65.28682456679995
+          "start": 65.207,
+          "end": 65.287
         },
         {
           "text": "maior",
-          "start": 65.38689633958782,
-          "end": 65.80719778529684
+          "start": 65.387,
+          "end": 65.807
         },
         {
           "text": "ía",
-          "start": 65.88725520352712,
-          "end": 66.0473700399877
+          "start": 65.88,
+          "end": 66.067
         },
         {
           "text": "ter",
-          "start": 66.20748487644828,
-          "end": 66.58775761304214
+          "start": 66.2,
+          "end": 66.568
         },
         {
           "text": "ao",
-          "start": 66.62778632215728,
-          "end": 66.66781503127243
+          "start": 66.588,
+          "end": 66.668
         },
         {
           "text": "meu",
-          "start": 66.76788680406028,
-          "end": 66.86795857684815
+          "start": 66.768,
+          "end": 66.908
         },
         {
           "text": "servizo",
-          "start": 66.96803034963601,
-          "end": 67.44837485901773
+          "start": 66.968,
+          "end": 67.468
         },
         {
           "text": "un",
-          "start": 68.14887726853276,
-          "end": 68.26896339587819
+          "start": 68.069,
+          "end": 68.209
         },
         {
           "text": "motor,",
-          "start": 68.4090638777812,
-          "end": 68.88940838716292
+          "start": 68.389,
+          "end": 68.909
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e agora teño un billete de tren e un título de doutor.",
-      "start": 70.21035578796267,
-      "end": 75.33403055470112,
+      "start": 70.19,
+      "end": 75.394,
       "words": [
         {
           "text": "e",
-          "start": 70.21035578796267,
-          "end": 70.23037014252024
+          "start": 70.19,
+          "end": 70.21
         },
         {
           "text": "agora",
-          "start": 70.33044191530811,
-          "end": 70.67068594278683
+          "start": 70.31,
+          "end": 70.731
         },
         {
           "text": "teño",
-          "start": 71.01092997026555,
-          "end": 71.47126012508971
+          "start": 71.0,
+          "end": 71.471
         },
         {
           "text": "un",
-          "start": 71.63137496155029,
-          "end": 71.691418025223
+          "start": 71.591,
+          "end": 71.691
         },
         {
           "text": "billete",
-          "start": 71.7714754434533,
-          "end": 72.25181995283502
+          "start": 71.791,
+          "end": 72.232
         },
         {
           "text": "de",
-          "start": 72.4119347892956,
-          "end": 72.47197785296831
+          "start": 72.36,
+          "end": 72.44
         },
         {
           "text": "tren",
-          "start": 72.61207833487131,
-          "end": 73.17248026248333
+          "start": 72.592,
+          "end": 73.052
         },
         {
           "text": "e",
-          "start": 73.27255203527119,
-          "end": 73.29256638982876
+          "start": 73.253,
+          "end": 73.273
         },
         {
           "text": "un",
-          "start": 73.45268122628934,
-          "end": 73.51272428996207
+          "start": 73.393,
+          "end": 73.48
         },
         {
           "text": "título",
-          "start": 73.59278170819235,
-          "end": 74.11315492668922
+          "start": 73.6,
+          "end": 74.113
         },
         {
           "text": "de",
-          "start": 74.4133702450528,
-          "end": 74.49342766328309
+          "start": 74.413,
+          "end": 74.493
         },
         {
           "text": "doutor.",
-          "start": 74.69357120885881,
-          "end": 75.33403055470112
+          "start": 74.654,
+          "end": 75.394
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -402,7 +402,7 @@
           "end": 87.5027581257049
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -428,7 +428,7 @@
           "end": 88.98382036296523
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -464,7 +464,7 @@
           "end": 91.4455859735466
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -490,7 +490,7 @@
           "end": 99.5313852148057
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -561,55 +561,55 @@
           "end": 107.47708397416179
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "o parque de maquinaria da Garda Civil",
-      "start": 107.63719881062237,
-      "end": 109.21833282067055,
+      "start": 107.637,
+      "end": 109.258,
       "words": [
         {
           "text": "o",
-          "start": 107.63719881062237,
-          "end": 107.65721316517994
+          "start": 107.637,
+          "end": 107.657
         },
         {
           "text": "parque",
-          "start": 107.7572849379678,
-          "end": 107.95742848354352
+          "start": 107.757,
+          "end": 107.957
         },
         {
           "text": "de",
-          "start": 108.01747154721623,
-          "end": 108.05750025633138
+          "start": 108.017,
+          "end": 108.058
         },
         {
           "text": "maquinaria",
-          "start": 108.1175433200041,
-          "end": 108.51783041115554
+          "start": 108.118,
+          "end": 108.52
         },
         {
           "text": "da",
-          "start": 108.57787347482825,
-          "end": 108.6179021839434
+          "start": 108.578,
+          "end": 108.638
         },
         {
           "text": "Garda",
-          "start": 108.67794524761611,
-          "end": 108.85807443863426
+          "start": 108.678,
+          "end": 108.878
         },
         {
           "text": "Civil",
-          "start": 108.95814621142212,
-          "end": 109.21833282067055
+          "start": 108.938,
+          "end": 109.258
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -663,7 +663,7 @@
           "end": 111.86022762227006
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -764,7 +764,7 @@
           "end": 116.38347175228134
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -845,7 +845,7 @@
           "end": 120.82665846406233
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -911,589 +911,589 @@
           "end": 123.68871116579514
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "Pásase mellor de camiño aos sitios que cando chegas,",
-      "start": 124.78950066646159,
-      "end": 127.31130934071567,
+      "start": 124.769,
+      "end": 127.251,
       "words": [
         {
           "text": "Pásase",
-          "start": 124.78950066646159,
-          "end": 125.12974469394032
+          "start": 124.769,
+          "end": 125.13
         },
         {
           "text": "mellor",
-          "start": 125.2098021121706,
-          "end": 125.51001743053419
+          "start": 125.19,
+          "end": 125.53
         },
         {
           "text": "de",
-          "start": 125.61008920332205,
-          "end": 125.6501179124372
+          "start": 125.59,
+          "end": 125.65
         },
         {
           "text": "camiño",
-          "start": 125.7101609761099,
-          "end": 125.97034758535834
+          "start": 125.71,
+          "end": 125.99
         },
         {
           "text": "aos",
-          "start": 126.05040500358864,
-          "end": 126.11044806726134
+          "start": 126.03,
+          "end": 126.11
         },
         {
           "text": "sitios",
-          "start": 126.1504767763765,
-          "end": 126.4306777401825
+          "start": 126.17,
+          "end": 126.471
         },
         {
           "text": "que",
-          "start": 126.53074951297036,
-          "end": 126.59079257664308
+          "start": 126.511,
+          "end": 126.591
         },
         {
           "text": "cando",
-          "start": 126.67084999487336,
-          "end": 126.83096483133394
+          "start": 126.651,
+          "end": 126.851
         },
         {
           "text": "chegas,",
-          "start": 126.95105095867937,
-          "end": 127.31130934071567
+          "start": 126.951,
+          "end": 127.251
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e por iso subimos aos coches para acompañarnos a aparcar,",
-      "start": 127.41138111350354,
-      "end": 130.07329026966062,
+      "start": 127.371,
+      "end": 130.093,
       "words": [
         {
           "text": "e",
-          "start": 127.41138111350354,
-          "end": 127.4313954680611
+          "start": 127.371,
+          "end": 127.411
         },
         {
           "text": "por",
-          "start": 127.5114528862914,
-          "end": 127.59151030452168
+          "start": 127.491,
+          "end": 127.592
         },
         {
           "text": "iso",
-          "start": 127.6515533681944,
-          "end": 127.75162514098226
+          "start": 127.652,
+          "end": 127.772
         },
         {
           "text": "subimos",
-          "start": 127.87171126832769,
-          "end": 128.19194094124884
+          "start": 127.852,
+          "end": 128.192
         },
         {
           "text": "aos",
-          "start": 128.25198400492155,
-          "end": 128.3520557777094
+          "start": 128.232,
+          "end": 128.372
         },
         {
           "text": "coches",
-          "start": 128.4321131959397,
-          "end": 128.71231415974572
+          "start": 128.432,
+          "end": 128.732
         },
         {
           "text": "para",
-          "start": 128.81238593253357,
-          "end": 128.91245770532143
+          "start": 128.792,
+          "end": 128.912
         },
         {
           "text": "acompañarnos",
-          "start": 128.99251512355173,
-          "end": 129.55291705116375
+          "start": 128.973,
+          "end": 129.573
         },
         {
           "text": "a",
-          "start": 129.61296011483645,
-          "end": 129.63297446939401
+          "start": 129.613,
+          "end": 129.633
         },
         {
           "text": "aparcar,",
-          "start": 129.6529888239516,
-          "end": 130.07329026966062
+          "start": 129.653,
+          "end": 130.093
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e damos paseos nos que volvemos ao mesmo sitio,",
-      "start": 130.25341946067877,
-      "end": 132.45499846201167,
+      "start": 130.233,
+      "end": 132.48,
       "words": [
         {
           "text": "e",
-          "start": 130.25341946067877,
-          "end": 130.27343381523633
+          "start": 130.233,
+          "end": 130.273
         },
         {
           "text": "damos",
-          "start": 130.33347687890904,
-          "end": 130.53362042448478
+          "start": 130.333,
+          "end": 130.534
         },
         {
           "text": "paseos",
-          "start": 130.61367784271505,
-          "end": 130.99395057930892
+          "start": 130.594,
+          "end": 130.994
         },
         {
           "text": "nos",
-          "start": 131.05399364298165,
-          "end": 131.13405106121192
+          "start": 131.054,
+          "end": 131.154
         },
         {
           "text": "que",
-          "start": 131.17407977032707,
-          "end": 131.25413718855737
+          "start": 131.174,
+          "end": 131.274
         },
         {
           "text": "volvemos",
-          "start": 131.2941658976725,
-          "end": 131.6544242797088
+          "start": 131.294,
+          "end": 131.694
         },
         {
           "text": "ao",
-          "start": 131.71446734338153,
-          "end": 131.7945247616118
+          "start": 131.734,
+          "end": 131.795
         },
         {
           "text": "mesmo",
-          "start": 131.8745821798421,
-          "end": 132.05471137086025
+          "start": 131.855,
+          "end": 132.075
         },
         {
           "text": "sitio,",
-          "start": 132.1547831436481,
-          "end": 132.45499846201167
+          "start": 132.155,
+          "end": 132.48
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e non hai sitio máis bonito que o Kadett de Toni.",
-      "start": 132.99538603506613,
-      "end": 137.55865887419256,
+      "start": 132.975,
+      "end": 135.84,
       "words": [
         {
           "text": "e",
-          "start": 132.99538603506613,
-          "end": 133.0154003896237
+          "start": 132.975,
+          "end": 132.995
         },
         {
           "text": "non",
-          "start": 133.07544345329643,
-          "end": 133.1555008715267
+          "start": 133.075,
+          "end": 133.156
         },
         {
           "text": "hai",
-          "start": 133.19552958064185,
-          "end": 133.2956013534297
+          "start": 133.2,
+          "end": 133.296
         },
         {
           "text": "sitio",
-          "start": 133.37565877166,
-          "end": 133.655859735466
+          "start": 133.376,
+          "end": 133.68
         },
         {
           "text": "máis",
-          "start": 133.83598892648416,
-          "end": 134.03613247205988
+          "start": 133.836,
+          "end": 134.056
         },
         {
           "text": "bonito",
-          "start": 134.11618989029017,
-          "end": 134.5164769814416
+          "start": 134.116,
+          "end": 134.516
         },
         {
           "text": "que",
-          "start": 134.75664923613246,
-          "end": 134.83670665436276
+          "start": 134.757,
+          "end": 134.837
         },
         {
           "text": "o",
-          "start": 134.89674971803547,
-          "end": 134.91676407259305
+          "start": 134.897,
+          "end": 134.917
         },
         {
           "text": "Kadett",
-          "start": 134.99682149082332,
-          "end": 135.31705116374448
+          "start": 134.977,
+          "end": 135.297
         },
         {
           "text": "de",
-          "start": 135.33706551830207,
-          "end": 135.39710858197478
+          "start": 135.337,
+          "end": 135.417
         },
         {
           "text": "Toni.",
-          "start": 135.49718035476263,
-          "end": 137.55865887419256
+          "start": 135.497,
+          "end": 135.84
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Non teño aquela pero teño paixón:",
-      "start": 148.20629549882088,
-      "end": 150.62803240028708,
+      "start": 148.206,
+      "end": 150.48,
       "words": [
         {
           "text": "Non",
-          "start": 148.20629549882088,
-          "end": 148.34639598072388
+          "start": 148.206,
+          "end": 148.346
         },
         {
           "text": "teño",
-          "start": 148.42645339895415,
-          "end": 148.666625653645
+          "start": 148.406,
+          "end": 148.627
         },
         {
           "text": "aquela",
-          "start": 148.72666871731775,
-          "end": 149.06691274479647
+          "start": 148.647,
+          "end": 149.087
         },
         {
           "text": "pero",
-          "start": 149.20701322669947,
-          "end": 149.4671998359479
+          "start": 149.187,
+          "end": 149.467
         },
         {
           "text": "teño",
-          "start": 149.58728596329334,
-          "end": 149.9075156362145
+          "start": 149.587,
+          "end": 149.888
         },
         {
           "text": "paixón:",
-          "start": 150.00758740900235,
-          "end": 150.62803240028708
+          "start": 150.0,
+          "end": 150.48
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "un sentimento híbrido.",
-      "start": 150.70808981851738,
-      "end": 152.52939608325642,
+      "start": 150.668,
+      "end": 152.529,
       "words": [
         {
           "text": "un",
-          "start": 150.70808981851738,
-          "end": 150.74811852763253
+          "start": 150.668,
+          "end": 150.728
         },
         {
           "text": "sentimento",
-          "start": 150.8281759458628,
-          "end": 151.64876448272327
+          "start": 150.808,
+          "end": 151.669
         },
         {
           "text": "híbrido.",
-          "start": 151.82889367374142,
-          "end": 152.52939608325642
+          "start": 151.849,
+          "end": 152.529
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Pasan os coches e non deixan oír o ruido que nós facemos aquí,",
-      "start": 154.6309033118015,
-      "end": 159.9146929150005,
+      "start": 154.591,
+      "end": 159.92,
       "words": [
         {
           "text": "Pasan",
-          "start": 154.6309033118015,
-          "end": 154.95113298472265
+          "start": 154.591,
+          "end": 154.951
         },
         {
           "text": "os",
-          "start": 155.03119040295294,
-          "end": 155.1112478211832
+          "start": 155.011,
+          "end": 155.111
         },
         {
           "text": "coches",
-          "start": 155.17129088485595,
-          "end": 155.51153491233467
+          "start": 155.171,
+          "end": 155.532
         },
         {
           "text": "e",
-          "start": 155.67164974879523,
-          "end": 155.69166410335282
+          "start": 155.632,
+          "end": 155.652
         },
         {
           "text": "non",
-          "start": 155.79173587614068,
-          "end": 155.89180764892853
+          "start": 155.772,
+          "end": 155.912
         },
         {
           "text": "deixan",
-          "start": 155.97186506715883,
-          "end": 156.37215215831026
+          "start": 155.972,
+          "end": 156.4
         },
         {
           "text": "oír",
-          "start": 156.51225264021326,
-          "end": 156.99259714959499
+          "start": 156.52,
+          "end": 157.033
         },
         {
           "text": "o",
-          "start": 157.4929560135343,
-          "end": 157.51297036809186
+          "start": 157.453,
+          "end": 157.473
         },
         {
           "text": "ruido",
-          "start": 157.552999077207,
-          "end": 157.81318568645545
+          "start": 157.56,
+          "end": 157.833
         },
         {
           "text": "que",
-          "start": 157.97330052291602,
-          "end": 158.03334358658873
+          "start": 157.953,
+          "end": 158.053
         },
         {
           "text": "nós",
-          "start": 158.19345842304932,
-          "end": 158.59374551420075
+          "start": 158.173,
+          "end": 158.634
         },
         {
           "text": "facemos",
-          "start": 158.9940326053522,
-          "end": 159.55443453296422
+          "start": 158.994,
+          "end": 159.574
         },
         {
           "text": "aquí,",
-          "start": 159.67452066030964,
-          "end": 159.9146929150005
+          "start": 159.64,
+          "end": 159.92
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "pero igual se non lles dera por pasar preferiríamos calar.",
-      "start": 160.39503742438222,
-      "end": 166.65953040090227,
+      "start": 160.375,
+      "end": 166.66,
       "words": [
         {
           "text": "pero",
-          "start": 160.39503742438222,
-          "end": 160.63520967907309
+          "start": 160.375,
+          "end": 160.655
         },
         {
           "text": "igual",
-          "start": 160.73528145186097,
-          "end": 161.03549677022454
+          "start": 160.695,
+          "end": 161.056
         },
         {
           "text": "se",
-          "start": 161.1956116066851,
-          "end": 161.295683379473
+          "start": 161.176,
+          "end": 161.276
         },
         {
           "text": "non",
-          "start": 161.39575515226085,
-          "end": 161.6359274069517
+          "start": 161.396,
+          "end": 161.636
         },
         {
           "text": "lles",
-          "start": 161.7760278888547,
-          "end": 161.93614272531528
+          "start": 161.736,
+          "end": 161.956
         },
         {
           "text": "dera",
-          "start": 161.996185788988,
-          "end": 162.276386752794
+          "start": 162.0,
+          "end": 162.296
         },
         {
           "text": "por",
-          "start": 162.39647288013944,
-          "end": 162.61663078027274
+          "start": 162.416,
+          "end": 162.677
         },
         {
           "text": "pasar",
-          "start": 162.79675997129087,
-          "end": 163.43721931713318
+          "start": 162.837,
+          "end": 163.417
         },
         {
           "text": "preferiríamos",
-          "start": 164.15773608120577,
-          "end": 165.65881267302368
+          "start": 164.158,
+          "end": 165.659
         },
         {
           "text": "calar.",
-          "start": 165.79891315492668,
-          "end": 166.65953040090227
+          "start": 165.839,
+          "end": 166.66
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Todos conducen aquí menos nós, e iremos onde nos queiran levar.",
-      "start": 167.2199323285143,
-      "end": 173.14418127755562,
+      "start": 167.2,
+      "end": 173.164,
       "words": [
         {
           "text": "Todos",
-          "start": 167.2199323285143,
-          "end": 167.54016200143545
+          "start": 167.2,
+          "end": 167.54
         },
         {
           "text": "conducen",
-          "start": 167.60020506510816,
-          "end": 168.5008510201989
+          "start": 167.8,
+          "end": 168.501
         },
         {
           "text": "aquí",
-          "start": 168.6409515021019,
-          "end": 168.8811237567928
+          "start": 168.601,
+          "end": 168.861
         },
         {
           "text": "menos",
-          "start": 168.98119552958065,
-          "end": 169.34145391161692
+          "start": 168.981,
+          "end": 169.361
         },
         {
           "text": "nós,",
-          "start": 169.46154003896237,
-          "end": 169.90185583922894
+          "start": 169.462,
+          "end": 169.902
         },
         {
           "text": "e",
-          "start": 170.24209986670766,
-          "end": 170.26211422126525
+          "start": 170.202,
+          "end": 170.262
         },
         {
           "text": "iremos",
-          "start": 170.3621859940531,
-          "end": 170.88255921254998
+          "start": 170.342,
+          "end": 170.863
         },
         {
           "text": "onde",
-          "start": 171.14274582179843,
-          "end": 171.46297549471956
+          "start": 171.063,
+          "end": 171.503
         },
         {
           "text": "nos",
-          "start": 171.76319081308316,
-          "end": 171.90329129498616
+          "start": 171.763,
+          "end": 171.923
         },
         {
           "text": "queiran",
-          "start": 172.00336306777402,
-          "end": 172.32359274069518
+          "start": 171.983,
+          "end": 172.32
         },
         {
           "text": "levar.",
-          "start": 172.40365015892544,
-          "end": 173.14418127755562
+          "start": 172.404,
+          "end": 173.164
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Era simple, agora é complexo, pero un recordo non é un lamento.",
-      "start": 173.30429611401618,
-      "end": 178.8883010355788,
+      "start": 173.264,
+      "end": 178.888,
       "words": [
         {
           "text": "Era",
-          "start": 173.30429611401618,
-          "end": 173.46441095047678
+          "start": 173.264,
+          "end": 173.464
         },
         {
           "text": "simple,",
-          "start": 173.5844970778222,
-          "end": 173.9447554598585
+          "start": 173.584,
+          "end": 173.945
         },
         {
           "text": "agora",
-          "start": 174.10487029631906,
-          "end": 174.70530093304623
+          "start": 174.045,
+          "end": 174.745
         },
         {
           "text": "é",
-          "start": 174.86541576950682,
-          "end": 174.88543012406438
+          "start": 174.885,
+          "end": 174.905
         },
         {
           "text": "complexo,",
-          "start": 175.0255306059674,
-          "end": 175.6659899518097
+          "start": 175.006,
+          "end": 175.706
         },
         {
           "text": "pero",
-          "start": 175.82610478827027,
-          "end": 176.02624833384598
+          "start": 175.806,
+          "end": 176.026
         },
         {
           "text": "un",
-          "start": 176.18636317030658,
-          "end": 176.26642058853685
+          "start": 176.12,
+          "end": 176.24
         },
         {
           "text": "recordo",
-          "start": 176.42653542499744,
-          "end": 177.08700912539732
+          "start": 176.387,
+          "end": 177.087
         },
         {
           "text": "non",
-          "start": 177.38722444376089,
-          "end": 177.78751153491234
+          "start": 177.427,
+          "end": 177.788
         },
         {
           "text": "é",
-          "start": 177.92761201681535,
-          "end": 177.9476263713729
+          "start": 177.868,
+          "end": 177.888
         },
         {
           "text": "un",
-          "start": 178.0276837896032,
-          "end": 178.06771249871832
+          "start": 177.96,
+          "end": 178.088
         },
         {
           "text": "lamento.",
-          "start": 178.1677842715062,
-          "end": 178.8883010355788
+          "start": 178.188,
+          "end": 178.888
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     }
   ]

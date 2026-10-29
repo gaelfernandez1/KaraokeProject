@@ -8,7 +8,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | C1 | Arquitectura, repo y cimientos | hecho | `v3/c1-cimientos` (PR #1) | workspace uv, contratos v0, web SvelteKit, CI, entorno GPU comprobado | `karaoke_contracts` (`KaraokeDoc`, `Theme`, `validate_doc`, `validate_package`, `load_doc`, `dump_doc`); `schemas/*.schema.json`; `#lib/contracts` (tipos TS + `PlaybackClock`); `karaoke_engine.steps` (`Separator`, `Transcriber`, `Segmenter`, `Aligner`); CLI `karaoke validate|demo`; `fixtures/packages/demo-sintetico`; `fixtures/themes/basico.json`; `make ci|contracts|check-env` | C2: crear `packages/bench` y su comando; C5/C7: pueden empezar con el demo sintético |
 | C2 | Banco de pruebas y métricas | en curso | `v3/c2-banco` | banco completo: JamendoLyrics (79 y rápido 20) y 5 gallegas con licencia libre, métricas, runner con caché, informes, comparación, línea base medida y metas fijadas (`decisiones/003`), página de revisión de oído y 3 paquetes reales; falta que el usuario valide de oído las 5 referencias gallegas | `karaoke-bench fetch\|run\|compare\|draft\|review\|realign\|package`; pipelines TOML en `bench/pipelines/` (cualquier clase que cumpla `karaoke_engine.steps`); `karaoke_bench.baseline` (Demucs, faster-whisper, alineador CTC); guía en `docs/banco.md` | ver notas C2 → C3, C4, C5/C7 |
 | C3 | Audio: separación y sonido | en curso | `v3/c3-audio` | separador elegido con el banco (Mel-Band RoFormer de Kim en trozos de 8 s, `decisiones/004`), audio del paquete a −14 LUFS en m4a, motor de audio web con voz guía, tono, reloj con latencia y calibración, y página `/proba-audio`; falta que el usuario lo pruebe en aparatos reales y escuche la separación | `karaoke_engine.separation.RoformerSeparator`; `karaoke_engine.audio` (`decode`, `measure`, `plan_gain`, `package_audio`, `convert_package`); CLI `karaoke audio`; `#lib/audio/engine.js` (`AudioEngine`, cumple `PlaybackClock`), `clock.js` (`SongClock`), `calibration.js`; guía en `docs/audio.md` | ver notas C3 → C4, C5/C7, C8 |
-| C4 | Transcripción y sincronización | sin empezar | — | — | — | — |
+| C4 | Transcripción y sincronización | en curso | `v3/c4-sincronia` | alineador nuevo con letra (`decisiones/005`): lee letras de webs (cabeceras, `x2`, coros), relleno entre líneas, saltos por letra y coste de silencio; jamendo 98,8 % a ≤ 0,3 s y media 0,093 s (metas cumplidas salvo la mediana), inglés 97,6 %, gallego 98,6 % en las 2 validadas; banco con `stress`, `import-srt`, `triangulate`, `package --align` y avisos sin referencia; faltan coros solapados, transcripción sin letra, sílabas y `karaoke make` | `karaoke_engine.align` (`LyricsAligner`, cumple `Aligner` y `TextAligner`; `parse_lyrics`, `spoken`, `vocal_activity`, `align_segments`); `karaoke_engine.steps.TextAligner`; `bench/pipelines/c4-default.toml`; guía en `docs/sincronia.md` | ver notas C4 → C2, C3, C5/C7, C8 |
 | C5 | Subtítulos animados | sin empezar | — | — | — | — |
 | C6 | Vídeo | sin empezar | — | — | — | — |
 | C7 | Frontend | sin empezar | — | — | — | — |
@@ -53,3 +53,14 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   sustituye o los borra. El cambio de tono necesita HTTPS o `localhost` (AudioWorklet).
 - C3 → C8: separar una canción de 4 min cuesta unos 50 s en la RTX 3050 (Demucs, 14 s); el
   separador se descarga una vez a `~/.cache/karaoke/models/audio-separator` (0,9 GB).
+- C4 → C2: el banco gana `TextAligner` (letra tal cual y número de líneas libre), el conjunto
+  `stress`, `import-srt` (referencias aproximadas y columna ≤ 0,5 s), `triangulate`,
+  `package --align`, avisos sin referencia, alineador por idioma agrupado, y los informes de
+  `private` van a `bench/data/results/`. Pantis y Clo Plas quedaron validadas solas
+  (`decisiones/005`); Cibrán, Fanny + Alexander y Mortos en Vida, no.
+- C4 → C3: `RoformerSeparator` decodifica con ffmpeg lo que no es WAV ni FLAC (fallaba con
+  `.m4a`, el formato de YouTube).
+- C4 → C5/C7: las líneas de coro salen como líneas propias con el campo extra `role: "backing"`
+  (se formalizará en el contrato con una versión menor); `confidence` por palabra para el editor.
+- C4 → C8: alinear cuesta unos 5 s y 2,7 GB de RAM por canción con un modelo; los modelos van a la
+  caché de Hugging Face (Nós XLS-R gallego, wav2vec2 large inglés, XLS-R es/fr/de/pt).

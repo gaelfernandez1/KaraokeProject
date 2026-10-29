@@ -3,47 +3,47 @@
   "language": "gl",
   "duration": 287.333333,
   "timing": "semiautomatic",
-  "approved": false,
+  "approved": true,
   "lines": [
     {
       "text": "Era o último finde do mes,",
-      "start": 31.84142924183325,
-      "end": 33.82276267674305,
+      "start": 31.841,
+      "end": 33.863,
       "words": [
         {
           "text": "Era",
-          "start": 31.84142924183325,
-          "end": 32.06157740126767
+          "start": 31.841,
+          "end": 32.082
         },
         {
           "text": "o",
-          "start": 32.24169862262311,
-          "end": 32.28172556070209
+          "start": 32.222,
+          "end": 32.262
         },
         {
           "text": "último",
-          "start": 32.38179290589956,
-          "end": 32.76204881764993
+          "start": 32.382,
+          "end": 32.762
         },
         {
           "text": "finde",
-          "start": 32.902143100926374,
-          "end": 33.182331667479275
+          "start": 32.882,
+          "end": 33.182
         },
         {
           "text": "do",
-          "start": 33.28239901267674,
-          "end": 33.36245288883471
+          "start": 33.282,
+          "end": 33.362
         },
         {
           "text": "mes,",
-          "start": 33.502547172111164,
-          "end": 33.82276267674305
+          "start": 33.523,
+          "end": 33.863
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -72,7 +72,7 @@
           "end": 34.96353041199415
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -113,142 +113,142 @@
           "end": 38.86615687469527
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "toda a semana comendo de tápers;",
-      "start": 39.046278096050706,
-      "end": 41.748096416382246,
+      "start": 39.046,
+      "end": 41.768,
       "words": [
         {
           "text": "toda",
-          "start": 39.046278096050706,
-          "end": 39.30645319356411
+          "start": 39.046,
+          "end": 39.346
         },
         {
           "text": "a",
-          "start": 39.64668216723549,
-          "end": 39.66669563627499
+          "start": 39.607,
+          "end": 39.667
         },
         {
           "text": "semana",
-          "start": 39.766762981472446,
-          "end": 40.24708623842028
+          "start": 39.767,
+          "end": 40.247
         },
         {
           "text": "comendo",
-          "start": 40.56730174305217,
-          "end": 41.027611530960506
+          "start": 40.567,
+          "end": 41.028
         },
         {
           "text": "de",
-          "start": 41.14769234519746,
-          "end": 41.20773275231594
+          "start": 41.148,
+          "end": 41.208
         },
         {
           "text": "tápers;",
-          "start": 41.30780009751341,
-          "end": 41.748096416382246
+          "start": 41.308,
+          "end": 41.768
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "na casa fechada da avoa de Andrea,",
-      "start": 42.088325390053626,
-      "end": 44.77013024134568,
+      "start": 42.088,
+      "end": 44.682,
       "words": [
         {
           "text": "na",
-          "start": 42.088325390053626,
-          "end": 42.1683792662116
+          "start": 42.088,
+          "end": 42.168
         },
         {
           "text": "casa",
-          "start": 42.26844661140907,
-          "end": 42.50860823988298
+          "start": 42.248,
+          "end": 42.529
         },
         {
           "text": "fechada",
-          "start": 42.64870252315943,
-          "end": 43.16905271818625
+          "start": 42.649,
+          "end": 43.189
         },
         {
           "text": "da",
-          "start": 43.64937597513408,
-          "end": 43.709416382252556
+          "start": 43.629,
+          "end": 43.729
         },
         {
           "text": "avoa",
-          "start": 43.769456789371034,
-          "end": 44.08967229400292
+          "start": 43.789,
+          "end": 44.11
         },
         {
           "text": "de",
-          "start": 44.16972617016089,
-          "end": 44.22976657727937
+          "start": 44.19,
+          "end": 44.25
         },
         {
           "text": "Andrea,",
-          "start": 44.28980698439785,
-          "end": 44.77013024134568
+          "start": 44.282,
+          "end": 44.682
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "eles e internet do móbil de Ana",
-      "start": 45.010291869819596,
-      "end": 46.95159836665041,
+      "start": 44.95,
+      "end": 46.972,
       "words": [
         {
           "text": "eles",
-          "start": 45.010291869819596,
-          "end": 45.2904804363725
+          "start": 44.95,
+          "end": 45.27
         },
         {
           "text": "e",
-          "start": 45.350520843490976,
-          "end": 45.37053431253047
+          "start": 45.331,
+          "end": 45.351
         },
         {
           "text": "internet",
-          "start": 45.390547781569964,
-          "end": 45.83084410043881
+          "start": 45.402,
+          "end": 45.811
         },
         {
           "text": "do",
-          "start": 45.8508575694783,
-          "end": 45.91089797659678
+          "start": 45.891,
+          "end": 45.951
         },
         {
           "text": "móbil",
-          "start": 46.091019197952214,
-          "end": 46.431248171623594
+          "start": 46.091,
+          "end": 46.431
         },
         {
           "text": "de",
-          "start": 46.51130204778157,
-          "end": 46.57134245490005
+          "start": 46.511,
+          "end": 46.571
         },
         {
           "text": "Ana",
-          "start": 46.77147714529497,
-          "end": 46.95159836665041
+          "start": 46.722,
+          "end": 46.972
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -282,118 +282,118 @@
           "end": 49.2531473061921
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "baixabamos sintes",
-      "start": 49.733470563139925,
-      "end": 50.934278705509506,
+      "start": 49.713,
+      "end": 50.922,
       "words": [
         {
           "text": "baixabamos",
-          "start": 49.733470563139925,
-          "end": 50.41392851048269
+          "start": 49.713,
+          "end": 50.402
         },
         {
           "text": "sintes",
-          "start": 50.47396891760117,
-          "end": 50.934278705509506
+          "start": 50.482,
+          "end": 50.922
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e ningún nos valía,",
-      "start": 51.13441339590443,
-      "end": 52.25516766211604,
+      "start": 51.114,
+      "end": 52.275,
       "words": [
         {
           "text": "e",
-          "start": 51.13441339590443,
-          "end": 51.15442686494393
+          "start": 51.114,
+          "end": 51.134
         },
         {
           "text": "ningún",
-          "start": 51.25449421014139,
-          "end": 51.57470971477328
+          "start": 51.234,
+          "end": 51.522
         },
         {
           "text": "nos",
-          "start": 51.614736652852265,
-          "end": 51.75483093612871
+          "start": 51.615,
+          "end": 51.775
         },
         {
           "text": "valía,",
-          "start": 51.83488481228669,
-          "end": 52.25516766211604
+          "start": 51.855,
+          "end": 52.275
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Xulia sempre nolo dicía,",
-      "start": 52.575383166747926,
-      "end": 54.556716601657726,
+      "start": 52.535,
+      "end": 54.597,
       "words": [
         {
           "text": "Xulia",
-          "start": 52.575383166747926,
-          "end": 52.85557173330083
+          "start": 52.535,
+          "end": 52.876
         },
         {
           "text": "sempre",
-          "start": 52.95563907849829,
-          "end": 53.275854583130176
+          "start": 52.956,
+          "end": 53.322
         },
         {
           "text": "nolo",
-          "start": 53.75617784007801,
-          "end": 54.036366406630904
+          "start": 53.736,
+          "end": 54.016
         },
         {
           "text": "dicía,",
-          "start": 54.13643375182837,
-          "end": 54.556716601657726
+          "start": 54.136,
+          "end": 54.597
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "mais queríamos soar",
-      "start": 55.657457398829834,
-      "end": 57.09842716967333,
+      "start": 55.637,
+      "end": 57.118,
       "words": [
         {
           "text": "mais",
-          "start": 55.657457398829834,
-          "end": 55.79755168210629
+          "start": 55.637,
+          "end": 55.818
         },
         {
           "text": "queríamos",
-          "start": 55.87760555826426,
-          "end": 56.55806350560702
+          "start": 55.858,
+          "end": 56.578
         },
         {
           "text": "soar",
-          "start": 56.638117381764985,
-          "end": 57.09842716967333
+          "start": 56.643,
+          "end": 57.118
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -427,7 +427,7 @@
           "end": 58.77955856899073
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -448,7 +448,7 @@
           "end": 60.08043405655777
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -484,7 +484,7 @@
           "end": 64.78359928083862
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -505,7 +505,7 @@
           "end": 66.18454211360311
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -541,7 +541,7 @@
           "end": 68.12584861043393
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -572,235 +572,235 @@
           "end": 82.83574835446123
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "CVs en todos os motores",
-      "start": 82.97584263773768,
-      "end": 84.99720301072647,
+      "start": 82.956,
+      "end": 85.017,
       "words": [
         {
           "text": "CVs",
-          "start": 82.97584263773768,
-          "end": 83.53621977084349
+          "start": 82.956,
+          "end": 83.516
         },
         {
           "text": "en",
-          "start": 83.61627364700145,
-          "end": 83.81640833739638
+          "start": 83.596,
+          "end": 83.816
         },
         {
           "text": "todos",
-          "start": 83.91647568259386,
-          "end": 84.25670465626523
+          "start": 83.916,
+          "end": 84.237
         },
         {
           "text": "os",
-          "start": 84.3567720014627,
-          "end": 84.43682587762066
+          "start": 84.337,
+          "end": 84.437
         },
         {
           "text": "motores",
-          "start": 84.51687975377864,
-          "end": 84.99720301072647
+          "start": 84.537,
+          "end": 85.017
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Multitask e terrorista local,",
-      "start": 85.09727035592394,
-      "end": 87.39881929546561,
+      "start": 85.097,
+      "end": 87.399,
       "words": [
         {
           "text": "Multitask",
-          "start": 85.09727035592394,
-          "end": 85.83776871038518
+          "start": 85.097,
+          "end": 85.804
         },
         {
           "text": "e",
-          "start": 85.97786299366162,
-          "end": 85.99787646270111
+          "start": 85.898,
+          "end": 86.004
         },
         {
           "text": "terrorista",
-          "start": 86.21802462213553,
-          "end": 86.85845563139931
+          "start": 86.198,
+          "end": 86.858
         },
         {
           "text": "local,",
-          "start": 86.99854991467576,
-          "end": 87.39881929546561
+          "start": 86.999,
+          "end": 87.399
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "que é unha curva sen unha roda a chiar",
-      "start": 87.53891357874207,
-      "end": 90.3007723061921,
+      "start": 87.539,
+      "end": 90.301,
       "words": [
         {
           "text": "que",
-          "start": 87.53891357874207,
-          "end": 87.61896745490004
+          "start": 87.539,
+          "end": 87.639
         },
         {
           "text": "é",
-          "start": 87.7190348000975,
-          "end": 87.739048269137
+          "start": 87.739,
+          "end": 87.759
         },
         {
           "text": "unha",
-          "start": 87.85912908337396,
-          "end": 87.99922336665041
+          "start": 87.804,
+          "end": 87.999
         },
         {
           "text": "curva",
-          "start": 88.11930418088737,
-          "end": 88.37947927840078
+          "start": 88.099,
+          "end": 88.399
         },
         {
           "text": "sen",
-          "start": 88.49956009263774,
-          "end": 88.81977559726961
+          "start": 88.5,
+          "end": 88.82
         },
         {
           "text": "unha",
-          "start": 88.99989681862506,
-          "end": 89.160004570941
+          "start": 88.96,
+          "end": 89.18
         },
         {
           "text": "roda",
-          "start": 89.30009885421745,
-          "end": 89.54026048269137
+          "start": 89.3,
+          "end": 89.56
         },
         {
           "text": "a",
-          "start": 89.7003682350073,
-          "end": 89.7203817040468
+          "start": 89.68,
+          "end": 89.7
         },
         {
           "text": "chiar",
-          "start": 89.82044904924426,
-          "end": 90.3007723061921
+          "start": 89.804,
+          "end": 90.301
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "pronto na capital.",
-      "start": 90.5609474037055,
-      "end": 91.86182289127254,
+      "start": 90.581,
+      "end": 91.882,
       "words": [
         {
           "text": "pronto",
-          "start": 90.5609474037055,
-          "end": 90.8411359702584
+          "start": 90.581,
+          "end": 90.861
         },
         {
           "text": "na",
-          "start": 90.98123025353486,
-          "end": 91.04127066065334
+          "start": 90.961,
+          "end": 91.061
         },
         {
           "text": "capital.",
-          "start": 91.18136494392978,
-          "end": 91.86182289127254
+          "start": 91.161,
+          "end": 91.882
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Andrea, botánica e fricallana:",
-      "start": 92.60232124573378,
-      "end": 94.92388365431496,
+      "start": 92.582,
+      "end": 94.964,
       "words": [
         {
           "text": "Andrea,",
-          "start": 92.60232124573378,
-          "end": 93.06263103364212
+          "start": 92.582,
+          "end": 93.004
         },
         {
           "text": "botánica",
-          "start": 93.28277919307654,
-          "end": 93.92321020234031
+          "start": 93.284,
+          "end": 93.963
         },
         {
           "text": "e",
-          "start": 94.12334489273525,
-          "end": 94.14335836177473
+          "start": 94.123,
+          "end": 94.163
         },
         {
           "text": "fricallana:",
-          "start": 94.2234122379327,
-          "end": 94.92388365431496
+          "start": 94.223,
+          "end": 94.964
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "facendo horas coa nai en Santa Marta",
-      "start": 95.20407222086786,
-      "end": 97.56566156752802,
+      "start": 95.184,
+      "end": 97.586,
       "words": [
         {
           "text": "facendo",
-          "start": 95.20407222086786,
-          "end": 95.60434160165772
+          "start": 95.184,
+          "end": 95.644
         },
         {
           "text": "horas",
-          "start": 95.76444935397366,
-          "end": 96.06465138956605
+          "start": 95.784,
+          "end": 96.085
         },
         {
           "text": "coa",
-          "start": 96.14470526572403,
-          "end": 96.26478607996098
+          "start": 96.145,
+          "end": 96.265
         },
         {
           "text": "nai",
-          "start": 96.34483995611896,
-          "end": 96.64504199171135
+          "start": 96.325,
+          "end": 96.665
         },
         {
           "text": "en",
-          "start": 96.7851362749878,
-          "end": 96.84517668210628
+          "start": 96.785,
+          "end": 96.845
         },
         {
           "text": "Santa",
-          "start": 96.90521708922476,
-          "end": 97.16539218673817
+          "start": 96.905,
+          "end": 97.185
         },
         {
           "text": "Marta",
-          "start": 97.30548647001461,
-          "end": 97.56566156752802
+          "start": 97.285,
+          "end": 97.586
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -839,447 +839,447 @@
           "end": 99.70710275475378
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "motoserras e tractores,",
-      "start": 99.96727785226717,
-      "end": 101.46828803022915,
+      "start": 99.967,
+      "end": 101.468,
       "words": [
         {
           "text": "motoserras",
-          "start": 99.96727785226717,
-          "end": 100.66774926864943
+          "start": 99.967,
+          "end": 100.725
         },
         {
           "text": "e",
-          "start": 100.78783008288639,
-          "end": 100.80784355192588
+          "start": 100.788,
+          "end": 100.828
         },
         {
           "text": "tractores,",
-          "start": 100.88789742808386,
-          "end": 101.46828803022915
+          "start": 100.908,
+          "end": 101.468
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "sempre os putos acosadores.",
-      "start": 101.68843618966358,
-      "end": 104.21013328863968,
+      "start": 101.668,
+      "end": 104.23,
       "words": [
         {
           "text": "sempre",
-          "start": 101.68843618966358,
-          "end": 101.98863822525597
+          "start": 101.668,
+          "end": 102.045
         },
         {
           "text": "os",
-          "start": 102.48897495124329,
-          "end": 102.56902882740125
+          "start": 102.469,
+          "end": 102.569
         },
         {
           "text": "putos",
-          "start": 102.64908270355923,
-          "end": 103.0293386153096
+          "start": 102.669,
+          "end": 103.029
         },
         {
           "text": "acosadores.",
-          "start": 103.30952718186249,
-          "end": 104.21013328863968
+          "start": 103.29,
+          "end": 104.23
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Xulia, curandeira e DJ:",
-      "start": 104.89059123598244,
-      "end": 106.85191120185274,
+      "start": 104.845,
+      "end": 106.872,
       "words": [
         {
           "text": "Xulia,",
-          "start": 104.89059123598244,
-          "end": 105.25083367869331
+          "start": 104.845,
+          "end": 105.291
         },
         {
           "text": "curandeira",
-          "start": 105.69112999756216,
-          "end": 106.33156100682594
+          "start": 105.671,
+          "end": 106.372
         },
         {
           "text": "e",
-          "start": 106.51168222818137,
-          "end": 106.53169569722085
+          "start": 106.492,
+          "end": 106.532
         },
         {
           "text": "DJ:",
-          "start": 106.65177651145781,
-          "end": 106.85191120185274
+          "start": 106.652,
+          "end": 106.872
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "CVs en todas as discotecas da comarca,",
-      "start": 107.43230180399804,
-      "end": 110.53438950511945,
+      "start": 107.412,
+      "end": 110.554,
       "words": [
         {
           "text": "CVs",
-          "start": 107.43230180399804,
-          "end": 107.99267893710385
+          "start": 107.412,
+          "end": 107.993
         },
         {
           "text": "en",
-          "start": 108.0927462823013,
-          "end": 108.27286750365674
+          "start": 108.073,
+          "end": 108.273
         },
         {
           "text": "todas",
-          "start": 108.3929483178937,
-          "end": 108.75319076060458
+          "start": 108.405,
+          "end": 108.725
         },
         {
           "text": "as",
-          "start": 108.9933523890785,
-          "end": 109.09341973427595
+          "start": 108.853,
+          "end": 109.093
         },
         {
           "text": "discotecas",
-          "start": 109.17347361043393,
-          "end": 109.85393155777669
+          "start": 109.173,
+          "end": 109.874
         },
         {
           "text": "da",
-          "start": 109.93398543393465,
-          "end": 110.01403931009263
+          "start": 109.934,
+          "end": 110.014
         },
         {
           "text": "comarca,",
-          "start": 110.13412012432958,
-          "end": 110.53438950511945
+          "start": 110.114,
+          "end": 110.554
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "B2Bs nos afters da casa de Laura,",
-      "start": 110.67448378839589,
-      "end": 113.43634251584592,
+      "start": 110.674,
+      "end": 113.436,
       "words": [
         {
           "text": "B2Bs",
-          "start": 110.67448378839589,
-          "end": 111.35494173573865
+          "start": 110.674,
+          "end": 111.355
         },
         {
           "text": "nos",
-          "start": 111.43499561189662,
-          "end": 111.69517070941004
+          "start": 111.455,
+          "end": 111.695
         },
         {
           "text": "afters",
-          "start": 111.85527846172597,
-          "end": 112.27556131155534
+          "start": 111.845,
+          "end": 112.296
         },
         {
           "text": "da",
-          "start": 112.39564212579229,
-          "end": 112.47569600195025
+          "start": 112.396,
+          "end": 112.496
         },
         {
           "text": "casa",
-          "start": 112.57576334714773,
-          "end": 112.83593844466114
+          "start": 112.556,
+          "end": 112.836
         },
         {
           "text": "de",
-          "start": 112.97603272793758,
-          "end": 113.05608660409555
+          "start": 112.976,
+          "end": 113.056
         },
         {
           "text": "Laura,",
-          "start": 113.15615394929301,
-          "end": 113.43634251584592
+          "start": 113.156,
+          "end": 113.436
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "pero sempre copas na barra do bar,",
-      "start": 113.75655802047781,
-      "end": 116.57845715504631,
+      "start": 113.737,
+      "end": 116.578,
       "words": [
         {
           "text": "pero",
-          "start": 113.75655802047781,
-          "end": 113.97670617991223
+          "start": 113.737,
+          "end": 113.977
         },
         {
           "text": "sempre",
-          "start": 114.09678699414918,
-          "end": 114.39698902974158
+          "start": 114.117,
+          "end": 114.437
         },
         {
           "text": "copas",
-          "start": 114.69719106533397,
-          "end": 115.37764901267674
+          "start": 114.697,
+          "end": 115.378
         },
         {
           "text": "na",
-          "start": 115.51774329595318,
-          "end": 115.57778370307166
+          "start": 115.498,
+          "end": 115.598
         },
         {
           "text": "barra",
-          "start": 115.65783757922964,
-          "end": 115.93802614578253
+          "start": 115.658,
+          "end": 115.958
         },
         {
           "text": "do",
-          "start": 116.03809349098,
-          "end": 116.11814736713798
+          "start": 116.045,
+          "end": 116.118
         },
         {
           "text": "bar,",
-          "start": 116.21821471233544,
-          "end": 116.57845715504631
+          "start": 116.218,
+          "end": 116.578
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "ajuantando porcos all style",
-      "start": 116.8786591906387,
-      "end": 118.51976365187713,
+      "start": 116.839,
+      "end": 118.56,
       "words": [
         {
           "text": "ajuantando",
-          "start": 116.8786591906387,
-          "end": 117.41902285470502
+          "start": 116.839,
+          "end": 117.439
         },
         {
           "text": "porcos",
-          "start": 117.53910366894198,
-          "end": 117.87933264261335
+          "start": 117.539,
+          "end": 117.879
         },
         {
           "text": "all",
-          "start": 117.9994134568503,
-          "end": 118.11949427108726
+          "start": 117.999,
+          "end": 118.125
         },
         {
           "text": "style",
-          "start": 118.23957508532422,
-          "end": 118.51976365187713
+          "start": 118.24,
+          "end": 118.56
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e dealers á porta da igrexa",
-      "start": 118.5798040589956,
-      "end": 120.06080076791808,
+      "start": 118.6,
+      "end": 120.101,
       "words": [
         {
           "text": "e",
-          "start": 118.5798040589956,
-          "end": 118.59981752803509
+          "start": 118.6,
+          "end": 118.62
         },
         {
           "text": "dealers",
-          "start": 118.69988487323256,
-          "end": 119.08014078498293
+          "start": 118.7,
+          "end": 119.04
         },
         {
           "text": "á",
-          "start": 119.14018119210141,
-          "end": 119.16019466114089
+          "start": 119.14,
+          "end": 119.16
         },
         {
           "text": "porta",
-          "start": 119.26026200633837,
-          "end": 119.52043710385178
+          "start": 119.26,
+          "end": 119.526
         },
         {
           "text": "da",
-          "start": 119.62050444904924,
-          "end": 119.68054485616771
+          "start": 119.6,
+          "end": 119.681
         },
         {
           "text": "igrexa",
-          "start": 119.74058526328619,
-          "end": 120.06080076791808
+          "start": 119.821,
+          "end": 120.101
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "nos enterros dos colegas",
-      "start": 120.44105667966845,
-      "end": 122.70257868113114,
+      "start": 120.421,
+      "end": 122.683,
       "words": [
         {
           "text": "nos",
-          "start": 120.44105667966845,
-          "end": 120.64119137006337
+          "start": 120.421,
+          "end": 120.681
         },
         {
           "text": "enterros",
-          "start": 120.82131259141882,
-          "end": 121.34166278644562
+          "start": 120.806,
+          "end": 121.402
         },
         {
           "text": "dos",
-          "start": 121.58182441491954,
-          "end": 121.76194563627497
+          "start": 121.582,
+          "end": 121.822
         },
         {
           "text": "colegas",
-          "start": 121.94206685763041,
-          "end": 122.70257868113114
+          "start": 121.962,
+          "end": 122.683
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "facendo cola pa caixa",
-      "start": 123.48310397367138,
-      "end": 124.88404680643588,
+      "start": 123.463,
+      "end": 124.886,
       "words": [
         {
           "text": "facendo",
-          "start": 123.48310397367138,
-          "end": 123.84334641638225
+          "start": 123.463,
+          "end": 123.883
         },
         {
           "text": "cola",
-          "start": 124.02346763773768,
-          "end": 124.28364273525109
+          "start": 124.003,
+          "end": 124.304
         },
         {
           "text": "pa",
-          "start": 124.38371008044855,
-          "end": 124.50379089468551
+          "start": 124.404,
+          "end": 124.504
         },
         {
           "text": "caixa",
-          "start": 124.60385823988297,
-          "end": 124.88404680643588
+          "start": 124.584,
+          "end": 124.886
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "mentres estramos o tempo",
-      "start": 125.00412762067283,
-      "end": 126.40507045343733,
+      "start": 124.984,
+      "end": 126.405,
       "words": [
         {
           "text": "mentres",
-          "start": 125.00412762067283,
-          "end": 125.32434312530472
+          "start": 124.984,
+          "end": 125.344
         },
         {
           "text": "estramos",
-          "start": 125.44442393954168,
-          "end": 125.9247471964895
+          "start": 125.424,
+          "end": 125.945
         },
         {
           "text": "o",
-          "start": 126.04482801072646,
-          "end": 126.08485494880546
+          "start": 126.006,
+          "end": 126.065
         },
         {
           "text": "tempo",
-          "start": 126.16490882496342,
-          "end": 126.40507045343733
+          "start": 126.145,
+          "end": 126.405
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "moitos invernos iguais.",
-      "start": 126.56517820575328,
-      "end": 128.02616144563626,
+      "start": 126.545,
+      "end": 128.026,
       "words": [
         {
           "text": "moitos",
-          "start": 126.56517820575328,
-          "end": 126.88539371038517
+          "start": 126.545,
+          "end": 126.865
         },
         {
           "text": "invernos",
-          "start": 127.02548799366161,
-          "end": 127.42575737445148
+          "start": 126.985,
+          "end": 127.446
         },
         {
           "text": "iguais.",
-          "start": 127.54583818868844,
-          "end": 128.02616144563626
+          "start": 127.546,
+          "end": 128.026
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Moitos invernos:",
-      "start": 128.10621532179422,
-      "end": 128.96679449049245,
+      "start": 128.086,
+      "end": 128.987,
       "words": [
         {
           "text": "Moitos",
-          "start": 128.10621532179422,
-          "end": 128.40641735738663
+          "start": 128.086,
+          "end": 128.386
         },
         {
           "text": "invernos:",
-          "start": 128.5264981716236,
-          "end": 128.96679449049245
+          "start": 128.506,
+          "end": 128.987
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -1303,61 +1303,61 @@
           "end": 130.40776426133593
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "Tren a Madrid.",
-      "start": 130.7479932350073,
-      "end": 131.96881484641636,
+      "start": 130.728,
+      "end": 131.949,
       "words": [
         {
           "text": "Tren",
-          "start": 130.7479932350073,
-          "end": 131.08822220867867
+          "start": 130.728,
+          "end": 131.068
         },
         {
           "text": "a",
-          "start": 131.38842424427108,
-          "end": 131.42845118235007
+          "start": 131.348,
+          "end": 131.388
         },
         {
           "text": "Madrid.",
-          "start": 131.52851852754753,
-          "end": 131.96881484641636
+          "start": 131.486,
+          "end": 131.949
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Tren a Madrid",
-      "start": 132.24900341296927,
-      "end": 133.44981155533884,
+      "start": 132.229,
+      "end": 133.41,
       "words": [
         {
           "text": "Tren",
-          "start": 132.24900341296927,
-          "end": 132.54920544856168
+          "start": 132.229,
+          "end": 132.566
         },
         {
           "text": "a",
-          "start": 132.88943442223305,
-          "end": 132.92946136031205
+          "start": 132.849,
+          "end": 132.889
         },
         {
           "text": "Madrid",
-          "start": 133.0295287055095,
-          "end": 133.44981155533884
+          "start": 133.03,
+          "end": 133.41
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -1391,447 +1391,447 @@
           "end": 135.25102376889322
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "con algunha boa tempada",
-      "start": 135.93148171623596,
-      "end": 138.01288249634322,
+      "start": 135.911,
+      "end": 137.766,
       "words": [
         {
           "text": "con",
-          "start": 135.93148171623596,
-          "end": 136.15162987567038
+          "start": 135.911,
+          "end": 136.112
         },
         {
           "text": "algunha",
-          "start": 136.17164334470988,
-          "end": 136.6519666016577
+          "start": 136.172,
+          "end": 136.632
         },
         {
           "text": "boa",
-          "start": 136.89212823013165,
-          "end": 137.11227638956606
+          "start": 136.892,
+          "end": 137.092
         },
         {
           "text": "tempada",
-          "start": 137.25237067284252,
-          "end": 138.01288249634322
+          "start": 137.246,
+          "end": 137.766
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e interese en case nada.",
-      "start": 138.47319228425158,
-      "end": 140.85479509995125,
+      "start": 138.453,
+      "end": 140.815,
       "words": [
         {
           "text": "e",
-          "start": 138.47319228425158,
-          "end": 138.49320575329108
+          "start": 138.453,
+          "end": 138.473
         },
         {
           "text": "interese",
-          "start": 139.05358288639687,
-          "end": 139.61396001950268
+          "start": 139.006,
+          "end": 139.614
         },
         {
           "text": "en",
-          "start": 140.03424286933202,
-          "end": 140.074269807411
+          "start": 139.974,
+          "end": 140.054
         },
         {
           "text": "case",
-          "start": 140.11429674548998,
-          "end": 140.3744718430034
+          "start": 140.114,
+          "end": 140.394
         },
         {
           "text": "nada.",
-          "start": 140.45452571916138,
-          "end": 140.85479509995125
+          "start": 140.475,
+          "end": 140.815
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Ok. Unha da mañá",
-      "start": 144.95755625304727,
-      "end": 147.07898397123353,
+      "start": 144.938,
+      "end": 147.119,
       "words": [
         {
           "text": "Ok.",
-          "start": 144.95755625304727,
-          "end": 145.11766400536322
+          "start": 144.938,
+          "end": 145.118
         },
         {
           "text": "Unha",
-          "start": 146.29845867869332,
-          "end": 146.49859336908824
+          "start": 146.238,
+          "end": 146.499
         },
         {
           "text": "da",
-          "start": 146.5986607142857,
-          "end": 146.67871459044366
+          "start": 146.579,
+          "end": 146.699
         },
         {
           "text": "mañá",
-          "start": 146.81880887372012,
-          "end": 147.07898397123353
+          "start": 146.799,
+          "end": 147.119
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "o capítulo final:",
-      "start": 147.4792533520234,
-      "end": 148.8601827157484,
+      "start": 147.439,
+      "end": 148.86,
       "words": [
         {
           "text": "o",
-          "start": 147.4792533520234,
-          "end": 147.4992668210629
+          "start": 147.439,
+          "end": 147.479
         },
         {
           "text": "capítulo",
-          "start": 147.59933416626035,
-          "end": 148.15971129936617
+          "start": 147.579,
+          "end": 148.2
         },
         {
           "text": "final:",
-          "start": 148.3198190516821,
-          "end": 148.8601827157484
+          "start": 148.3,
+          "end": 148.86
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Isto comeza mal,",
-      "start": 149.00027699902486,
-      "end": 150.38120636274988,
+      "start": 148.94,
+      "end": 150.441,
       "words": [
         {
           "text": "Isto",
-          "start": 149.00027699902486,
-          "end": 149.18039822038028
+          "start": 148.94,
+          "end": 149.18
         },
         {
           "text": "comeza",
-          "start": 149.52062719405168,
-          "end": 149.90088310580202
+          "start": 149.481,
+          "end": 149.941
         },
         {
           "text": "mal,",
-          "start": 150.06099085811798,
-          "end": 150.38120636274988
+          "start": 150.041,
+          "end": 150.441
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "todas as sombras do lugar",
-      "start": 151.00162390297416,
-      "end": 153.10303815212092,
+      "start": 151.002,
+      "end": 153.103,
       "words": [
         {
           "text": "todas",
-          "start": 151.00162390297416,
-          "end": 151.34185287664553
+          "start": 151.002,
+          "end": 151.342
         },
         {
           "text": "as",
-          "start": 151.441920221843,
-          "end": 151.481947159922
+          "start": 151.422,
+          "end": 151.522
         },
         {
           "text": "sombras",
-          "start": 151.56200103607995,
-          "end": 152.18241857630423
+          "start": 151.562,
+          "end": 152.202
         },
         {
           "text": "do",
-          "start": 152.32251285958068,
-          "end": 152.40256673573865
+          "start": 152.323,
+          "end": 152.407
         },
         {
           "text": "lugar",
-          "start": 152.5026340809361,
-          "end": 153.10303815212092
+          "start": 152.523,
+          "end": 153.103
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "facendo unha conga",
-      "start": 153.24313243539734,
-      "end": 154.5440079229644,
+      "start": 153.243,
+      "end": 154.567,
       "words": [
         {
           "text": "facendo",
-          "start": 153.24313243539734,
-          "end": 153.6634152852267
+          "start": 153.243,
+          "end": 153.687
         },
         {
           "text": "unha",
-          "start": 153.88356344466112,
-          "end": 154.06368466601657
+          "start": 153.864,
+          "end": 154.084
         },
         {
           "text": "conga",
-          "start": 154.20377894929302,
-          "end": 154.5440079229644
+          "start": 154.184,
+          "end": 154.567
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "mentres pedimos unha copa,",
-      "start": 154.8442099585568,
-      "end": 156.42527401267674,
+      "start": 154.844,
+      "end": 156.445,
       "words": [
         {
           "text": "mentres",
-          "start": 154.8442099585568,
-          "end": 155.12439852510968
+          "start": 154.844,
+          "end": 155.164
         },
         {
           "text": "pedimos",
-          "start": 155.24447933934664,
-          "end": 155.6847756582155
+          "start": 155.224,
+          "end": 155.705
         },
         {
           "text": "unha",
-          "start": 155.84488341053142,
-          "end": 156.00499116284738
+          "start": 155.825,
+          "end": 156.005
         },
         {
           "text": "copa,",
-          "start": 156.12507197708433,
-          "end": 156.42527401267674
+          "start": 156.125,
+          "end": 156.445
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "poucos paisanos e xa sen moitas vidas",
-      "start": 157.12574542905898,
-      "end": 159.68746946611407,
+      "start": 157.126,
+      "end": 159.707,
       "words": [
         {
           "text": "poucos",
-          "start": 157.12574542905898,
-          "end": 157.4259474646514
+          "start": 157.126,
+          "end": 157.426
         },
         {
           "text": "paisanos",
-          "start": 157.50600134080935,
-          "end": 157.96631112871768
+          "start": 157.506,
+          "end": 158.007
         },
         {
           "text": "e",
-          "start": 158.10640541199413,
-          "end": 158.12641888103363
+          "start": 158.087,
+          "end": 158.126
         },
         {
           "text": "xa",
-          "start": 158.2064727571916,
-          "end": 158.34656704046805
+          "start": 158.226,
+          "end": 158.367
         },
         {
           "text": "sen",
-          "start": 158.62675560702095,
-          "end": 158.7668498902974
+          "start": 158.607,
+          "end": 158.767
         },
         {
           "text": "moitas",
-          "start": 158.82689029741587,
-          "end": 159.14710580204778
+          "start": 158.827,
+          "end": 159.167
         },
         {
           "text": "vidas",
-          "start": 159.22715967820574,
-          "end": 159.68746946611407
+          "start": 159.247,
+          "end": 159.707
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "nos baños curamos as feridas,",
-      "start": 160.14777925402242,
-      "end": 162.34926084836664,
+      "start": 160.148,
+      "end": 162.389,
       "words": [
         {
           "text": "nos",
-          "start": 160.14777925402242,
-          "end": 160.26786006825938
+          "start": 160.148,
+          "end": 160.288
         },
         {
           "text": "baños",
-          "start": 160.34791394441734,
-          "end": 160.84825067040467
+          "start": 160.368,
+          "end": 160.888
         },
         {
           "text": "curamos",
-          "start": 160.96833148464162,
-          "end": 161.44865474158945
+          "start": 160.968,
+          "end": 161.449
         },
         {
           "text": "as",
-          "start": 161.5887490248659,
-          "end": 161.6487894319844
+          "start": 161.549,
+          "end": 161.649
         },
         {
           "text": "feridas,",
-          "start": 161.70882983910286,
-          "end": 162.34926084836664
+          "start": 161.728,
+          "end": 162.389
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e pitillo en la puerta, está Camila!",
-      "start": 162.56940900780106,
-      "end": 165.21118692101413,
+      "start": 162.549,
+      "end": 165.231,
       "words": [
         {
           "text": "e",
-          "start": 162.56940900780106,
-          "end": 162.58942247684055
+          "start": 162.549,
+          "end": 162.589
         },
         {
           "text": "pitillo",
-          "start": 162.84959757435396,
-          "end": 163.2698804241833
+          "start": 162.83,
+          "end": 163.288
         },
         {
           "text": "en",
-          "start": 163.42998817649925,
-          "end": 163.51004205265724
+          "start": 163.43,
+          "end": 163.528
         },
         {
           "text": "la",
-          "start": 163.5900959288152,
-          "end": 163.67014980497316
+          "start": 163.59,
+          "end": 163.67
         },
         {
           "text": "puerta,",
-          "start": 163.75020368113115,
-          "end": 164.07041918576303
+          "start": 163.768,
+          "end": 164.088
         },
         {
           "text": "está",
-          "start": 164.4106481594344,
-          "end": 164.61078284982935
+          "start": 164.371,
+          "end": 164.611
         },
         {
           "text": "Camila!",
-          "start": 164.7308636640663,
-          "end": 165.21118692101413
+          "start": 164.728,
+          "end": 165.231
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "-que tal Madrid?",
-      "start": 165.37129467333008,
-      "end": 166.31192771818624,
+      "start": 165.511,
+      "end": 166.312,
       "words": [
         {
           "text": "-que",
-          "start": 165.37129467333008,
-          "end": 165.5914428327645
+          "start": 165.511,
+          "end": 165.611
         },
         {
           "text": "tal",
-          "start": 165.71152364700146,
-          "end": 165.8516179302779
+          "start": 165.692,
+          "end": 165.852
         },
         {
           "text": "Madrid?",
-          "start": 165.97169874451487,
-          "end": 166.31192771818624
+          "start": 165.932,
+          "end": 166.312
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "-fachas, clubs do can e policías.",
-      "start": 166.4520220014627,
-      "end": 168.49339584349096,
+      "start": 166.472,
+      "end": 168.533,
       "words": [
         {
           "text": "-fachas,",
-          "start": 166.4520220014627,
-          "end": 166.79225097513407
+          "start": 166.472,
+          "end": 166.772
         },
         {
           "text": "clubs",
-          "start": 166.83227791321306,
-          "end": 167.03241260360798
+          "start": 166.832,
+          "end": 167.032
         },
         {
           "text": "do",
-          "start": 167.07243954168698,
-          "end": 167.13247994880544
+          "start": 167.072,
+          "end": 167.132
         },
         {
           "text": "can",
-          "start": 167.2325472940029,
-          "end": 167.39265504631885
+          "start": 167.233,
+          "end": 167.393
         },
         {
           "text": "e",
-          "start": 167.5127358605558,
-          "end": 167.5327493295953
+          "start": 167.493,
+          "end": 167.513
         },
         {
           "text": "policías.",
-          "start": 167.63281667479276,
-          "end": 168.49339584349096
+          "start": 167.633,
+          "end": 168.533
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -1860,7 +1860,7 @@
           "end": 169.99440602145293
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1911,76 +1911,76 @@
           "end": 173.09649372257434
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "concerto en Santa Comba",
-      "start": 173.2165745368113,
-      "end": 174.43739614822036,
+      "start": 173.217,
+      "end": 174.457,
       "words": [
         {
           "text": "concerto",
-          "start": 173.2165745368113,
-          "end": 173.61684391760116
+          "start": 173.217,
+          "end": 173.608
         },
         {
           "text": "en",
-          "start": 173.65687085568015,
-          "end": 173.71691126279862
+          "start": 173.648,
+          "end": 173.697
         },
         {
           "text": "Santa",
-          "start": 173.7769516699171,
-          "end": 174.01711329839102
+          "start": 173.757,
+          "end": 174.017
         },
         {
           "text": "Comba",
-          "start": 174.11718064358848,
-          "end": 174.43739614822036
+          "start": 174.117,
+          "end": 174.457
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "un disco para a historia",
-      "start": 174.79763859093123,
-      "end": 175.91839285714283,
+      "start": 174.758,
+      "end": 176.008,
       "words": [
         {
           "text": "un",
-          "start": 174.79763859093123,
-          "end": 174.83766552901022
+          "start": 174.758,
+          "end": 174.838
         },
         {
           "text": "disco",
-          "start": 174.89770593612872,
-          "end": 175.1578810336421
+          "start": 174.898,
+          "end": 175.158
         },
         {
           "text": "para",
-          "start": 175.2579483788396,
-          "end": 175.4180561311555
+          "start": 175.238,
+          "end": 175.408
         },
         {
           "text": "a",
-          "start": 175.4580830692345,
-          "end": 175.478096538274
+          "start": 175.448,
+          "end": 175.478
         },
         {
           "text": "historia",
-          "start": 175.53813694539247,
-          "end": 175.91839285714283
+          "start": 175.538,
+          "end": 176.008
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -2014,7 +2014,7 @@
           "end": 177.61953772549975
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -2045,7 +2045,7 @@
           "end": 178.90039974402728
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -2076,369 +2076,369 @@
           "end": 179.86104625792296
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "entro de novo,",
-      "start": 180.14123482447584,
-      "end": 180.90174664797658,
+      "start": 180.128,
+      "end": 180.922,
       "words": [
         {
           "text": "entro",
-          "start": 180.14123482447584,
-          "end": 180.3213560458313
+          "start": 180.128,
+          "end": 180.341
         },
         {
           "text": "de",
-          "start": 180.46145032910775,
-          "end": 180.5214907362262
+          "start": 180.461,
+          "end": 180.521
         },
         {
           "text": "novo,",
-          "start": 180.6015446123842,
-          "end": 180.90174664797658
+          "start": 180.622,
+          "end": 180.922
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "as mesmas caras, centos de merdas xa,",
-      "start": 181.66225847147732,
-      "end": 184.14392863237444,
+      "start": 181.602,
+      "end": 184.204,
       "words": [
         {
           "text": "as",
-          "start": 181.66225847147732,
-          "end": 181.72229887859578
+          "start": 181.602,
+          "end": 181.702
         },
         {
           "text": "mesmas",
-          "start": 181.76232581667477,
-          "end": 182.04251438322768
+          "start": 181.768,
+          "end": 182.063
         },
         {
           "text": "caras,",
-          "start": 182.12256825938564,
-          "end": 182.582878047294
+          "start": 182.123,
+          "end": 182.623
         },
         {
           "text": "centos",
-          "start": 183.0832147732813,
-          "end": 183.4234437469527
+          "start": 183.063,
+          "end": 183.423
         },
         {
           "text": "de",
-          "start": 183.46347068503167,
-          "end": 183.52351109215016
+          "start": 183.463,
+          "end": 183.544
         },
         {
           "text": "merdas",
-          "start": 183.64359190638712,
-          "end": 183.94379394197952
+          "start": 183.649,
+          "end": 183.944
         },
         {
           "text": "xa,",
-          "start": 184.00383434909799,
-          "end": 184.14392863237444
+          "start": 184.004,
+          "end": 184.204
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "centos de merdas xa",
-      "start": 184.64426535836176,
-      "end": 185.70497921745488,
+      "start": 184.624,
+      "end": 185.729,
       "words": [
         {
           "text": "centos",
-          "start": 184.64426535836176,
-          "end": 184.96448086299364
+          "start": 184.624,
+          "end": 184.969
         },
         {
           "text": "de",
-          "start": 185.02452127011213,
-          "end": 185.0845616772306
+          "start": 185.025,
+          "end": 185.085
         },
         {
           "text": "merdas",
-          "start": 185.20464249146755,
-          "end": 185.50484452705996
+          "start": 185.205,
+          "end": 185.505
         },
         {
           "text": "xa",
-          "start": 185.56488493417842,
-          "end": 185.70497921745488
+          "start": 185.545,
+          "end": 185.729
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "esperando que me trague o chan",
-      "start": 186.40545063383715,
-      "end": 188.40679753778642,
+      "start": 186.405,
+      "end": 188.289,
       "words": [
         {
           "text": "esperando",
-          "start": 186.40545063383715,
-          "end": 186.96582776694294
+          "start": 186.405,
+          "end": 186.986
         },
         {
           "text": "que",
-          "start": 187.0859085811799,
-          "end": 187.16596245733788
+          "start": 187.066,
+          "end": 187.169
         },
         {
           "text": "me",
-          "start": 187.28604327157484,
-          "end": 187.3460836786933
+          "start": 187.266,
+          "end": 187.346
         },
         {
           "text": "trague",
-          "start": 187.44615102389076,
-          "end": 187.76636652852267
+          "start": 187.446,
+          "end": 187.769
         },
         {
           "text": "o",
-          "start": 187.9464877498781,
-          "end": 187.96650121891759
+          "start": 187.906,
+          "end": 187.929
         },
         {
           "text": "chan",
-          "start": 188.06656856411504,
-          "end": 188.40679753778642
+          "start": 188.047,
+          "end": 188.289
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "míroas co brillo do fugaz",
-      "start": 188.5068648829839,
-      "end": 190.08792893710384,
+      "start": 188.467,
+      "end": 190.128,
       "words": [
         {
           "text": "míroas",
-          "start": 188.5068648829839,
-          "end": 188.78705344953678
+          "start": 188.467,
+          "end": 188.807
         },
         {
           "text": "co",
-          "start": 188.84709385665528,
-          "end": 188.92714773281324
+          "start": 188.849,
+          "end": 188.927
         },
         {
           "text": "brillo",
-          "start": 189.00720160897123,
-          "end": 189.2873901755241
+          "start": 189.007,
+          "end": 189.307
         },
         {
           "text": "do",
-          "start": 189.40747098976107,
-          "end": 189.48752486591906
+          "start": 189.407,
+          "end": 189.488
         },
         {
           "text": "fugaz",
-          "start": 189.58759221111652,
-          "end": 190.08792893710384
+          "start": 189.608,
+          "end": 190.128
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "entre tebras que me collen da man",
-      "start": 190.2480366894198,
-      "end": 193.0098954168698,
+      "start": 190.248,
+      "end": 193.03,
       "words": [
         {
           "text": "entre",
-          "start": 190.2480366894198,
-          "end": 190.4481713798147
+          "start": 190.248,
+          "end": 190.448
         },
         {
           "text": "tebras",
-          "start": 190.54823872501217,
-          "end": 191.108615858118
+          "start": 190.568,
+          "end": 191.149
         },
         {
           "text": "que",
-          "start": 191.68900646026327,
-          "end": 191.78907380546073
+          "start": 191.669,
+          "end": 191.769
         },
         {
           "text": "me",
-          "start": 191.8891411506582,
-          "end": 191.94918155777668
+          "start": 191.869,
+          "end": 191.949
         },
         {
           "text": "collen",
-          "start": 192.08927584105314,
-          "end": 192.409491345685
+          "start": 192.069,
+          "end": 192.43
         },
         {
           "text": "da",
-          "start": 192.489545221843,
-          "end": 192.54958562896147
+          "start": 192.47,
+          "end": 192.59
         },
         {
           "text": "man",
-          "start": 192.66966644319842,
-          "end": 193.0098954168698
+          "start": 192.65,
+          "end": 193.03
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "O punto da noite",
-      "start": 193.45019173573866,
-      "end": 194.49089212579227,
+      "start": 193.41,
+      "end": 194.491,
       "words": [
         {
           "text": "O",
-          "start": 193.45019173573866,
-          "end": 193.47020520477815
+          "start": 193.41,
+          "end": 193.45
         },
         {
           "text": "punto",
-          "start": 193.5902860190151,
-          "end": 193.870474585568
+          "start": 193.57,
+          "end": 193.87
         },
         {
           "text": "da",
-          "start": 193.99055539980495,
-          "end": 194.07060927596294
+          "start": 193.991,
+          "end": 194.111
         },
         {
           "text": "noite",
-          "start": 194.1906900901999,
-          "end": 194.49089212579227
+          "start": 194.191,
+          "end": 194.491
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "no que sempre me da.",
-      "start": 194.79109416138468,
-      "end": 195.81178108239882,
+      "start": 194.811,
+      "end": 195.852,
       "words": [
         {
           "text": "no",
-          "start": 194.79109416138468,
-          "end": 194.87114803754264
+          "start": 194.811,
+          "end": 194.851
         },
         {
           "text": "que",
-          "start": 194.9712153827401,
-          "end": 195.0312557898586
+          "start": 194.951,
+          "end": 195.031
         },
         {
           "text": "sempre",
-          "start": 195.13132313505605,
-          "end": 195.39149823256946
+          "start": 195.131,
+          "end": 195.412
         },
         {
           "text": "me",
-          "start": 195.51157904680642,
-          "end": 195.59163292296438
+          "start": 195.532,
+          "end": 195.612
         },
         {
           "text": "da.",
-          "start": 195.71171373720136,
-          "end": 195.81178108239882
+          "start": 195.712,
+          "end": 195.852
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "O punto da noite",
-      "start": 196.53226596782056,
-      "end": 197.5329394197952,
+      "start": 196.492,
+      "end": 197.533,
       "words": [
         {
           "text": "O",
-          "start": 196.53226596782056,
-          "end": 196.55227943686006
+          "start": 196.492,
+          "end": 196.512
         },
         {
           "text": "punto",
-          "start": 196.65234678205752,
-          "end": 196.93253534861043
+          "start": 196.632,
+          "end": 196.913
         },
         {
           "text": "da",
-          "start": 197.0326026938079,
-          "end": 197.11265656996585
+          "start": 197.033,
+          "end": 197.153
         },
         {
           "text": "noite",
-          "start": 197.2327373842028,
-          "end": 197.5329394197952
+          "start": 197.253,
+          "end": 197.533
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "no que sempre me da.",
-      "start": 197.8531549244271,
-      "end": 198.87384184544123,
+      "start": 197.853,
+      "end": 198.894,
       "words": [
         {
           "text": "no",
-          "start": 197.8531549244271,
-          "end": 197.93320880058508
+          "start": 197.853,
+          "end": 197.913
         },
         {
           "text": "que",
-          "start": 198.01326267674304,
-          "end": 198.0733030838615
+          "start": 197.993,
+          "end": 198.073
         },
         {
           "text": "sempre",
-          "start": 198.19338389809846,
-          "end": 198.45355899561187
+          "start": 198.173,
+          "end": 198.474
         },
         {
           "text": "me",
-          "start": 198.59365327888833,
-          "end": 198.65369368600682
+          "start": 198.609,
+          "end": 198.689
         },
         {
           "text": "da.",
-          "start": 198.77377450024377,
-          "end": 198.87384184544123
+          "start": 198.774,
+          "end": 198.894
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -2457,482 +2457,482 @@
           "end": 199.49425938566552
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "Ás nove da mañá ninguén quere marchar",
-      "start": 211.84256978303264,
-      "end": 214.30422647489027,
+      "start": 211.823,
+      "end": 214.344,
       "words": [
         {
           "text": "Ás",
-          "start": 211.84256978303264,
-          "end": 211.90261019015114
+          "start": 211.823,
+          "end": 211.903
         },
         {
           "text": "nove",
-          "start": 211.9826640663091,
-          "end": 212.222825694783
+          "start": 211.983,
+          "end": 212.223
         },
         {
           "text": "da",
-          "start": 212.34290650901997,
-          "end": 212.40294691613846
+          "start": 212.323,
+          "end": 212.423
         },
         {
           "text": "mañá",
-          "start": 212.52302773037542,
-          "end": 212.8032162969283
+          "start": 212.523,
+          "end": 212.823
         },
         {
           "text": "ninguén",
-          "start": 213.0834048634812,
-          "end": 213.4036203681131
+          "start": 213.083,
+          "end": 213.41
         },
         {
           "text": "quere",
-          "start": 213.48367424427107,
-          "end": 213.7038224037055
+          "start": 213.464,
+          "end": 213.73
         },
         {
           "text": "marchar",
-          "start": 213.84391668698194,
-          "end": 214.30422647489027
+          "start": 213.844,
+          "end": 214.344
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "de mañaneo en Santa Comba",
-      "start": 214.44432075816673,
-      "end": 216.0053713432472,
+      "start": 214.444,
+      "end": 216.025,
       "words": [
         {
           "text": "de",
-          "start": 214.44432075816673,
-          "end": 214.50436116528522
+          "start": 214.444,
+          "end": 214.49
         },
         {
           "text": "mañaneo",
-          "start": 214.62444197952217,
-          "end": 215.18481911262796
+          "start": 214.604,
+          "end": 215.185
         },
         {
           "text": "en",
-          "start": 215.26487298878595,
-          "end": 215.30489992686492
+          "start": 215.25,
+          "end": 215.305
         },
         {
           "text": "Santa",
-          "start": 215.3649403339834,
-          "end": 215.60510196245733
+          "start": 215.365,
+          "end": 215.625
         },
         {
           "text": "Comba",
-          "start": 215.72518277669428,
-          "end": 216.0053713432472
+          "start": 215.725,
+          "end": 216.025
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "a vida a prazos, queimando roda",
-      "start": 216.06541175036566,
-      "end": 217.946677840078,
+      "start": 216.065,
+      "end": 217.97,
       "words": [
         {
           "text": "a",
-          "start": 216.06541175036566,
-          "end": 216.08542521940515
+          "start": 216.065,
+          "end": 216.085
         },
         {
           "text": "vida",
-          "start": 216.12545215748415,
-          "end": 216.36561378595806
+          "start": 216.125,
+          "end": 216.37
         },
         {
           "text": "a",
-          "start": 216.40564072403703,
-          "end": 216.42565419307653
+          "start": 216.41,
+          "end": 216.446
         },
         {
           "text": "prazos,",
-          "start": 216.48569460019502,
-          "end": 216.98603132618234
+          "start": 216.506,
+          "end": 216.986
         },
         {
           "text": "queimando",
-          "start": 217.0860986713798,
-          "end": 217.52639499024863
+          "start": 217.086,
+          "end": 217.57
         },
         {
           "text": "roda",
-          "start": 217.70651621160408,
-          "end": 217.946677840078
+          "start": 217.707,
+          "end": 217.97
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "bichas do monte, mirada en sangue",
-      "start": 218.28690681374937,
-      "end": 220.28825371769867,
+      "start": 218.267,
+      "end": 220.308,
       "words": [
         {
           "text": "bichas",
-          "start": 218.28690681374937,
-          "end": 218.60712231838127
+          "start": 218.267,
+          "end": 218.607
         },
         {
           "text": "do",
-          "start": 218.64714925646024,
-          "end": 218.70718966357873
+          "start": 218.647,
+          "end": 218.727
         },
         {
           "text": "monte,",
-          "start": 218.8072570087762,
-          "end": 219.1074590443686
+          "start": 218.827,
+          "end": 219.13
         },
         {
           "text": "mirada",
-          "start": 219.40766107996097,
-          "end": 219.80793046075084
+          "start": 219.41,
+          "end": 219.828
         },
         {
           "text": "en",
-          "start": 219.8679708678693,
-          "end": 219.9079978059483
+          "start": 219.848,
+          "end": 219.928
         },
         {
           "text": "sangue",
-          "start": 219.9680382130668,
-          "end": 220.28825371769867
+          "start": 219.968,
+          "end": 220.308
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e nas pistas uns derrapes",
-      "start": 220.8086039127255,
-      "end": 222.34964102876643,
+      "start": 220.769,
+      "end": 222.37,
       "words": [
         {
           "text": "e",
-          "start": 220.8086039127255,
-          "end": 220.82861738176499
+          "start": 220.769,
+          "end": 220.789
         },
         {
           "text": "nas",
-          "start": 220.90867125792295,
-          "end": 221.0287520721599
+          "start": 220.869,
+          "end": 221.049
         },
         {
           "text": "pistas",
-          "start": 221.10880594831787,
-          "end": 221.46904839102876
+          "start": 221.109,
+          "end": 221.41
         },
         {
           "text": "uns",
-          "start": 221.52908879814723,
-          "end": 221.6291561433447
+          "start": 221.509,
+          "end": 221.629
         },
         {
           "text": "derrapes",
-          "start": 221.66918308142368,
-          "end": 222.34964102876643
+          "start": 221.669,
+          "end": 222.37
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "berrando coma aves rapaces",
-      "start": 222.46972184300338,
-      "end": 224.27093405655776,
+      "start": 222.45,
+      "end": 224.291,
       "words": [
         {
           "text": "berrando",
-          "start": 222.46972184300338,
-          "end": 222.89000469283275
+          "start": 222.45,
+          "end": 222.91
         },
         {
           "text": "coma",
-          "start": 223.0100855070697,
-          "end": 223.23023366650412
+          "start": 223.01,
+          "end": 223.29
         },
         {
           "text": "aves",
-          "start": 223.47039529497803,
-          "end": 223.71055692345195
+          "start": 223.43,
+          "end": 223.711
         },
         {
           "text": "rapaces",
-          "start": 223.79061079960994,
-          "end": 224.27093405655776
+          "start": 223.771,
+          "end": 224.291
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Aire, aire! Aire, aire!",
-      "start": 224.41102833983422,
-      "end": 226.39236177474402,
+      "start": 224.41,
+      "end": 226.411,
       "words": [
         {
           "text": "Aire,",
-          "start": 224.41102833983422,
-          "end": 224.59114956118964
+          "start": 224.41,
+          "end": 224.69
         },
         {
           "text": "aire!",
-          "start": 225.011432411019,
-          "end": 225.21156710141392
+          "start": 225.011,
+          "end": 225.25
         },
         {
           "text": "Aire,",
-          "start": 225.5918230131643,
-          "end": 225.8319846416382
+          "start": 225.612,
+          "end": 225.851
         },
         {
           "text": "aire!",
-          "start": 226.19222708434907,
-          "end": 226.39236177474402
+          "start": 226.152,
+          "end": 226.411
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "sen tempo xa, a radio a rebentar",
-      "start": 226.6925638103364,
-      "end": 228.9540858117991,
+      "start": 226.673,
+      "end": 228.954,
       "words": [
         {
           "text": "sen",
-          "start": 226.6925638103364,
-          "end": 226.81264462457335
+          "start": 226.673,
+          "end": 226.833
         },
         {
           "text": "tempo",
-          "start": 226.87268503169184,
-          "end": 227.09283319112626
+          "start": 226.853,
+          "end": 227.113
         },
         {
           "text": "xa,",
-          "start": 227.23292747440271,
-          "end": 227.33299481960017
+          "start": 227.213,
+          "end": 227.373
         },
         {
           "text": "a",
-          "start": 227.93339889078496,
-          "end": 227.95341235982445
+          "start": 227.893,
+          "end": 227.933
         },
         {
           "text": "radio",
-          "start": 228.0534797050219,
-          "end": 228.27362786445636
+          "start": 228.053,
+          "end": 228.294
         },
         {
           "text": "a",
-          "start": 228.35368174061432,
-          "end": 228.37369520965382
+          "start": 228.334,
+          "end": 228.371
         },
         {
           "text": "rebentar",
-          "start": 228.43373561677228,
-          "end": 228.9540858117991
+          "start": 228.434,
+          "end": 228.954
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "o que facemos é como",
-      "start": 229.03413968795707,
-      "end": 230.53514986591904,
+      "start": 229.034,
+      "end": 230.555,
       "words": [
         {
           "text": "o",
-          "start": 229.03413968795707,
-          "end": 229.05415315699656
+          "start": 229.034,
+          "end": 229.054
         },
         {
           "text": "que",
-          "start": 229.13420703315455,
-          "end": 229.21426090931251
+          "start": 229.134,
+          "end": 229.214
         },
         {
           "text": "facemos",
-          "start": 229.35435519258897,
-          "end": 229.8546919185763
+          "start": 229.314,
+          "end": 229.895
         },
         {
           "text": "é",
-          "start": 230.01479967089222,
-          "end": 230.0348131399317
+          "start": 229.995,
+          "end": 230.015
         },
         {
           "text": "como",
-          "start": 230.29498823744512,
-          "end": 230.53514986591904
+          "start": 230.295,
+          "end": 230.555
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Beak! meets Delia Derbyshire",
-      "start": 230.6752441491955,
-      "end": 232.49646983178934,
+      "start": 230.675,
+      "end": 232.536,
       "words": [
         {
           "text": "Beak!",
-          "start": 230.6752441491955,
-          "end": 230.9154057776694
+          "start": 230.675,
+          "end": 230.915
         },
         {
           "text": "meets",
-          "start": 231.03548659190636,
-          "end": 231.35570209653827
+          "start": 231.035,
+          "end": 231.336
         },
         {
           "text": "Delia",
-          "start": 231.43575597269623,
-          "end": 231.73595800828863
+          "start": 231.436,
+          "end": 231.756
         },
         {
           "text": "Derbyshire",
-          "start": 231.8160118844466,
-          "end": 232.49646983178934
+          "start": 231.836,
+          "end": 232.536
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "din que as viron voar",
-      "start": 232.77665839834225,
-      "end": 234.35772245246218,
+      "start": 232.777,
+      "end": 234.378,
       "words": [
         {
           "text": "din",
-          "start": 232.77665839834225,
-          "end": 232.8967392125792
+          "start": 232.777,
+          "end": 232.897
         },
         {
           "text": "que",
-          "start": 232.9567796196977,
-          "end": 233.03683349585566
+          "start": 232.957,
+          "end": 233.057
         },
         {
           "text": "as",
-          "start": 233.25698165529008,
-          "end": 233.33703553144807
+          "start": 233.177,
+          "end": 233.317
         },
         {
           "text": "viron",
-          "start": 233.37706246952703,
-          "end": 233.65725103607994
+          "start": 233.377,
+          "end": 233.717
         },
         {
           "text": "voar",
-          "start": 233.71729144319843,
-          "end": 234.35772245246218
+          "start": 233.737,
+          "end": 234.378
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e os seus peitos,",
-      "start": 234.47780326669914,
-      "end": 235.45846324963432,
+      "start": 234.438,
+      "end": 235.438,
       "words": [
         {
           "text": "e",
-          "start": 234.47780326669914,
-          "end": 234.49781673573864
+          "start": 234.438,
+          "end": 234.458
         },
         {
           "text": "os",
-          "start": 234.6379110190151,
-          "end": 234.69795142613359
+          "start": 234.638,
+          "end": 234.678
         },
         {
           "text": "seus",
-          "start": 234.73797836421255,
-          "end": 234.8580591784495
+          "start": 234.718,
+          "end": 234.858
         },
         {
           "text": "peitos,",
-          "start": 234.8980861165285,
-          "end": 235.45846324963432
+          "start": 234.918,
+          "end": 235.438
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e o meu peito,",
-      "start": 235.51850365675278,
-      "end": 236.25900201121402,
+      "start": 235.519,
+      "end": 236.259,
       "words": [
         {
           "text": "e",
-          "start": 235.51850365675278,
-          "end": 235.53851712579228
+          "start": 235.519,
+          "end": 235.539
         },
         {
           "text": "o",
-          "start": 235.7386518161872,
-          "end": 235.7586652852267
+          "start": 235.691,
+          "end": 235.731
         },
         {
           "text": "meu",
-          "start": 235.8187056923452,
-          "end": 235.93878650658215
+          "start": 235.819,
+          "end": 235.939
         },
         {
           "text": "peito,",
-          "start": 236.0188403827401,
-          "end": 236.25900201121402
+          "start": 236.039,
+          "end": 236.259
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -2981,7 +2981,7 @@
           "end": 243.22368923695757
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -3032,7 +3032,7 @@
           "end": 247.44653120429058
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -3068,7 +3068,7 @@
           "end": 253.71074701365185
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -3104,7 +3104,7 @@
           "end": 258.67408733544613
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -3135,175 +3135,175 @@
           "end": 274.30460665529006
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "era o puto cabodano,",
-      "start": 275.6655225499756,
-      "end": 277.1865461969771,
+      "start": 275.625,
+      "end": 277.207,
       "words": [
         {
           "text": "era",
-          "start": 275.6655225499756,
-          "end": 275.82563030229153
+          "start": 275.625,
+          "end": 275.853
         },
         {
           "text": "o",
-          "start": 275.9857380546075,
-          "end": 276.005751523647
+          "start": 275.973,
+          "end": 276.013
         },
         {
           "text": "puto",
-          "start": 276.14584580692343,
-          "end": 276.38600743539735
+          "start": 276.126,
+          "end": 276.386
         },
         {
           "text": "cabodano,",
-          "start": 276.50608824963433,
-          "end": 277.1865461969771
+          "start": 276.506,
+          "end": 277.207
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "xa nunca volveron",
-      "start": 279.8083106411506,
-      "end": 280.90905143832276,
+      "start": 279.788,
+      "end": 280.929,
       "words": [
         {
           "text": "xa",
-          "start": 279.8083106411506,
-          "end": 279.8883645173086
+          "start": 279.788,
+          "end": 279.888
         },
         {
           "text": "nunca",
-          "start": 279.98843186250605,
-          "end": 280.24860696001946
+          "start": 279.988,
+          "end": 280.269
         },
         {
           "text": "volveron",
-          "start": 280.42872818137494,
-          "end": 280.90905143832276
+          "start": 280.409,
+          "end": 280.929
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "nin eu nunca fun",
-      "start": 281.3693612262311,
-      "end": 282.28998080204775,
+      "start": 281.329,
+      "end": 282.33,
       "words": [
         {
           "text": "nin",
-          "start": 281.3693612262311,
-          "end": 281.489442040468
+          "start": 281.329,
+          "end": 281.489
         },
         {
           "text": "eu",
-          "start": 281.5895093856655,
-          "end": 281.649549792784
+          "start": 281.569,
+          "end": 281.65
         },
         {
           "text": "nunca",
-          "start": 281.72960366894193,
-          "end": 281.9497518283764
+          "start": 281.73,
+          "end": 281.95
         },
         {
           "text": "fun",
-          "start": 282.08984611165283,
-          "end": 282.28998080204775
+          "start": 282.07,
+          "end": 282.33
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "merquei un Yamaha",
-      "start": 282.51012896148217,
-      "end": 283.6709101657728,
+      "start": 282.49,
+      "end": 283.691,
       "words": [
         {
           "text": "merquei",
-          "start": 282.51012896148217,
-          "end": 282.91039834227206
+          "start": 282.49,
+          "end": 282.95
         },
         {
           "text": "un",
-          "start": 283.0905195636275,
-          "end": 283.17057343978547
+          "start": 283.091,
+          "end": 283.171
         },
         {
           "text": "Yamaha",
-          "start": 283.2106003778644,
-          "end": 283.6709101657728
+          "start": 283.251,
+          "end": 283.691
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "e aprendín algunha canción",
-      "start": 283.7909909800097,
-      "end": 285.3520415650902,
+      "start": 283.771,
+      "end": 285.352,
       "words": [
         {
           "text": "e",
-          "start": 283.7909909800097,
-          "end": 283.8110044490492
+          "start": 283.771,
+          "end": 283.811
         },
         {
           "text": "aprendín",
-          "start": 283.8710448561677,
-          "end": 284.29132770599705
+          "start": 283.853,
+          "end": 284.311
         },
         {
           "text": "algunha",
-          "start": 284.39139505119454,
-          "end": 284.7716509629449
+          "start": 284.391,
+          "end": 284.812
         },
         {
           "text": "canción",
-          "start": 284.91174524622136,
-          "end": 285.3520415650902
+          "start": 284.912,
+          "end": 285.352
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "en Youtube.",
-      "start": 286.37272848610434,
-      "end": 286.9331056192101,
+      "start": 286.353,
+      "end": 286.933,
       "words": [
         {
           "text": "en",
-          "start": 286.37272848610434,
-          "end": 286.43276889322277
+          "start": 286.353,
+          "end": 286.413
         },
         {
           "text": "Youtube.",
-          "start": 286.47279583130177,
-          "end": 286.9331056192101
+          "start": 286.493,
+          "end": 286.933
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     }
   ]

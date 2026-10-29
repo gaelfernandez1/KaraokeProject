@@ -7,28 +7,28 @@
   "lines": [
     {
       "text": "Unha vez máis,",
-      "start": 1.0207026167447018,
-      "end": 1.5410608135165107,
+      "start": 0.961,
+      "end": 1.561,
       "words": [
         {
           "text": "Unha",
-          "start": 1.0207026167447018,
-          "end": 1.1207715007392804
+          "start": 0.961,
+          "end": 1.121
         },
         {
           "text": "vez",
-          "start": 1.1808128311360275,
-          "end": 1.2808817151306062
+          "start": 1.181,
+          "end": 1.28
         },
         {
           "text": "máis,",
-          "start": 1.360936822326269,
-          "end": 1.5410608135165107
+          "start": 1.341,
+          "end": 1.561
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -82,7 +82,7 @@
           "end": 4.282948234967964
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -123,65 +123,65 @@
           "end": 6.404408575653031
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "ameaza xa como solapada ao entornal das costas galegas,",
-      "start": 6.524491236446526,
-      "end": 9.12628222030557,
+      "start": 6.524,
+      "end": 9.186,
       "words": [
         {
           "text": "ameaza",
-          "start": 6.524491236446526,
-          "end": 6.884739218827009
+          "start": 6.524,
+          "end": 6.885
         },
         {
           "text": "xa",
-          "start": 6.9647943260226715,
-          "end": 7.06486321001725
+          "start": 6.965,
+          "end": 7.065
         },
         {
           "text": "como",
-          "start": 7.1449183172129125,
-          "end": 7.305028531604239
+          "start": 7.125,
+          "end": 7.285
         },
         {
           "text": "solapada",
-          "start": 7.365069862000986,
-          "end": 7.745331621180385
+          "start": 7.345,
+          "end": 7.745
         },
         {
           "text": "ao",
-          "start": 7.7653453979793,
-          "end": 7.805372951577132
+          "start": 7.765,
+          "end": 7.805
         },
         {
           "text": "entornal",
-          "start": 7.845400505174963,
-          "end": 8.145607157158699
+          "start": 7.865,
+          "end": 8.166
         },
         {
           "text": "das",
-          "start": 8.225662264354362,
-          "end": 8.32573114834894
+          "start": 8.226,
+          "end": 8.346
         },
         {
           "text": "costas",
-          "start": 8.385772478745688,
-          "end": 8.726006684327254
+          "start": 8.386,
+          "end": 8.706
         },
         {
           "text": "galegas,",
-          "start": 8.786048014724003,
-          "end": 9.12628222030557
+          "start": 8.766,
+          "end": 9.186
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -215,76 +215,76 @@
           "end": 11.147673676996057
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "a descoordinación de total,",
-      "start": 11.347811444985215,
-      "end": 12.408541615327747,
+      "start": 11.308,
+      "end": 12.389,
       "words": [
         {
           "text": "a",
-          "start": 11.347811444985215,
-          "end": 11.36782522178413
+          "start": 11.308,
+          "end": 11.328
         },
         {
           "text": "descoordinación",
-          "start": 11.387838998583046,
-          "end": 12.06830740974618
+          "start": 11.388,
+          "end": 11.968
         },
         {
           "text": "de",
-          "start": 12.108334963344012,
-          "end": 12.16837629374076
+          "start": 12.028,
+          "end": 12.079
         },
         {
           "text": "total,",
-          "start": 12.228417624137506,
-          "end": 12.408541615327747
+          "start": 12.119,
+          "end": 12.389
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "os sindicatos son os dazos,",
-      "start": 12.488596722523411,
-      "end": 13.509299339268113,
+      "start": 12.449,
+      "end": 13.509,
       "words": [
         {
           "text": "os",
-          "start": 12.488596722523411,
-          "end": 12.528624276121242
+          "start": 12.449,
+          "end": 12.529
         },
         {
           "text": "sindicatos",
-          "start": 12.568651829719073,
-          "end": 12.988941142496303
+          "start": 12.569,
+          "end": 12.949
         },
         {
           "text": "son",
-          "start": 13.008954919295219,
-          "end": 13.109023803289798
+          "start": 12.969,
+          "end": 13.109
         },
         {
           "text": "os",
-          "start": 13.169065133686546,
-          "end": 13.229106464083292
+          "start": 13.169,
+          "end": 13.239
         },
         {
           "text": "dazos,",
-          "start": 13.269134017681123,
-          "end": 13.509299339268113
+          "start": 13.289,
+          "end": 13.509
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -318,60 +318,60 @@
           "end": 14.449946848817152
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "o puro goberno nega todo o coñece vento.",
-      "start": 14.770167277599803,
-      "end": 16.491352082306555,
+      "start": 14.75,
+      "end": 16.511,
       "words": [
         {
           "text": "o",
-          "start": 14.770167277599803,
-          "end": 14.790181054398719
+          "start": 14.75,
+          "end": 14.77
         },
         {
           "text": "puro",
-          "start": 14.83020860799655,
-          "end": 14.990318822387875
+          "start": 14.83,
+          "end": 14.999
         },
         {
           "text": "goberno",
-          "start": 15.050360152784624,
-          "end": 15.330553027969444
+          "start": 15.05,
+          "end": 15.371
         },
         {
           "text": "nega",
-          "start": 15.430621911964021,
-          "end": 15.590732126355348
+          "start": 15.431,
+          "end": 15.591
         },
         {
           "text": "todo",
-          "start": 15.67078723355101,
-          "end": 15.81088367114342
+          "start": 15.679,
+          "end": 15.811
         },
         {
           "text": "o",
-          "start": 15.850911224741251,
-          "end": 15.870925001540169
+          "start": 15.891,
+          "end": 15.911
         },
         {
           "text": "coñece",
-          "start": 15.95098010873583,
-          "end": 16.23117298392065
+          "start": 15.951,
+          "end": 16.231
         },
         {
           "text": "vento.",
-          "start": 16.251186760719566,
-          "end": 16.491352082306555
+          "start": 16.271,
+          "end": 16.511
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -390,7 +390,7 @@
           "end": 20.053804352513552
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -436,7 +436,7 @@
           "end": 22.355388684388863
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -477,7 +477,7 @@
           "end": 24.296725033883686
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -513,7 +513,7 @@
           "end": 25.697689409807786
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -564,7 +564,7 @@
           "end": 27.47891554491129
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -600,7 +600,7 @@
           "end": 29.640403439194184
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -636,7 +636,7 @@
           "end": 31.30154691350419
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -692,7 +692,7 @@
           "end": 33.56310369178166
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -718,7 +718,7 @@
           "end": 34.20354454934697
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -744,7 +744,7 @@
           "end": 35.74460536286348
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -770,7 +770,7 @@
           "end": 37.32569372997782
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -811,61 +811,61 @@
           "end": 41.748738402538194
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "megan a verdade,",
-      "start": 42.18904149211434,
-      "end": 43.1497027784623,
+      "start": 42.149,
+      "end": 43.19,
       "words": [
         {
           "text": "megan",
-          "start": 42.18904149211434,
-          "end": 42.509261920896996
+          "start": 42.149,
+          "end": 42.518
         },
         {
           "text": "a",
-          "start": 42.6493583584894,
-          "end": 42.66937213528832
+          "start": 42.609,
+          "end": 42.649
         },
         {
           "text": "verdade,",
-          "start": 42.74942724248398,
-          "end": 43.1497027784623
+          "start": 42.749,
+          "end": 43.19
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "falan e falan,",
-      "start": 43.910226296821094,
-      "end": 45.3111906727452,
+      "start": 43.878,
+      "end": 45.331,
       "words": [
         {
           "text": "falan",
-          "start": 43.910226296821094,
-          "end": 44.27047427920158
+          "start": 43.878,
+          "end": 44.29
         },
         {
           "text": "e",
-          "start": 44.37054316319615,
-          "end": 44.39055693999507
+          "start": 44.358,
+          "end": 44.398
         },
         {
           "text": "falan,",
-          "start": 44.550667154386396,
-          "end": 45.3111906727452
+          "start": 44.571,
+          "end": 45.331
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -904,7 +904,7 @@
           "end": 47.892967879805326
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -940,7 +940,7 @@
           "end": 52.77632941874076
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -996,7 +996,7 @@
           "end": 61.282184558279944
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1052,7 +1052,7 @@
           "end": 67.40640025874815
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1093,138 +1093,138 @@
           "end": 69.80805347461803
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "as esperas dunha nova mensaxe,",
-      "start": 70.24835656419418,
-      "end": 72.22972046728684,
+      "start": 70.188,
+      "end": 72.25,
       "words": [
         {
           "text": "as",
-          "start": 70.24835656419418,
-          "end": 70.32841167138984
+          "start": 70.188,
+          "end": 70.328
         },
         {
           "text": "esperas",
-          "start": 70.42848055538443,
-          "end": 70.86878364496057
+          "start": 70.396,
+          "end": 70.889
         },
         {
           "text": "dunha",
-          "start": 70.96885252895515,
-          "end": 71.22903162734106
+          "start": 70.956,
+          "end": 71.236
         },
         {
           "text": "nova",
-          "start": 71.34911428813454,
-          "end": 71.62930716331937
+          "start": 71.349,
+          "end": 71.629
         },
         {
           "text": "mensaxe,",
-          "start": 71.74938982411287,
-          "end": 72.22972046728684
+          "start": 71.749,
+          "end": 72.25
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "as espreitas dunha nova linguaxe,",
-      "start": 72.65000978006407,
-      "end": 74.63137368315672,
+      "start": 72.59,
+      "end": 74.651,
       "words": [
         {
           "text": "as",
-          "start": 72.65000978006407,
-          "end": 72.71005111046082
+          "start": 72.59,
+          "end": 72.73
         },
         {
           "text": "espreitas",
-          "start": 72.81011999445539,
-          "end": 73.3304781912272
+          "start": 72.79,
+          "end": 73.33
         },
         {
           "text": "dunha",
-          "start": 73.41053329842286,
-          "end": 73.63068484321094
+          "start": 73.391,
+          "end": 73.636
         },
         {
           "text": "nova",
-          "start": 73.77078128080335,
-          "end": 74.01094660239035
+          "start": 73.751,
+          "end": 74.011
         },
         {
           "text": "linguaxe,",
-          "start": 74.15104303998275,
-          "end": 74.63137368315672
+          "start": 74.131,
+          "end": 74.651
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "as esperas dunha nova viaxe.",
-      "start": 75.05166299593395,
-      "end": 77.05304067582553,
+      "start": 74.972,
+      "end": 77.053,
       "words": [
         {
           "text": "as",
-          "start": 75.05166299593395,
-          "end": 75.13171810312961
+          "start": 74.972,
+          "end": 75.092
         },
         {
           "text": "esperas",
-          "start": 75.2317869871242,
-          "end": 75.67209007670034
+          "start": 75.196,
+          "end": 75.692
         },
         {
           "text": "dunha",
-          "start": 75.752145183896,
-          "end": 76.01232428228191
+          "start": 75.752,
+          "end": 76.036
         },
         {
           "text": "nova",
-          "start": 76.15242071987433,
-          "end": 76.41259981826023
+          "start": 76.152,
+          "end": 76.413
         },
         {
           "text": "viaxe.",
-          "start": 76.59272380945048,
-          "end": 77.05304067582553
+          "start": 76.573,
+          "end": 77.053
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Para voltar,",
-      "start": 77.41328865820601,
-      "end": 78.0337157389724,
+      "start": 77.393,
+      "end": 77.996,
       "words": [
         {
           "text": "Para",
-          "start": 77.41328865820601,
-          "end": 77.55338509579842
+          "start": 77.393,
+          "end": 77.553
         },
         {
           "text": "voltar,",
-          "start": 77.63344020299408,
-          "end": 78.0337157389724
+          "start": 77.633,
+          "end": 77.996
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -1258,7 +1258,7 @@
           "end": 81.05579603560868
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1299,7 +1299,7 @@
           "end": 82.71693950991867
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1340,7 +1340,7 @@
           "end": 84.45813809142435
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1371,153 +1371,153 @@
           "end": 86.13929534253327
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "incompetencia en xeral,",
-      "start": 86.47952954811484,
-      "end": 87.82045259364219,
+      "start": 86.44,
+      "end": 87.84,
       "words": [
         {
           "text": "incompetencia",
-          "start": 86.47952954811484,
-          "end": 87.26006684327255
+          "start": 86.44,
+          "end": 87.28
         },
         {
           "text": "en",
-          "start": 87.36013572726712,
-          "end": 87.42017705766388
+          "start": 87.316,
+          "end": 87.436
         },
         {
           "text": "xeral,",
-          "start": 87.52024594165846,
-          "end": 87.82045259364219
+          "start": 87.516,
+          "end": 87.84
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "só non traianos os xornais,",
-      "start": 88.18070057602267,
-      "end": 89.3615134071587,
+      "start": 88.161,
+      "end": 89.402,
       "words": [
         {
           "text": "só",
-          "start": 88.18070057602267,
-          "end": 88.26075568321833
+          "start": 88.161,
+          "end": 88.261
         },
         {
           "text": "non",
-          "start": 88.36082456721292,
-          "end": 88.50092100480532
+          "start": 88.341,
+          "end": 88.481
         },
         {
           "text": "traianos",
-          "start": 88.56096233520208,
-          "end": 88.80112765678906
+          "start": 88.581,
+          "end": 88.861
         },
         {
           "text": "os",
-          "start": 88.88118276398473,
-          "end": 88.92121031758255
+          "start": 88.881,
+          "end": 88.921
         },
         {
           "text": "xornais,",
-          "start": 88.9812516479793,
-          "end": 89.3615134071587
+          "start": 88.996,
+          "end": 89.402
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "pachar de medra, paténdoo.",
-      "start": 89.6216925055446,
-      "end": 91.40291864064811,
+      "start": 89.602,
+      "end": 91.383,
       "words": [
         {
           "text": "pachar",
-          "start": 89.6216925055446,
-          "end": 89.94191293432725
+          "start": 89.602,
+          "end": 89.942
         },
         {
           "text": "de",
-          "start": 90.001954264724,
-          "end": 90.08200937191967
+          "start": 90.002,
+          "end": 90.082
         },
         {
           "text": "medra,",
-          "start": 90.16206447911533,
-          "end": 90.44225735430015
+          "start": 90.162,
+          "end": 90.442
         },
         {
           "text": "paténdoo.",
-          "start": 90.86254666707738,
-          "end": 91.40291864064811
+          "start": 90.843,
+          "end": 91.383
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "Política carroñeira, Vigueo, todo é mongoleo, Petro Leijos.",
-      "start": 91.80319417662642,
-      "end": 98.76798850264909,
+      "start": 91.783,
+      "end": 98.748,
       "words": [
         {
           "text": "Política",
-          "start": 91.80319417662642,
-          "end": 92.26351104300149
+          "start": 91.783,
+          "end": 92.284
         },
         {
           "text": "carroñeira,",
-          "start": 92.42362125739281,
-          "end": 93.12410344535486
+          "start": 92.404,
+          "end": 93.144
         },
         {
           "text": "Vigueo,",
-          "start": 93.24418610614835,
-          "end": 93.90464074051256
+          "start": 93.244,
+          "end": 93.925
         },
         {
           "text": "todo",
-          "start": 94.38497138368655,
-          "end": 94.66516425887137
+          "start": 94.365,
+          "end": 94.555
         },
         {
           "text": "é",
-          "start": 94.72520558926811,
-          "end": 94.74521936606703
+          "start": 94.675,
+          "end": 94.715
         },
         {
           "text": "mongoleo,",
-          "start": 94.78524691966486,
-          "end": 95.50574288442583
+          "start": 94.785,
+          "end": 95.475
         },
         {
           "text": "Petro",
-          "start": 96.2262388491868,
-          "end": 96.7465970459586
+          "start": 96.226,
+          "end": 96.727
         },
         {
           "text": "Leijos.",
-          "start": 96.9867623675456,
-          "end": 98.76798850264909
+          "start": 96.967,
+          "end": 98.748
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -1566,7 +1566,7 @@
           "end": 103.47122605039428
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1582,7 +1582,7 @@
           "end": 106.13305836465007
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1613,7 +1613,7 @@
           "end": 109.45534531327009
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1669,7 +1669,7 @@
           "end": 115.13925792416215
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1710,158 +1710,158 @@
           "end": 119.7824541415106
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
     },
     {
       "text": "Nunca máis na beiriña do mar,",
-      "start": 120.18272967748891,
-      "end": 122.32420379497289,
+      "start": 120.163,
+      "end": 122.324,
       "words": [
         {
           "text": "Nunca",
-          "start": 120.18272967748891,
-          "end": 120.44290877587481
+          "start": 120.163,
+          "end": 120.474
         },
         {
           "text": "máis",
-          "start": 120.60301899026614,
-          "end": 120.9232394190488
+          "start": 120.583,
+          "end": 120.923
         },
         {
           "text": "na",
-          "start": 121.02330830304338,
-          "end": 121.12337718703795
+          "start": 121.023,
+          "end": 121.143
         },
         {
           "text": "beiriña",
-          "start": 121.22344607103253,
-          "end": 121.76381804460325
+          "start": 121.234,
+          "end": 121.764
         },
         {
           "text": "do",
-          "start": 121.88390070539675,
-          "end": 121.96395581259242
+          "start": 121.874,
+          "end": 121.964
         },
         {
           "text": "mar,",
-          "start": 122.0840384733859,
-          "end": 122.32420379497289
+          "start": 122.084,
+          "end": 122.324
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "as esperas dunha nova mensaxe,",
-      "start": 122.74449310775013,
-      "end": 124.86595344843519,
+      "start": 122.674,
+      "end": 124.886,
       "words": [
         {
           "text": "as",
-          "start": 122.74449310775013,
-          "end": 122.8445619917447
+          "start": 122.674,
+          "end": 122.825
         },
         {
           "text": "esperas",
-          "start": 122.92461709894036,
-          "end": 123.40494774211435
+          "start": 122.925,
+          "end": 123.445
         },
         {
           "text": "dunha",
-          "start": 123.50501662610893,
-          "end": 123.78520950129374
+          "start": 123.505,
+          "end": 123.794
         },
         {
           "text": "nova",
-          "start": 123.92530593888615,
-          "end": 124.18548503727206
+          "start": 123.905,
+          "end": 124.185
         },
         {
           "text": "mensaxe,",
-          "start": 124.34559525166338,
-          "end": 124.86595344843519
+          "start": 124.326,
+          "end": 124.886
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "as espleitas dunha nova linguaxe,",
-      "start": 125.22620143081568,
-      "end": 127.34766177150074,
+      "start": 125.166,
+      "end": 127.348,
       "words": [
         {
           "text": "as",
-          "start": 125.22620143081568,
-          "end": 125.30625653801134
+          "start": 125.166,
+          "end": 125.326
         },
         {
           "text": "espleitas",
-          "start": 125.42633919880483,
-          "end": 125.94669739557663
+          "start": 125.406,
+          "end": 125.967
         },
         {
           "text": "dunha",
-          "start": 126.04676627957122,
-          "end": 126.30694537795712
+          "start": 126.027,
+          "end": 126.314
         },
         {
           "text": "nova",
-          "start": 126.42702803875062,
-          "end": 126.70722091393544
+          "start": 126.427,
+          "end": 126.707
         },
         {
           "text": "linguaxe,",
-          "start": 126.86733112832677,
-          "end": 127.34766177150074
+          "start": 126.847,
+          "end": 127.348
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
       "text": "as esperas dunha nova viaxe,",
-      "start": 127.72792353068014,
-      "end": 129.8293700945663,
+      "start": 127.668,
+      "end": 129.869,
       "words": [
         {
           "text": "as",
-          "start": 127.72792353068014,
-          "end": 127.8079786378758
+          "start": 127.668,
+          "end": 127.808
         },
         {
           "text": "esperas",
-          "start": 127.90804752187039,
-          "end": 128.36836438824545
+          "start": 127.888,
+          "end": 128.408
         },
         {
           "text": "dunha",
-          "start": 128.46843327224002,
-          "end": 128.74862614742483
+          "start": 128.468,
+          "end": 128.754
         },
         {
           "text": "nova",
-          "start": 128.88872258501726,
-          "end": 129.16891546020207
+          "start": 128.889,
+          "end": 129.189
         },
         {
           "text": "viaxe,",
-          "start": 129.3290256745934,
-          "end": 129.8293700945663
+          "start": 129.329,
+          "end": 129.869
         }
       ],
-      "status": "draft",
+      "status": "ok",
       "anchor": null,
-      "note": null,
+      "note": "auto: coinciden 3 alineadores",
       "revised": false
     },
     {
@@ -1915,7 +1915,7 @@
           "end": 133.75207034715376
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1956,7 +1956,7 @@
           "end": 136.17373733982257
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -1992,7 +1992,7 @@
           "end": 138.93563853807294
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -2023,7 +2023,7 @@
           "end": 140.75689222677428
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -2054,7 +2054,7 @@
           "end": 142.27793926349187
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
@@ -2090,7 +2090,7 @@
           "end": 145.1399093457368
         }
       ],
-      "status": "draft",
+      "status": "unsure",
       "anchor": null,
       "note": null,
       "revised": false
