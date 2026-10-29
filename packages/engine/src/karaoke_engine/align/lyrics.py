@@ -7,6 +7,7 @@ lines and keeps each line's text exactly as written, for display.
 """
 
 import re
+import unicodedata
 from dataclasses import dataclass
 
 _HEADER = re.compile(r"^\[([^\]]*)\]$")
@@ -121,3 +122,9 @@ def _expand(sections: list[_Section]) -> list[LyricLine]:
 def _count(match: re.Match[str]) -> int:
     number = next((group for group in match.groups() if group), None)
     return int(number) if number else 2
+
+
+def singer_id(name: str) -> str:
+    """A stable singer id for a name from a section label ("Ana, Brais" → "ana-brais")."""
+    folded = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", folded.lower()).strip("-") or "singer"

@@ -22,7 +22,7 @@ from karaoke_engine.align.activity import vocal_activity
 from karaoke_engine.align.audio import SAMPLE_RATE, load_mono16k
 from karaoke_engine.align.ctc import Segment, align_segments
 from karaoke_engine.align.emissions import EmissionModel, Emissions, Vocab
-from karaoke_engine.align.lyrics import LyricLine, parse_lyrics
+from karaoke_engine.align.lyrics import LyricLine, parse_lyrics, singer_id
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
 from karaoke_engine.align.spoken import spoken
 from karaoke_engine.align.syllables import syllables
@@ -56,7 +56,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "7"
+    version = "8"
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -136,11 +136,13 @@ class LyricsAligner:
             words = self._words(
                 lines[i], tokens[i], path.spans, emissions, column, active, language
             )
+            singer = lines[i].singer
             out.append(
                 Line(
                     id=f"l{len(out) + 1}",
                     start=words[0].start,
                     end=max(word.end for word in words),
+                    singer=singer_id(singer) if singer else None,
                     role="backing" if lines[i].backing else "lead",
                     words=words,
                 )

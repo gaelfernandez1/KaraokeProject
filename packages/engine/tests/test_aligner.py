@@ -207,3 +207,16 @@ def test_model_for_language_names_the_pinned_model() -> None:
         "proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl@"
     )
     assert aligner.model_for_language("eu").startswith("aadel4/omniASR-CTC-300M-v2@")
+
+
+def test_header_singer_reaches_the_line(tmp_path: Path) -> None:
+    from karaoke_engine.align.lyrics import singer_id
+
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = _spell("ola", 20) + _spell("mar", 120)
+
+    lines = _aligner(peaks).align_text(
+        vocals, "[Verso: Ana]\nola\n[Estribillo: Brais]\nmar\n", "gl"
+    )
+
+    assert [line.singer for line in lines] == [singer_id("Ana"), singer_id("Brais")]

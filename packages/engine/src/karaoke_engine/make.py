@@ -23,6 +23,7 @@ from karaoke_contracts import (
     validate_package,
 )
 from karaoke_engine.align.aligner import LyricsAligner
+from karaoke_engine.align.lyrics import parse_lyrics, singer_id
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL
 from karaoke_engine.audio import decode, package_audio, probe
 from karaoke_engine.separation import RoformerSeparator
@@ -70,7 +71,7 @@ def make_package(
         language=language,
         duration=duration,
         audio=refs,
-        singers=[Singer(id="s1")],
+        singers=_singers(lyrics),
         lines=_numbered(lines),
         provenance=Provenance(
             lyrics_source="user",
@@ -100,6 +101,17 @@ def _numbered(lines: list[Line]) -> list[Line]:
         line.model_copy(update={"id": f"l{i + 1}", "singer": line.singer or "s1"})
         for i, line in enumerate(ordered)
     ]
+
+
+def _singers(lyrics: str) -> list[Singer]:
+    """s1 for lines nobody is credited with, then one singer per name in the section labels."""
+    singers = [Singer(id="s1")]
+    seen = {"s1"}
+    for line in parse_lyrics(lyrics):
+        if line.singer and singer_id(line.singer) not in seen:
+            seen.add(singer_id(line.singer))
+            singers.append(Singer(id=singer_id(line.singer), name=line.singer))
+    return singers
 
 
 def _align_model(aligner: Any, language: str) -> str:
