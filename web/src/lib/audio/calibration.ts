@@ -10,6 +10,14 @@ export function clickTimes(start: number, count: number, interval: number, leadI
 	return Array.from({ length: count }, (_, i) => start + leadIn + i * interval);
 }
 
+/**
+ * Seconds between clicks. A tap belongs to the last click before it (allowing for anticipation),
+ * so delays from -ANTICIPATION up to CLICK_INTERVAL - ANTICIPATION can be told apart: enough for
+ * Bluetooth, which can add half a second.
+ */
+export const CLICK_INTERVAL = 1;
+/** How early people tap ahead of a beat they can predict. */
+const ANTICIPATION = 0.15;
 const MIN_TAPS = 4;
 /** Taps further than this from the typical delay are strays. */
 const TOLERANCE = 0.08;
@@ -17,17 +25,15 @@ const TOLERANCE = 0.08;
 const MIN_AGREEMENT = 0.6;
 
 /**
- * Typical delay (seconds) from each click to the tap nearest it, or null when the taps are too
- * few or too scattered to trust. Both lists use the audio clock.
+ * Typical delay (seconds) from each click to the tap that answers it, or null when the taps are
+ * too few or too scattered to trust. Both lists use the audio clock, clicks in order.
  */
 export function estimateLatency(clicks: readonly number[], taps: readonly number[]): number | null {
-	if (clicks.length === 0 || taps.length < MIN_TAPS) return null;
-	const delays = taps.map((tap) => {
-		const nearest = clicks.reduce((best, click) =>
-			Math.abs(tap - click) < Math.abs(tap - best) ? click : best
-		);
-		return tap - nearest;
+	const delays = taps.flatMap((tap) => {
+		const click = clicks.findLast((c) => c <= tap + ANTICIPATION);
+		return click === undefined ? [] : [tap - click];
 	});
+	if (delays.length < MIN_TAPS) return null;
 	const typical = median(delays);
 	const agreeing = delays.filter((delay) => Math.abs(delay - typical) < TOLERANCE);
 	if (agreeing.length < MIN_TAPS || agreeing.length < MIN_AGREEMENT * delays.length) return null;

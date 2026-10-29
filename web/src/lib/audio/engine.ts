@@ -8,13 +8,16 @@ const VOLUME_SMOOTHING = 0.02;
 /** A full octave either way; beyond that voices sound like cartoons. */
 export const MAX_SEMITONES = 12;
 
-/** What the engine needs from a pitch shifter (signalsmith-stretch in live input mode). */
+/**
+ * What the engine needs from a pitch shifter (signalsmith-stretch in live input mode). It runs in
+ * an AudioWorklet, so every call is a message and answers with a promise.
+ */
 export interface PitchNode extends AudioNode {
-	schedule(change: { semitones?: number; formantCompensation?: boolean }): void;
-	start(when?: number): void;
-	stop(when?: number): void;
+	schedule(change: { semitones?: number; formantCompensation?: boolean }): Promise<unknown>;
+	start(when?: number): Promise<unknown>;
+	stop(when?: number): Promise<unknown>;
 	/** Delay it adds, in seconds. */
-	latency(): number;
+	latency(): Promise<number>;
 }
 
 export interface StemUrls {
@@ -60,9 +63,16 @@ export class AudioEngine implements PlaybackClock {
 	#endedListeners: (() => void)[] = [];
 	#manualOffset = 0;
 	#extraLatency = 0;
+	/** Bumped by every play, pause and load: a play that waited for the context checks it. */
+	#playRequest = 0;
+	/** Bumped by every load: only the last one asked for sets the song. */
+	#loadRequest = 0;
 	readonly #createPitchNode: (context: AudioContext) => Promise<PitchNode>;
-	#pitch: Promise<PitchNode> | null = null;
+	#pitch: PitchNode | null = null;
 	#pitchActive = false;
+	#pitchTarget = 0;
+	/** Key changes, one at a time. */
+	#pitchChanges: Promise<void> = Promise.resolve();
 
 	constructor(context: AudioContext, options: EngineOptions = {}) {
 		this.#context = context;
@@ -72,7 +82,7 @@ export class AudioEngine implements PlaybackClock {
 		this.#master.connect(context.destination);
 		this.#vocalGain = context.createGain();
 		this.#vocalGain.connect(this.#master);
-		this.#clock = new SongClock(audioTimeSource(context), 0);
+		this.#clock = this.#newClock(0);
 	}
 
 	get duration(): number {
@@ -97,28 +107,43 @@ export class AudioEngine implements PlaybackClock {
 		return this.#clock.position();
 	}
 
+	/**
+	 * Replaces the song. The old one stops and its buffers go at once (phones are short of
+	 * memory), so while loading, and after a failed load, there is nothing to play. If another
+	 * load starts before this one ends, this one gives way.
+	 */
 	async load(urls: StemUrls): Promise<void> {
-		this.#stopSources();
-		const [instrumental, vocals] = await Promise.all([
-			this.#decode(urls.instrumental),
-			urls.vocals ? this.#decode(urls.vocals).then((b) => this.#toMono(b)) : null
-		]);
-		this.#instrumental = instrumental;
-		this.#vocals = vocals;
-		this.#clock = new SongClock(audioTimeSource(this.#context), instrumental.duration);
-		this.#clock.setManualOffset(this.#manualOffset);
-		this.#clock.setExtraLatency(this.#extraLatency);
+		const request = ++this.#loadRequest;
+		this.pause();
+		this.#instrumental = null;
+		this.#vocals = null;
+		this.#clock = this.#newClock(0);
+		try {
+			const [instrumental, vocals] = await Promise.all([
+				this.#decode(urls.instrumental),
+				urls.vocals ? this.#decode(urls.vocals).then((b) => this.#toMono(b)) : null
+			]);
+			if (request !== this.#loadRequest) return;
+			this.#instrumental = instrumental;
+			this.#vocals = vocals;
+			this.#clock = this.#newClock(instrumental.duration);
+		} catch (error) {
+			if (request === this.#loadRequest) throw error;
+		}
 	}
 
 	async play(): Promise<void> {
 		if (!this.#instrumental || this.playing) return;
+		const request = ++this.#playRequest;
 		// Browsers start the context suspended until the user interacts with the page.
 		if (this.#context.state !== 'running') await this.#context.resume();
-		const from = this.#clock.ended() ? 0 : this.#clock.position();
-		this.#start(from);
+		// A pause, a load or another play may have come while the context woke up.
+		if (request !== this.#playRequest || !this.#instrumental || this.playing) return;
+		this.#start(this.#clock.ended() ? 0 : this.#clock.position());
 	}
 
 	pause(): void {
+		this.#playRequest++;
 		if (!this.playing) return;
 		this.#clock.pause();
 		this.#stopSources();
@@ -152,36 +177,52 @@ export class AudioEngine implements PlaybackClock {
 	 * clock delays the lyrics by the same amount; at 0 it is taken out of the path altogether.
 	 */
 	async setPitch(semitones: number): Promise<void> {
-		const value = Math.min(Math.max(semitones, -MAX_SEMITONES), MAX_SEMITONES);
-		if (value === 0) {
-			if (this.#pitchActive && this.#pitch) {
-				const node = await this.#pitch;
-				this.#master.disconnect();
-				this.#master.connect(this.#context.destination);
-				node.stop();
-				this.#pitchActive = false;
-			}
-			this.#setExtraLatency(0);
-			return;
-		}
-		this.#pitch ??= this.#createPitchNode(this.#context).then((node) => {
-			node.connect(this.#context.destination);
-			return node;
-		});
-		const node = await this.#pitch;
-		// Formant compensation keeps the shifted guide vocals from sounding like a chipmunk.
-		node.schedule({ semitones: value, formantCompensation: true });
-		if (!this.#pitchActive) {
-			node.start();
-			this.#master.disconnect();
-			this.#master.connect(node);
-			this.#pitchActive = true;
-		}
-		this.#setExtraLatency(node.latency());
+		this.#pitchTarget = Math.min(Math.max(semitones, -MAX_SEMITONES), MAX_SEMITONES);
+		// One change at a time, each to the latest key asked for, so the last request wins.
+		const change = this.#pitchChanges.then(() => this.#applyPitch());
+		this.#pitchChanges = change.catch(() => {});
+		return change;
 	}
 
 	onEnded(listener: () => void): void {
 		this.#endedListeners.push(listener);
+	}
+
+	async #applyPitch(): Promise<void> {
+		const semitones = this.#pitchTarget;
+		if (semitones === 0) {
+			if (this.#pitch && this.#pitchActive) {
+				this.#master.disconnect();
+				this.#master.connect(this.#context.destination);
+				this.#pitchActive = false;
+				await this.#pitch.stop();
+			}
+			this.#setExtraLatency(0);
+			return;
+		}
+		// Left null if it fails (no AudioWorklet outside HTTPS), so the next change tries again.
+		if (!this.#pitch) {
+			const created = await this.#createPitchNode(this.#context);
+			created.connect(this.#context.destination);
+			this.#pitch = created;
+		}
+		const node = this.#pitch;
+		// Formant compensation keeps the shifted guide vocals from sounding like a chipmunk.
+		await node.schedule({ semitones, formantCompensation: true });
+		if (!this.#pitchActive) {
+			await node.start();
+			this.#master.disconnect();
+			this.#master.connect(node);
+			this.#pitchActive = true;
+		}
+		this.#setExtraLatency(await node.latency());
+	}
+
+	#newClock(duration: number): SongClock {
+		const clock = new SongClock(audioTimeSource(this.#context), duration);
+		clock.setManualOffset(this.#manualOffset);
+		clock.setExtraLatency(this.#extraLatency);
+		return clock;
 	}
 
 	#setExtraLatency(seconds: number): void {
@@ -190,6 +231,7 @@ export class AudioEngine implements PlaybackClock {
 	}
 
 	#start(from: number): void {
+		this.#stopSources();
 		const at = this.#context.currentTime + START_DELAY;
 		const stems: [AudioBuffer | null, AudioNode][] = [
 			[this.#instrumental, this.#master],

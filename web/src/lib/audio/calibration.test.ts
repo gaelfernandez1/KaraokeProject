@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clickTimes, estimateLatency, manualOffset } from './calibration';
+import { CLICK_INTERVAL, clickTimes, estimateLatency, manualOffset } from './calibration';
 
 describe('clickTimes', () => {
 	it('schedules evenly spaced clicks after a lead-in', () => {
@@ -22,6 +22,19 @@ describe('estimateLatency', () => {
 		expect(estimateLatency(clicks, taps)).toBeCloseTo(-0.05, 6);
 	});
 
+	it('measures a Bluetooth delay longer than half the click spacing', () => {
+		const taps = clicks.map((c) => c + 0.4);
+
+		expect(estimateLatency(clicks, taps)).toBeCloseTo(0.4, 6);
+	});
+
+	it('measures delays up to the click spacing minus the anticipation', () => {
+		const slow = clickTimes(0, 8, CLICK_INTERVAL, 0);
+		const taps = slow.map((c) => c + 0.7);
+
+		expect(estimateLatency(slow, taps)).toBeCloseTo(0.7, 6);
+	});
+
 	it('ignores stray taps and double taps', () => {
 		const taps = [...clicks.map((c) => c + 0.2), 3.0, 0.21];
 
@@ -33,7 +46,8 @@ describe('estimateLatency', () => {
 	});
 
 	it('gives up when the taps do not follow the clicks', () => {
-		const taps = [0.05, 0.9, 1.0, 2.6, 2.7, 4.4];
+		// 0, 0.25, 0.4, 0.1, 0.35 and 0.2 s after their clicks: no delay is typical.
+		const taps = [0.0, 0.85, 1.6, 1.9, 2.75, 3.2];
 
 		expect(estimateLatency(clicks, taps)).toBeNull();
 	});
