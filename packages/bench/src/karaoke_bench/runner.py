@@ -211,8 +211,10 @@ def _run_steps(
             if text_aligner and state.lines_in:
                 state.lyrics_text = "\n".join(state.lines_in)
 
+    # Grouped by language, so an aligner with a model per language loads each one once.
     live = [s for s in states if s.error is None and s.lines_in]
     args = {s.song.song_id: _aligner_args(s) for s in live}
+    live.sort(key=lambda s: args[s.song.song_id]["language"])
     outcome = stages["aligner"] = _stage(pipeline, "aligner", live, args, paths, cache)
     for state in live:
         state.aligned = _take(state, "aligner", outcome)
