@@ -233,3 +233,15 @@ def test_summary_groups_by_group_when_present(
     assert set(results.summary) == {"all", "gap", "echo"}
     assert results.summary["gap"].songs == 1
     assert {song.group for song in results.songs} == {"gap", "echo"}
+
+
+def test_report_flags_words_outside_the_voice(paths: BenchPaths) -> None:
+    # The smoke aligner spreads the words over the whole song, breaks included.
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    results = load_results(out / "results.json")
+    [song] = results.songs
+    assert song.outside_voice is not None
+    assert song.outside_voice > 0.1
+    assert results.summary["all"].outside_voice == pytest.approx(song.outside_voice)
+    assert "Fuera de voz" in (out / "report.md").read_text(encoding="utf-8")

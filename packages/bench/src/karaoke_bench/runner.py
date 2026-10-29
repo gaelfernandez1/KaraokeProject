@@ -18,8 +18,9 @@ from statistics import median
 from typing import Any
 
 from karaoke_bench import __version__
-from karaoke_bench.audio import duration, file_sha256
+from karaoke_bench.audio import SAMPLE_RATE, duration, file_sha256, load_mono16k
 from karaoke_bench.cache import cache_key
+from karaoke_bench.checks import low_confidence, outside_voice
 from karaoke_bench.codec import encode_output
 from karaoke_bench.files import write_text_atomic
 from karaoke_bench.metrics import (
@@ -39,10 +40,12 @@ from karaoke_bench.sets import SetError, Song, load_set
 from karaoke_bench.stage import ItemOutcome, StageItem, StageOutcome, run_stage
 from karaoke_bench.textnorm import NORMALIZATION_VERSION, lyrics_lines
 from karaoke_contracts import Line
+from karaoke_engine.align.activity import vocal_activity
 from karaoke_engine.steps import Stems, Transcript
 
 # Aligners may overshoot the end of the audio slightly; more than this is a bug.
 _END_SLACK = 0.5
+_HOP = 0.02
 _PACKAGES = ("torch", "transformers", "faster-whisper", "ctranslate2", "demucs", "numpy", "jiwer")
 
 
@@ -294,9 +297,13 @@ def _score(
     if problem:
         result.error = f"aligner: {problem}"
         return result
+    words = [word for line in state.aligned for word in line.words]
+    if state.vocals is not None:
+        active = vocal_activity(load_mono16k(state.vocals), SAMPLE_RATE, _HOP)
+        result.outside_voice = outside_voice(words, active, _HOP)
+    result.low_confidence = low_confidence(words)
     # A draft nobody has finished checking by ear is not a reference yet.
     if ref is not None and result.reference_validated is not False:
-        words = [word for line in state.aligned for word in line.words]
         scored = ref.scored_words()
         timing[song.song_id] = timing_errors(pair_words(scored, words), len(scored))
         result.timing = timing_stats([timing[song.song_id]])
