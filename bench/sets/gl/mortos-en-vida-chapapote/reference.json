@@ -1,0 +1,2099 @@
+{
+  "song_id": "mortos-en-vida-chapapote",
+  "language": "gl",
+  "duration": 162.431791,
+  "timing": "semiautomatic",
+  "approved": false,
+  "lines": [
+    {
+      "text": "Unha vez máis,",
+      "start": 1.0207026167447018,
+      "end": 1.5410608135165107,
+      "words": [
+        {
+          "text": "Unha",
+          "start": 1.0207026167447018,
+          "end": 1.1207715007392804
+        },
+        {
+          "text": "vez",
+          "start": 1.1808128311360275,
+          "end": 1.2808817151306062
+        },
+        {
+          "text": "máis,",
+          "start": 1.360936822326269,
+          "end": 1.5410608135165107
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "temos que lamentar o donar das de mareas negras.",
+      "start": 1.6411296975110892,
+      "end": 4.282948234967964,
+      "words": [
+        {
+          "text": "temos",
+          "start": 1.6411296975110892,
+          "end": 1.8412674655002466
+        },
+        {
+          "text": "que",
+          "start": 1.9013087958969936,
+          "end": 1.9613501262937407
+        },
+        {
+          "text": "lamentar",
+          "start": 2.021391456690488,
+          "end": 2.4817083230655497
+        },
+        {
+          "text": "o",
+          "start": 2.861970082244948,
+          "end": 2.881983859043864
+        },
+        {
+          "text": "donar",
+          "start": 2.962038966239527,
+          "end": 3.2022042878265156
+        },
+        {
+          "text": "das",
+          "start": 3.242231841424347,
+          "end": 3.3222869486200097
+        },
+        {
+          "text": "de",
+          "start": 3.362314502217841,
+          "end": 3.4223558326145884
+        },
+        {
+          "text": "mareas",
+          "start": 3.46238338621242,
+          "end": 3.8026175917939873
+        },
+        {
+          "text": "negras.",
+          "start": 3.902686475788566,
+          "end": 4.282948234967964
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Mundo o carliro vertido pola prescindio,",
+      "start": 4.763278878141942,
+      "end": 6.404408575653031,
+      "words": [
+        {
+          "text": "Mundo",
+          "start": 4.763278878141942,
+          "end": 4.943402869332183
+        },
+        {
+          "text": "o",
+          "start": 4.983430422930015,
+          "end": 5.00344419972893
+        },
+        {
+          "text": "carliro",
+          "start": 5.043471753326762,
+          "end": 5.403719735707245
+        },
+        {
+          "text": "vertido",
+          "start": 5.463761066103992,
+          "end": 5.763967718087728
+        },
+        {
+          "text": "pola",
+          "start": 5.824009048484475,
+          "end": 5.964105486076885
+        },
+        {
+          "text": "prescindio,",
+          "start": 6.024146816473633,
+          "end": 6.404408575653031
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "ameaza xa como solapada ao entornal das costas galegas,",
+      "start": 6.524491236446526,
+      "end": 9.12628222030557,
+      "words": [
+        {
+          "text": "ameaza",
+          "start": 6.524491236446526,
+          "end": 6.884739218827009
+        },
+        {
+          "text": "xa",
+          "start": 6.9647943260226715,
+          "end": 7.06486321001725
+        },
+        {
+          "text": "como",
+          "start": 7.1449183172129125,
+          "end": 7.305028531604239
+        },
+        {
+          "text": "solapada",
+          "start": 7.365069862000986,
+          "end": 7.745331621180385
+        },
+        {
+          "text": "ao",
+          "start": 7.7653453979793,
+          "end": 7.805372951577132
+        },
+        {
+          "text": "entornal",
+          "start": 7.845400505174963,
+          "end": 8.145607157158699
+        },
+        {
+          "text": "das",
+          "start": 8.225662264354362,
+          "end": 8.32573114834894
+        },
+        {
+          "text": "costas",
+          "start": 8.385772478745688,
+          "end": 8.726006684327254
+        },
+        {
+          "text": "galegas,",
+          "start": 8.786048014724003,
+          "end": 9.12628222030557
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "pesca pechas todas as rías,",
+      "start": 9.906819515463283,
+      "end": 11.147673676996057,
+      "words": [
+        {
+          "text": "pesca",
+          "start": 9.906819515463283,
+          "end": 10.187012390648103
+        },
+        {
+          "text": "pechas",
+          "start": 10.307095051441596,
+          "end": 10.52724659622967
+        },
+        {
+          "text": "todas",
+          "start": 10.587287926626416,
+          "end": 10.76741191781666
+        },
+        {
+          "text": "as",
+          "start": 10.827453248213406,
+          "end": 10.867480801811237
+        },
+        {
+          "text": "rías,",
+          "start": 10.927522132207985,
+          "end": 11.147673676996057
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "a descoordinación de total,",
+      "start": 11.347811444985215,
+      "end": 12.408541615327747,
+      "words": [
+        {
+          "text": "a",
+          "start": 11.347811444985215,
+          "end": 11.36782522178413
+        },
+        {
+          "text": "descoordinación",
+          "start": 11.387838998583046,
+          "end": 12.06830740974618
+        },
+        {
+          "text": "de",
+          "start": 12.108334963344012,
+          "end": 12.16837629374076
+        },
+        {
+          "text": "total,",
+          "start": 12.228417624137506,
+          "end": 12.408541615327747
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "os sindicatos son os dazos,",
+      "start": 12.488596722523411,
+      "end": 13.509299339268113,
+      "words": [
+        {
+          "text": "os",
+          "start": 12.488596722523411,
+          "end": 12.528624276121242
+        },
+        {
+          "text": "sindicatos",
+          "start": 12.568651829719073,
+          "end": 12.988941142496303
+        },
+        {
+          "text": "son",
+          "start": 13.008954919295219,
+          "end": 13.109023803289798
+        },
+        {
+          "text": "os",
+          "start": 13.169065133686546,
+          "end": 13.229106464083292
+        },
+        {
+          "text": "dazos,",
+          "start": 13.269134017681123,
+          "end": 13.509299339268113
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "pero as duras non chegan,",
+      "start": 13.529313116067028,
+      "end": 14.449946848817152,
+      "words": [
+        {
+          "text": "pero",
+          "start": 13.529313116067028,
+          "end": 13.609368223262692
+        },
+        {
+          "text": "as",
+          "start": 13.70943710725727,
+          "end": 13.769478437654017
+        },
+        {
+          "text": "duras",
+          "start": 13.789492214452933,
+          "end": 13.969616205643174
+        },
+        {
+          "text": "non",
+          "start": 14.009643759241005,
+          "end": 14.149740196833415
+        },
+        {
+          "text": "chegan,",
+          "start": 14.209781527230163,
+          "end": 14.449946848817152
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "o puro goberno nega todo o coñece vento.",
+      "start": 14.770167277599803,
+      "end": 16.491352082306555,
+      "words": [
+        {
+          "text": "o",
+          "start": 14.770167277599803,
+          "end": 14.790181054398719
+        },
+        {
+          "text": "puro",
+          "start": 14.83020860799655,
+          "end": 14.990318822387875
+        },
+        {
+          "text": "goberno",
+          "start": 15.050360152784624,
+          "end": 15.330553027969444
+        },
+        {
+          "text": "nega",
+          "start": 15.430621911964021,
+          "end": 15.590732126355348
+        },
+        {
+          "text": "todo",
+          "start": 15.67078723355101,
+          "end": 15.81088367114342
+        },
+        {
+          "text": "o",
+          "start": 15.850911224741251,
+          "end": 15.870925001540169
+        },
+        {
+          "text": "coñece",
+          "start": 15.95098010873583,
+          "end": 16.23117298392065
+        },
+        {
+          "text": "vento.",
+          "start": 16.251186760719566,
+          "end": 16.491352082306555
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Puñanos danos.",
+      "start": 17.131792939871858,
+      "end": 20.053804352513552,
+      "words": [
+        {
+          "text": "Puñanos",
+          "start": 17.131792939871858,
+          "end": 19.053115512567768
+        },
+        {
+          "text": "danos.",
+          "start": 19.753597700529816,
+          "end": 20.053804352513552
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Nos mariñeiros que tiran saílo entón ao",
+      "start": 20.714258986877773,
+      "end": 22.355388684388863,
+      "words": [
+        {
+          "text": "Nos",
+          "start": 20.714258986877773,
+          "end": 20.834341647671266
+        },
+        {
+          "text": "mariñeiros",
+          "start": 20.874369201269097,
+          "end": 21.254630960448498
+        },
+        {
+          "text": "que",
+          "start": 21.314672290845245,
+          "end": 21.37471362124199
+        },
+        {
+          "text": "tiran",
+          "start": 21.414741174839822,
+          "end": 21.61487894282898
+        },
+        {
+          "text": "saílo",
+          "start": 21.694934050024642,
+          "end": 21.915085594812716
+        },
+        {
+          "text": "entón",
+          "start": 21.975126925209462,
+          "end": 22.21529224679645
+        },
+        {
+          "text": "ao",
+          "start": 22.295347353992113,
+          "end": 22.355388684388863
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "encontro no Chavapoque nas súas demarcacións,",
+      "start": 22.395416237986694,
+      "end": 24.296725033883686,
+      "words": [
+        {
+          "text": "encontro",
+          "start": 22.395416237986694,
+          "end": 22.755664220367176
+        },
+        {
+          "text": "no",
+          "start": 22.795691773965007,
+          "end": 22.855733104361754
+        },
+        {
+          "text": "Chavapoque",
+          "start": 22.915774434758504,
+          "end": 23.39610507793248
+        },
+        {
+          "text": "nas",
+          "start": 23.43613263153031,
+          "end": 23.53620151552489
+        },
+        {
+          "text": "súas",
+          "start": 23.556215292323806,
+          "end": 23.71632550671513
+        },
+        {
+          "text": "demarcacións,",
+          "start": 23.75635306031296,
+          "end": 24.296725033883686
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "mentres que pai o goberno,",
+      "start": 24.436821471476097,
+      "end": 25.697689409807786,
+      "words": [
+        {
+          "text": "mentres",
+          "start": 24.436821471476097,
+          "end": 24.83709700745441
+        },
+        {
+          "text": "que",
+          "start": 24.87712456105224,
+          "end": 24.93716589144899
+        },
+        {
+          "text": "pai",
+          "start": 25.057248552242484,
+          "end": 25.21735876663381
+        },
+        {
+          "text": "o",
+          "start": 25.277400097030558,
+          "end": 25.297413873829473
+        },
+        {
+          "text": "goberno,",
+          "start": 25.377468981025135,
+          "end": 25.697689409807786
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "cunha que todo o levaba en cansa feria.",
+      "start": 26.037923615389353,
+      "end": 27.47891554491129,
+      "words": [
+        {
+          "text": "cunha",
+          "start": 26.037923615389353,
+          "end": 26.258075160177427
+        },
+        {
+          "text": "que",
+          "start": 26.318116490574173,
+          "end": 26.39817159776984
+        },
+        {
+          "text": "todo",
+          "start": 26.458212928166585,
+          "end": 26.638336919356828
+        },
+        {
+          "text": "o",
+          "start": 26.698378249753574,
+          "end": 26.71839202655249
+        },
+        {
+          "text": "levaba",
+          "start": 26.738405803351405,
+          "end": 26.878502240943813
+        },
+        {
+          "text": "en",
+          "start": 26.95855734813948,
+          "end": 27.018598678536225
+        },
+        {
+          "text": "cansa",
+          "start": 27.03861245533514,
+          "end": 27.17870889292755
+        },
+        {
+          "text": "feria.",
+          "start": 27.198722669726468,
+          "end": 27.47891554491129
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Non te dices, volve arrelo.",
+      "start": 28.03930129528093,
+      "end": 29.640403439194184,
+      "words": [
+        {
+          "text": "Non",
+          "start": 28.03930129528093,
+          "end": 28.259452840069
+        },
+        {
+          "text": "te",
+          "start": 28.339507947264664,
+          "end": 28.419563054460326
+        },
+        {
+          "text": "dices,",
+          "start": 28.459590608058157,
+          "end": 28.81983859043864
+        },
+        {
+          "text": "volve",
+          "start": 28.85986614403647,
+          "end": 29.14005901922129
+        },
+        {
+          "text": "arrelo.",
+          "start": 29.320183010411533,
+          "end": 29.640403439194184
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Non te dices, volve arrelo.",
+      "start": 29.720458546389846,
+      "end": 31.30154691350419,
+      "words": [
+        {
+          "text": "Non",
+          "start": 29.720458546389846,
+          "end": 29.840541207183342
+        },
+        {
+          "text": "te",
+          "start": 29.860554983982258,
+          "end": 29.920596314379004
+        },
+        {
+          "text": "dices,",
+          "start": 30.02066519837358,
+          "end": 30.46096828794973
+        },
+        {
+          "text": "volve",
+          "start": 30.60106472554214,
+          "end": 31.0613815919172
+        },
+        {
+          "text": "arrelo.",
+          "start": 31.121422922313947,
+          "end": 31.30154691350419
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Non te dices, volve arrelo. Galicia, seime. Unha nova",
+      "start": 31.38160202069985,
+      "end": 33.56310369178166,
+      "words": [
+        {
+          "text": "Non",
+          "start": 31.38160202069985,
+          "end": 31.521698458292263
+        },
+        {
+          "text": "te",
+          "start": 31.66179489588467,
+          "end": 31.741850003080337
+        },
+        {
+          "text": "dices,",
+          "start": 31.781877556678168,
+          "end": 32.122111762259735
+        },
+        {
+          "text": "volve",
+          "start": 32.24219442305323,
+          "end": 32.4623459678413
+        },
+        {
+          "text": "arrelo.",
+          "start": 32.50237352143913,
+          "end": 32.722525066227206
+        },
+        {
+          "text": "Galicia,",
+          "start": 32.80258017342287,
+          "end": 33.00271794141202
+        },
+        {
+          "text": "seime.",
+          "start": 33.06275927180877,
+          "end": 33.222869486200096
+        },
+        {
+          "text": "Unha",
+          "start": 33.242883262999015,
+          "end": 33.342952146993596
+        },
+        {
+          "text": "nova",
+          "start": 33.36296592379251,
+          "end": 33.56310369178166
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Unha nova mensaxe,",
+      "start": 33.58311746858058,
+      "end": 34.20354454934697,
+      "words": [
+        {
+          "text": "Unha",
+          "start": 33.58311746858058,
+          "end": 33.743227682971906
+        },
+        {
+          "text": "nova",
+          "start": 33.763241459770825,
+          "end": 33.84329656696649
+        },
+        {
+          "text": "mensaxe,",
+          "start": 33.8633103437654,
+          "end": 34.20354454934697
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "unha nova mensaxe,",
+      "start": 34.48373742453179,
+      "end": 35.74460536286348,
+      "words": [
+        {
+          "text": "unha",
+          "start": 34.48373742453179,
+          "end": 34.64384763892311
+        },
+        {
+          "text": "nova",
+          "start": 34.76393029971661,
+          "end": 35.06413695170035
+        },
+        {
+          "text": "mensaxe,",
+          "start": 35.32431605008625,
+          "end": 35.74460536286348
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "unha nova mensaxe,",
+      "start": 36.18490845243963,
+      "end": 37.32569372997782,
+      "words": [
+        {
+          "text": "unha",
+          "start": 36.18490845243963,
+          "end": 36.34501866683095
+        },
+        {
+          "text": "nova",
+          "start": 36.445087550825534,
+          "end": 36.68525287241252
+        },
+        {
+          "text": "mensaxe,",
+          "start": 36.82534931000493,
+          "end": 37.32569372997782
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "unha nova mensaxe, unha nova! Despoisables,",
+      "start": 37.86606570354855,
+      "end": 41.748738402538194,
+      "words": [
+        {
+          "text": "unha",
+          "start": 37.86606570354855,
+          "end": 38.006162141140955
+        },
+        {
+          "text": "nova",
+          "start": 38.106231025135536,
+          "end": 38.38642390032035
+        },
+        {
+          "text": "mensaxe,",
+          "start": 38.666616775505176,
+          "end": 39.06689231148349
+        },
+        {
+          "text": "unha",
+          "start": 39.50719540105963,
+          "end": 39.667305615450964
+        },
+        {
+          "text": "nova!",
+          "start": 39.78738827624446,
+          "end": 40.06758115142927
+        },
+        {
+          "text": "Despoisables,",
+          "start": 41.00822866097832,
+          "end": 41.748738402538194
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "megan a verdade,",
+      "start": 42.18904149211434,
+      "end": 43.1497027784623,
+      "words": [
+        {
+          "text": "megan",
+          "start": 42.18904149211434,
+          "end": 42.509261920896996
+        },
+        {
+          "text": "a",
+          "start": 42.6493583584894,
+          "end": 42.66937213528832
+        },
+        {
+          "text": "verdade,",
+          "start": 42.74942724248398,
+          "end": 43.1497027784623
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "falan e falan,",
+      "start": 43.910226296821094,
+      "end": 45.3111906727452,
+      "words": [
+        {
+          "text": "falan",
+          "start": 43.910226296821094,
+          "end": 44.27047427920158
+        },
+        {
+          "text": "e",
+          "start": 44.37054316319615,
+          "end": 44.39055693999507
+        },
+        {
+          "text": "falan,",
+          "start": 44.550667154386396,
+          "end": 45.3111906727452
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "que lle estean o día pasado.",
+      "start": 45.691452431924596,
+      "end": 47.892967879805326,
+      "words": [
+        {
+          "text": "que",
+          "start": 45.691452431924596,
+          "end": 45.77150753912026
+        },
+        {
+          "text": "lle",
+          "start": 45.91160397671267,
+          "end": 46.03168663750616
+        },
+        {
+          "text": "estean",
+          "start": 46.13175552150074,
+          "end": 46.712155048669295
+        },
+        {
+          "text": "o",
+          "start": 47.212499468642186,
+          "end": 47.232513245441105
+        },
+        {
+          "text": "día",
+          "start": 47.31256835263677,
+          "end": 47.45266479022918
+        },
+        {
+          "text": "pasado.",
+          "start": 47.53271989742484,
+          "end": 47.892967879805326
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Está moi manipulado nun chamar",
+      "start": 48.01305054059882,
+      "end": 52.77632941874076,
+      "words": [
+        {
+          "text": "Está",
+          "start": 48.01305054059882,
+          "end": 48.393312299778216
+        },
+        {
+          "text": "moi",
+          "start": 48.51339496057171,
+          "end": 48.6334776213652
+        },
+        {
+          "text": "manipulado",
+          "start": 48.73354650535978,
+          "end": 49.7742628989034
+        },
+        {
+          "text": "nun",
+          "start": 50.33464864927304,
+          "end": 50.554800194061116
+        },
+        {
+          "text": "chamar",
+          "start": 50.71491040845244,
+          "end": 52.77632941874076
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Volve, volve á realidade, volve, volve á realidade, volve.",
+      "start": 53.37674272270823,
+      "end": 61.282184558279944,
+      "words": [
+        {
+          "text": "Volve,",
+          "start": 53.37674272270823,
+          "end": 53.87708714268113
+        },
+        {
+          "text": "volve",
+          "start": 54.99785864342041,
+          "end": 55.29806529540414
+        },
+        {
+          "text": "á",
+          "start": 55.338092849001974,
+          "end": 55.358106625800886
+        },
+        {
+          "text": "realidade,",
+          "start": 55.378120402599805,
+          "end": 55.978533706567276
+        },
+        {
+          "text": "volve,",
+          "start": 56.63898834093149,
+          "end": 57.1593465377033
+        },
+        {
+          "text": "volve",
+          "start": 58.16003537764909,
+          "end": 58.40020069923608
+        },
+        {
+          "text": "á",
+          "start": 58.52028336002957,
+          "end": 58.540297136828485
+        },
+        {
+          "text": "realidade,",
+          "start": 58.580324690426316,
+          "end": 59.3208344319862
+        },
+        {
+          "text": "volve.",
+          "start": 60.30150949513307,
+          "end": 61.282184558279944
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Ponme a realidade, ponme a realidade, non podemos afincar",
+      "start": 61.4823223262691,
+      "end": 67.40640025874815,
+      "words": [
+        {
+          "text": "Ponme",
+          "start": 61.4823223262691,
+          "end": 61.922625415845246
+        },
+        {
+          "text": "a",
+          "start": 61.98266674624199,
+          "end": 62.00268052304091
+        },
+        {
+          "text": "realidade,",
+          "start": 62.02269429983982,
+          "end": 62.74319026460079
+        },
+        {
+          "text": "ponme",
+          "start": 63.28356223817151,
+          "end": 63.78390665814441
+        },
+        {
+          "text": "a",
+          "start": 64.18418219412273,
+          "end": 64.20419597092163
+        },
+        {
+          "text": "realidade,",
+          "start": 65.06478837327501,
+          "end": 65.88535322203056
+        },
+        {
+          "text": "non",
+          "start": 66.04546343642188,
+          "end": 66.22558742761213
+        },
+        {
+          "text": "podemos",
+          "start": 66.3256563116067,
+          "end": 66.84601450837852
+        },
+        {
+          "text": "afincar",
+          "start": 66.86602828517742,
+          "end": 67.40640025874815
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Nunca máis na beiriña do mar,",
+      "start": 67.76664824112864,
+      "end": 69.80805347461803,
+      "words": [
+        {
+          "text": "Nunca",
+          "start": 67.76664824112864,
+          "end": 68.04684111631346
+        },
+        {
+          "text": "máis",
+          "start": 68.18693755390586,
+          "end": 68.44711665229177
+        },
+        {
+          "text": "na",
+          "start": 68.60722686668309,
+          "end": 68.70729575067767
+        },
+        {
+          "text": "beiriña",
+          "start": 68.78735085787334,
+          "end": 69.28769527784623
+        },
+        {
+          "text": "do",
+          "start": 69.3877641618408,
+          "end": 69.46781926903647
+        },
+        {
+          "text": "mar,",
+          "start": 69.58790192982997,
+          "end": 69.80805347461803
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "as esperas dunha nova mensaxe,",
+      "start": 70.24835656419418,
+      "end": 72.22972046728684,
+      "words": [
+        {
+          "text": "as",
+          "start": 70.24835656419418,
+          "end": 70.32841167138984
+        },
+        {
+          "text": "esperas",
+          "start": 70.42848055538443,
+          "end": 70.86878364496057
+        },
+        {
+          "text": "dunha",
+          "start": 70.96885252895515,
+          "end": 71.22903162734106
+        },
+        {
+          "text": "nova",
+          "start": 71.34911428813454,
+          "end": 71.62930716331937
+        },
+        {
+          "text": "mensaxe,",
+          "start": 71.74938982411287,
+          "end": 72.22972046728684
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "as espreitas dunha nova linguaxe,",
+      "start": 72.65000978006407,
+      "end": 74.63137368315672,
+      "words": [
+        {
+          "text": "as",
+          "start": 72.65000978006407,
+          "end": 72.71005111046082
+        },
+        {
+          "text": "espreitas",
+          "start": 72.81011999445539,
+          "end": 73.3304781912272
+        },
+        {
+          "text": "dunha",
+          "start": 73.41053329842286,
+          "end": 73.63068484321094
+        },
+        {
+          "text": "nova",
+          "start": 73.77078128080335,
+          "end": 74.01094660239035
+        },
+        {
+          "text": "linguaxe,",
+          "start": 74.15104303998275,
+          "end": 74.63137368315672
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "as esperas dunha nova viaxe.",
+      "start": 75.05166299593395,
+      "end": 77.05304067582553,
+      "words": [
+        {
+          "text": "as",
+          "start": 75.05166299593395,
+          "end": 75.13171810312961
+        },
+        {
+          "text": "esperas",
+          "start": 75.2317869871242,
+          "end": 75.67209007670034
+        },
+        {
+          "text": "dunha",
+          "start": 75.752145183896,
+          "end": 76.01232428228191
+        },
+        {
+          "text": "nova",
+          "start": 76.15242071987433,
+          "end": 76.41259981826023
+        },
+        {
+          "text": "viaxe.",
+          "start": 76.59272380945048,
+          "end": 77.05304067582553
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Para voltar,",
+      "start": 77.41328865820601,
+      "end": 78.0337157389724,
+      "words": [
+        {
+          "text": "Para",
+          "start": 77.41328865820601,
+          "end": 77.55338509579842
+        },
+        {
+          "text": "voltar,",
+          "start": 77.63344020299408,
+          "end": 78.0337157389724
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "recordar retornar no tempo atrás,",
+      "start": 78.23385350696155,
+      "end": 81.05579603560868,
+      "words": [
+        {
+          "text": "recordar",
+          "start": 78.23385350696155,
+          "end": 78.77422548053228
+        },
+        {
+          "text": "retornar",
+          "start": 79.0544183557171,
+          "end": 79.65483165968458
+        },
+        {
+          "text": "no",
+          "start": 79.89499698127156,
+          "end": 79.9550383116683
+        },
+        {
+          "text": "tempo",
+          "start": 80.09513474926072,
+          "end": 80.53543783883687
+        },
+        {
+          "text": "atrás,",
+          "start": 80.63550672283145,
+          "end": 81.05579603560868
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "e o mal feito xa está,",
+      "start": 81.0958235892065,
+      "end": 82.71693950991867,
+      "words": [
+        {
+          "text": "e",
+          "start": 81.0958235892065,
+          "end": 81.11583736600542
+        },
+        {
+          "text": "o",
+          "start": 81.51611290198373,
+          "end": 81.53612667878265
+        },
+        {
+          "text": "mal",
+          "start": 81.63619556277723,
+          "end": 81.81631955396747
+        },
+        {
+          "text": "feito",
+          "start": 81.99644354515772,
+          "end": 82.2366088667447
+        },
+        {
+          "text": "xa",
+          "start": 82.39671908113603,
+          "end": 82.49678796513061
+        },
+        {
+          "text": "está,",
+          "start": 82.55682929552735,
+          "end": 82.71693950991867
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "e quen o vai a limpar,",
+      "start": 83.117215045897,
+      "end": 84.45813809142435,
+      "words": [
+        {
+          "text": "e",
+          "start": 83.117215045897,
+          "end": 83.13722882269592
+        },
+        {
+          "text": "quen",
+          "start": 83.23729770669048,
+          "end": 83.43743547467965
+        },
+        {
+          "text": "o",
+          "start": 83.55751813547315,
+          "end": 83.57753191227205
+        },
+        {
+          "text": "vai",
+          "start": 83.63757324266881,
+          "end": 83.7576559034623
+        },
+        {
+          "text": "a",
+          "start": 83.91776611785362,
+          "end": 83.93777989465254
+        },
+        {
+          "text": "limpar,",
+          "start": 84.0178350018482,
+          "end": 84.45813809142435
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "o chapapote do mar,",
+      "start": 84.79837229700591,
+      "end": 86.13929534253327,
+      "words": [
+        {
+          "text": "o",
+          "start": 84.79837229700591,
+          "end": 84.81838607380483
+        },
+        {
+          "text": "chapapote",
+          "start": 84.91845495779941,
+          "end": 85.61893714576146
+        },
+        {
+          "text": "do",
+          "start": 85.75903358335387,
+          "end": 85.83908869054953
+        },
+        {
+          "text": "mar,",
+          "start": 85.93915757454411,
+          "end": 86.13929534253327
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "incompetencia en xeral,",
+      "start": 86.47952954811484,
+      "end": 87.82045259364219,
+      "words": [
+        {
+          "text": "incompetencia",
+          "start": 86.47952954811484,
+          "end": 87.26006684327255
+        },
+        {
+          "text": "en",
+          "start": 87.36013572726712,
+          "end": 87.42017705766388
+        },
+        {
+          "text": "xeral,",
+          "start": 87.52024594165846,
+          "end": 87.82045259364219
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "só non traianos os xornais,",
+      "start": 88.18070057602267,
+      "end": 89.3615134071587,
+      "words": [
+        {
+          "text": "só",
+          "start": 88.18070057602267,
+          "end": 88.26075568321833
+        },
+        {
+          "text": "non",
+          "start": 88.36082456721292,
+          "end": 88.50092100480532
+        },
+        {
+          "text": "traianos",
+          "start": 88.56096233520208,
+          "end": 88.80112765678906
+        },
+        {
+          "text": "os",
+          "start": 88.88118276398473,
+          "end": 88.92121031758255
+        },
+        {
+          "text": "xornais,",
+          "start": 88.9812516479793,
+          "end": 89.3615134071587
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "pachar de medra, paténdoo.",
+      "start": 89.6216925055446,
+      "end": 91.40291864064811,
+      "words": [
+        {
+          "text": "pachar",
+          "start": 89.6216925055446,
+          "end": 89.94191293432725
+        },
+        {
+          "text": "de",
+          "start": 90.001954264724,
+          "end": 90.08200937191967
+        },
+        {
+          "text": "medra,",
+          "start": 90.16206447911533,
+          "end": 90.44225735430015
+        },
+        {
+          "text": "paténdoo.",
+          "start": 90.86254666707738,
+          "end": 91.40291864064811
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Política carroñeira, Vigueo, todo é mongoleo, Petro Leijos.",
+      "start": 91.80319417662642,
+      "end": 98.76798850264909,
+      "words": [
+        {
+          "text": "Política",
+          "start": 91.80319417662642,
+          "end": 92.26351104300149
+        },
+        {
+          "text": "carroñeira,",
+          "start": 92.42362125739281,
+          "end": 93.12410344535486
+        },
+        {
+          "text": "Vigueo,",
+          "start": 93.24418610614835,
+          "end": 93.90464074051256
+        },
+        {
+          "text": "todo",
+          "start": 94.38497138368655,
+          "end": 94.66516425887137
+        },
+        {
+          "text": "é",
+          "start": 94.72520558926811,
+          "end": 94.74521936606703
+        },
+        {
+          "text": "mongoleo,",
+          "start": 94.78524691966486,
+          "end": 95.50574288442583
+        },
+        {
+          "text": "Petro",
+          "start": 96.2262388491868,
+          "end": 96.7465970459586
+        },
+        {
+          "text": "Leijos.",
+          "start": 96.9867623675456,
+          "end": 98.76798850264909
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Chama vento, acodo o bollo engañado, da filla.",
+      "start": 99.60856712820355,
+      "end": 103.47122605039428,
+      "words": [
+        {
+          "text": "Chama",
+          "start": 99.60856712820355,
+          "end": 99.80870489619271
+        },
+        {
+          "text": "vento,",
+          "start": 99.86874622658945,
+          "end": 100.14893910177427
+        },
+        {
+          "text": "acodo",
+          "start": 100.449145753758,
+          "end": 100.82940751293741
+        },
+        {
+          "text": "o",
+          "start": 100.90946262013307,
+          "end": 100.92947639693199
+        },
+        {
+          "text": "bollo",
+          "start": 100.94949017373091,
+          "end": 101.16964171851897
+        },
+        {
+          "text": "engañado,",
+          "start": 101.20966927211681,
+          "end": 101.77005502248645
+        },
+        {
+          "text": "da",
+          "start": 102.55059231764416,
+          "end": 102.67067497843766
+        },
+        {
+          "text": "filla.",
+          "start": 102.93085407682356,
+          "end": 103.47122605039428
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Volve,",
+      "start": 105.61270016787827,
+      "end": 106.13305836465007,
+      "words": [
+        {
+          "text": "Volve,",
+          "start": 105.61270016787827,
+          "end": 106.13305836465007
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "volve á realidade, volve,",
+      "start": 107.29385741898719,
+      "end": 109.45534531327009,
+      "words": [
+        {
+          "text": "volve",
+          "start": 107.29385741898719,
+          "end": 107.57405029417201
+        },
+        {
+          "text": "á",
+          "start": 107.63409162456875,
+          "end": 107.65410540136767
+        },
+        {
+          "text": "realidade,",
+          "start": 107.67411917816659,
+          "end": 108.29454625893297
+        },
+        {
+          "text": "volve,",
+          "start": 108.9550008932972,
+          "end": 109.45534531327009
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "volve á realidade, volve nena, volve nena, volve nena.",
+      "start": 110.61614436760719,
+      "end": 115.13925792416215,
+      "words": [
+        {
+          "text": "volve",
+          "start": 110.61614436760719,
+          "end": 110.91635101959093
+        },
+        {
+          "text": "á",
+          "start": 110.9964061267866,
+          "end": 111.01641990358551
+        },
+        {
+          "text": "realidade,",
+          "start": 111.136502564379,
+          "end": 111.6368469843519
+        },
+        {
+          "text": "volve",
+          "start": 112.25727406511828,
+          "end": 112.99778380667817
+        },
+        {
+          "text": "nena,",
+          "start": 113.11786646747166,
+          "end": 113.39805934265648
+        },
+        {
+          "text": "volve",
+          "start": 113.87838998583047,
+          "end": 114.09854153061853
+        },
+        {
+          "text": "nena,",
+          "start": 114.13856908421636,
+          "end": 114.2986792986077
+        },
+        {
+          "text": "volve",
+          "start": 114.3186930754066,
+          "end": 114.73898238818384
+        },
+        {
+          "text": "nena.",
+          "start": 114.8190374953795,
+          "end": 115.13925792416215
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Pola a realidade non podemos ficar.",
+      "start": 115.59957479053722,
+      "end": 119.7824541415106,
+      "words": [
+        {
+          "text": "Pola",
+          "start": 115.59957479053722,
+          "end": 116.07990543371119
+        },
+        {
+          "text": "a",
+          "start": 116.3400845320971,
+          "end": 116.36009830889601
+        },
+        {
+          "text": "realidade",
+          "start": 116.62027740728192,
+          "end": 118.22137955119517
+        },
+        {
+          "text": "non",
+          "start": 118.58162753357566,
+          "end": 118.70171019436916
+        },
+        {
+          "text": "podemos",
+          "start": 118.78176530156482,
+          "end": 119.26209594473879
+        },
+        {
+          "text": "ficar.",
+          "start": 119.4021923823312,
+          "end": 119.7824541415106
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Nunca máis na beiriña do mar,",
+      "start": 120.18272967748891,
+      "end": 122.32420379497289,
+      "words": [
+        {
+          "text": "Nunca",
+          "start": 120.18272967748891,
+          "end": 120.44290877587481
+        },
+        {
+          "text": "máis",
+          "start": 120.60301899026614,
+          "end": 120.9232394190488
+        },
+        {
+          "text": "na",
+          "start": 121.02330830304338,
+          "end": 121.12337718703795
+        },
+        {
+          "text": "beiriña",
+          "start": 121.22344607103253,
+          "end": 121.76381804460325
+        },
+        {
+          "text": "do",
+          "start": 121.88390070539675,
+          "end": 121.96395581259242
+        },
+        {
+          "text": "mar,",
+          "start": 122.0840384733859,
+          "end": 122.32420379497289
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "as esperas dunha nova mensaxe,",
+      "start": 122.74449310775013,
+      "end": 124.86595344843519,
+      "words": [
+        {
+          "text": "as",
+          "start": 122.74449310775013,
+          "end": 122.8445619917447
+        },
+        {
+          "text": "esperas",
+          "start": 122.92461709894036,
+          "end": 123.40494774211435
+        },
+        {
+          "text": "dunha",
+          "start": 123.50501662610893,
+          "end": 123.78520950129374
+        },
+        {
+          "text": "nova",
+          "start": 123.92530593888615,
+          "end": 124.18548503727206
+        },
+        {
+          "text": "mensaxe,",
+          "start": 124.34559525166338,
+          "end": 124.86595344843519
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "as espleitas dunha nova linguaxe,",
+      "start": 125.22620143081568,
+      "end": 127.34766177150074,
+      "words": [
+        {
+          "text": "as",
+          "start": 125.22620143081568,
+          "end": 125.30625653801134
+        },
+        {
+          "text": "espleitas",
+          "start": 125.42633919880483,
+          "end": 125.94669739557663
+        },
+        {
+          "text": "dunha",
+          "start": 126.04676627957122,
+          "end": 126.30694537795712
+        },
+        {
+          "text": "nova",
+          "start": 126.42702803875062,
+          "end": 126.70722091393544
+        },
+        {
+          "text": "linguaxe,",
+          "start": 126.86733112832677,
+          "end": 127.34766177150074
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "as esperas dunha nova viaxe,",
+      "start": 127.72792353068014,
+      "end": 129.8293700945663,
+      "words": [
+        {
+          "text": "as",
+          "start": 127.72792353068014,
+          "end": 127.8079786378758
+        },
+        {
+          "text": "esperas",
+          "start": 127.90804752187039,
+          "end": 128.36836438824545
+        },
+        {
+          "text": "dunha",
+          "start": 128.46843327224002,
+          "end": 128.74862614742483
+        },
+        {
+          "text": "nova",
+          "start": 128.88872258501726,
+          "end": 129.16891546020207
+        },
+        {
+          "text": "viaxe,",
+          "start": 129.3290256745934,
+          "end": 129.8293700945663
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "para voltar a recordar retornar os no tempo atrás.",
+      "start": 130.12957674655001,
+      "end": 133.75207034715376,
+      "words": [
+        {
+          "text": "para",
+          "start": 130.12957674655001,
+          "end": 130.24965940734353
+        },
+        {
+          "text": "voltar",
+          "start": 130.36974206813701,
+          "end": 130.81004515771315
+        },
+        {
+          "text": "a",
+          "start": 130.89010026490882,
+          "end": 130.91011404170774
+        },
+        {
+          "text": "recordar",
+          "start": 131.05021047930015,
+          "end": 131.59058245287088
+        },
+        {
+          "text": "retornar",
+          "start": 131.91080288165352,
+          "end": 132.45117485522425
+        },
+        {
+          "text": "os",
+          "start": 132.511216185621,
+          "end": 132.6312988464145
+        },
+        {
+          "text": "no",
+          "start": 132.69134017681125,
+          "end": 132.79140906080582
+        },
+        {
+          "text": "tempo",
+          "start": 132.89147794480039,
+          "end": 133.39182236477328
+        },
+        {
+          "text": "atrás.",
+          "start": 133.45186369517003,
+          "end": 133.75207034715376
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Quen o vai a limpar ao",
+      "start": 134.172359659931,
+      "end": 136.17373733982257,
+      "words": [
+        {
+          "text": "Quen",
+          "start": 134.172359659931,
+          "end": 134.412524981518
+        },
+        {
+          "text": "o",
+          "start": 134.63267652630606,
+          "end": 134.65269030310498
+        },
+        {
+          "text": "vai",
+          "start": 134.79278674069738,
+          "end": 134.9528969550887
+        },
+        {
+          "text": "a",
+          "start": 135.09299339268114,
+          "end": 135.11300716948003
+        },
+        {
+          "text": "limpar",
+          "start": 135.21307605347462,
+          "end": 135.65337914305076
+        },
+        {
+          "text": "ao",
+          "start": 135.9535857950345,
+          "end": 136.17373733982257
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "chápaar o chápaar o mal,",
+      "start": 136.29382000061608,
+      "end": 138.93563853807294,
+      "words": [
+        {
+          "text": "chápaar",
+          "start": 136.29382000061608,
+          "end": 136.83419197418678
+        },
+        {
+          "text": "o",
+          "start": 137.51466038534994,
+          "end": 137.53467416214883
+        },
+        {
+          "text": "chápaar",
+          "start": 137.69478437654016,
+          "end": 138.47532167169788
+        },
+        {
+          "text": "o",
+          "start": 138.59540433249137,
+          "end": 138.6154181092903
+        },
+        {
+          "text": "mal,",
+          "start": 138.71548699328488,
+          "end": 138.93563853807294
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "non ten que pensar,",
+      "start": 139.3759416276491,
+      "end": 140.75689222677428,
+      "words": [
+        {
+          "text": "non",
+          "start": 139.3759416276491,
+          "end": 139.53605184204042
+        },
+        {
+          "text": "ten",
+          "start": 139.61610694923607,
+          "end": 139.97635493161656
+        },
+        {
+          "text": "que",
+          "start": 140.05641003881223,
+          "end": 140.1564789228068
+        },
+        {
+          "text": "pensar,",
+          "start": 140.23653403000247,
+          "end": 140.75689222677428
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "non ten o cenar,",
+      "start": 141.2772504235461,
+      "end": 142.27793926349187,
+      "words": [
+        {
+          "text": "non",
+          "start": 141.2772504235461,
+          "end": 141.37731930754066
+        },
+        {
+          "text": "ten",
+          "start": 141.49740196833415,
+          "end": 141.6975397363233
+        },
+        {
+          "text": "o",
+          "start": 141.75758106672006,
+          "end": 141.77759484351898
+        },
+        {
+          "text": "cenar,",
+          "start": 141.87766372751355,
+          "end": 142.27793926349187
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "fachas de nada, policía carballega.",
+      "start": 142.61817346907344,
+      "end": 145.1399093457368,
+      "words": [
+        {
+          "text": "fachas",
+          "start": 142.61817346907344,
+          "end": 142.958407674655
+        },
+        {
+          "text": "de",
+          "start": 143.03846278185065,
+          "end": 143.11851788904633
+        },
+        {
+          "text": "nada,",
+          "start": 143.198572996242,
+          "end": 143.51879342502465
+        },
+        {
+          "text": "policía",
+          "start": 143.8390138538073,
+          "end": 144.31934449698127
+        },
+        {
+          "text": "carballega.",
+          "start": 144.41941338097584,
+          "end": 145.1399093457368
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    }
+  ]
+}
