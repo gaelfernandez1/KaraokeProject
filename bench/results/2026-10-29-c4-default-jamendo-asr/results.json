@@ -1,8 +1,8 @@
 {
   "bench_version": "0.1.0",
   "normalization_version": 1,
-  "created": "2026-10-29T19:55:06+01:00",
-  "git_commit": "70c0da5",
+  "created": "2026-10-29T21:03:58+01:00",
+  "git_commit": "22522ba-dirty",
   "pipeline": {
     "name": "c4-default",
     "description": "Mel-Band RoFormer (Kim, 8 s) + Whisper (HiTZ large-v3 for Galician, large-v3-turbo otherwise) + lyrics aligner (each language's default CTC model)",
@@ -18,12 +18,12 @@
       "transcriber": {
         "target": "karaoke_engine.transcribe:WhisperTranscriber",
         "params": {},
-        "version": "2"
+        "version": "5"
       },
       "segmenter": {
         "target": "karaoke_engine.transcribe:LineSegmenter",
         "params": {},
-        "version": "1"
+        "version": "2"
       },
       "aligner": {
         "target": "karaoke_engine.align.aligner:LyricsAligner",
@@ -61,17 +61,17 @@
       "ram_peak_mb": 2388.078125
     },
     "transcriber": {
-      "load_seconds": 0.05932288899930427,
+      "load_seconds": 0.06007342000521021,
       "vram_peak_mb": 1334.50390625,
-      "ram_peak_mb": 2118.765625
+      "ram_peak_mb": 2117.390625
     },
     "segmenter": {
       "load_seconds": null,
       "vram_peak_mb": 0.0,
-      "ram_peak_mb": 93.64453125
+      "ram_peak_mb": 93.7109375
     },
     "aligner": {
-      "load_seconds": 0.06674686200130964,
+      "load_seconds": 0.06679449800139992,
       "vram_peak_mb": 1558.50390625,
       "ram_peak_mb": 3786.8046875
     }
@@ -91,35 +91,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 9.02689056500094,
+          "seconds": 7.750415782997152,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00008516199886798859,
+          "seconds": 0.00026530399918556213,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.092812032999063,
+          "seconds": 3.7511355290043866,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.1134020618556701,
-      "cer": 0.08258706467661692,
+      "wer": 0.4329896907216495,
+      "cer": 0.4079601990049751,
       "ref_words": 194,
       "ref_chars": 1005,
       "timing": {
-        "words": 173,
-        "coverage": 0.8917525773195877,
-        "start_median": 0.023750566999979128,
-        "start_mean": 0.037066821341040335,
-        "start_within": 0.9942196531791907,
-        "start_within_wide": 0.9942196531791907,
-        "end_median": 0.07709523800000184,
-        "end_mean": 0.10257604239306427,
-        "start_bias": 0.0036090466820825067
+        "words": 110,
+        "coverage": 0.5670103092783505,
+        "start_median": 0.026133787000000908,
+        "start_mean": 0.816029870145455,
+        "start_within": 0.8636363636363636,
+        "start_within_wide": 0.8636363636363636,
+        "end_median": 0.08580158749999356,
+        "end_mean": 0.8958542156363639,
+        "start_bias": -0.7916440940363632
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -128,7 +128,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.2265193370165746,
+      "low_confidence": 0.2845528455284553,
       "error": null
     },
     {
@@ -145,35 +145,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.100463695998769,
+          "seconds": 4.867215117999876,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00015937299758661538,
+          "seconds": 0.0005839689983986318,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 10.580665064997447,
+          "seconds": 12.303348802000983,
           "cached": true,
           "error": null
         }
       },
       "wer": 0.09016393442622951,
-      "cer": 0.044602128737962494,
+      "cer": 0.04308160162189559,
       "ref_words": 366,
       "ref_chars": 1973,
       "timing": {
         "words": 332,
         "coverage": 0.9046321525885559,
-        "start_median": 0.044767574000008636,
-        "start_mean": 0.1667629629246987,
+        "start_median": 0.04445918400000437,
+        "start_mean": 0.16640128492168663,
         "start_within": 0.9759036144578314,
         "start_within_wide": 0.9759036144578314,
-        "end_median": 0.038602041000004306,
-        "end_mean": 0.16821206809638506,
-        "start_bias": 0.16425180470180678
+        "end_median": 0.03793197249999736,
+        "end_mean": 0.16726858668674655,
+        "start_bias": 0.1638901266987947
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -182,7 +182,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.3202247191011236,
+      "low_confidence": 0.31932773109243695,
       "error": null
     },
     {
@@ -199,35 +199,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 2.335246967006242,
+          "seconds": 1.9412201310042292,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.000070012996729929,
-          "cached": false,
+          "seconds": 0.0001302270029555075,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.539337250003882,
-          "cached": false,
+          "seconds": 4.571471964998636,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.8256410256410256,
-      "cer": 0.6432160804020101,
+      "wer": 0.8051282051282052,
+      "cer": 0.6663316582914572,
       "ref_words": 195,
       "ref_chars": 995,
       "timing": {
-        "words": 34,
-        "coverage": 0.17989417989417988,
-        "start_median": 2.492898636650004,
-        "start_mean": 18.64437176565294,
-        "start_within": 0.4411764705882353,
-        "start_within_wide": 0.4411764705882353,
-        "end_median": 3.1700830503000006,
-        "end_mean": 18.806544876358824,
-        "start_bias": -18.340459173817646
+        "words": 39,
+        "coverage": 0.20634920634920634,
+        "start_median": 1.0368223589999985,
+        "start_mean": 16.323628107284616,
+        "start_within": 0.48717948717948717,
+        "start_within_wide": 0.48717948717948717,
+        "end_median": 1.8097755100000086,
+        "end_mean": 16.463743580584616,
+        "start_bias": -15.456449145720512
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -236,7 +236,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.78125,
+      "low_confidence": 0.8289473684210527,
       "error": null
     },
     {
@@ -253,23 +253,23 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.736526304004656,
+          "seconds": 4.5049588389956625,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014270099927671254,
+          "seconds": 0.0004816650034626946,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.1997608750025393,
+          "seconds": 3.006444211001508,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.09154929577464789,
-      "cer": 0.0458970792767733,
+      "wer": 0.09859154929577464,
+      "cer": 0.04659248956884562,
       "ref_words": 284,
       "ref_chars": 1438,
       "timing": {
@@ -307,18 +307,18 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.672493368998403,
+          "seconds": 4.899858108001354,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00015076599811436608,
-          "cached": false,
+          "seconds": 0.00044045699905836955,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 5.120055480001611,
-          "cached": false,
+          "seconds": 3.4568023519968847,
+          "cached": true,
           "error": null
         }
       },
@@ -361,35 +361,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 8.460062017999007,
+          "seconds": 7.830699579993961,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014617799752159044,
-          "cached": false,
+          "seconds": 0.0005446740033221431,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 13.248448880993237,
-          "cached": false,
+          "seconds": 4.203083322005114,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.1388101983002833,
-      "cer": 0.08750658935160781,
+      "wer": 0.0679886685552408,
+      "cer": 0.020031628887717447,
       "ref_words": 353,
       "ref_chars": 1897,
       "timing": {
-        "words": 307,
-        "coverage": 0.8696883852691218,
-        "start_median": 0.038460317000001965,
-        "start_mean": 0.1951144127589581,
-        "start_within": 0.9739413680781759,
-        "start_within_wide": 0.9771986970684039,
-        "end_median": 0.08299999999999841,
-        "end_mean": 0.25323724582084656,
-        "start_bias": -0.12198666786644922
+        "words": 332,
+        "coverage": 0.9405099150141643,
+        "start_median": 0.03757369650001152,
+        "start_mean": 0.04734784717469914,
+        "start_within": 0.9969879518072289,
+        "start_within_wide": 0.9969879518072289,
+        "end_median": 0.08326077099999907,
+        "end_mean": 0.10582563587650566,
+        "start_bias": 0.026718691078313324
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -397,8 +397,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.00035542918073573843,
-      "low_confidence": 0.22530864197530864,
+      "outside_voice": 0.0003362474781439139,
+      "low_confidence": 0.22792022792022792,
       "error": null
     },
     {
@@ -415,35 +415,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 7.575006274004409,
+          "seconds": 6.320319084006769,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014999499398982152,
-          "cached": false,
+          "seconds": 0.0005181340020499192,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.00249240300036,
-          "cached": false,
+          "seconds": 3.8421979670019937,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.08099688473520249,
-      "cer": 0.03446327683615819,
+      "wer": 0.07476635514018691,
+      "cer": 0.03333333333333333,
       "ref_words": 321,
       "ref_chars": 1770,
       "timing": {
-        "words": 287,
-        "coverage": 0.8696969696969697,
-        "start_median": 0.03893650800000614,
-        "start_mean": 0.10990225422299726,
-        "start_within": 0.9860627177700348,
-        "start_within_wide": 0.9895470383275261,
-        "end_median": 0.06504081599999267,
-        "end_mean": 0.15120348604878073,
-        "start_bias": 0.10265438372822333
+        "words": 286,
+        "coverage": 0.8666666666666667,
+        "start_median": 0.039138322000003,
+        "start_mean": 0.11021745405594478,
+        "start_within": 0.986013986013986,
+        "start_within_wide": 0.9895104895104895,
+        "end_median": 0.06597392249999245,
+        "end_mean": 0.15161095744405617,
+        "start_bias": 0.10294424135664368
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -451,8 +451,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.0001733102253032929,
-      "low_confidence": 0.10903426791277258,
+      "outside_voice": 0.00017319016279875303,
+      "low_confidence": 0.10625,
       "error": null
     },
     {
@@ -469,35 +469,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.955644173001929,
+          "seconds": 4.130058205999376,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001053099986165762,
-          "cached": false,
+          "seconds": 0.00033913399965967983,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.931342907999351,
-          "cached": false,
+          "seconds": 4.686768696999934,
+          "cached": true,
           "error": null
         }
       },
       "wer": 0.532967032967033,
-      "cer": 0.4066481994459834,
+      "cer": 0.41717451523545707,
       "ref_words": 364,
       "ref_chars": 1805,
       "timing": {
-        "words": 166,
-        "coverage": 0.4742857142857143,
-        "start_median": 0.033275509999999286,
-        "start_mean": 0.14436122720481862,
-        "start_within": 0.963855421686747,
-        "start_within_wide": 0.963855421686747,
-        "end_median": 0.11156802750001305,
-        "end_mean": 0.2215043985783134,
-        "start_bias": 0.03715460484337403
+        "words": 167,
+        "coverage": 0.47714285714285715,
+        "start_median": 0.03406122399999845,
+        "start_mean": 0.16509208791017962,
+        "start_within": 0.9580838323353293,
+        "start_within_wide": 0.9580838323353293,
+        "end_median": 0.11492516999999225,
+        "end_mean": 0.24405195055688644,
+        "start_bias": 0.07800202319161723
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -506,7 +506,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.41530054644808745,
+      "low_confidence": 0.4,
       "error": null
     },
     {
@@ -523,35 +523,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.653815101002692,
+          "seconds": 3.9298183520004386,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009030199726112187,
-          "cached": false,
+          "seconds": 0.0003386730022612028,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.9592616890004138,
-          "cached": false,
+          "seconds": 2.950212793999526,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.12135922330097088,
-      "cer": 0.08217821782178218,
+      "wer": 0.09223300970873786,
+      "cer": 0.05841584158415842,
       "ref_words": 206,
       "ref_chars": 1010,
       "timing": {
-        "words": 183,
-        "coverage": 0.8970588235294118,
-        "start_median": 0.04194557799999643,
-        "start_mean": 0.4362591601038244,
-        "start_within": 0.9398907103825137,
-        "start_within_wide": 0.9398907103825137,
-        "end_median": 0.1020816329999974,
-        "end_mean": 0.5132798656830597,
-        "start_bias": 0.4200041510109295
+        "words": 189,
+        "coverage": 0.9264705882352942,
+        "start_median": 0.03640816300000438,
+        "start_mean": 0.05050850037566056,
+        "start_within": 0.9894179894179894,
+        "start_within_wide": 0.9947089947089947,
+        "end_median": 0.09879591799997911,
+        "end_mean": 0.17550034193650774,
+        "start_bias": 0.03291248843915399
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -559,8 +559,8 @@
       "line_start_median": null,
       "language_reported": "es",
       "language_switch": false,
-      "outside_voice": 0.00034782608695652176,
-      "low_confidence": 0.1368421052631579,
+      "outside_voice": 0.0003380662609871535,
+      "low_confidence": 0.1377551020408163,
       "error": null
     },
     {
@@ -577,35 +577,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 2.9395261099998606,
+          "seconds": 2.558810091999476,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0000431119988206774,
+          "seconds": 0.00015064600302139297,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.209592947998317,
+          "seconds": 3.047405534001882,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.15053763440860216,
-      "cer": 0.06458333333333334,
+      "wer": 0.13978494623655913,
+      "cer": 0.05625,
       "ref_words": 93,
       "ref_chars": 480,
       "timing": {
-        "words": 76,
-        "coverage": 0.8260869565217391,
-        "start_median": 0.05077777750000223,
-        "start_mean": 0.06752768826315793,
-        "start_within": 0.9736842105263158,
-        "start_within_wide": 0.9868421052631579,
-        "end_median": 0.10290362799999997,
-        "end_mean": 0.1288577694605258,
-        "start_bias": 0.04867096313157937
+        "words": 77,
+        "coverage": 0.8369565217391305,
+        "start_median": 0.049365078999997536,
+        "start_mean": 0.06723264716883122,
+        "start_within": 0.974025974025974,
+        "start_within_wide": 0.987012987012987,
+        "end_median": 0.10260997700000019,
+        "end_mean": 0.12820614310389564,
+        "start_bias": 0.04862081457142901
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -614,7 +614,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.10989010989010989,
+      "low_confidence": 0.12087912087912088,
       "error": null
     },
     {
@@ -631,35 +631,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.1403512399992906,
+          "seconds": 4.22211065099691,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.000115458999061957,
+          "seconds": 0.0003734989950316958,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.748035454998899,
+          "seconds": 2.7157961880002404,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.10204081632653061,
-      "cer": 0.05909797822706065,
+      "wer": 0.10612244897959183,
+      "cer": 0.061430793157076204,
       "ref_words": 245,
       "ref_chars": 1286,
       "timing": {
-        "words": 219,
-        "coverage": 0.8938775510204081,
-        "start_median": 0.024612245000014354,
-        "start_mean": 0.045749800666667464,
-        "start_within": 0.9954337899543378,
-        "start_within_wide": 0.9954337899543378,
-        "end_median": 0.08195918399999869,
-        "end_mean": 0.11362821107305925,
-        "start_bias": 0.01369765687671181
+        "words": 218,
+        "coverage": 0.889795918367347,
+        "start_median": 0.024785714500012546,
+        "start_mean": 0.046922725651376944,
+        "start_within": 0.9954128440366973,
+        "start_within_wide": 0.9954128440366973,
+        "end_median": 0.08164285750000033,
+        "end_mean": 0.11475121177064211,
+        "start_bias": 0.012694803339449019
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -668,7 +668,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.07327586206896551,
+      "low_confidence": 0.06926406926406926,
       "error": null
     },
     {
@@ -685,35 +685,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.420059575997584,
+          "seconds": 3.573786465000012,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00008104399603325874,
-          "cached": false,
+          "seconds": 0.0002802620001602918,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.7557430009983364,
-          "cached": false,
+          "seconds": 3.7086281269948813,
+          "cached": true,
           "error": null
         }
       },
       "wer": 0.21226415094339623,
-      "cer": 0.13829787234042554,
+      "cer": 0.14119922630560927,
       "ref_words": 212,
       "ref_chars": 1034,
       "timing": {
-        "words": 165,
-        "coverage": 0.7819905213270142,
-        "start_median": 0.03028571399997304,
-        "start_mean": 1.360866158163637,
-        "start_within": 0.9636363636363636,
-        "start_within_wide": 0.9636363636363636,
-        "end_median": 0.09688435399999662,
-        "end_mean": 1.4224659108121211,
-        "start_bias": 1.3263707277151517
+        "words": 166,
+        "coverage": 0.7867298578199052,
+        "start_median": 0.030412698499986845,
+        "start_mean": 1.358722877891567,
+        "start_within": 0.9578313253012049,
+        "start_within_wide": 0.9578313253012049,
+        "end_median": 0.09713265299999918,
+        "end_mean": 1.4195494494999998,
+        "start_bias": 1.3126937819638558
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -721,8 +721,8 @@
       "line_start_median": null,
       "language_reported": "es",
       "language_switch": false,
-      "outside_voice": 0.0,
-      "low_confidence": 0.22043010752688172,
+      "outside_voice": 0.0003272251308900524,
+      "low_confidence": 0.22872340425531915,
       "error": null
     },
     {
@@ -739,35 +739,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.66613635700196,
+          "seconds": 3.8736329520033905,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009380799747304991,
-          "cached": false,
+          "seconds": 0.00031018899608170614,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.1584124639994116,
-          "cached": false,
+          "seconds": 3.0054484059946844,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.32234432234432236,
-      "cer": 0.25806451612903225,
+      "wer": 0.34065934065934067,
+      "cer": 0.2745869394177813,
       "ref_words": 273,
       "ref_chars": 1271,
       "timing": {
         "words": 175,
         "coverage": 0.78125,
-        "start_median": 0.14651324870000337,
-        "start_mean": 0.4083556688234287,
-        "start_within": 0.9371428571428572,
-        "start_within_wide": 0.9428571428571428,
-        "end_median": 0.09226415799999188,
-        "end_mean": 0.3652328497091426,
-        "start_bias": -0.12483937843028492
+        "start_median": 0.1490985836999954,
+        "start_mean": 0.40877319174285764,
+        "start_within": 0.96,
+        "start_within_wide": 0.9657142857142857,
+        "end_median": 0.09090141629999948,
+        "end_mean": 0.4070439722205711,
+        "start_bias": 0.3948584386228581
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -776,7 +776,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.33816425120772947,
+      "low_confidence": 0.3251231527093596,
       "error": null
     },
     {
@@ -793,17 +793,17 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.62545717300236,
+          "seconds": 3.576045243004046,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00010435799777042121,
+          "seconds": 0.0004090060028829612,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.1589272880009958,
+          "seconds": 2.0394003769979463,
           "cached": true,
           "error": null
         }
@@ -830,7 +830,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.3593073593073593,
+      "low_confidence": 0.3565217391304348,
       "error": null
     },
     {
@@ -847,35 +847,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 8.007588899003167,
+          "seconds": 6.202983559996937,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014042600378161296,
-          "cached": false,
+          "seconds": 0.0005014920025132596,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.775040985994565,
+          "seconds": 3.5801419179988443,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.09550561797752809,
+      "wer": 0.09831460674157304,
       "cer": 0.07628734901462174,
       "ref_words": 356,
       "ref_chars": 1573,
       "timing": {
-        "words": 319,
-        "coverage": 0.8985915492957747,
-        "start_median": 0.07151426979999087,
-        "start_mean": 0.24825686587805604,
-        "start_within": 0.9686520376175548,
-        "start_within_wide": 0.9686520376175548,
-        "end_median": 0.07692703419999702,
-        "end_mean": 0.2953311904282137,
-        "start_bias": 0.24104867738213193
+        "words": 318,
+        "coverage": 0.895774647887324,
+        "start_median": 0.0689409062500026,
+        "start_mean": 0.24840698494842725,
+        "start_within": 0.9685534591194969,
+        "start_within_wide": 0.9685534591194969,
+        "end_median": 0.07695149135000179,
+        "end_mean": 0.296253373732076,
+        "start_bias": 0.241176129193082
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -884,7 +884,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.11246200607902736,
+      "low_confidence": 0.11585365853658537,
       "error": null
     },
     {
@@ -901,35 +901,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.0999070620018756,
+          "seconds": 2.3520341719995486,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00006827999459346756,
-          "cached": false,
+          "seconds": 0.00014201999874785542,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.7505058809983893,
-          "cached": false,
+          "seconds": 2.6154225089994725,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.4304635761589404,
-      "cer": 0.27848101265822783,
+      "wer": 0.6423841059602649,
+      "cer": 0.5372714486638537,
       "ref_words": 151,
       "ref_chars": 711,
       "timing": {
-        "words": 84,
-        "coverage": 0.6363636363636364,
-        "start_median": 0.02384920600000129,
-        "start_mean": 0.04461507939285779,
-        "start_within": 0.9880952380952381,
-        "start_within_wide": 1.0,
-        "end_median": 0.11108956899998645,
-        "end_mean": 0.1619709534404751,
-        "start_bias": 0.010487933226190566
+        "words": 55,
+        "coverage": 0.4166666666666667,
+        "start_median": 0.02990476200000103,
+        "start_mean": 0.7938073799636367,
+        "start_within": 0.9454545454545454,
+        "start_within_wide": 0.9636363636363636,
+        "end_median": 0.11525396799999044,
+        "end_mean": 0.913933044745454,
+        "start_bias": 0.7509883322545456
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -938,7 +938,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.5873015873015873,
+      "low_confidence": 0.6075949367088608,
       "error": null
     },
     {
@@ -955,35 +955,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 7.578938561993709,
+          "seconds": 6.063798502000282,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00020571100321831182,
-          "cached": false,
+          "seconds": 0.0006096069992054254,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.324979926001106,
-          "cached": false,
+          "seconds": 3.329804906999925,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.3272394881170018,
-      "cer": 0.2283724340175953,
+      "wer": 0.3327239488117002,
+      "cer": 0.23277126099706744,
       "ref_words": 547,
       "ref_chars": 2728,
       "timing": {
-        "words": 374,
-        "coverage": 0.7405940594059406,
-        "start_median": 0.03206122450000137,
-        "start_mean": 0.09024675932887705,
-        "start_within": 0.9411764705882353,
-        "start_within_wide": 0.9491978609625669,
-        "end_median": 0.09391383199999126,
-        "end_mean": 0.2025987000802139,
-        "start_bias": -0.02776473617914424
+        "words": 369,
+        "coverage": 0.7306930693069307,
+        "start_median": 0.03247165500000193,
+        "start_mean": 0.09002596343089435,
+        "start_within": 0.943089430894309,
+        "start_within_wide": 0.948509485094851,
+        "end_median": 0.09416326499999172,
+        "end_mean": 0.20168493630081297,
+        "start_bias": -0.028826668861788463
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -991,8 +991,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.00037700282752120643,
-      "low_confidence": 0.4178743961352657,
+      "outside_voice": 0.00037023324694557573,
+      "low_confidence": 0.41504854368932037,
       "error": null
     },
     {
@@ -1009,18 +1009,18 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.890017401994555,
+          "seconds": 4.214498394001566,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00006312999903457239,
-          "cached": false,
+          "seconds": 0.00020908700389554724,
+          "cached": true,
           "error": null
         },
         "aligner": {
           "seconds": 2.8108876109981793,
-          "cached": false,
+          "cached": true,
           "error": null
         }
       },
@@ -1063,35 +1063,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.789087683995604,
+          "seconds": 4.333578316000057,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009110300015890971,
-          "cached": false,
+          "seconds": 0.00035776900040218607,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.0011230659947614,
-          "cached": false,
+          "seconds": 2.8804396229970735,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.0945945945945946,
-      "cer": 0.06026058631921824,
+      "wer": 0.07207207207207207,
+      "cer": 0.03420195439739414,
       "ref_words": 222,
       "ref_chars": 1228,
       "timing": {
-        "words": 202,
-        "coverage": 0.9099099099099099,
+        "words": 208,
+        "coverage": 0.9369369369369369,
         "start_median": 0.027063492499987518,
-        "start_mean": 0.04032111986633659,
+        "start_mean": 0.039591531485576786,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.08213832200000581,
-        "end_mean": 0.08945519855445688,
-        "start_bias": 0.01580105970791993
+        "end_median": 0.08409977300000548,
+        "end_mean": 0.09539923466827059,
+        "start_bias": 0.014365689870191658
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1099,8 +1099,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.0003189792663476874,
-      "low_confidence": 0.1261682242990654,
+      "outside_voice": 0.00030656039239730225,
+      "low_confidence": 0.12946428571428573,
       "error": null
     },
     {
@@ -1117,35 +1117,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.154382778004219,
+          "seconds": 4.729403092998837,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00013161000242689624,
+          "seconds": 0.00048020199756138027,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.330611823999789,
+          "seconds": 4.076645000001008,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.1912568306010929,
-      "cer": 0.09718670076726342,
+      "wer": 0.1885245901639344,
+      "cer": 0.09923273657289003,
       "ref_words": 366,
       "ref_chars": 1955,
       "timing": {
         "words": 297,
         "coverage": 0.8389830508474576,
-        "start_median": 0.019975057000010565,
-        "start_mean": 0.023171625545453885,
-        "start_within": 1.0,
-        "start_within_wide": 1.0,
-        "end_median": 0.05601360500000396,
-        "end_mean": 0.0660335784208755,
-        "start_bias": 0.002916924346801653
+        "start_median": 0.020199546000000623,
+        "start_mean": 0.034105438353534766,
+        "start_within": 0.9966329966329966,
+        "start_within_wide": 0.9966329966329966,
+        "end_median": 0.05415646299999821,
+        "end_mean": 0.0747925590134678,
+        "start_bias": 0.014761507740740993
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1154,7 +1154,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.09146341463414634,
+      "low_confidence": 0.08588957055214724,
       "error": null
     },
     {
@@ -1171,35 +1171,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.6656305180003983,
+          "seconds": 3.0216829589990084,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007534299948019907,
-          "cached": false,
+          "seconds": 0.00017933100025402382,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.215871262997098,
-          "cached": false,
+          "seconds": 2.1012996540011954,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.18181818181818182,
-      "cer": 0.16421052631578947,
+      "wer": 0.4,
+      "cer": 0.3757894736842105,
       "ref_words": 165,
       "ref_chars": 950,
       "timing": {
-        "words": 133,
-        "coverage": 0.8525641025641025,
-        "start_median": 0.02700680300000613,
-        "start_mean": 0.1020318824887217,
-        "start_within": 0.9699248120300752,
-        "start_within_wide": 0.9699248120300752,
-        "end_median": 0.06255102000000079,
-        "end_mean": 0.21509559613533788,
-        "start_bias": 0.015494620924811417
+        "words": 98,
+        "coverage": 0.6282051282051282,
+        "start_median": 0.03292176850000139,
+        "start_mean": 0.2687792818367345,
+        "start_within": 0.8367346938775511,
+        "start_within_wide": 0.8469387755102041,
+        "end_median": 0.08621428599999881,
+        "end_mean": 0.3559678837448976,
+        "start_bias": 0.18640624279591794
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1208,7 +1208,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.36551724137931035,
+      "low_confidence": 0.2641509433962264,
       "error": null
     },
     {
@@ -1225,18 +1225,18 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.328799519003951,
+          "seconds": 4.408924530995137,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009141399641521275,
-          "cached": false,
+          "seconds": 0.00029613199876621366,
+          "cached": true,
           "error": null
         },
         "aligner": {
           "seconds": 3.0467021410004236,
-          "cached": false,
+          "cached": true,
           "error": null
         }
       },
@@ -1279,18 +1279,18 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 8.648264126997674,
+          "seconds": 6.763454267005727,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00021810400357935578,
-          "cached": false,
+          "seconds": 0.0007930459978524595,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.4913878020015545,
-          "cached": false,
+          "seconds": 4.34904319600173,
+          "cached": true,
           "error": null
         }
       },
@@ -1301,13 +1301,13 @@
       "timing": {
         "words": 490,
         "coverage": 0.9441233140655106,
-        "start_median": 0.025928571500003272,
-        "start_mean": 0.03669280390408179,
+        "start_median": 0.025980725499996637,
+        "start_mean": 0.036840723753061376,
         "start_within": 0.9897959183673469,
         "start_within_wide": 0.9918367346938776,
-        "end_median": 0.08471768700000126,
-        "end_mean": 0.09443870610408168,
-        "start_bias": 0.006075015046939178
+        "end_median": 0.08503854900000363,
+        "end_mean": 0.09453214865102047,
+        "start_bias": 0.006235355646939159
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1316,7 +1316,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.07312252964426877,
+      "low_confidence": 0.07509881422924901,
       "error": null
     },
     {
@@ -1333,35 +1333,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 7.146326662994397,
+          "seconds": 6.101620448003814,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00012689099821727723,
-          "cached": false,
+          "seconds": 0.0004434319998836145,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.4220577189989854,
-          "cached": false,
+          "seconds": 3.478335102001438,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.17712177121771217,
-      "cer": 0.056810845706907684,
+      "wer": 0.2029520295202952,
+      "cer": 0.0684312459651388,
       "ref_words": 271,
       "ref_chars": 1549,
       "timing": {
-        "words": 232,
-        "coverage": 0.8721804511278195,
-        "start_median": 0.03284240349999834,
-        "start_mean": 0.040286593943965256,
+        "words": 226,
+        "coverage": 0.849624060150376,
+        "start_median": 0.0332675735000052,
+        "start_mean": 0.040320229557521875,
         "start_within": 1.0,
         "start_within_wide": 1.0,
         "end_median": 0.12363832200000502,
-        "end_mean": 0.2801224098663802,
-        "start_bias": -0.013749315797413847
+        "end_mean": 0.2769197218584081,
+        "start_bias": -0.013078421902654944
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1369,8 +1369,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.000196811651249754,
-      "low_confidence": 0.2509090909090909,
+      "outside_voice": 0.00019727756954034326,
+      "low_confidence": 0.25,
       "error": null
     },
     {
@@ -1387,35 +1387,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.741260520000651,
+          "seconds": 5.497666051000124,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00013766099436907098,
+          "seconds": 0.0004801320028491318,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.046260795999842,
+          "seconds": 3.879239382004016,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.15568862275449102,
-      "cer": 0.08520710059171598,
+      "wer": 0.12574850299401197,
+      "cer": 0.05502958579881657,
       "ref_words": 334,
       "ref_chars": 1690,
       "timing": {
-        "words": 294,
-        "coverage": 0.8802395209580839,
-        "start_median": 0.022623582999997893,
-        "start_mean": 0.04329462261224502,
-        "start_within": 0.9965986394557823,
-        "start_within_wide": 0.9965986394557823,
+        "words": 304,
+        "coverage": 0.9101796407185628,
+        "start_median": 0.022664399499987553,
+        "start_mean": 0.058602794190789585,
+        "start_within": 0.993421052631579,
+        "start_within_wide": 0.993421052631579,
         "end_median": 0.08679591849999468,
-        "end_mean": 0.13287397998639405,
-        "start_bias": 0.014292925782312917
+        "end_mean": 0.14685002686184187,
+        "start_bias": 0.03021885815131578
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1423,8 +1423,8 @@
       "line_start_median": null,
       "language_reported": "es",
       "language_switch": false,
-      "outside_voice": 0.00020580366330520683,
-      "low_confidence": 0.12738853503184713,
+      "outside_voice": 0.00019948134849391582,
+      "low_confidence": 0.12422360248447205,
       "error": null
     },
     {
@@ -1441,35 +1441,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 9.656642939997255,
+          "seconds": 7.9245456169956014,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00011054999777115881,
-          "cached": false,
+          "seconds": 0.000420379001297988,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.827217705998919,
-          "cached": false,
+          "seconds": 2.7098831569965114,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.39906103286384975,
-      "cer": 0.2851966873706004,
+      "wer": 0.3967136150234742,
+      "cer": 0.33540372670807456,
       "ref_words": 426,
       "ref_chars": 1932,
       "timing": {
-        "words": 255,
-        "coverage": 0.9622641509433962,
-        "start_median": 0.04949288769999782,
-        "start_mean": 0.055505031566666606,
+        "words": 256,
+        "coverage": 0.9660377358490566,
+        "start_median": 0.04907176914999667,
+        "start_mean": 0.055326694554687444,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.06777072060000933,
-        "end_mean": 0.09298139708235338,
-        "start_bias": 0.04394602651725474
+        "end_median": 0.06762786530000398,
+        "end_mean": 0.09279978926562543,
+        "start_bias": 0.04381284186874984
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1477,8 +1477,8 @@
       "line_start_median": null,
       "language_reported": "en",
       "language_switch": false,
-      "outside_voice": 0.0015193719929095975,
-      "low_confidence": 0.14338235294117646,
+      "outside_voice": 0.00026695141484249865,
+      "low_confidence": 0.14022140221402213,
       "error": null
     },
     {
@@ -1495,35 +1495,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 1.866326934999961,
+          "seconds": 1.6861793610005407,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.000027102003514301032,
-          "cached": false,
+          "seconds": 0.00010052099969470873,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.0308555209994665,
-          "cached": false,
+          "seconds": 2.008696406002855,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.5642857142857143,
-      "cer": 0.4627659574468085,
+      "wer": 0.55,
+      "cer": 0.4432624113475177,
       "ref_words": 140,
       "ref_chars": 564,
       "timing": {
-        "words": 61,
-        "coverage": 0.6931818181818182,
+        "words": 63,
+        "coverage": 0.7159090909090909,
         "start_median": 0.03641496600000238,
-        "start_mean": 0.06408122377049177,
-        "start_within": 0.9836065573770492,
-        "start_within_wide": 0.9836065573770492,
-        "end_median": 0.1767346940000003,
-        "end_mean": 0.1991592134426227,
-        "start_bias": 0.045604141114754235
+        "start_mean": 0.174176258873016,
+        "start_within": 0.9682539682539683,
+        "start_within_wide": 0.9682539682539683,
+        "end_median": 0.18675963699999443,
+        "end_mean": 0.3043862074126982,
+        "start_bias": 0.15628575026984154
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1549,35 +1549,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.282391290995292,
+          "seconds": 3.7333796579987393,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007518300117226318,
-          "cached": false,
+          "seconds": 0.00020293600391596556,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.445614279000438,
-          "cached": false,
+          "seconds": 3.3608807990021887,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.1111111111111111,
-      "cer": 0.06839945280437756,
+      "wer": 0.06666666666666667,
+      "cer": 0.038303693570451436,
       "ref_words": 135,
       "ref_chars": 731,
       "timing": {
-        "words": 121,
-        "coverage": 0.8962962962962963,
-        "start_median": 0.029634920999995984,
-        "start_mean": 0.04372508004958719,
+        "words": 125,
+        "coverage": 0.9259259259259259,
+        "start_median": 0.029777778000010358,
+        "start_mean": 0.044252589512000444,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.11389342399999691,
-        "end_mean": 0.12823189223140494,
-        "start_bias": 0.012425816611570871
+        "end_median": 0.11129705199999762,
+        "end_mean": 0.12776063494400014,
+        "start_bias": 0.012031129256000554
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1586,7 +1586,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.1640625,
+      "low_confidence": 0.16793893129770993,
       "error": null
     },
     {
@@ -1603,35 +1603,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.895851255001617,
+          "seconds": 4.353268194005068,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007119499787222594,
-          "cached": false,
+          "seconds": 0.0002613360047689639,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.1595052030024817,
-          "cached": false,
+          "seconds": 3.153935440997884,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.15584415584415584,
-      "cer": 0.12485811577752554,
+      "wer": 0.12987012987012986,
+      "cer": 0.1021566401816118,
       "ref_words": 154,
       "ref_chars": 881,
       "timing": {
-        "words": 131,
-        "coverage": 0.8506493506493507,
+        "words": 135,
+        "coverage": 0.8766233766233766,
         "start_median": 0.021979592000008097,
-        "start_mean": 0.02996056848854976,
+        "start_mean": 0.030197262148148215,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.11615646300001004,
-        "end_mean": 0.14975385572518957,
-        "start_bias": 0.006559865725190623
+        "end_median": 0.11452834499999653,
+        "end_mean": 0.14757492230370234,
+        "start_bias": 0.007247232770370215
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1639,8 +1639,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.0008192244675040961,
-      "low_confidence": 0.036231884057971016,
+      "outside_voice": 0.0008042895442359249,
+      "low_confidence": 0.035211267605633804,
       "error": null
     },
     {
@@ -1657,35 +1657,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.86202328899526,
+          "seconds": 5.244433050000225,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00016593500185990706,
-          "cached": false,
+          "seconds": 0.0005517579993465915,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.4459752650000155,
-          "cached": false,
+          "seconds": 2.3148151929999585,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.3251366120218579,
-      "cer": 0.1574539363484087,
+      "wer": 0.34972677595628415,
+      "cer": 0.16806253489670575,
       "ref_words": 366,
       "ref_chars": 1791,
       "timing": {
-        "words": 251,
-        "coverage": 0.7382352941176471,
-        "start_median": 0.025356009000006452,
-        "start_mean": 0.0415555465498007,
-        "start_within": 0.9920318725099602,
-        "start_within_wide": 0.9960159362549801,
-        "end_median": 0.09161904799999832,
-        "end_mean": 0.0990641425298803,
-        "start_bias": -0.024730203888446704
+        "words": 250,
+        "coverage": 0.7352941176470589,
+        "start_median": 0.025249433000002597,
+        "start_mean": 0.031987809555999905,
+        "start_within": 0.992,
+        "start_within_wide": 1.0,
+        "end_median": 0.092058956999999,
+        "end_mean": 0.1019511927519998,
+        "start_bias": -0.01753941042800061
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1693,8 +1693,8 @@
       "line_start_median": null,
       "language_reported": "es",
       "language_switch": false,
-      "outside_voice": 0.00022512381809995497,
-      "low_confidence": 0.2930513595166163,
+      "outside_voice": 0.00023894862604540023,
+      "low_confidence": 0.271875,
       "error": null
     },
     {
@@ -1711,35 +1711,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.173413774005894,
+          "seconds": 4.6263469609984895,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00008185499609680846,
-          "cached": false,
+          "seconds": 0.00039239499892573804,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.1901044879996334,
-          "cached": false,
+          "seconds": 3.185106976998213,
+          "cached": true,
           "error": null
         }
       },
       "wer": 0.28213166144200624,
-      "cer": 0.26591511936339524,
+      "cer": 0.2625994694960212,
       "ref_words": 319,
       "ref_chars": 1508,
       "timing": {
-        "words": 228,
-        "coverage": 0.7080745341614907,
-        "start_median": 0.06526679930000512,
-        "start_mean": 0.3060216989552637,
-        "start_within": 0.9517543859649122,
-        "start_within_wide": 0.9517543859649122,
-        "end_median": 0.08678038424999102,
-        "end_mean": 0.3697052872149128,
-        "start_bias": 0.26527585211403537
+        "words": 229,
+        "coverage": 0.7111801242236024,
+        "start_median": 0.06388481839999827,
+        "start_mean": 0.1772463646663761,
+        "start_within": 0.9737991266375546,
+        "start_within_wide": 0.9737991266375546,
+        "end_median": 0.08408727779999481,
+        "end_mean": 0.24012128726593912,
+        "start_bias": 0.14852171020524035
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1748,7 +1748,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.24279835390946503,
+      "low_confidence": 0.2571428571428571,
       "error": null
     },
     {
@@ -1765,17 +1765,17 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.587182066999958,
+          "seconds": 3.134204575995682,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00005785900430055335,
+          "seconds": 0.00017109500186052173,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.7822582619992318,
+          "seconds": 2.6632975899992744,
           "cached": true,
           "error": null
         }
@@ -1819,35 +1819,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.3150248669990106,
+          "seconds": 4.763332371003344,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00008882799738785252,
-          "cached": false,
+          "seconds": 0.00029326700314413756,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.468956625998544,
-          "cached": false,
+          "seconds": 3.409417933005898,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.10606060606060606,
-      "cer": 0.06417624521072797,
+      "wer": 0.15151515151515152,
+      "cer": 0.11877394636015326,
       "ref_words": 198,
       "ref_chars": 1044,
       "timing": {
-        "words": 178,
-        "coverage": 0.898989898989899,
-        "start_median": 0.03231972750000267,
-        "start_mean": 0.03685160131460683,
-        "start_within": 1.0,
-        "start_within_wide": 1.0,
-        "end_median": 0.11702721099997859,
-        "end_mean": 0.15899673875280956,
-        "start_bias": 0.02011856356179848
+        "words": 169,
+        "coverage": 0.8535353535353535,
+        "start_median": 0.03235374099999433,
+        "start_mean": 0.059217848076922805,
+        "start_within": 0.9940828402366864,
+        "start_within_wide": 0.9940828402366864,
+        "end_median": 0.11704761899997607,
+        "end_mean": 0.17867211420118365,
+        "start_bias": 0.04168298247929071
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1856,7 +1856,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.11764705882352941,
+      "low_confidence": 0.11797752808988764,
       "error": null
     },
     {
@@ -1873,35 +1873,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.50206787600473,
+          "seconds": 3.6157072850037366,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0000843599991640076,
-          "cached": false,
+          "seconds": 0.0003292050023446791,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.0814130759972613,
-          "cached": false,
+          "seconds": 2.948163815999578,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.20089285714285715,
-      "cer": 0.12332439678284182,
+      "wer": 0.22321428571428573,
+      "cer": 0.11706881143878463,
       "ref_words": 224,
       "ref_chars": 1119,
       "timing": {
-        "words": 175,
-        "coverage": 0.78125,
+        "words": 173,
+        "coverage": 0.7723214285714286,
         "start_median": 0.022727891000002387,
-        "start_mean": 0.030449627451429293,
+        "start_mean": 0.03032345036994292,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.06339455800000238,
-        "end_mean": 0.08110319404000005,
-        "start_bias": 0.008309841257142077
+        "end_median": 0.06571655300000145,
+        "end_mean": 0.08444208512716765,
+        "start_bias": 0.009049414751444254
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1910,7 +1910,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.13114754098360656,
+      "low_confidence": 0.14594594594594595,
       "error": null
     },
     {
@@ -1927,35 +1927,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 2.6830790089952643,
+          "seconds": 1.958180748995801,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00003737099905265495,
-          "cached": false,
+          "seconds": 0.00013023700012126938,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 1.9642646249994868,
-          "cached": false,
+          "seconds": 1.9599415000047884,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.2804878048780488,
-      "cer": 0.13859275053304904,
+      "wer": 0.2926829268292683,
+      "cer": 0.13219616204690832,
       "ref_words": 82,
       "ref_chars": 469,
       "timing": {
-        "words": 63,
-        "coverage": 0.7682926829268293,
-        "start_median": 0.03788208599999621,
-        "start_mean": 0.06055897493650655,
-        "start_within": 0.9523809523809523,
+        "words": 60,
+        "coverage": 0.7317073170731707,
+        "start_median": 0.03776190449999817,
+        "start_mean": 0.0566567649499986,
+        "start_within": 0.9666666666666667,
         "start_within_wide": 1.0,
-        "end_median": 0.10375963699999602,
-        "end_mean": 0.6531427491111111,
-        "start_bias": 0.025503869285714017
+        "end_median": 0.10440929699999657,
+        "end_mean": 0.6838131518833332,
+        "start_bias": 0.030520181416666622
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -1964,7 +1964,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.5119047619047619,
+      "low_confidence": 0.525,
       "error": null
     },
     {
@@ -1981,35 +1981,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 16.681559698001365,
+          "seconds": 17.244236539001577,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00021668100089300424,
-          "cached": false,
+          "seconds": 0.0007472590004908852,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.391979594998702,
-          "cached": false,
+          "seconds": 3.302412358003494,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.13992537313432835,
-      "cer": 0.07801418439716312,
+      "wer": 0.16977611940298507,
+      "cer": 0.08771929824561403,
       "ref_words": 536,
       "ref_chars": 2679,
       "timing": {
-        "words": 454,
-        "coverage": 0.8714011516314779,
-        "start_median": 0.04978240865001027,
-        "start_mean": 0.056701373733700544,
+        "words": 466,
+        "coverage": 0.8944337811900192,
+        "start_median": 0.05021445450000783,
+        "start_mean": 0.0566133808175966,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.03589188814999744,
-        "end_mean": 0.044288622160572826,
-        "start_bias": 0.04891481885264325
+        "end_median": 0.03545417639999826,
+        "end_mean": 0.04463075045901287,
+        "start_bias": 0.048924771330472155
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2017,8 +2017,8 @@
       "line_start_median": null,
       "language_reported": "en",
       "language_switch": false,
-      "outside_voice": 0.00022431583669807088,
-      "low_confidence": 0.10038610038610038,
+      "outside_voice": 0.00044662795891022776,
+      "low_confidence": 0.10810810810810811,
       "error": null
     },
     {
@@ -2035,35 +2035,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 16.11935414700565,
+          "seconds": 12.744065571001556,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001599240058567375,
-          "cached": false,
+          "seconds": 0.0005708940007025376,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.61852091900073,
-          "cached": false,
+          "seconds": 3.54515049100155,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.2843691148775895,
-      "cer": 0.2576342576342576,
+      "wer": 0.3446327683615819,
+      "cer": 0.31133731133731135,
       "ref_words": 531,
       "ref_chars": 2849,
       "timing": {
-        "words": 369,
-        "coverage": 0.6988636363636364,
-        "start_median": 0.016326531000004252,
-        "start_mean": 0.42131836366666653,
-        "start_within": 0.9295392953929539,
-        "start_within_wide": 0.9376693766937669,
-        "end_median": 0.06431972800000096,
-        "end_mean": 0.4637299129214093,
-        "start_bias": 0.028142261037940607
+        "words": 335,
+        "coverage": 0.634469696969697,
+        "start_median": 0.01791836700000715,
+        "start_mean": 0.8756356381432835,
+        "start_within": 0.9074626865671642,
+        "start_within_wide": 0.9194029850746268,
+        "end_median": 0.06401587299998823,
+        "end_mean": 0.9037312620716416,
+        "start_bias": 0.8580893423820899
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2072,7 +2072,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.0775,
+      "low_confidence": 0.08401084010840108,
       "error": null
     },
     {
@@ -2089,35 +2089,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 2.9821226410058443,
+          "seconds": 2.5227209190052235,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001800719983293675,
+          "seconds": 0.00020329600374680012,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.508256009001343,
+          "seconds": 2.363256481999997,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.25157232704402516,
-      "cer": 0.15704697986577182,
+      "wer": 0.2641509433962264,
+      "cer": 0.16241610738255033,
       "ref_words": 159,
       "ref_chars": 745,
       "timing": {
-        "words": 120,
-        "coverage": 0.8163265306122449,
-        "start_median": 0.05474125115000206,
-        "start_mean": 0.07689561200833404,
-        "start_within": 0.9666666666666667,
-        "start_within_wide": 0.975,
-        "end_median": 0.05715680135000056,
-        "end_mean": 0.14220401290833307,
-        "start_bias": 0.03052822256000057
+        "words": 118,
+        "coverage": 0.8027210884353742,
+        "start_median": 0.056119035600001865,
+        "start_mean": 0.07788655636355997,
+        "start_within": 0.9661016949152542,
+        "start_within_wide": 0.9745762711864406,
+        "end_median": 0.05842392385000039,
+        "end_mean": 0.14258416548135566,
+        "start_bias": 0.03073327895847507
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2126,7 +2126,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.2949640287769784,
+      "low_confidence": 0.30656934306569344,
       "error": null
     },
     {
@@ -2143,35 +2143,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 7.830385968001792,
+          "seconds": 9.644324173001223,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009874700481304899,
-          "cached": false,
+          "seconds": 0.0005017829971620813,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.003369553000084,
-          "cached": false,
+          "seconds": 3.150513021995721,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.36054421768707484,
-      "cer": 0.3006442376521117,
+      "wer": 0.16666666666666666,
+      "cer": 0.11667859699355762,
       "ref_words": 294,
       "ref_chars": 1397,
       "timing": {
-        "words": 186,
-        "coverage": 0.6458333333333334,
-        "start_median": 0.07042471939999473,
-        "start_mean": 0.9435337776747311,
-        "start_within": 0.8817204301075269,
-        "start_within_wide": 0.8817204301075269,
-        "end_median": 0.06661602830000035,
-        "end_mean": 0.955524175304838,
-        "start_bias": 0.9402966823586022
+        "words": 250,
+        "coverage": 0.8680555555555556,
+        "start_median": 0.06441216045000608,
+        "start_mean": 0.0653847862343996,
+        "start_within": 1.0,
+        "start_within_wide": 1.0,
+        "end_median": 0.07392284710000752,
+        "end_mean": 0.10611830969639965,
+        "start_bias": 0.061767738919199615
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2180,7 +2180,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.1651376146788991,
+      "low_confidence": 0.1423611111111111,
       "error": null
     },
     {
@@ -2197,35 +2197,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 8.590356109001732,
+          "seconds": 9.436085104003723,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00010912700236076489,
+          "seconds": 0.00041089000296778977,
           "cached": false,
           "error": null
         },
         "aligner": {
-          "seconds": 2.639067141004489,
+          "seconds": 11.843645770000876,
           "cached": false,
           "error": null
         }
       },
-      "wer": 0.09777777777777778,
-      "cer": 0.1487603305785124,
+      "wer": 0.08888888888888889,
+      "cer": 0.11983471074380166,
       "ref_words": 225,
       "ref_chars": 1452,
       "timing": {
-        "words": 202,
-        "coverage": 0.9017857142857143,
-        "start_median": 0.03111224499999743,
-        "start_mean": 0.41859099480692985,
-        "start_within": 0.9603960396039604,
-        "start_within_wide": 0.9603960396039604,
-        "end_median": 0.06791156450000813,
-        "end_mean": 0.4723873846683172,
-        "start_bias": 0.40306377266831694
+        "words": 205,
+        "coverage": 0.9151785714285714,
+        "start_median": 0.028768707000004667,
+        "start_mean": 0.22560221225853586,
+        "start_within": 0.9804878048780488,
+        "start_within_wide": 0.9804878048780488,
+        "end_median": 0.06620408199998451,
+        "end_mean": 0.29188218575122005,
+        "start_bias": 0.2093160997414636
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2233,8 +2233,8 @@
       "line_start_median": null,
       "language_reported": "es",
       "language_switch": false,
-      "outside_voice": 0.0006419858763107211,
-      "low_confidence": 0.12315270935960591,
+      "outside_voice": 0.0005952380952380953,
+      "low_confidence": 0.11538461538461539,
       "error": null
     },
     {
@@ -2251,35 +2251,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.164675916996202,
+          "seconds": 4.658426467998652,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00011977800022577867,
+          "seconds": 0.0004020240012323484,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.772947220997594,
+          "seconds": 2.6103343829963706,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.10317460317460317,
-      "cer": 0.05028735632183908,
+      "wer": 0.0992063492063492,
+      "cer": 0.04956896551724138,
       "ref_words": 252,
       "ref_chars": 1392,
       "timing": {
-        "words": 243,
-        "coverage": 0.94921875,
-        "start_median": 0.021782313000002773,
-        "start_mean": 0.041609837366255356,
-        "start_within": 0.9958847736625515,
-        "start_within_wide": 0.9958847736625515,
-        "end_median": 0.07575963700000443,
-        "end_mean": 0.10672272148148174,
-        "start_bias": 0.009791803135802005
+        "words": 244,
+        "coverage": 0.953125,
+        "start_median": 0.02177550999999056,
+        "start_mean": 0.04148503774590187,
+        "start_within": 0.9959016393442623,
+        "start_within_wide": 0.9959016393442623,
+        "end_median": 0.07596371849999883,
+        "end_mean": 0.10669367311885267,
+        "start_bias": 0.009797405295081526
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2288,7 +2288,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.12955465587044535,
+      "low_confidence": 0.13360323886639677,
       "error": null
     },
     {
@@ -2305,35 +2305,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.516457086996525,
+          "seconds": 3.2865109800040955,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007688600453548133,
-          "cached": false,
+          "seconds": 0.0003171720018144697,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.2605922229995485,
-          "cached": false,
+          "seconds": 2.253593624998757,
+          "cached": true,
           "error": null
         }
       },
       "wer": 0.25742574257425743,
-      "cer": 0.153713298791019,
+      "cer": 0.1226252158894646,
       "ref_words": 202,
       "ref_chars": 1158,
       "timing": {
-        "words": 153,
-        "coverage": 0.7574257425742574,
-        "start_median": 0.03521542000000011,
-        "start_mean": 0.07421979157516403,
-        "start_within": 0.9934640522875817,
-        "start_within_wide": 0.9934640522875817,
-        "end_median": 0.07143083900000136,
-        "end_mean": 0.11610998469281021,
-        "start_bias": 0.019656040241830607
+        "words": 154,
+        "coverage": 0.7623762376237624,
+        "start_median": 0.034655328999996016,
+        "start_mean": 0.03962963450000017,
+        "start_within": 1.0,
+        "start_within_wide": 1.0,
+        "end_median": 0.07286961500000899,
+        "end_mean": 0.08447090433116854,
+        "start_bias": -0.015995391188311132
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2342,7 +2342,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.2578947368421053,
+      "low_confidence": 0.21608040201005024,
       "error": null
     },
     {
@@ -2359,35 +2359,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.3225380619987845,
+          "seconds": 4.252601423999295,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00010253399523207918,
-          "cached": false,
+          "seconds": 0.0003818949990090914,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.714031025003351,
-          "cached": false,
+          "seconds": 2.740089523998904,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.39622641509433965,
-      "cer": 0.2998790810157195,
+      "wer": 0.41509433962264153,
+      "cer": 0.3083434099153567,
       "ref_words": 318,
       "ref_chars": 1654,
       "timing": {
-        "words": 179,
-        "coverage": 0.5611285266457681,
-        "start_median": 0.03240816299999949,
-        "start_mean": 0.08314407327374292,
-        "start_within": 0.9720670391061452,
-        "start_within_wide": 0.9776536312849162,
-        "end_median": 0.07142857099999844,
-        "end_mean": 0.1619544458603346,
-        "start_bias": 0.025538149720669687
+        "words": 174,
+        "coverage": 0.5454545454545454,
+        "start_median": 0.033785714499998676,
+        "start_mean": 0.1403702400517245,
+        "start_within": 0.9482758620689655,
+        "start_within_wide": 0.9597701149425287,
+        "end_median": 0.07607142849999349,
+        "end_mean": 0.1965091615344825,
+        "start_bias": 0.07530203040804535
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2396,7 +2396,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.271889400921659,
+      "low_confidence": 0.2863636363636364,
       "error": null
     },
     {
@@ -2413,35 +2413,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 7.2334798149968265,
+          "seconds": 5.737812011000642,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00018379899847786874,
-          "cached": false,
+          "seconds": 0.0006694719995721243,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.6077170989956358,
-          "cached": false,
+          "seconds": 3.534033508003631,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.25,
-      "cer": 0.11198600174978128,
+      "wer": 0.26,
+      "cer": 0.11854768153980752,
       "ref_words": 400,
       "ref_chars": 2286,
       "timing": {
-        "words": 315,
-        "coverage": 0.7934508816120907,
-        "start_median": 0.028190476000020226,
-        "start_mean": 0.03672054854285743,
+        "words": 310,
+        "coverage": 0.7808564231738035,
+        "start_median": 0.028206349000015507,
+        "start_mean": 0.03716970960967759,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.04650793700000122,
-        "end_mean": 0.05673633517142826,
-        "start_bias": 0.0136883778000001
+        "end_median": 0.04810544249999538,
+        "end_mean": 0.05791458562258026,
+        "start_bias": 0.013064260125806497
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2450,7 +2450,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.3144963144963145,
+      "low_confidence": 0.3235294117647059,
       "error": null
     },
     {
@@ -2467,35 +2467,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.733649986003002,
+          "seconds": 3.7793378839996876,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0000989480031421408,
-          "cached": false,
+          "seconds": 0.0003447139970376156,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.4769977949981694,
-          "cached": false,
+          "seconds": 2.4757314220041735,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.10648148148148148,
-      "cer": 0.08961845607808341,
+      "wer": 0.10185185185185185,
+      "cer": 0.08518189884649512,
       "ref_words": 216,
       "ref_chars": 1127,
       "timing": {
-        "words": 188,
-        "coverage": 0.8867924528301887,
-        "start_median": 0.056984038349998656,
-        "start_mean": 0.06475961142127659,
+        "words": 189,
+        "coverage": 0.8915094339622641,
+        "start_median": 0.057036585299997,
+        "start_mean": 0.06509657048677239,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.082569160999995,
-        "end_mean": 0.11820564720106287,
-        "start_bias": 0.05810108164574454
+        "end_median": 0.08261224499999287,
+        "end_mean": 0.11802533096190386,
+        "start_bias": 0.05847327102751299
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2504,7 +2504,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.18536585365853658,
+      "low_confidence": 0.18932038834951456,
       "error": null
     },
     {
@@ -2521,35 +2521,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.624272746004863,
+          "seconds": 4.940391994998208,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00016174700431292877,
-          "cached": false,
+          "seconds": 0.0005626389975077473,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.4376897050024127,
-          "cached": false,
+          "seconds": 2.4093250100049772,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.41040462427745666,
-      "cer": 0.1898936170212766,
+      "wer": 0.35260115606936415,
+      "cer": 0.175,
       "ref_words": 346,
       "ref_chars": 1880,
       "timing": {
-        "words": 210,
-        "coverage": 0.5412371134020618,
+        "words": 222,
+        "coverage": 0.5721649484536082,
         "start_median": 0.023833333499997167,
-        "start_mean": 0.09507157973333331,
-        "start_within": 0.9523809523809523,
-        "start_within_wide": 0.9619047619047619,
-        "end_median": 0.059035147499999496,
-        "end_mean": 0.13700544221904756,
-        "start_bias": 0.05345946442857091
+        "start_mean": 0.04727984104504523,
+        "start_within": 0.9774774774774775,
+        "start_within_wide": 0.9864864864864865,
+        "end_median": 0.056647392000003904,
+        "end_mean": 0.08150710918918941,
+        "start_bias": -0.0031696696666673315
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2558,7 +2558,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.4697406340057637,
+      "low_confidence": 0.47604790419161674,
       "error": null
     },
     {
@@ -2575,35 +2575,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.349263703996257,
+          "seconds": 2.5615017770032864,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00004902300133835524,
-          "cached": false,
+          "seconds": 0.00018023300071945414,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.739081316998636,
-          "cached": false,
+          "seconds": 2.757044992998999,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.7389705882352942,
-      "cer": 0.713963963963964,
+      "wer": 0.6948529411764706,
+      "cer": 0.6478978978978979,
       "ref_words": 272,
       "ref_chars": 1332,
       "timing": {
-        "words": 70,
-        "coverage": 0.25735294117647056,
-        "start_median": 0.08513997049999666,
-        "start_mean": 1.1866117172471426,
-        "start_within": 0.8285714285714286,
-        "start_within_wide": 0.8285714285714286,
-        "end_median": 0.08856565604999389,
-        "end_mean": 1.4452385449257135,
-        "start_bias": 1.1490402244785713
+        "words": 82,
+        "coverage": 0.3014705882352941,
+        "start_median": 0.08767978224999773,
+        "start_mean": 0.6791889318341461,
+        "start_within": 0.7682926829268293,
+        "start_within_wide": 0.8292682926829268,
+        "end_median": 0.09990916105000203,
+        "end_mean": 0.7715623521109761,
+        "start_bias": 0.4846040887195119
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2612,7 +2612,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.35555555555555557,
+      "low_confidence": 0.36283185840707965,
       "error": null
     },
     {
@@ -2629,35 +2629,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.284531793004135,
+          "seconds": 5.912895451998338,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00010331600060453638,
-          "cached": false,
+          "seconds": 0.0003913240070687607,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.111099781002849,
-          "cached": false,
+          "seconds": 4.056895367000834,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.06329113924050633,
-      "cer": 0.014029618082618862,
+      "wer": 0.05907172995780591,
+      "cer": 0.013250194855806703,
       "ref_words": 237,
       "ref_chars": 1283,
       "timing": {
-        "words": 226,
-        "coverage": 0.9535864978902954,
-        "start_median": 0.024447845499992127,
-        "start_mean": 0.035486555066372105,
+        "words": 225,
+        "coverage": 0.9493670886075949,
+        "start_median": 0.02462585000000672,
+        "start_mean": 0.035537213377778286,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.09171655349999952,
-        "end_mean": 0.17210502080088513,
-        "start_bias": 0.0059836754646021475
+        "end_median": 0.09136734700000204,
+        "end_mean": 0.17177910812000013,
+        "start_bias": 0.005903209866667127
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2665,8 +2665,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.000944733112895607,
-      "low_confidence": 0.10548523206751055,
+      "outside_voice": 0.0009453285016543249,
+      "low_confidence": 0.10126582278481013,
       "error": null
     },
     {
@@ -2683,35 +2683,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.946152736003569,
+          "seconds": 4.980180682003265,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014579699927708134,
+          "seconds": 0.0004604439964168705,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.3874263150064507,
+          "seconds": 3.153961509997316,
           "cached": true,
           "error": null
         }
       },
       "wer": 0.1541501976284585,
-      "cer": 0.06618819776714513,
+      "cer": 0.0685805422647528,
       "ref_words": 253,
       "ref_chars": 1254,
       "timing": {
-        "words": 226,
-        "coverage": 0.889763779527559,
-        "start_median": 0.03741043099999786,
-        "start_mean": 0.04059313106637237,
+        "words": 223,
+        "coverage": 0.8779527559055118,
+        "start_median": 0.03672562400001311,
+        "start_mean": 0.04036127635426077,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.10678684799999871,
-        "end_mean": 0.1871220676991146,
-        "start_bias": -0.025684737022124707
+        "end_median": 0.10586394599999949,
+        "end_mean": 0.18461456330941658,
+        "start_bias": -0.025086025439462697
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2719,8 +2719,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.0002589331952356292,
-      "low_confidence": 0.20463320463320464,
+      "outside_voice": 0.00025940337224383917,
+      "low_confidence": 0.19844357976653695,
       "error": null
     },
     {
@@ -2737,35 +2737,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.684739741001977,
+          "seconds": 3.9979913710049004,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.000084380000771489,
-          "cached": false,
+          "seconds": 0.0002695220027817413,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.754676811004174,
-          "cached": false,
+          "seconds": 2.7851132770010736,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.17123287671232876,
-      "cer": 0.05636978579481398,
+      "wer": 0.2054794520547945,
+      "cer": 0.05749718151071026,
       "ref_words": 146,
       "ref_chars": 887,
       "timing": {
         "words": 113,
         "coverage": 0.773972602739726,
-        "start_median": 0.03134693899998808,
-        "start_mean": 0.04788776513274342,
+        "start_median": 0.0328276640000027,
+        "start_mean": 0.048896895628318546,
         "start_within": 0.9911504424778761,
         "start_within_wide": 0.9911504424778761,
-        "end_median": 0.1629999999999825,
-        "end_mean": 0.2536808139115038,
-        "start_bias": 0.004276985168140342
+        "end_median": 0.16260544200000027,
+        "end_mean": 0.2510079064070791,
+        "start_bias": 0.003035237734512146
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2773,8 +2773,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.0022823606129768505,
-      "low_confidence": 0.2097902097902098,
+      "outside_voice": 0.0022609819121447027,
+      "low_confidence": 0.2198581560283688,
       "error": null
     },
     {
@@ -2791,35 +2791,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.0123651920002885,
+          "seconds": 4.79222046599898,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009071299427887425,
-          "cached": false,
+          "seconds": 0.000317812999128364,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.982251584995538,
-          "cached": false,
+          "seconds": 2.922047955005837,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.09433962264150944,
-      "cer": 0.06405693950177936,
+      "wer": 0.08962264150943396,
+      "cer": 0.04181494661921708,
       "ref_words": 212,
       "ref_chars": 1124,
       "timing": {
-        "words": 193,
-        "coverage": 0.910377358490566,
-        "start_median": 0.03253968299998178,
-        "start_mean": 0.3951966914455956,
-        "start_within": 0.9378238341968912,
-        "start_within_wide": 0.9378238341968912,
-        "end_median": 0.09973922900000787,
-        "end_mean": 0.5070141341606219,
-        "start_bias": 0.38098299907253896
+        "words": 194,
+        "coverage": 0.9150943396226415,
+        "start_median": 0.028747165499993343,
+        "start_mean": 0.042007948180411946,
+        "start_within": 1.0,
+        "start_within_wide": 1.0,
+        "end_median": 0.09604421750000824,
+        "end_mean": 0.16630508219072168,
+        "start_bias": 0.026355144118557
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2828,7 +2828,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.06532663316582915,
+      "low_confidence": 0.06372549019607843,
       "error": null
     },
     {
@@ -2845,35 +2845,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.807723598001758,
+          "seconds": 5.177784762003284,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00013259100524010137,
+          "seconds": 0.0004562460017041303,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.0756085500033805,
+          "seconds": 2.881357485995977,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.14666666666666667,
-      "cer": 0.07535121328224777,
+      "wer": 0.15666666666666668,
+      "cer": 0.07918263090676884,
       "ref_words": 300,
       "ref_chars": 1566,
       "timing": {
-        "words": 230,
-        "coverage": 0.8582089552238806,
-        "start_median": 0.03705442150000238,
-        "start_mean": 0.04185308095217436,
+        "words": 227,
+        "coverage": 0.8470149253731343,
+        "start_median": 0.03663265299999807,
+        "start_mean": 0.0416365389118948,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.07563038549999845,
-        "end_mean": 0.11736954550434868,
-        "start_bias": -0.025027289778261703
+        "end_median": 0.07558730200000241,
+        "end_mean": 0.11770411659911978,
+        "start_bias": -0.024588380453745416
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2881,8 +2881,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.00026602819898909286,
-      "low_confidence": 0.4148148148148148,
+      "outside_voice": 0.0002666666666666667,
+      "low_confidence": 0.41044776119402987,
       "error": null
     },
     {
@@ -2899,35 +2899,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.168088281003293,
+          "seconds": 3.509132970000792,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.000056577002396807075,
-          "cached": false,
+          "seconds": 0.0002073239957098849,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.5824185230012517,
-          "cached": false,
+          "seconds": 2.5640417049944517,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.31690140845070425,
-      "cer": 0.17897727272727273,
+      "wer": 0.33098591549295775,
+      "cer": 0.18607954545454544,
       "ref_words": 142,
       "ref_chars": 704,
       "timing": {
-        "words": 96,
-        "coverage": 0.7164179104477612,
+        "words": 94,
+        "coverage": 0.7014925373134329,
         "start_median": 0.03711904749999917,
-        "start_mean": 0.04611082764583355,
+        "start_mean": 0.046246248829787236,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.14906802700000021,
-        "end_mean": 0.2154922997083348,
-        "start_bias": -0.02483801018749976
+        "end_median": 0.15210884350000953,
+        "end_mean": 0.21754250494680993,
+        "start_bias": -0.02452081823404208
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2935,8 +2935,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.001682085786375105,
-      "low_confidence": 0.2376237623762376,
+      "outside_voice": 0.0016877637130801688,
+      "low_confidence": 0.22772277227722773,
       "error": null
     },
     {
@@ -2953,35 +2953,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 1.2215996910017566,
+          "seconds": 1.2163180299976375,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 8.05500167189166e-6,
-          "cached": false,
+          "seconds": 0.000019988001440651715,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.0321524450046127,
-          "cached": false,
+          "seconds": 3.0112135099989246,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.959731543624161,
+      "wer": 0.9664429530201343,
       "cer": 0.9591503267973857,
       "ref_words": 149,
       "ref_chars": 612,
       "timing": {
-        "words": 6,
-        "coverage": 0.05263157894736842,
-        "start_median": 2.714350681900001,
-        "start_mean": 12.523338856049998,
-        "start_within": 0.3333333333333333,
-        "start_within_wide": 0.3333333333333333,
-        "end_median": 1.872513140200006,
-        "end_mean": 13.912021179200002,
-        "start_bias": 11.707352600183333
+        "words": 5,
+        "coverage": 0.043859649122807015,
+        "start_median": 2.9807425962000025,
+        "start_mean": 15.02310301098,
+        "start_within": 0.2,
+        "start_within_wide": 0.2,
+        "end_median": 2.46653421740001,
+        "end_mean": 16.683908475880003,
+        "start_bias": 14.04391950394
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -2990,7 +2990,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.2857142857142857,
+      "low_confidence": 0.42857142857142855,
       "error": null
     },
     {
@@ -3007,35 +3007,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.6755578679949394,
+          "seconds": 3.2727647760038963,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00008549300400773063,
-          "cached": false,
+          "seconds": 0.0002687599990167655,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.532105369005876,
-          "cached": false,
+          "seconds": 2.5171497899937094,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.12631578947368421,
-      "cer": 0.08515057113187954,
+      "wer": 0.17894736842105263,
+      "cer": 0.13395638629283488,
       "ref_words": 190,
       "ref_chars": 963,
       "timing": {
-        "words": 161,
-        "coverage": 0.92,
-        "start_median": 0.04516285509998852,
-        "start_mean": 0.04923953956397501,
-        "start_within": 1.0,
-        "start_within_wide": 1.0,
-        "end_median": 0.050182969399998,
-        "end_mean": 0.0777926585434783,
-        "start_bias": 0.04502979714906811
+        "words": 152,
+        "coverage": 0.8685714285714285,
+        "start_median": 0.04416651790000259,
+        "start_mean": 0.1358992722861841,
+        "start_within": 0.9868421052631579,
+        "start_within_wide": 0.9868421052631579,
+        "end_median": 0.049999648200000024,
+        "end_mean": 0.16456468722763165,
+        "start_bias": 0.13178747560855228
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3044,7 +3044,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.2,
+      "low_confidence": 0.20245398773006135,
       "error": null
     },
     {
@@ -3061,35 +3061,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 15.363343150005676,
+          "seconds": 7.920478141997592,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0003064109987462871,
-          "cached": false,
+          "seconds": 0.0010681490020942874,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.526015144998382,
-          "cached": false,
+          "seconds": 4.2702809420006815,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.05909797822706065,
-      "cer": 0.022291021671826627,
+      "wer": 0.038880248833592534,
+      "cer": 0.012693498452012383,
       "ref_words": 643,
       "ref_chars": 3230,
       "timing": {
-        "words": 609,
-        "coverage": 0.9515625,
-        "start_median": 0.027122449000003712,
-        "start_mean": 0.033333087594416964,
+        "words": 622,
+        "coverage": 0.971875,
+        "start_median": 0.027419501499998944,
+        "start_mean": 0.03450247903054646,
         "start_within": 1.0,
         "start_within_wide": 1.0,
-        "end_median": 0.06375737000001891,
-        "end_mean": 0.07384918588669902,
-        "start_bias": 0.004043683377668714
+        "end_median": 0.061971655500009604,
+        "end_mean": 0.0722843180337617,
+        "start_bias": 0.0060963135578781125
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3098,7 +3098,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.15756630265210608,
+      "low_confidence": 0.1294851794071763,
       "error": null
     },
     {
@@ -3115,35 +3115,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.817150415998185,
+          "seconds": 4.272293046000414,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001355279964627698,
+          "seconds": 0.0003554049981175922,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.05652342200483,
+          "seconds": 3.9106901670020306,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.297029702970297,
-      "cer": 0.26980568011958145,
+      "wer": 0.33003300330033003,
+      "cer": 0.30493273542600896,
       "ref_words": 303,
       "ref_chars": 1338,
       "timing": {
-        "words": 173,
-        "coverage": 0.569078947368421,
-        "start_median": 0.04676062110002022,
-        "start_mean": 0.4764157513381503,
-        "start_within": 0.976878612716763,
-        "start_within_wide": 0.976878612716763,
-        "end_median": 0.03710884399998804,
-        "end_mean": 0.47447356217745656,
-        "start_bias": -0.3505774482144508
+        "words": 161,
+        "coverage": 0.5296052631578947,
+        "start_median": 0.04962531620000732,
+        "start_mean": 5.15638124292236,
+        "start_within": 0.937888198757764,
+        "start_within_wide": 0.937888198757764,
+        "end_median": 0.03888869610000256,
+        "end_mean": 5.202686660229192,
+        "start_bias": 5.15324500238323
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3151,8 +3151,8 @@
       "line_start_median": null,
       "language_reported": "en",
       "language_switch": false,
-      "outside_voice": 0.0,
-      "low_confidence": 0.2512315270935961,
+      "outside_voice": 0.0011896264572924102,
+      "low_confidence": 0.29381443298969073,
       "error": null
     },
     {
@@ -3169,35 +3169,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 8.675921362002555,
+          "seconds": 9.254261676003807,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001850120024755597,
-          "cached": false,
+          "seconds": 0.0006792300046072342,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.3304277950010146,
-          "cached": false,
+          "seconds": 3.307468246006465,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.16593886462882096,
-      "cer": 0.1312877263581489,
+      "wer": 0.17685589519650655,
+      "cer": 0.12173038229376258,
       "ref_words": 458,
       "ref_chars": 1988,
       "timing": {
-        "words": 394,
-        "coverage": 0.8954545454545455,
-        "start_median": 0.056048556549995965,
-        "start_mean": 0.07212790379416215,
-        "start_within": 0.9898477157360406,
-        "start_within_wide": 0.9898477157360406,
-        "end_median": 0.044617492950010273,
-        "end_mean": 0.12106409191218341,
-        "start_bias": 0.0650643710104057
+        "words": 387,
+        "coverage": 0.8795454545454545,
+        "start_median": 0.05607794549999312,
+        "start_mean": 0.07163986732532279,
+        "start_within": 0.9896640826873385,
+        "start_within_wide": 0.9922480620155039,
+        "end_median": 0.04532052979999435,
+        "end_mean": 0.11172249449638312,
+        "start_bias": 0.06440439308552949
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3206,7 +3206,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.2246376811594203,
+      "low_confidence": 0.24757281553398058,
       "error": null
     },
     {
@@ -3223,35 +3223,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 8.510405761000584,
+          "seconds": 6.602471929996682,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.000189200000022538,
-          "cached": false,
+          "seconds": 0.0007243760046549141,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.5734628540012636,
-          "cached": false,
+          "seconds": 3.589367091000895,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.164079822616408,
-      "cer": 0.0583996966249526,
+      "wer": 0.16851441241685144,
+      "cer": 0.054986727341676145,
       "ref_words": 451,
       "ref_chars": 2637,
       "timing": {
-        "words": 356,
-        "coverage": 0.7946428571428571,
-        "start_median": 0.041891156499998417,
-        "start_mean": 0.05071186524999974,
-        "start_within": 0.9887640449438202,
+        "words": 354,
+        "coverage": 0.7901785714285714,
+        "start_median": 0.04177550999999369,
+        "start_mean": 0.050194159375705885,
+        "start_within": 0.9887005649717514,
         "start_within_wide": 1.0,
-        "end_median": 0.042209750999994355,
-        "end_mean": 0.06453852962921358,
-        "start_bias": 0.03604760630617929
+        "end_median": 0.04176530649999677,
+        "end_mean": 0.0643347361355934,
+        "start_bias": 0.03617508359039504
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3260,7 +3260,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.3333333333333333,
+      "low_confidence": 0.3310657596371882,
       "error": null
     },
     {
@@ -3277,35 +3277,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.501896545996715,
+          "seconds": 5.177928607001377,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00010385700443293899,
-          "cached": false,
+          "seconds": 0.00043700000242097303,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.9141492580019985,
-          "cached": false,
+          "seconds": 2.965347893994476,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.14726027397260275,
-      "cer": 0.05790387955993052,
+      "wer": 0.14383561643835616,
+      "cer": 0.056745801968731906,
       "ref_words": 292,
       "ref_chars": 1727,
       "timing": {
-        "words": 258,
-        "coverage": 0.8865979381443299,
-        "start_median": 0.02194217700000678,
-        "start_mean": 0.056229569868216873,
-        "start_within": 0.9961240310077519,
-        "start_within_wide": 0.9961240310077519,
-        "end_median": 0.06687528349999639,
-        "end_mean": 0.12630829335271287,
-        "start_bias": -0.025615356224805114
+        "words": 257,
+        "coverage": 0.8831615120274914,
+        "start_median": 0.021732425999999805,
+        "start_mean": 0.0308146236459142,
+        "start_within": 1.0,
+        "start_within_wide": 1.0,
+        "end_median": 0.06651020399999652,
+        "end_mean": 0.10599555309338507,
+        "start_bias": -0.00033028049416249273
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3314,7 +3314,7 @@
       "language_reported": "de",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.14084507042253522,
+      "low_confidence": 0.1413793103448276,
       "error": null
     },
     {
@@ -3331,35 +3331,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.7899813639960485,
+          "seconds": 3.4932185020006727,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00005429299926618114,
+          "seconds": 0.000234496001212392,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.1516653430007864,
+          "seconds": 2.9807156579990988,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.25165562913907286,
-      "cer": 0.18385093167701863,
+      "wer": 0.152317880794702,
+      "cer": 0.08944099378881988,
       "ref_words": 151,
       "ref_chars": 805,
       "timing": {
-        "words": 115,
-        "coverage": 0.7615894039735099,
-        "start_median": 0.0327346939999984,
-        "start_mean": 0.1070640638782604,
-        "start_within": 0.991304347826087,
-        "start_within_wide": 0.991304347826087,
-        "end_median": 0.0950816330000066,
-        "end_mean": 0.2191211081652172,
-        "start_bias": 0.08356730749565242
+        "words": 130,
+        "coverage": 0.8609271523178808,
+        "start_median": 0.031786848000002976,
+        "start_mean": 0.0423579975461533,
+        "start_within": 1.0,
+        "start_within_wide": 1.0,
+        "end_median": 0.09970181450000126,
+        "end_mean": 0.1528479155769226,
+        "start_bias": 0.014251351823076965
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3367,8 +3367,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.0013837638376383763,
-      "low_confidence": 0.13076923076923078,
+      "outside_voice": 0.0012583892617449664,
+      "low_confidence": 0.11724137931034483,
       "error": null
     },
     {
@@ -3385,35 +3385,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.3171606000032625,
+          "seconds": 4.722943471002509,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007448100222973153,
-          "cached": false,
+          "seconds": 0.0002482820054865442,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.331081829004688,
-          "cached": false,
+          "seconds": 3.135059847998491,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.05813953488372093,
-      "cer": 0.051227321237993596,
+      "wer": 0.16279069767441862,
+      "cer": 0.10779082177161152,
       "ref_words": 172,
       "ref_chars": 937,
       "timing": {
-        "words": 162,
-        "coverage": 0.9473684210526315,
-        "start_median": 0.026714285500002433,
-        "start_mean": 0.18291978108641943,
-        "start_within": 0.9753086419753086,
-        "start_within_wide": 0.9753086419753086,
-        "end_median": 0.16065306100000498,
-        "end_mean": 0.3196246605679005,
-        "start_bias": -0.1645546457407402
+        "words": 144,
+        "coverage": 0.8421052631578947,
+        "start_median": 0.02703061199999368,
+        "start_mean": 0.08912673217361067,
+        "start_within": 0.9930555555555556,
+        "start_within_wide": 0.9930555555555556,
+        "end_median": 0.15937755100000572,
+        "end_mean": 0.21832993197916603,
+        "start_bias": 0.0387820609652784
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3422,7 +3422,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.12962962962962962,
+      "low_confidence": 0.14,
       "error": null
     },
     {
@@ -3439,35 +3439,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.054583892997471,
+          "seconds": 4.420178396998381,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007784800254739821,
-          "cached": false,
+          "seconds": 0.00026351099950261414,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.9873953169953893,
-          "cached": false,
+          "seconds": 2.977596814002027,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.1411042944785276,
-      "cer": 0.08807134894091416,
+      "wer": 0.13496932515337423,
+      "cer": 0.0858416945373467,
       "ref_words": 163,
       "ref_chars": 897,
       "timing": {
-        "words": 138,
-        "coverage": 0.8518518518518519,
-        "start_median": 0.06261958549999491,
-        "start_mean": 0.12370837713043414,
-        "start_within": 0.9637681159420289,
-        "start_within_wide": 0.9855072463768116,
-        "end_median": 0.10999494014999378,
-        "end_mean": 0.25406000074782553,
-        "start_bias": 0.10231497699999995
+        "words": 139,
+        "coverage": 0.8580246913580247,
+        "start_median": 0.06259340099998667,
+        "start_mean": 0.12318588585467556,
+        "start_within": 0.9640287769784173,
+        "start_within_wide": 0.9856115107913669,
+        "end_median": 0.10927559429999789,
+        "end_mean": 0.25271834402446,
+        "start_bias": 0.10194639507769772
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3493,35 +3493,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.31918597999902,
+          "seconds": 4.4997711869946215,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001272709996555932,
-          "cached": false,
+          "seconds": 0.0003826259999186732,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.8361320220064954,
-          "cached": false,
+          "seconds": 2.890720251001767,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.2558139534883721,
-      "cer": 0.19686274509803922,
+      "wer": 0.2591362126245847,
+      "cer": 0.2,
       "ref_words": 301,
       "ref_chars": 1275,
       "timing": {
-        "words": 169,
-        "coverage": 0.7100840336134454,
+        "words": 167,
+        "coverage": 0.7016806722689075,
         "start_median": 0.062267573699998024,
-        "start_mean": 0.33345337332307645,
-        "start_within": 0.9171597633136095,
-        "start_within_wide": 0.9171597633136095,
-        "end_median": 0.08995011300000044,
-        "end_mean": 0.4105118662816568,
-        "start_bias": -0.22529292563313674
+        "start_mean": 0.3222202173970058,
+        "start_within": 0.9221556886227545,
+        "start_within_wide": 0.9221556886227545,
+        "end_median": 0.08802721099999644,
+        "end_mean": 0.40896016855089823,
+        "start_bias": -0.21326489113353367
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3529,8 +3529,8 @@
       "line_start_median": null,
       "language_reported": "en",
       "language_switch": false,
-      "outside_voice": 0.0011373976342129207,
-      "low_confidence": 0.3288888888888889,
+      "outside_voice": 0.0011627906976744186,
+      "low_confidence": 0.3274336283185841,
       "error": null
     },
     {
@@ -3547,35 +3547,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.415715597002418,
+          "seconds": 4.862718434000271,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00016337999841198325,
-          "cached": false,
+          "seconds": 0.0005157999985385686,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.4681100090019754,
-          "cached": false,
+          "seconds": 2.430115539995313,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.23303834808259588,
-      "cer": 0.12414800389483933,
+      "wer": 0.23893805309734514,
+      "cer": 0.13485881207400194,
       "ref_words": 339,
       "ref_chars": 2054,
       "timing": {
-        "words": 274,
-        "coverage": 0.7942028985507247,
-        "start_median": 0.023184807499998072,
-        "start_mean": 0.030361545587591098,
-        "start_within": 0.9963503649635036,
-        "start_within_wide": 1.0,
-        "end_median": 0.040072562500000686,
-        "end_mean": 0.06599322208394183,
-        "start_bias": 0.004411498434306755
+        "words": 263,
+        "coverage": 0.7623188405797101,
+        "start_median": 0.02321315199999674,
+        "start_mean": 0.06648877852471483,
+        "start_within": 0.9923954372623575,
+        "start_within_wide": 0.9961977186311787,
+        "end_median": 0.0399410429999989,
+        "end_mean": 0.10070253396958184,
+        "start_bias": 0.040292611863118125
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3583,8 +3583,8 @@
       "line_start_median": null,
       "language_reported": "fr",
       "language_switch": false,
-      "outside_voice": 0.0012044564890093346,
-      "low_confidence": 0.24,
+      "outside_voice": 0.0012183978068839476,
+      "low_confidence": 0.23300970873786409,
       "error": null
     },
     {
@@ -3601,35 +3601,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 7.666476830003376,
+          "seconds": 6.160348031000467,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00020704299822682515,
+          "seconds": 0.0007460270062438212,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.274198384999181,
+          "seconds": 3.1661290940028266,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.08471074380165289,
-      "cer": 0.05232558139534884,
+      "wer": 0.08677685950413223,
+      "cer": 0.04785330948121646,
       "ref_words": 484,
       "ref_chars": 2236,
       "timing": {
-        "words": 424,
-        "coverage": 0.925764192139738,
-        "start_median": 0.02843083899999943,
-        "start_mean": 0.11220042892216954,
-        "start_within": 0.9787735849056604,
-        "start_within_wide": 0.9811320754716981,
-        "end_median": 0.07907482999999615,
-        "end_mean": 0.16521710415801907,
-        "start_bias": 0.05252903456367945
+        "words": 425,
+        "coverage": 0.9279475982532751,
+        "start_median": 0.02849433099999743,
+        "start_mean": 0.10622055756941148,
+        "start_within": 0.9811764705882353,
+        "start_within_wide": 0.9835294117647059,
+        "end_median": 0.07947165499999898,
+        "end_mean": 0.16969385622588262,
+        "start_bias": 0.0585255542188238
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3638,7 +3638,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.15384615384615385,
+      "low_confidence": 0.15730337078651685,
       "error": null
     },
     {
@@ -3655,35 +3655,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.1056172820026404,
+          "seconds": 2.579137977998471,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007104500400600955,
-          "cached": false,
+          "seconds": 0.00026556399825494736,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.2139525480015436,
-          "cached": false,
+          "seconds": 2.253854978000163,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.28773584905660377,
-      "cer": 0.25461613216715256,
+      "wer": 0.2971698113207547,
+      "cer": 0.2555879494655005,
       "ref_words": 212,
       "ref_chars": 1029,
       "timing": {
-        "words": 137,
-        "coverage": 0.7486338797814208,
+        "words": 135,
+        "coverage": 0.7377049180327869,
         "start_median": 0.0629075988999972,
-        "start_mean": 0.4231510721781029,
-        "start_within": 0.9708029197080292,
-        "start_within_wide": 0.9708029197080292,
+        "start_mean": 0.428717964156297,
+        "start_within": 0.9703703703703703,
+        "start_within_wide": 0.9703703703703703,
         "end_median": 0.049665145300011204,
-        "end_mean": 0.3877890012656937,
-        "start_bias": 0.1804972958467162
+        "end_mean": 0.391917962786667,
+        "start_bias": 0.18246931706444533
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3691,7 +3691,7 @@
       "line_start_median": null,
       "language_reported": "en",
       "language_switch": false,
-      "outside_voice": 0.0013557483731019523,
+      "outside_voice": 0.001359064963305246,
       "low_confidence": 0.14285714285714285,
       "error": null
     },
@@ -3709,35 +3709,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 3.3465985899965744,
+          "seconds": 2.500564049994864,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00005524500011233613,
+          "seconds": 0.000167117003002204,
           "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.0150096860015765,
+          "seconds": 2.8989931890027947,
           "cached": true,
           "error": null
         }
       },
-      "wer": 0.5841584158415841,
-      "cer": 0.5256410256410257,
+      "wer": 0.6138613861386139,
+      "cer": 0.5547008547008547,
       "ref_words": 202,
       "ref_chars": 1170,
       "timing": {
-        "words": 85,
-        "coverage": 0.4187192118226601,
-        "start_median": 0.07787855210000316,
-        "start_mean": 10.85751571170941,
-        "start_within": 0.788235294117647,
-        "start_within_wide": 0.8117647058823529,
-        "end_median": 0.10370844339999508,
-        "end_mean": 10.85424616556353,
-        "start_bias": 10.854763543022353
+        "words": 80,
+        "coverage": 0.39408866995073893,
+        "start_median": 0.07123821234998928,
+        "start_mean": 10.03488426848875,
+        "start_within": 0.8,
+        "start_within_wide": 0.8125,
+        "end_median": 0.10271144989999925,
+        "end_mean": 10.06967613415625,
+        "start_bias": 10.03215557415375
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3746,7 +3746,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.3047619047619048,
+      "low_confidence": 0.27,
       "error": null
     },
     {
@@ -3763,35 +3763,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.189900061996013,
+          "seconds": 4.683506793997367,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0001443250002921559,
-          "cached": false,
+          "seconds": 0.0005627089994959533,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.644404755999858,
-          "cached": false,
+          "seconds": 3.650858046996291,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.5319488817891374,
-      "cer": 0.45200276243093923,
+      "wer": 0.5303514376996805,
+      "cer": 0.4516574585635359,
       "ref_words": 626,
       "ref_chars": 2896,
       "timing": {
-        "words": 286,
-        "coverage": 0.5742971887550201,
-        "start_median": 0.04274411279998702,
-        "start_mean": 0.40237857580524533,
-        "start_within": 0.9790209790209791,
-        "start_within_wide": 0.9790209790209791,
-        "end_median": 0.04254732489999924,
-        "end_mean": 0.5148365266986007,
-        "start_bias": 0.3968786044730772
+        "words": 288,
+        "coverage": 0.5783132530120482,
+        "start_median": 0.04245685680000122,
+        "start_mean": 0.3997258750586811,
+        "start_within": 0.9791666666666666,
+        "start_within_wide": 0.9791666666666666,
+        "end_median": 0.04202758230000114,
+        "end_mean": 0.5109097103795133,
+        "start_bias": 0.3940336736475697
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3799,8 +3799,8 @@
       "line_start_median": null,
       "language_reported": "en",
       "language_switch": false,
-      "outside_voice": 0.00033772374197906115,
-      "low_confidence": 0.2215909090909091,
+      "outside_voice": 0.0003380662609871535,
+      "low_confidence": 0.2231638418079096,
       "error": null
     },
     {
@@ -3817,35 +3817,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 6.896452877001138,
+          "seconds": 6.419755770002666,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014618799468735233,
-          "cached": false,
+          "seconds": 0.0005244660060270689,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 4.496367047002423,
-          "cached": false,
+          "seconds": 4.625550808996195,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.10289389067524116,
-      "cer": 0.06760728982951206,
+      "wer": 0.09967845659163987,
+      "cer": 0.06466784244562022,
       "ref_words": 311,
       "ref_chars": 1701,
       "timing": {
-        "words": 278,
-        "coverage": 0.8938906752411575,
+        "words": 280,
+        "coverage": 0.9003215434083601,
         "start_median": 0.029782313000005445,
-        "start_mean": 0.03539786129136746,
+        "start_mean": 0.03543228861428627,
         "start_within": 1.0,
         "start_within_wide": 1.0,
         "end_median": 0.08628231299999456,
-        "end_mean": 0.13411090719064703,
-        "start_bias": -0.01532436908273399
+        "end_mean": 0.13511110301071386,
+        "start_bias": -0.014852664407142984
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3854,7 +3854,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.051194539249146756,
+      "low_confidence": 0.05387205387205387,
       "error": null
     },
     {
@@ -3871,35 +3871,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 10.320408478997706,
+          "seconds": 8.347298974993464,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00023814199812477455,
-          "cached": false,
+          "seconds": 0.0007831670009181835,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 5.552449604001595,
-          "cached": false,
+          "seconds": 5.58528089599713,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.1286549707602339,
-      "cer": 0.0998003992015968,
+      "wer": 0.10136452241715399,
+      "cer": 0.07864271457085828,
       "ref_words": 513,
       "ref_chars": 2505,
       "timing": {
-        "words": 438,
-        "coverage": 0.8673267326732673,
+        "words": 454,
+        "coverage": 0.899009900990099,
         "start_median": 0.03318707450000602,
-        "start_mean": 0.04971656880136968,
-        "start_within": 0.9954337899543378,
-        "start_within_wide": 0.9954337899543378,
-        "end_median": 0.09993877549999297,
-        "end_mean": 0.1545033392077634,
-        "start_bias": 0.000586302426940285
+        "start_mean": 0.05728690299118948,
+        "start_within": 0.9933920704845814,
+        "start_within_wide": 0.9933920704845814,
+        "end_median": 0.09883446699998899,
+        "end_mean": 0.15736524415859113,
+        "start_bias": -0.006156692317181076
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3908,7 +3908,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.09544468546637744,
+      "low_confidence": 0.11134453781512606,
       "error": null
     },
     {
@@ -3925,35 +3925,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.178444675002538,
+          "seconds": 3.904418721998809,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00009058199793798849,
-          "cached": false,
+          "seconds": 0.00034505499934311956,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.637170251000498,
-          "cached": false,
+          "seconds": 2.649539890997403,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.13744075829383887,
-      "cer": 0.0693950177935943,
+      "wer": 0.14218009478672985,
+      "cer": 0.07206405693950178,
       "ref_words": 211,
       "ref_chars": 1124,
       "timing": {
-        "words": 182,
-        "coverage": 0.8625592417061612,
-        "start_median": 0.028810657499999337,
-        "start_mean": 0.228914405302198,
-        "start_within": 0.9835164835164835,
-        "start_within_wide": 0.9835164835164835,
-        "end_median": 0.08706576000000421,
-        "end_mean": 0.3270947521813189,
-        "start_bias": 0.2054049737197801
+        "words": 181,
+        "coverage": 0.8578199052132701,
+        "start_median": 0.028510203999999817,
+        "start_mean": 0.22964173586187872,
+        "start_within": 0.9834254143646409,
+        "start_within_wide": 0.9834254143646409,
+        "end_median": 0.08656009100000084,
+        "end_mean": 0.32295176707182327,
+        "start_bias": 0.20603376305524845
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -3961,7 +3961,7 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.0002553626149131767,
+      "outside_voice": 0.0002559508574353724,
       "low_confidence": 0.171875,
       "error": null
     },
@@ -3979,35 +3979,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 27.740558452998812,
+          "seconds": 24.46168894100265,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00021219300106167793,
-          "cached": false,
+          "seconds": 0.0008032460027607158,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.829617777002568,
-          "cached": false,
+          "seconds": 2.844217320001917,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.2879045996592845,
-      "cer": 0.19459267164710067,
+      "wer": 0.29471890971039183,
+      "cer": 0.21060120953397368,
       "ref_words": 587,
       "ref_chars": 2811,
       "timing": {
-        "words": 391,
-        "coverage": 0.6729776247848537,
-        "start_median": 0.05737486449999096,
-        "start_mean": 0.5465538779378515,
-        "start_within": 0.9130434782608695,
-        "start_within_wide": 0.9130434782608695,
-        "end_median": 0.03208388440000931,
-        "end_mean": 0.5285933422953963,
-        "start_bias": 0.5443258813056264
+        "words": 384,
+        "coverage": 0.6609294320137694,
+        "start_median": 0.05503863569999368,
+        "start_mean": 0.23082958711953128,
+        "start_within": 0.9713541666666666,
+        "start_within_wide": 0.9713541666666666,
+        "end_median": 0.027028171149996894,
+        "end_mean": 0.21291131283255194,
+        "start_bias": 0.22951014704401046
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4016,7 +4016,7 @@
       "language_reported": "en",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.3107569721115538,
+      "low_confidence": 0.2909090909090909,
       "error": null
     },
     {
@@ -4033,35 +4033,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 12.07323075599561,
+          "seconds": 5.528971605999686,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00013557700003730133,
-          "cached": false,
+          "seconds": 0.0005041180047555827,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.603970210002444,
-          "cached": false,
+          "seconds": 2.5450679559944547,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.2462686567164179,
+      "wer": 0.2574626865671642,
       "cer": 0.07415565345080763,
       "ref_words": 268,
       "ref_chars": 1362,
       "timing": {
-        "words": 206,
-        "coverage": 0.7686567164179104,
-        "start_median": 0.02720181400000854,
-        "start_mean": 0.06490234018931941,
-        "start_within": 0.9660194174757282,
-        "start_within_wide": 0.9660194174757282,
-        "end_median": 0.10093424049999555,
-        "end_mean": 0.1692926821067961,
-        "start_bias": 0.027700063830097304
+        "words": 211,
+        "coverage": 0.7873134328358209,
+        "start_median": 0.02708163300000166,
+        "start_mean": 0.054985319838861506,
+        "start_within": 0.976303317535545,
+        "start_within_wide": 0.976303317535545,
+        "end_median": 0.09847392300000024,
+        "end_mean": 0.15540596015165872,
+        "start_bias": 0.02652608782938406
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4070,7 +4070,7 @@
       "language_reported": "es",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.21189591078066913,
+      "low_confidence": 0.19622641509433963,
       "error": null
     },
     {
@@ -4087,35 +4087,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.738446556999406,
+          "seconds": 4.25831993400061,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00011067000014008954,
-          "cached": false,
+          "seconds": 0.00039949899655766785,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.302871548999974,
-          "cached": false,
+          "seconds": 2.2861798890007776,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.2126865671641791,
-      "cer": 0.07604017216642754,
+      "wer": 0.22761194029850745,
+      "cer": 0.09469153515064563,
       "ref_words": 268,
       "ref_chars": 1394,
       "timing": {
-        "words": 219,
-        "coverage": 0.8233082706766918,
-        "start_median": 0.029009070000000747,
-        "start_mean": 0.036371136561644625,
-        "start_within": 1.0,
-        "start_within_wide": 1.0,
-        "end_median": 0.07240816299999153,
-        "end_mean": 0.0964807463744293,
-        "start_bias": -0.008047919328767883
+        "words": 214,
+        "coverage": 0.8045112781954887,
+        "start_median": 0.02932086150000046,
+        "start_mean": 0.07278026784112228,
+        "start_within": 0.9906542056074766,
+        "start_within_wide": 0.9906542056074766,
+        "end_median": 0.07224829899999463,
+        "end_mean": 0.130401657280374,
+        "start_bias": 0.028762614700933924
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4124,7 +4124,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.1455223880597015,
+      "low_confidence": 0.1520912547528517,
       "error": null
     },
     {
@@ -4141,35 +4141,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.4882385460005025,
+          "seconds": 3.3354119369978434,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.0000773069987189956,
-          "cached": false,
+          "seconds": 0.0002707339954213239,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.5259049860032974,
-          "cached": false,
+          "seconds": 2.5234814309951616,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.08241758241758242,
-      "cer": 0.0304093567251462,
+      "wer": 0.06593406593406594,
+      "cer": 0.026900584795321637,
       "ref_words": 182,
       "ref_chars": 855,
       "timing": {
-        "words": 166,
-        "coverage": 0.9171270718232044,
-        "start_median": 0.030295918500002017,
-        "start_mean": 0.12184577766867487,
-        "start_within": 0.963855421686747,
-        "start_within_wide": 0.9759036144578314,
-        "end_median": 0.09175056700000184,
-        "end_mean": 0.21078617868674687,
-        "start_bias": 0.08855402563252945
+        "words": 169,
+        "coverage": 0.9337016574585635,
+        "start_median": 0.029489796000000013,
+        "start_mean": 0.04245292435502977,
+        "start_within": 0.9881656804733728,
+        "start_within_wide": 1.0,
+        "end_median": 0.0925827660000067,
+        "end_mean": 0.14601380667455632,
+        "start_bias": 0.00747174925443728
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4177,8 +4177,8 @@
       "line_start_median": null,
       "language_reported": "de",
       "language_switch": false,
-      "outside_voice": 0.0004222972972972973,
-      "low_confidence": 0.096045197740113,
+      "outside_voice": 0.0004297378599054577,
+      "low_confidence": 0.1016949152542373,
       "error": null
     },
     {
@@ -4195,35 +4195,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.966153723995376,
+          "seconds": 4.8426906540044,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00014372300211107358,
-          "cached": false,
+          "seconds": 0.0005238149969954975,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 3.1381337030034047,
-          "cached": false,
+          "seconds": 3.128218558995286,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.1952662721893491,
-      "cer": 0.10184119677790564,
+      "wer": 0.17751479289940827,
+      "cer": 0.09263521288837745,
       "ref_words": 338,
       "ref_chars": 1738,
       "timing": {
-        "words": 268,
-        "coverage": 0.7859237536656891,
-        "start_median": 0.029222222000001352,
-        "start_mean": 0.0629141875522385,
-        "start_within": 0.9776119402985075,
-        "start_within_wide": 0.9813432835820896,
-        "end_median": 0.10735714300000154,
-        "end_mean": 0.1513282989813433,
-        "start_bias": 0.0065608691268653485
+        "words": 274,
+        "coverage": 0.8035190615835777,
+        "start_median": 0.029928570999999238,
+        "start_mean": 0.0804827614635032,
+        "start_within": 0.9635036496350365,
+        "start_within_wide": 0.9708029197080292,
+        "end_median": 0.10925850349999422,
+        "end_mean": 0.1680249102043795,
+        "start_bias": 0.020254531010948526
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4232,7 +4232,7 @@
       "language_reported": "fr",
       "language_switch": false,
       "outside_voice": 0.0,
-      "low_confidence": 0.18152866242038215,
+      "low_confidence": 0.18808777429467086,
       "error": null
     },
     {
@@ -4249,18 +4249,18 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 4.609080790003645,
+          "seconds": 3.905902389997209,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007252799696289003,
-          "cached": false,
+          "seconds": 0.00026597499527269974,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.602204235998215,
-          "cached": false,
+          "seconds": 2.565742245002184,
+          "cached": true,
           "error": null
         }
       },
@@ -4272,12 +4272,12 @@
         "words": 157,
         "coverage": 0.9289940828402367,
         "start_median": 0.03257142900000076,
-        "start_mean": 0.07223756085350365,
+        "start_mean": 0.07211017231847178,
         "start_within": 0.9808917197452229,
         "start_within_wide": 0.9872611464968153,
         "end_median": 0.14293650799999824,
-        "end_mean": 0.2154370495732482,
-        "start_bias": 0.03705848026751543
+        "end_mean": 0.21530966103821636,
+        "start_bias": 0.03693109173248356
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4303,35 +4303,35 @@
           "error": null
         },
         "transcriber": {
-          "seconds": 5.155107594000583,
+          "seconds": 4.1184119659956195,
           "cached": false,
           "error": null
         },
         "segmenter": {
-          "seconds": 0.00007729599747108296,
-          "cached": false,
+          "seconds": 0.0003302369950688444,
+          "cached": true,
           "error": null
         },
         "aligner": {
-          "seconds": 2.396194643995841,
-          "cached": false,
+          "seconds": 2.3801360780053074,
+          "cached": true,
           "error": null
         }
       },
-      "wer": 0.1761904761904762,
-      "cer": 0.18144750254842,
+      "wer": 0.09047619047619047,
+      "cer": 0.09480122324159021,
       "ref_words": 210,
       "ref_chars": 981,
       "timing": {
-        "words": 171,
-        "coverage": 0.8142857142857143,
-        "start_median": 0.036000000000001364,
-        "start_mean": 0.4151099574210527,
-        "start_within": 0.935672514619883,
-        "start_within_wide": 0.935672514619883,
-        "end_median": 0.1948730160000025,
-        "end_mean": 0.569852395567252,
-        "start_bias": 0.341720266274853
+        "words": 190,
+        "coverage": 0.9047619047619048,
+        "start_median": 0.03375396799999919,
+        "start_mean": 0.05961567011052663,
+        "start_within": 0.9789473684210527,
+        "start_within_wide": 0.9842105263157894,
+        "end_median": 0.19157142850000497,
+        "end_mean": 0.24708215778947387,
+        "start_bias": -0.02077490153157962
       },
       "scored_share": 1.0,
       "reference_validated": null,
@@ -4339,8 +4339,8 @@
       "line_start_median": null,
       "language_reported": "es",
       "language_switch": false,
-      "outside_voice": 0.00031210986267166043,
-      "low_confidence": 0.14124293785310735,
+      "outside_voice": 0.00026752273943285177,
+      "low_confidence": 0.14285714285714285,
       "error": null
     }
   ],
@@ -4348,142 +4348,142 @@
     "all": {
       "songs": 79,
       "failed": 0,
-      "wer": 0.22868511646622255,
-      "cer": 0.15654740077182322,
+      "wer": 0.23217239683462243,
+      "cer": 0.15996123421865996,
       "timing": {
-        "words": 17088,
-        "coverage": 0.7918443002780352,
-        "start_median": 0.03427210899998556,
-        "start_mean": 0.24981207002970507,
-        "start_within": 0.9767673220973783,
-        "start_within_wide": 0.978815543071161,
-        "end_median": 0.07529024950000718,
-        "end_mean": 0.3219134365801908,
-        "start_bias": 0.10521572716639746
+        "words": 17051,
+        "coverage": 0.790129749768304,
+        "start_median": 0.03436734699999988,
+        "start_mean": 0.2672157139973081,
+        "start_within": 0.9795906398451704,
+        "start_within_wide": 0.98217113365785,
+        "end_median": 0.07520634899998413,
+        "end_mean": 0.3404665065924521,
+        "start_bias": 0.14387438215205556
       },
       "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.2044457523780086,
-        "transcriber": 0.026395351863324673,
-        "segmenter": 4.859511345954324e-7,
-        "aligner": 0.014342489811549666
+        "transcriber": 0.021015543008410256,
+        "segmenter": 1.7805153887223629e-6,
+        "aligner": 0.014000636632774175
       },
-      "est_seconds_4min": 65.84541720796442,
-      "outside_voice": 0.00023620190324202868,
-      "low_confidence": 0.2192526321422371
+      "est_seconds_4min": 64.47332718230584,
+      "outside_voice": 0.00023938978488358272,
+      "low_confidence": 0.22116929921995787
     },
     "de": {
       "songs": 20,
       "failed": 0,
-      "wer": 0.13891035548686245,
-      "cer": 0.08557984858133447,
+      "wer": 0.14219474497681608,
+      "cer": 0.08957758437699002,
       "timing": {
-        "words": 4434,
-        "coverage": 0.8598022105875509,
-        "start_median": 0.02943650799999631,
-        "start_mean": 0.1119055892201173,
-        "start_within": 0.983085250338295,
-        "start_within_wide": 0.9866937302661254,
-        "end_median": 0.07257029499999135,
-        "end_mean": 0.18444899489896258,
-        "start_bias": 0.03465346360712683
+        "words": 4405,
+        "coverage": 0.8541787861159589,
+        "start_median": 0.029766440000003058,
+        "start_mean": 0.13224489524404087,
+        "start_within": 0.981838819523269,
+        "start_within_wide": 0.9854710556186153,
+        "end_median": 0.07304081600000245,
+        "end_mean": 0.20370479636095346,
+        "start_bias": 0.1102264875341658
       },
       "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.20456434753710234,
-        "transcriber": 0.023078903581629097,
-        "segmenter": 4.42628321767945e-7,
-        "aligner": 0.013849144117051989
+        "transcriber": 0.020091117466815207,
+        "segmenter": 1.5567454035378379e-6,
+        "aligner": 0.013709065244019688
       },
-      "est_seconds_4min": 64.95951909438546,
-      "outside_voice": 0.00023365500013176362,
-      "low_confidence": 0.1710646641409978
+      "est_seconds_4min": 64.209897052408,
+      "outside_voice": 0.00022548470291580076,
+      "low_confidence": 0.16692531565407998
     },
     "en": {
       "songs": 20,
       "failed": 0,
-      "wer": 0.33702100368767035,
-      "cer": 0.27733766673437604,
+      "wer": 0.3347763347763348,
+      "cer": 0.27638973525628,
       "timing": {
-        "words": 3969,
-        "coverage": 0.6971719655717548,
-        "start_median": 0.058557610500002966,
-        "start_mean": 0.6931647833652305,
-        "start_within": 0.9541446208112875,
-        "start_within_wide": 0.9559082892416225,
-        "end_median": 0.055197635799999034,
-        "end_mean": 0.7315994780078862,
-        "start_bias": 0.27400578044152185
+        "words": 4020,
+        "coverage": 0.7061303354997365,
+        "start_median": 0.058071581799978844,
+        "start_mean": 0.758918849484602,
+        "start_within": 0.9649253731343284,
+        "start_within_wide": 0.9679104477611941,
+        "end_median": 0.05524957105000183,
+        "end_mean": 0.800027068271617,
+        "start_bias": 0.4062436857036567
       },
       "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.2044423912728473,
-        "transcriber": 0.02209743514887683,
-        "segmenter": 4.6383548919651503e-7,
-        "aligner": 0.013992431416142906
+        "transcriber": 0.01939700688916482,
+        "segmenter": 1.6162996388340207e-6,
+        "aligner": 0.013761393373819687
       },
-      "est_seconds_4min": 64.72909120860571,
-      "outside_voice": 0.00022872787894508015,
-      "low_confidence": 0.26426037211469944
+      "est_seconds_4min": 64.02661405451917,
+      "outside_voice": 0.00023815638765059774,
+      "low_confidence": 0.27492788151030456
     },
     "es": {
       "songs": 20,
       "failed": 0,
-      "wer": 0.1503870254330999,
-      "cer": 0.09631102275237464,
+      "wer": 0.1566531514928124,
+      "cer": 0.0986672557249098,
       "timing": {
-        "words": 4605,
-        "coverage": 0.873979882330613,
-        "start_median": 0.027825397000000862,
-        "start_mean": 0.17255887739153075,
-        "start_within": 0.9815418023887079,
-        "start_within_wide": 0.9821932681867536,
-        "end_median": 0.09176190499999848,
-        "end_mean": 0.25844511167383283,
-        "start_bias": 0.12036481641520091
+        "words": 4598,
+        "coverage": 0.872651356993737,
+        "start_median": 0.027824262999999405,
+        "start_mean": 0.13845685445454528,
+        "start_within": 0.985863418877773,
+        "start_within_wide": 0.9871683340582862,
+        "end_median": 0.09181972800000171,
+        "end_mean": 0.22976628949978253,
+        "start_bias": 0.05929907709134405
       },
       "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.204249298371232,
-        "transcriber": 0.02651182627185171,
-        "segmenter": 4.776683448924553e-7,
-        "aligner": 0.014521375429232656
+        "transcriber": 0.021296493135243177,
+        "segmenter": 1.70812326134203e-6,
+        "aligner": 0.013931812711471692
       },
-      "est_seconds_4min": 65.86915266475891,
-      "outside_voice": 0.0001572307006613209,
-      "low_confidence": 0.16909025242362222
+      "est_seconds_4min": 64.47707113589618,
+      "outside_voice": 0.00016891234534849108,
+      "low_confidence": 0.1708861876088143
     },
     "fr": {
       "songs": 19,
       "failed": 0,
-      "wer": 0.26736613603473225,
-      "cer": 0.15905708874458874,
+      "wer": 0.27478292329956583,
+      "cer": 0.16724161255411255,
       "timing": {
-        "words": 4080,
-        "coverage": 0.7471159128364768,
-        "start_median": 0.029653061000004755,
-        "start_mean": 0.05558691531887276,
-        "start_within": 0.9865196078431373,
-        "start_within_wide": 0.9887254901960785,
-        "end_median": 0.08044557850000089,
-        "end_mean": 0.1443999738796569,
-        "start_bias": 0.0006039132404409428
+        "words": 4028,
+        "coverage": 0.7375938472807179,
+        "start_median": 0.0299183670000005,
+        "start_mean": 0.07107199208242326,
+        "start_within": 0.9846077457795432,
+        "start_within_wide": 0.9870903674280039,
+        "end_median": 0.08063378700000001,
+        "end_mean": 0.15774591915739827,
+        "start_bias": 0.015366841979145745
       },
       "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.20455363261095522,
-        "transcriber": 0.02845099223018642,
-        "segmenter": 6.472021939890421e-7,
-        "aligner": 0.014964920739864128
+        "transcriber": 0.023093497174928368,
+        "segmenter": 2.0439403154227027e-6,
+        "aligner": 0.014235018233685117
       },
-      "est_seconds_4min": 66.51408427496816,
-      "outside_voice": 0.00032987782954510385,
-      "low_confidence": 0.2754027455605443
+      "est_seconds_4min": 65.0542422443784,
+      "outside_voice": 0.00032951180460553915,
+      "low_confidence": 0.27460983910066816
     }
   },
   "notes": []

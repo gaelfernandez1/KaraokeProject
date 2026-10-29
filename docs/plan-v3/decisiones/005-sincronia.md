@@ -140,14 +140,36 @@ más o menos; luego lo alinea como una letra pegada.
 
 | Sin letra | Línea base | Nuevo (`c4-default`) | Meta (003) |
 |---|---|---|---|
-| WER jamendo (79) | 33,7 % (`base-turbo`) | **22,9 %** | ≤ 30 % ✓ |
-| WER gallego (2 con letra publicada) | 35,9 % | 27,8 % (0,77×) | ≤ 0,7× (25 %) ✗ |
+| WER jamendo (79) | 33,7 % (`base-turbo`) | **23,2 %** | ≤ 30 % ✓ |
+| WER gallego (2 con letra publicada) | 35,9 % | 26,5 % (0,74×) | ≤ 0,7× (25 %) ✗ por 1,5 puntos |
+| WER gallego privadas (2) | 61,0 % (`sep-melkim-8s`) | 40,1 % | — |
 | Cambios de idioma (jamendo y gallego) | 0 | 0 | 0 ✓ |
-| Canción de 4 min sin letra (jamendo / gallego) | 40 s | 66 / 90 s | ≤ 2 min ✓ |
 
-El gallego se queda a 2,8 puntos de la meta. Son dos canciones (690 palabras) y el ruido por idioma
-es de ±5,6 puntos. Lo que más ayudó no fue el modelo, sino quitar lo que Whisper inventa donde la
-voz calla.
+Ajustes después de la revisión:
+
+- **Búsqueda con haz de 1** en vez de 5: el mismo WER, y menos tiempo.
+- **Cánticos en bucle donde suena la voz**: se quedan en una línea en vez de borrarse. Un cierre
+  de Pantis salía como la misma palabra 75 veces; la letra publicada lo escribe en dos líneas.
+- **Repeticiones de un estribillo** en segmentos seguidos: se mantienen donde la voz suena
+  claramente.
+
+`karaoke make` en un proceso, con una canción gallega de 4 min 47 s (Pantis):
+
+| | Total | Por 4 min | RAM pico | VRAM pico |
+|---|---|---|---|---|
+| Con letra | 109 s | ~91 s ✓ | 3,8 GB ✓ | 2,9 GB ✓ |
+| Sin letra | 187 s | ~156 s ✗ | 3,6 GB ✓ | 3,4 GB ✗ |
+
+- **Sin letra, en un solo proceso**: llegaba a 5,7 GB de RAM, porque CTranslate2 y torch se
+  quedan la memoria que usaron. Por eso el transcriptor por defecto va en un proceso hijo.
+- **El tiempo sin letra de Pantis lo dispara su cántico final**. Whisper vuelve a decodificar el
+  texto repetitivo con más temperatura: 73 s de transcripción, frente a 10–19 s de las otras
+  cuatro gallegas.
+  - Con una gallega típica, sin letra sale en unos 105–115 s por cada 4 minutos.
+  - Con `temperatures = [0.0]` (sin reintentos), Pantis transcribe en 28 s, pero su WER sube
+    2 puntos. Queda como opción; por defecto se prefiere la precisión.
+- **Otros pasos que pesan** (de C3): separar, unos 55 s por cada 4 min, y nivelar y codificar el
+  audio, unos 25–30 s.
 
 ## Validación automática del gallego
 
