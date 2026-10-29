@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -58,3 +59,45 @@ def test_roformer_separator_writes_two_stems(tmp_path: Path) -> None:
     assert stems.instrumental == tmp_path / "instrumental.wav"
     assert stems.vocals.stat().st_size > 1000
     assert stems.instrumental.stat().st_size > 1000
+
+
+class _FakeSeparator:
+    """Stands in for audio_separator's Separator and keeps the arguments it got."""
+
+    calls: ClassVar[list[dict[str, object]]] = []
+
+    def __init__(self, **kwargs: object) -> None:
+        _FakeSeparator.calls.append(kwargs)
+
+    def load_model(self, model_filename: str) -> None:
+        pass
+
+
+def _loaded_params(monkeypatch: pytest.MonkeyPatch, tmp_path: Path, **params: object) -> object:
+    import sys
+    import types
+
+    module = types.ModuleType("audio_separator.separator")
+    module.Separator = _FakeSeparator  # type: ignore[attr-defined]
+    monkeypatch.setitem(sys.modules, "audio_separator", types.ModuleType("audio_separator"))
+    monkeypatch.setitem(sys.modules, "audio_separator.separator", module)
+    _FakeSeparator.calls = []
+    RoformerSeparator(model="m.ckpt", model_dir=str(tmp_path), **params).load()  # type: ignore[arg-type]
+    return _FakeSeparator.calls[-1]["mdxc_params"]
+
+
+def test_model_chunk_length_is_kept_by_default(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    params = _loaded_params(monkeypatch, tmp_path)
+
+    assert params["override_model_segment_size"] is False  # type: ignore[index]
+
+
+def test_a_segment_size_overrides_the_model_chunk_length(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    params = _loaded_params(monkeypatch, tmp_path, segment_size=551)
+
+    assert params["override_model_segment_size"] is True  # type: ignore[index]
+    assert params["segment_size"] == 551  # type: ignore[index]

@@ -32,7 +32,9 @@ class RoformerSeparator:
         model: str,
         vocals_stem: str = "Vocals",
         model_dir: str | None = None,
-        segment_size: int = 256,
+        # STFT frames per chunk; None keeps the model's own (8 s for most RoFormers). Shorter
+        # chunks need less VRAM.
+        segment_size: int | None = None,
         # Overlapping passes per chunk. With 8, audio-separator's default, a 4 min song took over
         # 3 min on the laptop GPU; 2 is the usual trade-off (the models ship with 1 to 8).
         overlap: int = 2,
@@ -62,8 +64,8 @@ class RoformerSeparator:
             normalization_threshold=1.0,
             use_autocast=self.autocast,
             mdxc_params={
-                "segment_size": self.segment_size,
-                "override_model_segment_size": False,
+                "segment_size": self.segment_size or 256,
+                "override_model_segment_size": self.segment_size is not None,
                 "batch_size": self.batch_size,
                 "overlap": self.overlap,
                 "pitch_shift": 0,
