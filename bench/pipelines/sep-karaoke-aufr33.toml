@@ -1,0 +1,18 @@
+# Separation candidate: base-turbo with the separator swapped, so a compare against base-turbo
+# shows only the effect of the separation.
+name = "sep-karaoke-aufr33"
+description = "Mel-Band RoFormer karaoke model (aufr33 and viperx): lead vocals, backing vocals stay in the instrumental + Whisper large-v3-turbo + default CTC aligner"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "mel_band_roformer_karaoke_aufr33_viperx_sdr_10.1956.ckpt" }
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "large-v3-turbo" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"
