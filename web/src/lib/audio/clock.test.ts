@@ -150,6 +150,18 @@ describe('SongClock', () => {
 		expect(clock.now()).toBeCloseTo(61, 6);
 	});
 
+	it('counts from the scheduled start, not from the call', () => {
+		const time = new FakeTime();
+		const clock = clockAt(time);
+		clock.play(30, time.context + 0.05);
+		time.tick(0.03);
+
+		expect(clock.position()).toBe(30);
+		expect(clock.now()).toBe(30);
+		time.tick(0.07);
+		expect(clock.position()).toBeCloseTo(30.05, 6);
+	});
+
 	it('never passes the end of the song or goes below zero', () => {
 		const time = new FakeTime();
 		const clock = clockAt(time, 10);
