@@ -54,7 +54,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "4"
+    version = "5"
 
     # Defaults measured on the quick, stress and private sets (decision 005). Skip costs are per
     # letter: a flat cost per line rewarded cramming many short lines into the audio. Moving
@@ -65,7 +65,7 @@ class LyricsAligner:
         filler_penalty: float = 3.0,
         skip_penalty: float = 6.0,
         backing_skip_penalty: float = 4.0,
-        edge_skip_penalty: float = 1.0,
+        edge_skip_penalty: float = 3.0,
         silence_penalty: float = 4.0,
         refine_onsets: bool = False,
         char_map: dict[str, str] | None = None,

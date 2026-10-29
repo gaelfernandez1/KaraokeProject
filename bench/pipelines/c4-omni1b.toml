@@ -1,0 +1,18 @@
+# Omnilingual CTC 1B for every language
+name = "c4-omni1b"
+description = "Mel-Band RoFormer (Kim, 8 s) + Whisper large-v3-turbo + lyrics aligner (Omnilingual CTC 1B for every language)"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "vocals_mel_band_roformer.ckpt", segment_size = 801 }
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "large-v3-turbo" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_engine.align.aligner:LyricsAligner"
+params = { model = "omni-ctc-1b" }
