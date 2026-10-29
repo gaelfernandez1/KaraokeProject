@@ -25,6 +25,7 @@ karaoke-engine = { workspace = true }
 karaoke-bench = { workspace = true }
 torch = { index = "pytorch-cu130" }
 torchaudio = { index = "pytorch-cu130" }
+torchvision = { index = "pytorch-cu130" }
 
 [[tool.uv.index]]
 name = "pytorch-cu130"
@@ -52,7 +53,7 @@ files = ["packages/contracts/src", "packages/engine/src", "packages/bench/src"]
 
 # Libraries without type information used by the bench (the optional ones live in the ml extra).
 [[tool.mypy.overrides]]
-module = ["pynvml", "faster_whisper.*", "demucs.*", "ctranslate2.*"]
+module = ["pynvml", "faster_whisper.*", "demucs.*", "ctranslate2.*", "audio_separator.*"]
 ignore_missing_imports = true
 
 # The contract models accept unknown fields at runtime (forward compatibility); mypy still
