@@ -42,4 +42,6 @@ def invoke(kind: StepKind, step: Any, args: dict[str, Any], work_dir: Path) -> A
         return step.transcribe(Path(args["vocals"]), args["language"])
     if kind == "segmenter":
         return step.segment(decode_output("transcriber", args["transcript"]))
+    if "lyrics" in args:
+        return step.align_text(Path(args["vocals"]), args["lyrics"], args["language"])
     return step.align(Path(args["vocals"]), list(args["lines"]), args["language"])

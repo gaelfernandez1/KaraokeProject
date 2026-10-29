@@ -31,7 +31,7 @@ from karaoke_bench.metrics import (
     timing_stats,
 )
 from karaoke_bench.paths import BenchPaths
-from karaoke_bench.pipeline import Mode, Pipeline, StepKind, step_version
+from karaoke_bench.pipeline import Mode, Pipeline, StepKind, step_class, step_version
 from karaoke_bench.reference import Reference
 from karaoke_bench.report import render_report
 from karaoke_bench.results import RunResults, SongResult, SongStep, StageRecord, summarize
@@ -62,6 +62,8 @@ class _SongState:
     duration: float
     steps: dict[str, SongStep]
     lines_in: list[str] | None = None
+    # Set when the aligner reads pasted lyrics as they are (a TextAligner).
+    lyrics_text: str | None = None
     vocals: Path | None = None
     vocals_fp: str = ""
     transcript: Transcript | None = None
@@ -82,6 +84,7 @@ def run(options: RunOptions, paths: BenchPaths) -> Path:
 
     notes: list[str] = []
     states = []
+    text_aligner = _reads_text(options.pipeline)
     for song in songs:
         reference = song.load_reference()
         lyrics = song.lyrics_text()
@@ -95,10 +98,11 @@ def run(options: RunOptions, paths: BenchPaths) -> Path:
                 duration=reference.duration if reference else duration(song.audio),
                 steps={},
                 lines_in=lyrics_lines(lyrics) if lyrics else None,
+                lyrics_text=lyrics if text_aligner and options.mode == "lyrics" else None,
             )
         )
 
-    stages = _run_steps(states, options, paths)
+    stages = _run_steps(states, options, paths, text_aligner)
     timing: dict[str, TimingErrors] = {}
     line_errors: dict[str, list[float]] = {}
     results = [_score(state, options.mode, timing, line_errors) for state in states]
@@ -158,7 +162,7 @@ def run_lyrics_stages(
 
 
 def _run_steps(
-    states: list[_SongState], options: RunOptions, paths: BenchPaths
+    states: list[_SongState], options: RunOptions, paths: BenchPaths, text_aligner: bool = False
 ) -> dict[str, StageOutcome]:
     pipeline, cache = options.pipeline, options.use_cache
     stages: dict[str, StageOutcome] = {}
@@ -195,20 +199,27 @@ def _run_steps(
         outcome = stages["segmenter"] = _stage(pipeline, "segmenter", live, args, paths, cache)
         for state in live:
             state.lines_in = _take(state, "segmenter", outcome)
+            if text_aligner and state.lines_in:
+                state.lyrics_text = "\n".join(state.lines_in)
 
     live = [s for s in states if s.error is None and s.lines_in]
-    args = {
-        s.song.song_id: {
-            "vocals": str(s.vocals),
-            "lines": s.lines_in,
-            "language": s.transcript.language if s.transcript else s.song.language,
-        }
-        for s in live
-    }
+    args = {s.song.song_id: _aligner_args(s) for s in live}
     outcome = stages["aligner"] = _stage(pipeline, "aligner", live, args, paths, cache)
     for state in live:
         state.aligned = _take(state, "aligner", outcome)
     return stages
+
+
+def _aligner_args(state: _SongState) -> dict[str, Any]:
+    language = state.transcript.language if state.transcript else state.song.language
+    if state.lyrics_text is not None:
+        return {"vocals": str(state.vocals), "lyrics": state.lyrics_text, "language": language}
+    return {"vocals": str(state.vocals), "lines": state.lines_in, "language": language}
+
+
+def _reads_text(pipeline: Pipeline) -> bool:
+    spec = pipeline.steps.get("aligner")
+    return spec is not None and callable(getattr(step_class(spec), "align_text", None))
 
 
 def _stage(
@@ -299,7 +310,11 @@ def _score(
 
 def _check_aligned(state: _SongState) -> str | None:
     aligned = state.aligned or []
-    if state.lines_in is not None and len(aligned) != len(state.lines_in):
+    if (
+        state.lyrics_text is None
+        and state.lines_in is not None
+        and len(aligned) != len(state.lines_in)
+    ):
         return f"returned {len(aligned)} lines for {len(state.lines_in)} lyric lines"
     for line in aligned:
         for word in line.words:

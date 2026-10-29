@@ -59,3 +59,16 @@ class Aligner(Protocol):
     name: str
 
     def align(self, vocals: Path, lyrics_lines: Sequence[str], language: str) -> list[Line]: ...
+
+
+@runtime_checkable
+class TextAligner(Protocol):
+    """An aligner that reads the lyrics as pasted: section labels, repeat marks, backing parts.
+
+    It may return a different number of lines than the text has (repeats it expands, lines it
+    finds are not sung).
+    """
+
+    name: str
+
+    def align_text(self, vocals: Path, lyrics: str, language: str) -> list[Line]: ...

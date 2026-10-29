@@ -167,3 +167,53 @@ def test_approximate_reference_scores_and_says_so(paths: BenchPaths) -> None:
     assert song.reference_timing == "approximate"
     assert "| aproximada |" in report
     assert "≤ 0,5 s" in report
+
+
+def _web_lyrics(paths: BenchPaths) -> str:
+    """Gives the demo song pasted-from-the-web lyrics: a section label and a repeat mark."""
+    from karaoke_bench.reference import load_reference
+
+    song_dir = paths.data / "private" / "demo"
+    lines = [line.text for line in load_reference(song_dir / "reference.json").lines]
+    text = "\n".join(["[Estribillo]", *lines[:-1], f"{lines[-1]} x2"]) + "\n"
+    (song_dir / "lyrics.txt").write_text(text, encoding="utf-8")
+    return text
+
+
+def test_runner_passes_raw_lyrics_to_text_aligners(paths: BenchPaths, tmp_path: Path) -> None:
+    text = _web_lyrics(paths)
+    record = tmp_path / "seen.txt"
+    aligner = 'target = "karaoke_bench.fakes:TextEvenSplitAligner"'
+    pipeline = _pipeline(tmp_path, f'{aligner}\nparams = {{ record_to = "{record}" }}')
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.error is None
+    assert record.read_text(encoding="utf-8") == text
+
+
+def test_text_aligner_may_return_more_lines(paths: BenchPaths, tmp_path: Path) -> None:
+    _web_lyrics(paths)
+    pipeline = _pipeline(
+        tmp_path, 'target = "karaoke_bench.fakes:TextEvenSplitAligner"\nparams = { repeat = 2 }'
+    )
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.error is None
+    assert song.timing is not None
+    assert song.line_start_median is None
+
+
+def test_plain_aligners_still_get_clean_lines(paths: BenchPaths, tmp_path: Path) -> None:
+    _web_lyrics(paths)
+    pipeline = _pipeline(tmp_path, 'target = "karaoke_bench.fakes:EvenSplitAligner"')
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.error is None
+    raw = (paths.runs / out.name / "demo.json").read_text(encoding="utf-8")
+    assert "Estribillo" not in raw

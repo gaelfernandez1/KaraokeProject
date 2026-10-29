@@ -64,6 +64,12 @@ protocolos de `karaoke_engine.steps`. Para que el banco la use bien:
   métodos, porque el banco importa la clase para leer `version`.
 - Opcional: un método `load()` sin argumentos. El banco lo cronometra aparte como «carga».
 - Fija la revisión de los modelos de Hugging Face.
+- Si el alineador tiene además `align_text(vocals, lyrics, language)` (protocolo
+  `karaoke_engine.steps.TextAligner`), recibe la letra tal como se pegó, con cabeceras
+  (`[Estribillo]`), repeticiones (`x2`) y coros entre paréntesis, y puede devolver otro número de
+  líneas, por ejemplo si repite un estribillo o se salta una línea que no se canta. En modo `asr`
+  recibe las líneas del segmentador unidas por saltos de línea. Los demás alineadores siguen
+  recibiendo las líneas limpias.
 
 Pipelines incluidos:
 
