@@ -34,6 +34,8 @@ _ONSET_SILENCE = 0.2
 _ONSET_REACH = 0.5
 _END_SLACK = 0.1
 _END_GAP = 0.3
+# A backing part may start this long before the lead line it answers.
+_BACKING_MARGIN = 0.5
 
 
 class _Model(Protocol):
@@ -56,7 +58,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "8"
+    version = "9"
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -68,7 +70,8 @@ class LyricsAligner:
         model: str | None = None,
         filler_penalty: float = 3.0,
         skip_penalty: float = 6.0,
-        backing_skip_penalty: float = 4.0,
+        backing_skip_penalty: float = 6.0,
+        backing_min_confidence: float = 0.05,
         edge_skip_penalty: float = math.inf,
         silence_penalty: float = 4.0,
         refine_onsets: bool = False,
@@ -82,6 +85,7 @@ class LyricsAligner:
         self.filler_penalty = filler_penalty
         self.skip_penalty = skip_penalty
         self.backing_skip_penalty = backing_skip_penalty
+        self.backing_min_confidence = backing_min_confidence
         self.edge_skip_penalty = edge_skip_penalty
         self.silence_penalty = silence_penalty
         self.refine_onsets = refine_onsets
@@ -114,32 +118,34 @@ class LyricsAligner:
         frame_active = _resample(active, emissions.log_probs.shape[0], emissions.frame_seconds)
         penalty = np.where(frame_active, 0.0, self.silence_penalty).astype(np.float32)
 
-        aligned = [i for i, line in enumerate(tokens) if line.ids]
-        segments = []
-        for i in aligned:
-            count = len(tokens[i].ids)
-            rate = self.backing_skip_penalty if lines[i].backing else self.skip_penalty
-            segments.append(
-                Segment(
-                    tokens=tuple(column[t] for t in tokens[i].ids),
-                    owner=tokens[i].owner,
-                    skip_penalty=rate * count,
-                    edge_skip_penalty=min(rate, self.edge_skip_penalty) * count,
-                )
-            )
-        paths = align_segments(emissions.log_probs, segments, self.filler_penalty, penalty)
+        # Lead lines first, in one path. Backing parts then go one by one into the stretch around
+        # their lead line, where they may overlap it (two voices at once cannot share one path).
+        segments = {i: self._segment(lines[i], tokens[i], column) for i in range(len(lines))
+                    if tokens[i].ids}  # fmt: skip
+        leads = [i for i in segments if not lines[i].backing]
+        paths = align_segments(
+            emissions.log_probs, [segments[i] for i in leads], self.filler_penalty, penalty
+        )
+        placed = {i: p.spans for i, p in zip(leads, paths, strict=True) if p.spans is not None}
+        for i in (i for i in segments if lines[i].backing):
+            first, last = _backing_window(i, leads, placed, len(emissions.log_probs),
+                                          emissions.frame_seconds)  # fmt: skip
+            [path] = align_segments(
+                emissions.log_probs[first:last], [segments[i]], self.filler_penalty,
+                penalty[first:last],
+            )  # fmt: skip
+            if path.spans is not None:
+                placed[i] = [(a + first, b + first) for a, b in path.spans]
 
         out: list[Line] = []
-        for i, path in zip(aligned, paths, strict=True):
-            if path.spans is None:
-                continue
-            words = self._words(
-                lines[i], tokens[i], path.spans, emissions, column, active, language
-            )
+        for i, spans in placed.items():
+            words = self._words(lines[i], tokens[i], spans, emissions, column, active, language)
+            if lines[i].backing and _mean_confidence(words) < self.backing_min_confidence:
+                continue  # placed over the lead voice by chance, not sung
             singer = lines[i].singer
             out.append(
                 Line(
-                    id=f"l{len(out) + 1}",
+                    id="l",
                     start=words[0].start,
                     end=max(word.end for word in words),
                     singer=singer_id(singer) if singer else None,
@@ -147,7 +153,21 @@ class LyricsAligner:
                     words=words,
                 )
             )
-        return out
+        out.sort(key=lambda line: line.start)
+        return [line.model_copy(update={"id": f"l{k + 1}"}) for k, line in enumerate(out)]
+
+    def _segment(self, line: LyricLine, tokens: _Tokens, column: dict[int, int]) -> Segment:
+        count = len(tokens.ids)
+        if line.backing:
+            # Aligned alone in its stretch: absent costs the same at either edge or skipped.
+            cost = self.backing_skip_penalty * count
+            return Segment(tuple(column[t] for t in tokens.ids), tokens.owner, cost, cost)
+        return Segment(
+            tokens=tuple(column[t] for t in tokens.ids),
+            owner=tokens.owner,
+            skip_penalty=self.skip_penalty * count,
+            edge_skip_penalty=min(self.skip_penalty, self.edge_skip_penalty) * count,
+        )
 
     def _tokens(self, line: LyricLine, vocab: Vocab, language: str) -> _Tokens:
         ids: list[int] = []
@@ -248,6 +268,27 @@ class LyricsAligner:
         model.load()
         self._loaded = (name, model)
         return model
+
+
+def _mean_confidence(words: Sequence[Word]) -> float:
+    rated = [w.confidence for w in words if w.confidence]
+    return math.exp(sum(math.log(c) for c in rated) / len(rated)) if rated else 0.0
+
+
+def _backing_window(
+    index: int,
+    leads: Sequence[int],
+    placed: dict[int, list[tuple[int, int]]],
+    frames: int,
+    frame_seconds: float,
+) -> tuple[int, int]:
+    """Frames from just before the lead line before a backing part to the second one after it."""
+    before = [i for i in leads if i < index and i in placed]
+    after = [i for i in leads if i > index and i in placed]
+    margin = round(_BACKING_MARGIN / frame_seconds)
+    first = max(placed[before[-1]][0][0] - margin, 0) if before else 0
+    last = placed[after[1]][0][0] if len(after) > 1 else frames
+    return first, max(last, first)
 
 
 def _fill_gaps(
