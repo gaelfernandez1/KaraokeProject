@@ -113,3 +113,36 @@ def test_segmenter_cuts_on_punctuation_and_length() -> None:
 
     assert lines == ["Ola, mar.", "Vai o vento!", " ".join(f"p{i}" for i in range(6)),
                      " ".join(f"p{i}" for i in range(6, 12))]  # fmt: skip
+
+
+def test_galician_defaults_to_the_galician_model() -> None:
+    assert WhisperTranscriber().model_for_language("gl").startswith("HiTZ/whisper-large-v3-gl@")
+    assert (
+        WhisperTranscriber()
+        .model_for_language("es")
+        .startswith("dropbox-dash/faster-whisper-large-v3-turbo@")
+    )
+
+
+def test_conversion_runs_in_its_own_process(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.transcribe as transcribe
+
+    ran: list[list[str]] = []
+
+    def fake_run(command: list[str], check: bool) -> None:
+        ran.append(command)
+        (Path(command[-1]) / "model.bin").parent.mkdir(parents=True, exist_ok=True)
+        (Path(command[-1]) / "model.bin").write_bytes(b"x")
+
+    monkeypatch.setattr(transcribe, "CACHE", tmp_path)
+    monkeypatch.setattr(transcribe.subprocess, "run", fake_run)
+    monkeypatch.setattr(transcribe, "_download", lambda spec: tmp_path / "hf")
+
+    target = transcribe.prepare("hitz-large-v3-gl")
+
+    assert (target / "model.bin").is_file()
+    assert ran[0][1:3] == ["-m", "karaoke_engine.transcribe"]
+    assert transcribe.prepare("hitz-large-v3-gl") == target
+    assert len(ran) == 1
