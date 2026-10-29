@@ -54,16 +54,18 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "2"
+    version = "3"
 
+    # Defaults measured on the quick and stress sets (decision 005). Moving line starts to the
+    # voice onset made JamendoLyrics worse, whose hand-made starts follow the sung vowel.
     def __init__(
         self,
         model: str | None = None,
         filler_penalty: float = 3.0,
-        skip_penalty: float = 40.0,
-        backing_skip_penalty: float = 5.0,
+        skip_penalty: float = 200.0,
+        backing_skip_penalty: float = 60.0,
         silence_penalty: float = 4.0,
-        refine_onsets: bool = True,
+        refine_onsets: bool = False,
         char_map: dict[str, str] | None = None,
         device: str = "cuda",
         dtype: str = "float16",
