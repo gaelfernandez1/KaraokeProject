@@ -71,6 +71,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--pipeline", type=Path, required=True, help="its separator makes the stems"
     )
     package.add_argument("--out", type=Path, required=True)
+    package.add_argument(
+        "--align", action="store_true", help="time the lyrics with the pipeline's aligner"
+    )
 
     tri = commands.add_parser(
         "triangulate", help="validate a drafted reference where several aligners agree"
@@ -97,7 +100,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "realign":
             return _realign(paths, _one_song(args.song, paths), args.pipeline)
         if args.command == "package":
-            return _package(paths, _one_song(args.song, paths), args.pipeline, args.out)
+            song = _one_song(args.song, paths)
+            if args.align:
+                return _package_aligned(paths, song, args.pipeline, args.out)
+            return _package(paths, song, args.pipeline, args.out)
         if args.command == "triangulate":
             song = _one_song(args.song, paths)
             return _triangulate(paths, song, args.pipelines, args.tolerance)
@@ -264,6 +270,32 @@ def _import_srt(paths: BenchPaths, name: str, srt: Path) -> int:
     target = song.audio.parent / "reference.json"
     dump_reference(ref, target)
     print(f"{target}: {len(ref.lines)} lines, {len(ref.scored_words())} words")
+    return 0
+
+
+def _package_aligned(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> int:
+    from karaoke_bench.package import write_package
+    from karaoke_bench.runner import run_lyrics_stages
+    from karaoke_bench.sets import read_meta
+
+    pipeline = load_pipeline(pipeline_path)
+    if "aligner" not in pipeline.steps:
+        raise PackageError(f"{pipeline.name} has no aligner")
+    stems, aligned, _ = run_lyrics_stages([song], pipeline, paths, raw_text=True)
+    outcome = aligned.get(song.song_id)
+    if song.song_id not in stems or outcome is None or outcome.output is None:
+        raise PackageError(f"aligning {song.song_id}: {outcome.error if outcome else 'no lyrics'}")
+    spec = pipeline.steps["aligner"]
+    separator = pipeline.steps.get("separator")
+    meta_path = song.audio.parent / "meta.toml"
+    meta = read_meta(meta_path) if meta_path.is_file() else {}
+    credits = _credits(song, meta, pipeline_path).replace(" --out ", " --align --out ")
+    doc = write_package(
+        song, outcome.output, duration(song.audio), stems[song.song_id], out, credits,
+        f"{separator.target} {separator.params or ''}".strip() if separator else None,
+        f"{spec.target} {spec.params or ''}".strip(),
+    )  # fmt: skip
+    print(f"{out}: {len(doc.lines)} lines")
     return 0
 
 

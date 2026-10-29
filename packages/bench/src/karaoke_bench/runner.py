@@ -147,12 +147,18 @@ def run_lyrics_stages(
     paths: BenchPaths,
     use_cache: bool = True,
     lines: dict[str, list[str]] | None = None,
+    raw_text: bool = False,
 ) -> tuple[dict[str, Stems], dict[str, ItemOutcome], dict[str, StageOutcome]]:
-    """Separator (if any) and aligner with the songs' lyrics; for drafts and packages."""
+    """Separator (if any) and aligner with the songs' lyrics; for drafts and packages.
+
+    With `raw_text`, an aligner that reads pasted lyrics gets the song's lyrics as they are.
+    """
+    text_aligner = raw_text and _reads_text(pipeline)
     states = []
     for song in songs:
         given = lines[song.song_id] if lines else lyrics_lines(song.lyrics_text() or "")
-        states.append(_SongState(song, None, 0.0, {}, lines_in=given))
+        text = song.lyrics_text() if text_aligner else None
+        states.append(_SongState(song, None, 0.0, {}, lines_in=given, lyrics_text=text))
     options = RunOptions(pipeline, "", "lyrics", use_cache=use_cache)
     stages = _run_steps(states, options, paths)
     stems = {
