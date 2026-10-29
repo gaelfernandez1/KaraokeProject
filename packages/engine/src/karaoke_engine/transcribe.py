@@ -38,6 +38,7 @@ CONVERSION_MEMORY_GB = 6.0
 # The same text this many times in a row is a loop; and a long run of one or two words is too.
 _MAX_SAME_IN_A_ROW = 2
 _LOOP_WORDS = 10
+_CHANT_WORDS = 8
 
 
 @dataclass(frozen=True)
@@ -78,7 +79,7 @@ DEFAULT_BY_LANGUAGE: dict[str, str] = {"gl": "hitz-large-v3-gl"}
 class WhisperTranscriber:
     name = "whisper"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "4"
+    version = "5"
 
     def __init__(
         self,
@@ -146,6 +147,9 @@ class WhisperTranscriber:
             looping = _is_loop(text) or _repeats(kept, text) >= _MAX_SAME_IN_A_ROW
             if looping and share < _SURE_VOICE_SHARE:
                 continue
+            if _is_loop(text):
+                # A chant may be real, but Whisper runs on with it: keep one line of it.
+                text = " ".join(text.split()[:_CHANT_WORDS])
             kept.append(TranscriptSegment(segment.start, segment.end, text))
         return Transcript(language=language, segments=tuple(kept))
 
