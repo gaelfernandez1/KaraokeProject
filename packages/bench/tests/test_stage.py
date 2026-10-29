@@ -14,7 +14,7 @@ ToneMaker = Callable[..., Path]
 pytestmark = pytest.mark.usefixtures("ffmpeg")
 
 
-def _items(make_tone: ToneMaker) -> list[StageItem]:
+def _items(make_tone: ToneMaker, names: tuple[str, ...] = ("a", "b")) -> list[StageItem]:
     return [
         StageItem(
             key=name,
@@ -25,7 +25,7 @@ def _items(make_tone: ToneMaker) -> list[StageItem]:
             },
             fingerprint=name,
         )
-        for name in ("a", "b")
+        for name in names
     ]
 
 
@@ -125,3 +125,28 @@ def test_worker_death_marks_missing_items(
     outcome = run_stage(spec, _items(make_tone), BenchPaths(tmp_path / "bench"))
 
     assert all("exited with code 9" in (item.error or "") for item in outcome.items.values())
+
+
+def test_worker_death_fails_only_the_song_it_died_on(tmp_path: Path, make_tone: ToneMaker) -> None:
+    # Like an OOM kill on one song: the songs after it still run.
+    spec = StepSpec("aligner", "karaoke_bench.fakes:CrashingAligner", {"crash_on": "b.wav"})
+
+    outcome = run_stage(spec, _items(make_tone, ("a", "b", "c")), BenchPaths(tmp_path / "bench"))
+
+    assert outcome.items["a"].error is None
+    assert "exited with code 3" in (outcome.items["b"].error or "")
+    assert outcome.items["c"].error is None
+
+
+def test_interrupted_stage_keeps_the_finished_songs(tmp_path: Path, make_tone: ToneMaker) -> None:
+    # The fake sends Ctrl+C to the bench on song b, like a user stopping a long run.
+    params = {"crash_on": "b.wav", "interrupt_parent": True}
+    spec = StepSpec("aligner", "karaoke_bench.fakes:CrashingAligner", params)
+    paths = BenchPaths(tmp_path / "bench")
+    items = _items(make_tone)
+
+    with pytest.raises(KeyboardInterrupt):
+        run_stage(spec, items, paths)
+
+    key = cache_key(spec, step_version(spec), items[0].fingerprint)
+    assert Cache(paths.cache).get("aligner", key) is not None
