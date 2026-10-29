@@ -1,0 +1,241 @@
+"""The lyrics aligner: pasted lyrics and separated vocals in, timed lines and words out.
+
+It reads the lyrics the way a lyrics site writes them (parse_lyrics), turns each word into the
+letters a singer says (spoken), and lets the CTC path rest between lines, skip lines nobody
+sings and keep letters out of the instrumental breaks (align_segments). After the path, line
+starts move back to where the voice really starts (CTC tends to place the first letter late)
+and word ends are kept out of silence.
+"""
+
+import math
+from collections.abc import Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Protocol
+
+import numpy as np
+import numpy.typing as npt
+
+from karaoke_contracts import Line, Word
+from karaoke_engine.align.activity import vocal_activity
+from karaoke_engine.align.audio import SAMPLE_RATE, load_mono16k
+from karaoke_engine.align.ctc import Segment, align_segments
+from karaoke_engine.align.emissions import EmissionModel, Emissions, Vocab
+from karaoke_engine.align.lyrics import LyricLine, parse_lyrics
+from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
+from karaoke_engine.align.spoken import spoken
+
+_HOP = 0.02
+# A line start moves back to the voice onset only if the voice was silent this long before it,
+# and the onset is at most this far back.
+_ONSET_SILENCE = 0.2
+_ONSET_REACH = 0.5
+_END_SLACK = 0.1
+
+
+class _Model(Protocol):
+    @property
+    def vocab(self) -> Vocab: ...
+
+    def load(self) -> None: ...
+
+    def emissions(self, samples: npt.NDArray[np.float32], ids: Sequence[int]) -> Emissions: ...
+
+    def unload(self) -> None: ...
+
+
+@dataclass(frozen=True)
+class _Tokens:
+    ids: tuple[int, ...]  # vocabulary ids, with delimiters between words
+    owner: tuple[int, ...]  # word index per token, -1 for delimiters
+
+
+class LyricsAligner:
+    name = "lyrics-ctc"
+    # Bumped when a default changes too: defaults are not part of the bench cache key.
+    version = "1"
+
+    def __init__(
+        self,
+        model: str | None = None,
+        filler_penalty: float = 3.0,
+        skip_penalty: float = 40.0,
+        backing_skip_penalty: float = 5.0,
+        silence_penalty: float = 4.0,
+        refine_onsets: bool = True,
+        char_map: dict[str, str] | None = None,
+        device: str = "cuda",
+        dtype: str = "float16",
+        emission_model: Any = None,
+    ) -> None:
+        self.model = model
+        self.filler_penalty = filler_penalty
+        self.skip_penalty = skip_penalty
+        self.backing_skip_penalty = backing_skip_penalty
+        self.silence_penalty = silence_penalty
+        self.refine_onsets = refine_onsets
+        self.char_map = char_map or {}
+        self.device = device
+        self.dtype = dtype
+        self._injected: _Model | None = emission_model
+        self._loaded: tuple[str, _Model] | None = None
+
+    def load(self) -> None:
+        """Loads the chosen model ahead of time; without one, it waits to know the language."""
+        if self._injected is None and self.model is not None:
+            self._model_for("")
+
+    def align(self, vocals: Path, lyrics_lines: Sequence[str], language: str) -> list[Line]:
+        return self.align_text(vocals, "\n".join(lyrics_lines), language)
+
+    def align_text(self, vocals: Path, lyrics: str, language: str) -> list[Line]:
+        lines = parse_lyrics(lyrics)
+        model = self._model_for(language)
+        vocab = model.vocab
+        tokens = [self._tokens(line, vocab, language) for line in lines]
+        used = sorted({token for line in tokens for token in line.ids})
+        column = {token: i + 2 for i, token in enumerate(used)}
+
+        samples = load_mono16k(vocals)
+        emissions = model.emissions(samples, used)
+        active = vocal_activity(samples, SAMPLE_RATE, _HOP)
+        frame_active = _resample(active, emissions.log_probs.shape[0], emissions.frame_seconds)
+        penalty = np.where(frame_active, 0.0, self.silence_penalty).astype(np.float32)
+
+        aligned = [i for i, line in enumerate(tokens) if line.ids]
+        segments = [
+            Segment(
+                tokens=tuple(column[t] for t in tokens[i].ids),
+                owner=tokens[i].owner,
+                skip_penalty=self.backing_skip_penalty if lines[i].backing else self.skip_penalty,
+            )
+            for i in aligned
+        ]
+        paths = align_segments(emissions.log_probs, segments, self.filler_penalty, penalty)
+
+        out: list[Line] = []
+        for i, path in zip(aligned, paths, strict=True):
+            if path.spans is None:
+                continue
+            words = self._words(lines[i], tokens[i], path.spans, emissions, column, active)
+            fields: dict[str, Any] = {
+                "id": f"l{len(out) + 1}",
+                "start": words[0].start,
+                "end": max(word.end for word in words),
+                "words": words,
+            }
+            if lines[i].backing:
+                fields["role"] = "backing"
+            out.append(Line.model_validate(fields))
+        return out
+
+    def _tokens(self, line: LyricLine, vocab: Vocab, language: str) -> _Tokens:
+        ids: list[int] = []
+        owner: list[int] = []
+        for index, word in enumerate(line.words):
+            said = "".join(self.char_map.get(ch, ch) for ch in spoken(word, language))
+            for piece in said.split():
+                encoded = vocab.encode(piece)
+                if not encoded:
+                    continue
+                if ids and vocab.delimiter is not None:
+                    ids.append(vocab.delimiter)
+                    owner.append(-1)
+                ids += encoded
+                owner += [index] * len(encoded)
+        return _Tokens(tuple(ids), tuple(owner))
+
+    def _words(
+        self,
+        line: LyricLine,
+        tokens: _Tokens,
+        spans: Sequence[tuple[int, int]],
+        emissions: Emissions,
+        column: dict[int, int],
+        active: npt.NDArray[np.bool_],
+    ) -> list[Word]:
+        seconds = emissions.frame_seconds
+        lp = emissions.log_probs
+        found: list[tuple[float, float, float] | None] = [None] * len(line.words)
+        for word in range(len(line.words)):
+            mine = [k for k, owner in enumerate(tokens.owner) if owner == word]
+            if not mine:
+                continue
+            first, last = spans[mine[0]][0], spans[mine[-1]][1]
+            total = sum(
+                float(lp[spans[k][0] : spans[k][1] + 1, column[tokens.ids[k]]].sum()) for k in mine
+            )
+            count = sum(spans[k][1] - spans[k][0] + 1 for k in mine)
+            found[word] = (first * seconds, (last + 1) * seconds, math.exp(total / count))
+        times = _fill_gaps(found)
+        words: list[Word] = []
+        for text, (start, end, confidence) in zip(line.words, times, strict=True):
+            end = _trim_end(start, end, active)
+            if self.refine_onsets and confidence > 0:
+                previous_end = words[-1].end if words else 0.0
+                start = max(_voice_onset(start, active), min(start, previous_end))
+            words.append(
+                Word(text=text, start=round(start, 3), end=round(max(end, start), 3),
+                     confidence=round(confidence, 3))
+            )  # fmt: skip
+        return words
+
+    def _model_for(self, language: str) -> _Model:
+        if self._injected is not None:
+            return self._injected
+        name = self.model or DEFAULT_BY_LANGUAGE.get(language, FALLBACK_MODEL)
+        if self._loaded is not None and self._loaded[0] == name:
+            return self._loaded[1]
+        if self._loaded is not None:
+            self._loaded[1].unload()
+        model = EmissionModel(MODELS[name], device=self.device, dtype=self.dtype)
+        model.load()
+        self._loaded = (name, model)
+        return model
+
+
+def _fill_gaps(
+    found: Sequence[tuple[float, float, float] | None],
+) -> list[tuple[float, float, float]]:
+    """Words the model could not spell sit at their neighbour's edge, with confidence 0."""
+    out: list[tuple[float, float, float]] = []
+    for i, item in enumerate(found):
+        if item is not None:
+            out.append(item)
+            continue
+        later = (f[0] for f in found[i + 1 :] if f is not None)
+        point = out[-1][1] if out else next(later, 0.0)
+        out.append((point, point, 0.0))
+    return out
+
+
+def _resample(active: npt.NDArray[np.bool_], frames: int, seconds: float) -> npt.NDArray[np.bool_]:
+    """Activity at the model's frame rate (nearest activity frame for each model frame)."""
+    if not len(active):
+        return np.zeros(frames, dtype=bool)
+    index = np.minimum((np.arange(frames) * seconds / _HOP).astype(int), len(active) - 1)
+    resampled: npt.NDArray[np.bool_] = active[index]
+    return resampled
+
+
+def _voice_onset(start: float, active: npt.NDArray[np.bool_]) -> float:
+    """Where the voice run holding `start` begins, if it follows a silence and is close."""
+    index = min(round(start / _HOP), len(active) - 1)
+    if index < 0 or not active[index]:
+        return start
+    onset = index
+    while onset > 0 and active[onset - 1]:
+        onset -= 1
+    silence = round(_ONSET_SILENCE / _HOP)
+    if onset < silence or active[onset - silence : onset].any():
+        return start
+    return onset * _HOP if start - onset * _HOP <= _ONSET_REACH else start
+
+
+def _trim_end(start: float, end: float, active: npt.NDArray[np.bool_]) -> float:
+    """Keeps a word's end within the voice (plus a little release)."""
+    first, last = round(start / _HOP), round(end / _HOP)
+    voiced = np.flatnonzero(active[first:last])
+    if not len(voiced):
+        return end
+    return min(end, float(first + voiced[-1] + 1) * _HOP + _END_SLACK)
