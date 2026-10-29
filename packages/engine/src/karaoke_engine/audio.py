@@ -98,11 +98,15 @@ def plan_gain(
     target: float = TARGET_LUFS,
     ceiling: float = PEAK_CEILING_DBTP,
 ) -> Gain:
-    """The common gain that brings the mix to `target` without any stem passing `ceiling`."""
+    """The common gain that brings the mix to `target` without the mix or a stem passing `ceiling`.
+
+    The mix counts too: with the guide vocals at full volume the player sums both stems, which
+    gives back the mix.
+    """
     if mix.integrated is None:
         return Gain(db=0.0, lufs=None)
     db = target - mix.integrated
-    peaks = [p for p in stem_peaks if p is not None]
+    peaks = [p for p in (mix.true_peak, *stem_peaks) if p is not None]
     if peaks:
         db = min(db, ceiling - max(peaks))
     db = round(db, 2)
@@ -125,8 +129,13 @@ def package_audio(mix: Path, stems: Stems, out_dir: Path) -> AudioRefs:
     """Writes instrumental.m4a and vocals.m4a, levelled from the original mix."""
     peaks = [measure(stems.instrumental).true_peak, measure(stems.vocals).true_peak]
     gain = plan_gain(measure(mix), peaks)
-    encode_m4a(stems.instrumental, out_dir / "instrumental.m4a", gain.db, BITRATES["instrumental"])
-    encode_m4a(stems.vocals, out_dir / "vocals.m4a", gain.db, BITRATES["vocals"])
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Encoded aside and then moved in: the stems may be the very files being replaced (a package
+    # converted twice), and ffmpeg would truncate them while reading.
+    with tempfile.TemporaryDirectory(dir=out_dir) as tmp:
+        for role, src in (("instrumental", stems.instrumental), ("vocals", stems.vocals)):
+            encoded = encode_m4a(src, Path(tmp) / f"{role}.m4a", gain.db, BITRATES[role])
+            encoded.replace(out_dir / f"{role}.m4a")
     return AudioRefs(
         instrumental="instrumental.m4a",
         vocals="vocals.m4a",

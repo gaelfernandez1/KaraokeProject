@@ -36,12 +36,18 @@ def _noise(dest: Path, amplitude: float, seconds: float = 6.0, seed: int = 1) ->
 
 
 def test_plan_gain_reaches_the_target() -> None:
-    assert plan_gain(Loudness(-20.0, -6.0), [-8.0, -10.0]) == Gain(db=6.0, lufs=-14.0)
+    assert plan_gain(Loudness(-20.0, -7.5), [-8.0, -10.0]) == Gain(db=6.0, lufs=-14.0)
 
 
 def test_plan_gain_stops_at_the_peak_ceiling() -> None:
     # The loudest stem peaks at -3 dBTP, so only 2 dB fit under the -1 dBTP ceiling.
-    assert plan_gain(Loudness(-20.0, -2.0), [-3.0, -9.0]) == Gain(db=2.0, lufs=-18.0)
+    assert plan_gain(Loudness(-20.0, -4.0), [-3.0, -9.0]) == Gain(db=2.0, lufs=-18.0)
+
+
+def test_plan_gain_keeps_the_mix_under_the_ceiling_too() -> None:
+    # With the guide vocals at full volume the player sums both stems, which gives back the mix:
+    # its -2 dBTP peak leaves only 1 dB of room.
+    assert plan_gain(Loudness(-20.0, -2.0), [-3.0, -9.0]) == Gain(db=1.0, lufs=-19.0)
 
 
 def test_plan_gain_leaves_silence_alone() -> None:
@@ -141,3 +147,23 @@ def test_karaoke_audio_command(bare_package: Path) -> None:
 
     assert main(["audio", str(bare_package)]) == 0
     assert (bare_package / "vocals.m4a").is_file()
+
+
+def test_converting_a_package_twice_keeps_the_whole_song(
+    bare_package: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from karaoke_engine.audio import convert_package
+    from karaoke_engine.demo import synthesize_package_audio
+
+    synthesize_package_audio(bare_package)
+    # A relative path, as typed on the command line: the stems come back resolved, the output
+    # does not, so ffmpeg cannot tell it would be overwriting the file it is reading.
+    monkeypatch.chdir(bare_package.parent)
+    package = Path(bare_package.name)
+    convert_package(package)
+    first = probe(package / "instrumental.m4a").duration
+
+    convert_package(package)
+
+    assert probe(package / "instrumental.m4a").duration == pytest.approx(first, abs=0.05)
+    assert probe(package / "vocals.m4a").duration == pytest.approx(first, abs=0.05)
