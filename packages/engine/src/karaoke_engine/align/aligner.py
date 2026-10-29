@@ -31,6 +31,7 @@ _HOP = 0.02
 _ONSET_SILENCE = 0.2
 _ONSET_REACH = 0.5
 _END_SLACK = 0.1
+_END_GAP = 0.3
 
 
 class _Model(Protocol):
@@ -53,7 +54,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "1"
+    version = "2"
 
     def __init__(
         self,
@@ -233,9 +234,23 @@ def _voice_onset(start: float, active: npt.NDArray[np.bool_]) -> float:
 
 
 def _trim_end(start: float, end: float, active: npt.NDArray[np.bool_]) -> float:
-    """Keeps a word's end within the voice (plus a little release)."""
-    first, last = round(start / _HOP), round(end / _HOP)
-    voiced = np.flatnonzero(active[first:last])
-    if not len(voiced):
+    """Ends a word where its voice stops: at the first pause longer than _END_GAP after it starts.
+
+    The release after the voice stops keeps a little of the fade.
+    """
+    first = min(round(start / _HOP), len(active))
+    last = min(round(end / _HOP), len(active))
+    gap = round(_END_GAP / _HOP)
+    voiced_end = None
+    silent = 0
+    for frame in range(first, last):
+        if active[frame]:
+            voiced_end = frame + 1
+            silent = 0
+            continue
+        silent += 1
+        if voiced_end is not None and silent > gap:
+            break
+    if voiced_end is None:
         return end
-    return min(end, float(first + voiced[-1] + 1) * _HOP + _END_SLACK)
+    return min(end, voiced_end * _HOP + _END_SLACK)

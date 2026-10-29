@@ -127,3 +127,47 @@ def test_long_song_uses_compact_backpointers() -> None:
 def test_tokens_must_not_use_blank_or_any_columns(bad: int) -> None:
     with pytest.raises(ValueError, match="column"):
         align_segments(_finish(_emissions(10, 3)), [_segment([bad])], filler_penalty=3.0)
+
+
+def test_blank_inside_a_word_does_not_wait_through_silence() -> None:
+    # "ee": the blank between the two letters must not sit through a break to reach a later
+    # sound; between words the path may rest for free.
+    lp = _emissions(220, 3)
+    _peak(lp, 10, 2)
+    lp[12, 2] = -3.0
+    _peak(lp, 200, 2)
+    penalty = np.zeros(220, dtype=np.float32)
+    penalty[15:195] = 4.0
+    segment = Segment(tokens=(2, 2), owner=(0, 0), skip_penalty=math.inf)
+
+    [path] = align_segments(_finish(lp), [segment], filler_penalty=3.0, token_penalty=penalty)
+
+    assert (path.spans or [])[1][0] < 20
+
+
+def test_pause_between_words_is_free() -> None:
+    lp = _emissions(220, 4)
+    _peak(lp, 10, 2)
+    _peak(lp, 200, 3)
+    penalty = np.zeros(220, dtype=np.float32)
+    penalty[15:195] = 4.0
+    segment = Segment(tokens=(2, 3), owner=(0, 1), skip_penalty=math.inf)
+
+    [path] = align_segments(_finish(lp), [segment], filler_penalty=3.0, token_penalty=penalty)
+
+    assert [span[0] for span in path.spans or []] == [10, 200]
+
+
+def test_delimiters_pay_no_silence_cost() -> None:
+    lp = _emissions(60, 5)
+    _peak(lp, 10, 2)
+    lp[30, 4] = -0.5  # the word delimiter, clearest where the voice pauses
+    lp[47, 4] = -2.0
+    _peak(lp, 50, 3)
+    penalty = np.zeros(60, dtype=np.float32)
+    penalty[20:45] = 10.0
+    segment = Segment(tokens=(2, 4, 3), owner=(0, -1, 1), skip_penalty=math.inf)
+
+    [path] = align_segments(_finish(lp), [segment], filler_penalty=3.0, token_penalty=penalty)
+
+    assert (path.spans or [])[1][0] == 30

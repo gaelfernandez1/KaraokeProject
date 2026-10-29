@@ -6,7 +6,9 @@ and a line that is never sung is squeezed in somewhere anyway. Here the path may
 
 - stay in a filler state between lines, which explains any sound for a cost per frame;
 - jump over a whole line for a cost (lines a lyrics site has but the singer does not sing);
-- pay extra for letters where the voice is silent (the caller marks those frames).
+- pay extra for letters where the voice is silent (the caller marks those frames). The blank
+  between two letters of one word pays it too: otherwise it can wait through a whole break for
+  free (the two e of "Meer" were found 57 s apart). Between words the path rests for free.
 
 States, in order: filler F0, the CTC states of line 1 (blank, t1, blank, ..., tn, blank), F1,
 line 2, ..., Fk. Back-pointers are one byte per frame and state, and emissions are gathered per
@@ -95,26 +97,35 @@ class _Layout:
         fillers = [0]
         token_states: list[list[int]] = []
         can_skip = [False]
+        # States that pay the silence cost: letters, and blanks inside a word.
+        silenced = [False]
         for segment in segments:
             states = []
             for i, token in enumerate(segment.tokens):
                 columns.append(BLANK)
                 can_skip.append(False)
+                inside = (
+                    i > 0 and segment.owner[i] >= 0 and segment.owner[i] == segment.owner[i - 1]
+                )
+                silenced.append(inside)
                 states.append(len(columns))
+                silenced.append(segment.owner[i] >= 0)
                 columns.append(token)
                 # From the previous token over a blank, unless both are the same letter; the
                 # first token may skip its leading blank and come straight from the filler.
                 can_skip.append(i == 0 or token != segment.tokens[i - 1])
             columns.append(BLANK)
             can_skip.append(False)
+            silenced.append(False)
             fillers.append(len(columns))
             columns.append(-1)
             can_skip.append(True)  # the filler may follow the last token directly
+            silenced.append(False)
             token_states.append(states)
         self.size = len(columns)
         self.columns = np.array(columns)
         self.is_filler = self.columns < 0
-        self.is_token = self.columns > ANY
+        self.silenced = np.array(silenced)
         self.gather = np.where(self.is_filler, BLANK, self.columns)
         self.fillers = np.array(fillers)
         self.can_skip = np.array(can_skip)
@@ -145,6 +156,6 @@ def _emit(
 ) -> npt.NDArray[np.float64]:
     row = lp[t]
     emit: npt.NDArray[np.float64] = row[layout.gather].copy()
-    emit[layout.is_token] -= penalty[t]
+    emit[layout.silenced] -= penalty[t]
     emit[layout.is_filler] = max(row[BLANK], row[ANY] - filler_penalty - penalty[t])
     return emit
