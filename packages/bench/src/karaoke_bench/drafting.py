@@ -19,6 +19,8 @@ from karaoke_engine.steps import Stems
 
 # An anchor marks where the user heard the line start; leave a little room before it.
 ANCHOR_MARGIN = 0.2
+# Shorter windows cannot hold a sung line.
+MIN_WINDOW = 0.3
 
 
 class DraftError(RuntimeError):
@@ -59,15 +61,19 @@ def draft_reference(song: Song, pipeline: Pipeline, paths: BenchPaths) -> Refere
 
 
 def realign_windows(ref: Reference) -> list[tuple[int, int, float, float]]:
-    """(first, end, start, stop) of each run of lines flagged wrong, end exclusive."""
+    """(first, end, start, stop) of each run of lines flagged wrong, end exclusive.
+
+    Every anchor starts a window of its own, so marking where several lines begin pins each of
+    them; the previous window then ends at that anchor.
+    """
     windows: list[tuple[int, int, float, float]] = []
     i, lines = 0, ref.lines
     while i < len(lines):
         if lines[i].status != "wrong":
             i += 1
             continue
-        j = i
-        while j < len(lines) and lines[j].status == "wrong":
+        j = i + 1
+        while j < len(lines) and lines[j].status == "wrong" and lines[j].anchor is None:
             j += 1
         anchor = lines[i].anchor
         if anchor is not None:
@@ -78,6 +84,12 @@ def realign_windows(ref: Reference) -> list[tuple[int, int, float, float]]:
         if j < len(lines):
             next_anchor = lines[j].anchor
             stop = next_anchor if next_anchor is not None else lines[j].start
+        if stop - start < MIN_WINDOW:
+            lines_named = f"line {i + 1}" if j == i + 1 else f"lines {i + 1}-{j}"
+            raise DraftError(
+                f"{lines_named}: nothing to realign between {start:.2f} s and {stop:.2f} s; "
+                f"move the anchor or mark line {j + 1} wrong too"
+            )
         windows.append((i, j, start, stop))
         i = j
     return windows

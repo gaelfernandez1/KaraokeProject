@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from karaoke_bench.drafting import draft_reference, realign_reference, realign_windows
+from karaoke_bench.drafting import (
+    DraftError,
+    draft_reference,
+    realign_reference,
+    realign_windows,
+)
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.pipeline import Pipeline, load_pipeline
 from karaoke_bench.reference import Reference, RefLine, RefWord
@@ -44,6 +49,20 @@ def test_realign_windows_next_anchor_closes_the_window() -> None:
     ref = _ref(["wrong", "ok"], anchors={1: 5.5})
 
     assert realign_windows(ref) == [(0, 1, 0.0, 5.5)]
+
+
+def test_every_anchor_starts_its_own_window() -> None:
+    ref = _ref(["ok", "wrong", "wrong", "wrong", "ok"], anchors={1: 10.0, 3: 20.5})
+
+    assert realign_windows(ref) == [(1, 3, 9.8, 20.5), (3, 4, 20.3, 21.0)]
+
+
+def test_window_that_ends_before_it_starts_is_rejected() -> None:
+    # The anchor of line 2 is later than the start of line 3, which is marked good.
+    ref = _ref(["ok", "wrong", "ok"], anchors={1: 12.0})
+
+    with pytest.raises(DraftError, match="line 2"):
+        realign_windows(ref)
 
 
 def test_realign_windows_at_song_edges() -> None:
