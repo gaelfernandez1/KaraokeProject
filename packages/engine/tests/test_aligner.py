@@ -1,3 +1,4 @@
+import math
 import wave
 from collections.abc import Sequence
 from pathlib import Path
@@ -87,7 +88,7 @@ def test_unsung_line_is_left_out(tmp_path: Path) -> None:
     vocals = _vocals(tmp_path, [(0.0, 6.0)])
     peaks = _spell("ola mar", 20) + _spell("adeus", 200)
 
-    aligner = _aligner(peaks, skip_penalty=40.0)
+    aligner = _aligner(peaks, edge_skip_penalty=math.inf)
     lines = aligner.align_text(vocals, "ola mar\nnunca se canta isto\nadeus\n", "gl")
 
     assert [line.words[0].text for line in lines] == ["ola", "adeus"]
@@ -160,3 +161,18 @@ def test_word_end_stops_at_the_first_long_silence(tmp_path: Path) -> None:
     [line] = _aligner(peaks, silence_penalty=0.0).align_text(vocals, "ola\n", "gl")
 
     assert line.words[0].end <= 1.1 + HOP
+
+
+def test_lyrics_longer_than_the_song_keep_the_lines_that_are_sung(tmp_path: Path) -> None:
+    # A clip of a song with the whole song's lyrics: the first lines are sung, the rest is not,
+    # and many short lines must not be crammed in instead.
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = _spell("primeira longa", 20) + _spell("segunda longa", 120)
+    lyrics = "primeira longa\nsegunda longa\n" + "pa pan\n" * 20
+
+    lines = _aligner(peaks).align_text(vocals, lyrics, "gl")
+
+    assert [" ".join(w.text for w in line.words) for line in lines][:2] == [
+        "primeira longa",
+        "segunda longa",
+    ]

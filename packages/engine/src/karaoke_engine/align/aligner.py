@@ -54,16 +54,18 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "3"
+    version = "4"
 
-    # Defaults measured on the quick and stress sets (decision 005). Moving line starts to the
-    # voice onset made JamendoLyrics worse, whose hand-made starts follow the sung vowel.
+    # Defaults measured on the quick, stress and private sets (decision 005). Skip costs are per
+    # letter: a flat cost per line rewarded cramming many short lines into the audio. Moving
+    # line starts to the voice onset made JamendoLyrics worse (its starts follow the vowel).
     def __init__(
         self,
         model: str | None = None,
         filler_penalty: float = 3.0,
-        skip_penalty: float = 200.0,
-        backing_skip_penalty: float = 60.0,
+        skip_penalty: float = 6.0,
+        backing_skip_penalty: float = 4.0,
+        edge_skip_penalty: float = 1.0,
         silence_penalty: float = 4.0,
         refine_onsets: bool = False,
         char_map: dict[str, str] | None = None,
@@ -75,6 +77,7 @@ class LyricsAligner:
         self.filler_penalty = filler_penalty
         self.skip_penalty = skip_penalty
         self.backing_skip_penalty = backing_skip_penalty
+        self.edge_skip_penalty = edge_skip_penalty
         self.silence_penalty = silence_penalty
         self.refine_onsets = refine_onsets
         self.char_map = char_map or {}
@@ -106,14 +109,18 @@ class LyricsAligner:
         penalty = np.where(frame_active, 0.0, self.silence_penalty).astype(np.float32)
 
         aligned = [i for i, line in enumerate(tokens) if line.ids]
-        segments = [
-            Segment(
-                tokens=tuple(column[t] for t in tokens[i].ids),
-                owner=tokens[i].owner,
-                skip_penalty=self.backing_skip_penalty if lines[i].backing else self.skip_penalty,
+        segments = []
+        for i in aligned:
+            count = len(tokens[i].ids)
+            rate = self.backing_skip_penalty if lines[i].backing else self.skip_penalty
+            segments.append(
+                Segment(
+                    tokens=tuple(column[t] for t in tokens[i].ids),
+                    owner=tokens[i].owner,
+                    skip_penalty=rate * count,
+                    edge_skip_penalty=min(rate, self.edge_skip_penalty) * count,
+                )
             )
-            for i in aligned
-        ]
         paths = align_segments(emissions.log_probs, segments, self.filler_penalty, penalty)
 
         out: list[Line] = []
