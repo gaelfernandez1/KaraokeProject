@@ -115,3 +115,29 @@ def test_package_audio_writes_normalized_m4a(tmp_path: Path) -> None:
     )  # fmt: skip
     measured = measure(together).integrated
     assert measured == pytest.approx(-14.0, abs=0.7)
+
+
+def test_convert_package_levels_the_stems_into_m4a(bare_package: Path) -> None:
+    from karaoke_contracts import load_doc, validate_package
+    from karaoke_engine.audio import convert_package
+    from karaoke_engine.demo import synthesize_package_audio
+
+    synthesize_package_audio(bare_package)
+
+    refs = convert_package(bare_package)
+
+    doc = load_doc(bare_package / "karaoke.json")
+    assert doc.audio == refs
+    assert (doc.audio.instrumental, doc.audio.vocals) == ("instrumental.m4a", "vocals.m4a")
+    assert doc.audio.loudness_lufs is not None
+    assert validate_package(bare_package) == []
+
+
+def test_karaoke_audio_command(bare_package: Path) -> None:
+    from karaoke_engine.cli import main
+    from karaoke_engine.demo import synthesize_package_audio
+
+    synthesize_package_audio(bare_package)
+
+    assert main(["audio", str(bare_package)]) == 0
+    assert (bare_package / "vocals.m4a").is_file()

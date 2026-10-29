@@ -1,4 +1,4 @@
-"""The `karaoke` command. Later conversations add `make` (engine) and `render` (video)."""
+"""The `karaoke` command. `make` (engine) and `render` (video) come later."""
 
 import argparse
 import sys
@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from karaoke_contracts import validate_file, validate_package
+from karaoke_engine.audio import AudioError, convert_package
 from karaoke_engine.demo import synthesize_package_audio
 
 
@@ -23,15 +24,33 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     demo.add_argument("package", type=Path)
 
+    audio = commands.add_parser(
+        "audio", help="level a package's stems to -14 LUFS and write them as m4a for browsers"
+    )
+    audio.add_argument("package", type=Path)
+    audio.add_argument("--mix", type=Path, help="the original song (default: the stems summed)")
+
     args = parser.parse_args(argv)
     if args.command == "validate":
         return _validate(args.path)
+    if args.command == "audio":
+        return _audio(args.package, args.mix)
     try:
         synthesize_package_audio(args.package)
     except (OSError, ValueError) as exc:  # ValueError covers pydantic's ValidationError
         print(f"error: {exc}", file=sys.stderr)
         return 1
     print(f"Synthetic audio written to {args.package}")
+    return 0
+
+
+def _audio(package: Path, mix: Path | None) -> int:
+    try:
+        refs = convert_package(package, mix)
+    except (OSError, ValueError, AudioError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"{package}: {refs.instrumental}, {refs.vocals} at {refs.loudness_lufs} LUFS")
     return 0
 
 

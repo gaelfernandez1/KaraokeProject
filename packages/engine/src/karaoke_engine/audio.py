@@ -9,11 +9,12 @@ every song plays at the same level.
 import json
 import math
 import subprocess
+import tempfile
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
-from karaoke_contracts import AudioRefs
+from karaoke_contracts import AudioRefs, dump_doc, load_doc, resolve_media, validate_package
 from karaoke_engine.steps import Stems
 
 SAMPLE_RATE = 44_100
@@ -131,6 +132,35 @@ def package_audio(mix: Path, stems: Stems, out_dir: Path) -> AudioRefs:
         vocals="vocals.m4a",
         loudness_lufs=None if gain.lufs is None else round(gain.lufs, 1),
     )
+
+
+def convert_package(package_dir: Path, mix: Path | None = None) -> AudioRefs:
+    """Turns a package's stems (any format) into levelled m4a and points karaoke.json at them.
+
+    Without the original `mix`, the stems are summed to stand in for it.
+    """
+    doc = load_doc(package_dir / "karaoke.json")
+    if doc.audio.vocals is None:
+        raise ValueError("the package has no vocals stem")
+    stems = Stems(
+        vocals=resolve_media(package_dir, doc.audio.vocals),
+        instrumental=resolve_media(package_dir, doc.audio.instrumental),
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        if mix is None:
+            mix = Path(tmp) / "mix.wav"
+            _run(
+                stems.vocals,
+                ["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(stems.vocals), "-i",
+                 str(stems.instrumental), "-filter_complex", "amix=inputs=2:normalize=0",
+                 "-c:a", "pcm_f32le", str(mix)],
+            )  # fmt: skip
+        refs = package_audio(mix, stems, package_dir)
+    dump_doc(doc.model_copy(update={"audio": refs}), package_dir / "karaoke.json")
+    issues = validate_package(package_dir)
+    if issues:
+        raise ValueError("; ".join(f"{i.path}: {i.message}" for i in issues))
+    return refs
 
 
 def _level(value: str) -> float | None:
