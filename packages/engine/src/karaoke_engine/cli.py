@@ -1,4 +1,4 @@
-"""The `karaoke` command. `make` (engine) and `render` (video) come later."""
+"""The `karaoke` command. `render` (video) comes later."""
 
 import argparse
 import sys
@@ -30,7 +30,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     audio.add_argument("package", type=Path)
     audio.add_argument("--mix", type=Path, help="the original song (default: the stems summed)")
 
+    make = commands.add_parser("make", help="make a karaoke package from a song and its lyrics")
+    make.add_argument("source", type=Path, help="the song: any audio or video file ffmpeg reads")
+    make.add_argument("--lyrics", type=Path, help="text file with the lyrics, as pasted")
+    make.add_argument("--lang", default="gl", help="language of the lyrics (default: gl)")
+    make.add_argument("--out", type=Path, help="package folder (default: named after the song)")
+    make.add_argument("--title")
+    make.add_argument("--artist")
+
     args = parser.parse_args(argv)
+    if args.command == "make":
+        return _make(args)
     if args.command == "validate":
         return _validate(args.path)
     if args.command == "audio":
@@ -41,6 +51,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     print(f"Synthetic audio written to {args.package}")
+    return 0
+
+
+def _make(args: argparse.Namespace) -> int:
+    from karaoke_engine.make import make_package, slug
+
+    if args.lyrics is None:
+        print("error: give the lyrics with --lyrics letra.txt", file=sys.stderr)
+        return 2
+    out = args.out or Path(slug(args.title or args.source.stem) or "karaoke")
+    try:
+        lyrics = args.lyrics.read_text(encoding="utf-8")
+        doc = make_package(
+            args.source, out, args.lang, lyrics, title=args.title, artist=args.artist
+        )
+    except (OSError, ValueError, AudioError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    words = sum(len(line.words) for line in doc.lines)
+    print(f"{out}: {len(doc.lines)} lines, {words} words, {doc.duration:.0f} s")
     return 0
 
 

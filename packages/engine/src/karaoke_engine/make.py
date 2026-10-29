@@ -1,0 +1,128 @@
+"""`karaoke make`: a song and its lyrics in, a karaoke package out.
+
+The steps run one after another in this process, each freeing the GPU before the next loads its
+model (a 4 GB card holds one at a time): decode the song, separate the voice, align the lyrics,
+level and encode the stems, and only then write karaoke.json, so an interrupted run never leaves
+a package that looks complete.
+"""
+
+import re
+import tempfile
+import unicodedata
+from importlib import metadata
+from pathlib import Path
+from typing import Any
+
+from karaoke_contracts import (
+    KaraokeDoc,
+    LanguageFallback,
+    Line,
+    Provenance,
+    Singer,
+    dump_doc,
+    validate_package,
+)
+from karaoke_engine.align.aligner import LyricsAligner
+from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL
+from karaoke_engine.audio import decode, package_audio, probe
+from karaoke_engine.separation import RoformerSeparator
+from karaoke_engine.steps import Separator, TextAligner
+
+
+def default_separator() -> Separator:
+    """The separator chosen with the bench (decision 004): Kim's Mel-Band RoFormer, 8 s chunks."""
+    return RoformerSeparator(model="vocals_mel_band_roformer.ckpt", segment_size=801)
+
+
+def default_aligner() -> TextAligner:
+    return LyricsAligner()
+
+
+def make_package(
+    source: Path,
+    out_dir: Path,
+    language: str,
+    lyrics: str,
+    *,
+    separator: Separator | None = None,
+    aligner: TextAligner | None = None,
+    title: str | None = None,
+    artist: str | None = None,
+) -> KaraokeDoc:
+    probe(source)  # fails early, and clearly, on files without audio
+    separator = separator or default_separator()
+    aligner = aligner or default_aligner()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=out_dir, prefix=".make-") as tmp:
+        work = Path(tmp)
+        mix = decode(source, work / "mix.wav")
+        stems = separator.separate(mix, work / "stems")
+        _unload(separator)
+        lines = aligner.align_text(stems.vocals, lyrics, language)
+        _unload(aligner)
+        refs = package_audio(mix, stems, out_dir)
+        duration = probe(mix).duration
+    name = title or source.stem
+    doc = KaraokeDoc(
+        id=slug(name) or "karaoke",
+        title=name,
+        artist=artist,
+        language=language,
+        duration=duration,
+        audio=refs,
+        singers=[Singer(id="s1")],
+        lines=_numbered(lines),
+        provenance=Provenance(
+            lyrics_source="user",
+            separation_model=str(getattr(separator, "model", separator.name)),
+            align_model=_align_model(aligner, language),
+            engine_version=f"karaoke-engine {metadata.version('karaoke-engine')}",
+            language_fallbacks=_fallbacks(language),
+        ),
+    )
+    staged = out_dir / ".karaoke.json.tmp"
+    dump_doc(doc, staged)
+    staged.replace(out_dir / "karaoke.json")
+    issues = validate_package(out_dir)
+    if issues:
+        raise ValueError("; ".join(f"{i.path}: {i.message}" for i in issues[:5]))
+    return doc
+
+
+def slug(text: str) -> str:
+    folded = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", folded.lower()).strip("-")
+
+
+def _numbered(lines: list[Line]) -> list[Line]:
+    ordered = sorted(lines, key=lambda line: line.start)
+    return [
+        line.model_copy(update={"id": f"l{i + 1}", "singer": line.singer or "s1"})
+        for i, line in enumerate(ordered)
+    ]
+
+
+def _align_model(aligner: Any, language: str) -> str:
+    describe = getattr(aligner, "model_for_language", None)
+    if callable(describe):
+        return str(describe(language))
+    return str(getattr(aligner, "model_name", aligner.name))
+
+
+def _fallbacks(language: str) -> list[LanguageFallback]:
+    if language in DEFAULT_BY_LANGUAGE:
+        return []
+    return [
+        LanguageFallback(
+            step="align",
+            requested=language,
+            used=FALLBACK_MODEL,
+            reason="no alignment model for this language; a multilingual one aligns it",
+        )
+    ]
+
+
+def _unload(step: Any) -> None:
+    unload = getattr(step, "unload", None)
+    if callable(unload):
+        unload()

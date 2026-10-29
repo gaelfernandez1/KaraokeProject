@@ -77,6 +77,17 @@ muchas líneas cortas en el audio en vez de las largas que de verdad se cantan.
 | `parts` | dar sílabas con tiempo a las palabras (gl, es, pt) |
 | `char_map` | letras que se escriben de otra forma para alinear, por ejemplo `{ j = "x" }` para la gheada |
 
+## Hacer un karaoke
+
+```bash
+uv run karaoke make cancion.m4a --lyrics letra.txt --lang gl --out mi-karaoke
+```
+
+Acepta cualquier audio o vídeo que lea ffmpeg. Separa la voz, alinea la letra, deja el audio
+nivelado en m4a y escribe `karaoke.json` el último: si algo falla a medias, no queda un paquete
+que parezca bueno. Para escucharlo, copia la carpeta a `bench/data/paquetes/` y ábrela en
+`/proba-audio`.
+
 ## Medir
 
 ```bash
