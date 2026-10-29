@@ -206,3 +206,12 @@ def test_conversion_needs_free_memory(tmp_path: Path, monkeypatch: pytest.Monkey
 
     with pytest.raises(transcribe.ModelError, match="GB"):
         transcribe.prepare("hitz-large-v3-gl")
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_a_long_chant_where_the_voice_sounds_is_cut_to_one_line(tmp_path: Path) -> None:
+    segments = [FakeSegment(0.0, 6.0, " ".join(["Abater!"] * 30))]
+
+    transcript, _ = _transcribe(tmp_path, segments, [(0, 8)])
+
+    assert [s.text for s in transcript.segments] == [" ".join(["Abater!"] * 8)]
