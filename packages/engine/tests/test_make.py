@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from karaoke_contracts import Line, Word, load_doc, validate_package
+from karaoke_engine.align.lyrics import parse_lyrics, singer_id
 from karaoke_engine.audio import AudioError
 from karaoke_engine.cli import main
 from karaoke_engine.make import make_package
@@ -50,12 +51,14 @@ class EvenAligner:
         if self.fail:
             raise RuntimeError("out of memory")
         lines, t = [], 0.5
-        for i, text in enumerate(row for row in lyrics.splitlines() if row.strip()):
+        for i, parsed in enumerate(parse_lyrics(lyrics)):
             words = []
-            for word in text.split():
+            for word in parsed.words:
                 words.append(Word(text=word, start=t, end=t + 0.4, confidence=0.9))
                 t += 0.5
-            lines.append(Line(id=f"l{i + 1}", start=words[0].start, end=words[-1].end, words=words))
+            singer = singer_id(parsed.singer) if parsed.singer else None
+            lines.append(Line(id=f"l{i + 1}", start=words[0].start, end=words[-1].end,
+                              singer=singer, words=words))  # fmt: skip
         return lines
 
 
@@ -154,3 +157,14 @@ def test_cli_make_reads_the_lyrics_file(tmp_path: Path, monkeypatch: pytest.Monk
 
     assert code == 0
     assert load_doc(out / "karaoke.json").lines[0].words[0].text == "Ola"
+
+
+def test_make_lists_singers(tmp_path: Path) -> None:
+    lyrics = "[Verso: Ana]\nOla mar\n[Estribillo: Brais]\nVai o vento\n[Final]\nAdeus\n"
+
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "gl", lyrics,
+                       separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
+
+    names = {singer.id: singer.name for singer in doc.singers}
+    assert names == {"s1": None, singer_id("Ana"): "Ana", singer_id("Brais"): "Brais"}
+    assert [line.singer for line in doc.lines] == [singer_id("Ana"), singer_id("Brais"), "s1"]
