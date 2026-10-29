@@ -55,10 +55,10 @@ export class SongClock implements PlaybackClock {
 		return this.#playing;
 	}
 
-	/** The engine calls this in the same instant it starts its audio sources. */
-	play(position: number): void {
+	/** `at` is the audio time the sources were scheduled to start at (default: now). */
+	play(position: number, at: number = this.#time.contextTime()): void {
 		this.#startPosition = this.#clamp(position);
-		this.#startContext = this.#time.contextTime();
+		this.#startContext = at;
 		this.#playing = true;
 		this.#lastContext = Number.NEGATIVE_INFINITY;
 		this.#lastHeard = Number.NEGATIVE_INFINITY;
@@ -77,7 +77,8 @@ export class SongClock implements PlaybackClock {
 
 	position(): number {
 		if (!this.#playing) return this.#pausedAt;
-		return this.#clamp(this.#startPosition + this.#time.contextTime() - this.#startContext);
+		const elapsed = Math.max(0, this.#time.contextTime() - this.#startContext);
+		return this.#clamp(this.#startPosition + elapsed);
 	}
 
 	now(): number {
