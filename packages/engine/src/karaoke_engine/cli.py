@@ -3,6 +3,7 @@
 import argparse
 import subprocess
 import sys
+import time
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
@@ -69,6 +70,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     return 0
 
 
+_STEPS = {
+    "decode": "reading the song",
+    "separate": "separating the voice",
+    "transcribe": "transcribing the voice",
+    "align": "placing the lyrics",
+    "encode": "writing the package",
+}
+
+
 def _make(args: argparse.Namespace) -> int:
     from karaoke_engine.make import make_package, slug
 
@@ -85,9 +95,14 @@ def _make(args: argparse.Namespace) -> int:
                 print("LRCLIB has no lyrics for this song; transcribing instead", file=sys.stderr)
             else:
                 lyrics, source = found.text, "lrclib"
+        started = time.monotonic()
+
+        def progress(step: str) -> None:
+            print(f"[{time.monotonic() - started:5.0f} s] {_STEPS[step]}", file=sys.stderr)
+
         doc = make_package(
             args.source, out, args.lang, lyrics, title=args.title, artist=args.artist,
-            lyrics_source=source, overlap_backing=args.overlap_backing,
+            lyrics_source=source, overlap_backing=args.overlap_backing, progress=progress,
         )  # fmt: skip
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         # RuntimeError covers AudioError, a model that fails to convert, and CUDA out of memory.
