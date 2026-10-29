@@ -173,7 +173,12 @@ def test_cli_make_without_lyrics_transcribes(
 
     monkeypatch.setattr(make_module, "default_separator", CopySeparator)
     monkeypatch.setattr(make_module, "default_aligner", EvenAligner)
-    monkeypatch.setattr(make_module, "default_transcriber", FakeTranscriber)
+    monkeypatch.setattr(make_module.WhisperTranscriber, "prepare_for", lambda self, language: None)
+    monkeypatch.setattr(
+        make_module,
+        "transcribe_in_child",
+        lambda vocals, language: (FakeTranscriber().transcribe(vocals, language), "fake@1"),
+    )
     out = tmp_path / "pkg"
 
     assert main(["make", str(_song(tmp_path)), "--out", str(out)]) == 0
@@ -305,3 +310,34 @@ def test_cli_can_let_backing_vocals_overlap(
           "--overlap-backing"])  # fmt: skip
 
     assert seen == [{"overlap_backing": True}]
+
+
+def test_make_reports_each_step(tmp_path: Path) -> None:
+    steps: list[str] = []
+
+    make_package(_song(tmp_path), tmp_path / "pkg", "gl", "Ola\n", separator=CopySeparator(),
+                 aligner=EvenAligner(), progress=steps.append)  # fmt: skip
+
+    assert steps == ["decode", "separate", "align", "encode"]
+
+
+def test_the_default_transcriber_runs_in_a_child_process(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.make as make_module
+
+    calls: list[tuple[str, str]] = []
+
+    def fake_child(vocals: Path, language: str) -> tuple[Transcript, str]:
+        calls.append((vocals.name, language))
+        segments = (TranscriptSegment(0.5, 1.5, "Ola mar"),)
+        return Transcript(language=language, segments=segments), "child-model@1"
+
+    monkeypatch.setattr(make_module, "transcribe_in_child", fake_child)
+    monkeypatch.setattr(make_module.WhisperTranscriber, "prepare_for", lambda self, language: None)
+
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "gl", None, separator=CopySeparator(),
+                       aligner=EvenAligner())  # fmt: skip
+
+    assert calls == [("vocals.wav", "gl")]
+    assert doc.provenance.asr_model == "child-model@1"

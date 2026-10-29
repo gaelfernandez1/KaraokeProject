@@ -78,14 +78,14 @@ DEFAULT_BY_LANGUAGE: dict[str, str] = {"gl": "hitz-large-v3-gl"}
 class WhisperTranscriber:
     name = "whisper"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "3"
+    version = "4"
 
     def __init__(
         self,
         model: str = "auto",
         vad: bool = True,
         seed: int = 0,
-        beam_size: int = 5,
+        beam_size: int = 1,
         compute_type: str = "int8_float16",
         device: str = "cuda",
         whisper: Any = None,
@@ -179,7 +179,7 @@ class LineSegmenter:
     """Lyric lines from a transcript: a line per sentence, and no line longer than MAX_WORDS."""
 
     name = "lines"
-    version = "1"
+    version = "2"
     MAX_WORDS = 9
 
     def segment(self, transcript: Transcript) -> list[str]:
@@ -213,6 +213,27 @@ def _sentences(text: str) -> list[str]:
     if current:
         out.append(" ".join(current))
     return out
+
+
+def transcribe_in_child(vocals: Path, language: str) -> tuple[Transcript, str]:
+    """Transcribes in a fresh process, and says with which model.
+
+    CTranslate2 and torch keep their memory in the process that used them: alongside the
+    separator and the aligner, a large-v3 pushed `karaoke make` to 5.7 GB of RAM. In a child, its
+    memory goes back to the system as soon as the text is out.
+    """
+    import multiprocessing
+
+    with multiprocessing.get_context("spawn").Pool(1) as pool:
+        found, segments, model = pool.apply(_transcribe_here, (str(vocals), language))
+    return Transcript(found, tuple(TranscriptSegment(*s) for s in segments)), model
+
+
+def _transcribe_here(vocals: str, language: str) -> tuple[str, list[tuple[float, float, str]], str]:
+    transcriber = WhisperTranscriber()
+    transcript = transcriber.transcribe(Path(vocals), language)
+    segments = [(s.start, s.end, s.text) for s in transcript.segments]
+    return transcript.language, segments, transcriber.model_for_language(language)
 
 
 def _ct2_dir(name: str) -> Path:

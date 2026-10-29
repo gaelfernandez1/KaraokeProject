@@ -9,6 +9,7 @@ a package that looks complete.
 import re
 import tempfile
 import unicodedata
+from collections.abc import Callable
 from importlib import metadata
 from pathlib import Path
 from typing import Any, Literal
@@ -29,7 +30,7 @@ from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL
 from karaoke_engine.audio import decode, package_audio, probe
 from karaoke_engine.separation import RoformerSeparator
 from karaoke_engine.steps import Separator, TextAligner, Transcriber
-from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber
+from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber, transcribe_in_child
 
 _LANGUAGE = re.compile(r"^[a-z]{2,3}$")
 
@@ -41,10 +42,6 @@ def default_separator() -> Separator:
 
 def default_aligner(**options: Any) -> TextAligner:
     return LyricsAligner(**options)
-
-
-def default_transcriber() -> Transcriber:
-    return WhisperTranscriber()
 
 
 def make_package(
@@ -60,19 +57,19 @@ def make_package(
     overlap_backing: bool = False,
     title: str | None = None,
     artist: str | None = None,
+    progress: Callable[[str], None] | None = None,
 ) -> KaraokeDoc:
+    """Without lyrics it transcribes: with the given transcriber, or else in a child process."""
     # Everything that can fail cheaply fails before the long steps start.
     if not _LANGUAGE.match(language):
         raise ValueError(f"language must be a two or three letter code like gl, not {language!r}")
     probe(source)  # files without audio
     if lyrics is not None and not parse_lyrics(lyrics):
         raise ValueError("the lyrics have no sung lines (only labels or symbols)")
-    if lyrics is None:
-        transcriber = transcriber or default_transcriber()
+    if lyrics is None and transcriber is None:
         # A model converted on first use needs the memory before anything else is loaded.
-        prepare_model = getattr(transcriber, "prepare_for", None)
-        if callable(prepare_model):
-            prepare_model(language)
+        WhisperTranscriber().prepare_for(language)
+    step = progress or (lambda name: None)
     separator = separator or default_separator()
     if aligner is None:
         aligner = default_aligner(overlap_backing=True) if overlap_backing else default_aligner()
@@ -81,20 +78,27 @@ def make_package(
     (out_dir / "karaoke.json").unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(dir=out_dir, prefix=".make-") as tmp:
         work = Path(tmp)
+        step("decode")
         mix = decode(source, work / "mix.wav")
+        step("separate")
         stems = separator.separate(mix, work / "stems")
         _unload(separator)
         asr_model = None
         source_kind: Literal["user", "asr", "lrclib"] = lyrics_source
         if lyrics is None:
-            assert transcriber is not None
-            transcript = transcriber.transcribe(stems.vocals, language)
-            asr_model = _model_name(transcriber, language)
-            _unload(transcriber)
+            step("transcribe")
+            if transcriber is None:
+                transcript, asr_model = transcribe_in_child(stems.vocals, language)
+            else:
+                transcript = transcriber.transcribe(stems.vocals, language)
+                asr_model = _model_name(transcriber, language)
+                _unload(transcriber)
             lyrics = "\n".join(LineSegmenter().segment(transcript))
             source_kind = "asr"
+        step("align")
         lines = aligner.align_text(stems.vocals, lyrics, language)
         _unload(aligner)
+        step("encode")
         refs = package_audio(mix, stems, out_dir)
         duration = probe(mix).duration
     name = title or source.stem
