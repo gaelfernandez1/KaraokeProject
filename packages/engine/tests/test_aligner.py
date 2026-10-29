@@ -150,3 +150,12 @@ def test_onset_refinement_applies_after_a_pause_inside_a_line(tmp_path: Path) ->
     [line] = _aligner(peaks).align_text(vocals, "ola mar\n", "gl")
 
     assert line.words[1].start == pytest.approx(2.4, abs=HOP)
+
+
+def test_word_end_stops_at_the_first_long_silence(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 1.0), (3.0, 4.0)])
+    peaks = [*_spell("ol", 20), *(("a", f) for f in range(40, 176))]
+
+    [line] = _aligner(peaks, silence_penalty=0.0).align_text(vocals, "ola\n", "gl")
+
+    assert line.words[0].end <= 1.1 + HOP
