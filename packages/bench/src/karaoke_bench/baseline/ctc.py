@@ -122,7 +122,9 @@ class CtcAligner:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         dtype = getattr(torch, self.dtype) if self.device != "cpu" else torch.float32
-        self._features = AutoFeatureExtractor.from_pretrained(repo, revision=revision)  # type: ignore[no-untyped-call]
+        # Untyped in transformers, missing without the ml extra: Any either way.
+        extractor: Any = AutoFeatureExtractor
+        self._features = extractor.from_pretrained(repo, revision=revision)
         net = AutoModelForCTC.from_pretrained(repo, revision=revision, dtype=dtype)
         self._net = net.to(self.device).eval()
         vocab_path = hf_hub_download(repo, "vocab.json", revision=revision)
