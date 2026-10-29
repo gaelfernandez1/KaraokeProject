@@ -38,8 +38,8 @@ def render_report(results: RunResults) -> str:
         "",
         "| Grupo | Canciones | Fallos | WER | CER | Inicio mediana | Inicio media | ≤ 0,3 s "
         "| ≤ 0,5 s | Fin mediana | Sesgo | Cobertura | Línea mediana | Cambios de idioma "
-        "| 4 min (s) |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| 4 min (s) | Fuera de voz | Confianza < 0,3 |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         *(_summary_row(name, group) for name, group in _ordered(results.summary)),
         "",
         "## Etapas",
@@ -56,8 +56,8 @@ def render_report(results: RunResults) -> str:
         "## Por canción",
         "",
         "| Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | ≤ 0,5 s | Cobertura "
-        "| Referencia | Idioma devuelto | Tiempo (s) | Error |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Referencia | Fuera de voz | Confianza < 0,3 | Idioma devuelto | Tiempo (s) | Error |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         *(_song_row(song) for song in results.songs),
         "",
         "## Peores casos",
@@ -94,6 +94,8 @@ def _summary_row(name: str, g: GroupSummary) -> str:
         _num(g.line_start_median),
         str(g.language_switches),
         _num(g.est_seconds_4min, 0),
+        _pct(g.outside_voice),
+        _pct(g.low_confidence),
     ]
     return _row(cells)
 
@@ -113,6 +115,8 @@ def _song_row(s: SongResult) -> str:
         _pct(_stat(t, "start_within_wide")),
         _pct(_stat(t, "coverage")),
         _reference_cell(s),
+        _pct(s.outside_voice),
+        _pct(s.low_confidence),
         s.language_reported or "—",
         _num(seconds, 1) + cached,
         error,
@@ -166,6 +170,10 @@ def _notes(results: RunResults) -> list[str]:
     notes.append(
         "- Sincronía: error absoluto de inicio y fin de las palabras emparejadas con la "
         "referencia (sin tildes); sesgo = media con signo (positivo = tarde)."
+    )
+    notes.append(
+        "- Sin referencia: «Fuera de voz» es la parte del tiempo de las palabras en la que la voz "
+        "(separada) calla; «Confianza < 0,3», la parte de las palabras con confianza baja."
     )
     return notes
 
