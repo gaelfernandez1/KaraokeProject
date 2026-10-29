@@ -56,6 +56,12 @@ files = ["packages/contracts/src", "packages/engine/src", "packages/bench/src"]
 module = ["pynvml", "faster_whisper.*", "demucs.*", "ctranslate2.*", "audio_separator.*"]
 ignore_missing_imports = true
 
+# The ml extra (torch and the Hugging Face libraries) is only installed on the GPU machine; CI
+# type-checks without it, where these imports resolve to Any.
+[[tool.mypy.overrides]]
+module = ["torch", "torch.*", "transformers", "transformers.*", "huggingface_hub", "huggingface_hub.*"]
+ignore_missing_imports = true
+
 # The contract models accept unknown fields at runtime (forward compatibility); mypy still
 # flags misspelled keyword arguments when our own code builds them.
 [tool.pydantic-mypy]
