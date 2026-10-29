@@ -150,3 +150,20 @@ def test_validated_reference_scores_timing(paths: BenchPaths) -> None:
     assert song.reference_validated is True
     assert song.timing is not None
     assert song.scored_share == pytest.approx(1.0)
+
+
+def test_approximate_reference_scores_and_says_so(paths: BenchPaths) -> None:
+    from karaoke_bench.reference import dump_reference, load_reference
+
+    path = paths.data / "private" / "demo" / "reference.json"
+    dump_reference(load_reference(path).model_copy(update={"timing": "approximate"}), path)
+
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    report = (out / "report.md").read_text(encoding="utf-8")
+    assert song.timing is not None
+    assert song.timing.start_within_wide is not None
+    assert song.reference_timing == "approximate"
+    assert "| aproximada |" in report
+    assert "≤ 0,5 s" in report

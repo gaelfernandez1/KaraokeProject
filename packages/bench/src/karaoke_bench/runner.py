@@ -264,6 +264,7 @@ def _score(
         steps=state.steps,
         scored_share=ref.scored_share() if ref else None,
         reference_validated=ref.approved if ref and ref.timing == "semiautomatic" else None,
+        reference_timing=ref.timing if ref else None,
         error=state.error,
     )
     if state.transcript is not None:
