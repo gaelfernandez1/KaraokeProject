@@ -24,7 +24,8 @@ def stem_roles(primary: str, secondary: str, vocals_stem: str) -> dict[str, str]
 
 class RoformerSeparator:
     name = "roformer"
-    version = "1"
+    # Bumped when a default changes too: defaults are not part of the bench cache key.
+    version = "2"
 
     def __init__(
         self,
@@ -32,7 +33,9 @@ class RoformerSeparator:
         vocals_stem: str = "Vocals",
         model_dir: str | None = None,
         segment_size: int = 256,
-        overlap: int = 8,
+        # Overlapping passes per chunk. With 8, audio-separator's default, a 4 min song took over
+        # 3 min on the laptop GPU; 2 is the usual trade-off (the models ship with 1 to 8).
+        overlap: int = 2,
         batch_size: int = 1,
         autocast: bool = True,
     ) -> None:
