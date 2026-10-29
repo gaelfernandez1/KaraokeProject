@@ -33,6 +33,11 @@ cifras están en `docs/plan-v3/decisiones/005-sincronia.md`, y la forma de medir
    0,3 s), con 0,1 s de margen. Mover también los inicios al arranque de la voz
    (`refine_onsets`) está disponible, pero empeora JamendoLyrics y no va activado.
 
+7. **Sílabas** (`syllables.syllables`, gallego, castellano y portugués): cada palabra de dos o más
+   sílabas cuyas letras tienen cada una su token recibe `parts`. Cada parte empieza cuando el CTC
+   pone su primera letra y acaba donde empieza la siguiente. Una palabra con números o con letras
+   que el modelo no conoce se queda sin partes; el reproductor la ilumina entera.
+
 La **confianza** de cada palabra es la media geométrica de la probabilidad CTC de sus letras. Una
 palabra sin ninguna letra que el modelo conozca (un número en un idioma sin reglas, un emoji) se
 queda pegada a su vecina con confianza 0. Las líneas saltadas no salen. Las de coro salen con
@@ -69,6 +74,7 @@ muchas líneas cortas en el audio en vez de las largas que de verdad se cantan.
 | `edge_skip_penalty` | coste por letra de dejar fuera líneas al principio o al final de la letra (para recortes o versiones cortas); desactivado, porque en canciones enteras puede tirar una estrofa cantada |
 | `silence_penalty` | coste extra por letra en un tramo sin voz |
 | `refine_onsets` | mover los inicios al arranque de la voz |
+| `parts` | dar sílabas con tiempo a las palabras (gl, es, pt) |
 | `char_map` | letras que se escriben de otra forma para alinear, por ejemplo `{ j = "x" }` para la gheada |
 
 ## Medir

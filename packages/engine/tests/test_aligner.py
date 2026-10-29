@@ -12,7 +12,7 @@ from karaoke_engine.steps import Aligner, TextAligner
 
 RATE = 16000
 HOP = 0.02
-ALPHABET = "abcdefghijklmnopqrstuvwxyz"
+ALPHABET = "abcdefghijklmnopqrstuvwxyzñ"
 pytestmark = pytest.mark.usefixtures("ffmpeg")
 
 
@@ -176,3 +176,25 @@ def test_lyrics_longer_than_the_song_keep_the_lines_that_are_sung(tmp_path: Path
         "primeira longa",
         "segunda longa",
     ]
+
+
+def test_parts_follow_letter_times(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = [("c", 20), ("a", 24), ("m", 40), ("i", 44), ("ñ", 60), ("a", 64), ("n", 66),
+             ("d", 80), ("o", 84)]  # fmt: skip
+
+    [line] = _aligner(peaks).align_text(vocals, "camiñando\n", "gl")
+
+    parts = line.words[0].parts
+    assert [p.text for p in parts] == ["ca", "mi", "ñan", "do"]
+    assert [p.start for p in parts] == pytest.approx([20 * HOP, 40 * HOP, 60 * HOP, 80 * HOP])
+    assert parts[-1].end == line.words[0].end
+
+
+def test_parts_skip_words_whose_letters_do_not_map(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = _spell("dous mil vinte", 20)
+
+    [line] = _aligner(peaks).align_text(vocals, "2020\n", "gl")
+
+    assert line.words[0].parts == []

@@ -7,6 +7,7 @@ starts move back to where the voice really starts (CTC tends to place the first 
 and word ends are kept out of silence.
 """
 
+import itertools
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -16,7 +17,7 @@ from typing import Any, Protocol
 import numpy as np
 import numpy.typing as npt
 
-from karaoke_contracts import Line, Word
+from karaoke_contracts import Line, Part, Word
 from karaoke_engine.align.activity import vocal_activity
 from karaoke_engine.align.audio import SAMPLE_RATE, load_mono16k
 from karaoke_engine.align.ctc import Segment, align_segments
@@ -24,6 +25,7 @@ from karaoke_engine.align.emissions import EmissionModel, Emissions, Vocab
 from karaoke_engine.align.lyrics import LyricLine, parse_lyrics
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
 from karaoke_engine.align.spoken import spoken
+from karaoke_engine.align.syllables import syllables
 
 _HOP = 0.02
 # A line start moves back to the voice onset only if the voice was silent this long before it,
@@ -54,7 +56,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "6"
+    version = "7"
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -70,6 +72,7 @@ class LyricsAligner:
         edge_skip_penalty: float = math.inf,
         silence_penalty: float = 4.0,
         refine_onsets: bool = False,
+        parts: bool = True,
         char_map: dict[str, str] | None = None,
         device: str = "cuda",
         dtype: str = "float16",
@@ -82,6 +85,7 @@ class LyricsAligner:
         self.edge_skip_penalty = edge_skip_penalty
         self.silence_penalty = silence_penalty
         self.refine_onsets = refine_onsets
+        self.parts = parts
         self.char_map = char_map or {}
         self.device = device
         self.dtype = dtype
@@ -129,7 +133,9 @@ class LyricsAligner:
         for i, path in zip(aligned, paths, strict=True):
             if path.spans is None:
                 continue
-            words = self._words(lines[i], tokens[i], path.spans, emissions, column, active)
+            words = self._words(
+                lines[i], tokens[i], path.spans, emissions, column, active, language
+            )
             fields: dict[str, Any] = {
                 "id": f"l{len(out) + 1}",
                 "start": words[0].start,
@@ -165,14 +171,17 @@ class LyricsAligner:
         emissions: Emissions,
         column: dict[int, int],
         active: npt.NDArray[np.bool_],
+        language: str,
     ) -> list[Word]:
         seconds = emissions.frame_seconds
         lp = emissions.log_probs
         found: list[tuple[float, float, float] | None] = [None] * len(line.words)
+        letter_starts: list[list[float]] = [[] for _ in line.words]
         for word in range(len(line.words)):
             mine = [k for k, owner in enumerate(tokens.owner) if owner == word]
             if not mine:
                 continue
+            letter_starts[word] = [spans[k][0] * seconds for k in mine]
             first, last = spans[mine[0]][0], spans[mine[-1]][1]
             total = sum(
                 float(lp[spans[k][0] : spans[k][1] + 1, column[tokens.ids[k]]].sum()) for k in mine
@@ -186,11 +195,33 @@ class LyricsAligner:
             if self.refine_onsets and confidence > 0:
                 previous_end = words[-1].end if words else 0.0
                 start = max(_voice_onset(start, active), min(start, previous_end))
+            end = max(end, start)
+            parts = self._parts(text, letter_starts[len(words)], start, end, language)
             words.append(
-                Word(text=text, start=round(start, 3), end=round(max(end, start), 3),
-                     confidence=round(confidence, 3))
+                Word(text=text, start=round(start, 3), end=round(end, 3),
+                     confidence=round(confidence, 3), parts=parts)
             )  # fmt: skip
         return words
+
+    def _parts(
+        self, text: str, letter_starts: Sequence[float], start: float, end: float, language: str
+    ) -> list[Part]:
+        """Syllables timed by their first letter, when each letter has its own token."""
+        if not self.parts:
+            return []
+        pieces = syllables(text, language)
+        if pieces is None or len(letter_starts) != sum(ch.isalpha() for ch in text):
+            return []
+        bounds = [start]
+        letters = 0
+        for piece in pieces[:-1]:
+            letters += sum(ch.isalpha() for ch in piece)
+            bounds.append(min(max(letter_starts[letters], bounds[-1]), end))
+        bounds.append(end)
+        return [
+            Part(text=piece, start=round(a, 3), end=round(b, 3))
+            for piece, (a, b) in zip(pieces, itertools.pairwise(bounds), strict=True)
+        ]
 
     def _model_for(self, language: str) -> _Model:
         if self._injected is not None:
