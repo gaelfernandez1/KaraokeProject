@@ -58,7 +58,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "9"
+    version = "10"
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -70,7 +70,8 @@ class LyricsAligner:
         model: str | None = None,
         filler_penalty: float = 3.0,
         skip_penalty: float = 6.0,
-        backing_skip_penalty: float = 6.0,
+        backing_skip_penalty: float = 4.0,
+        overlap_absent_penalty: float = 6.0,
         backing_min_confidence: float = 0.05,
         edge_skip_penalty: float = math.inf,
         silence_penalty: float = 4.0,
@@ -85,6 +86,7 @@ class LyricsAligner:
         self.filler_penalty = filler_penalty
         self.skip_penalty = skip_penalty
         self.backing_skip_penalty = backing_skip_penalty
+        self.overlap_absent_penalty = overlap_absent_penalty
         self.backing_min_confidence = backing_min_confidence
         self.edge_skip_penalty = edge_skip_penalty
         self.silence_penalty = silence_penalty
@@ -118,29 +120,33 @@ class LyricsAligner:
         frame_active = _resample(active, emissions.log_probs.shape[0], emissions.frame_seconds)
         penalty = np.where(frame_active, 0.0, self.silence_penalty).astype(np.float32)
 
-        # Lead lines first, in one path. Backing parts then go one by one into the stretch around
-        # their lead line, where they may overlap it (two voices at once cannot share one path).
-        segments = {i: self._segment(lines[i], tokens[i], column) for i in range(len(lines))
-                    if tokens[i].ids}  # fmt: skip
-        leads = [i for i in segments if not lines[i].backing]
+        # One path through every line, backing parts in their written place (mostly echoes and
+        # answers right after the lead). A backing part that does not fit there may be sung over
+        # the lead: it then gets a second chance alone in the stretch around its lead line.
+        order = [i for i in range(len(lines)) if tokens[i].ids]
+        segments = {i: self._segment(lines[i], tokens[i], column) for i in order}
         paths = align_segments(
-            emissions.log_probs, [segments[i] for i in leads], self.filler_penalty, penalty
+            emissions.log_probs, [segments[i] for i in order], self.filler_penalty, penalty
         )
-        placed = {i: p.spans for i, p in zip(leads, paths, strict=True) if p.spans is not None}
-        for i in (i for i in segments if lines[i].backing):
+        placed = {i: p.spans for i, p in zip(order, paths, strict=True) if p.spans is not None}
+        first_pass = set(placed)
+        leads = [i for i in order if not lines[i].backing]
+        for i in (i for i in order if lines[i].backing and i not in placed):
             first, last = _backing_window(i, leads, placed, len(emissions.log_probs),
                                           emissions.frame_seconds)  # fmt: skip
+            cost = self.overlap_absent_penalty * len(tokens[i].ids)
+            alone = Segment(segments[i].tokens, segments[i].owner, cost, cost)
             [path] = align_segments(
-                emissions.log_probs[first:last], [segments[i]], self.filler_penalty,
-                penalty[first:last],
-            )  # fmt: skip
+                emissions.log_probs[first:last], [alone], self.filler_penalty, penalty[first:last]
+            )
             if path.spans is not None:
                 placed[i] = [(a + first, b + first) for a, b in path.spans]
 
         out: list[Line] = []
         for i, spans in placed.items():
             words = self._words(lines[i], tokens[i], spans, emissions, column, active, language)
-            if lines[i].backing and _mean_confidence(words) < self.backing_min_confidence:
+            overlapped = lines[i].backing and i not in first_pass
+            if overlapped and _mean_confidence(words) < self.backing_min_confidence:
                 continue  # placed over the lead voice by chance, not sung
             singer = lines[i].singer
             out.append(
@@ -158,15 +164,12 @@ class LyricsAligner:
 
     def _segment(self, line: LyricLine, tokens: _Tokens, column: dict[int, int]) -> Segment:
         count = len(tokens.ids)
-        if line.backing:
-            # Aligned alone in its stretch: absent costs the same at either edge or skipped.
-            cost = self.backing_skip_penalty * count
-            return Segment(tuple(column[t] for t in tokens.ids), tokens.owner, cost, cost)
+        rate = self.backing_skip_penalty if line.backing else self.skip_penalty
         return Segment(
             tokens=tuple(column[t] for t in tokens.ids),
             owner=tokens.owner,
-            skip_penalty=self.skip_penalty * count,
-            edge_skip_penalty=min(self.skip_penalty, self.edge_skip_penalty) * count,
+            skip_penalty=rate * count,
+            edge_skip_penalty=min(rate, self.edge_skip_penalty) * count,
         )
 
     def _tokens(self, line: LyricLine, vocab: Vocab, language: str) -> _Tokens:
