@@ -1,0 +1,1282 @@
+{
+  "song_id": "fanny-alexander-lene",
+  "language": "gl",
+  "duration": 244.145708,
+  "timing": "semiautomatic",
+  "approved": false,
+  "lines": [
+    {
+      "text": "Señor, escribías na tú-ltima, despedida e imaxino",
+      "start": 16.592262886333824,
+      "end": 25.458815912444663,
+      "words": [
+        {
+          "text": "Señor,",
+          "start": 16.592262886333824,
+          "end": 17.893224391293653
+        },
+        {
+          "text": "escribías",
+          "start": 18.853934425725527,
+          "end": 20.315014269757338
+        },
+        {
+          "text": "na",
+          "start": 20.395073439293327,
+          "end": 20.51516219359731
+        },
+        {
+          "text": "tú-ltima,",
+          "start": 20.83539887174127,
+          "end": 21.51590181279718
+        },
+        {
+          "text": "despedida",
+          "start": 22.196404753853088,
+          "end": 23.437321881660928
+        },
+        {
+          "text": "e",
+          "start": 23.917676898876863,
+          "end": 23.937691691260863
+        },
+        {
+          "text": "imaxino",
+          "start": 24.438061500860794,
+          "end": 25.458815912444663
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Que sabe ben a liña que me",
+      "start": 26.339466777340547,
+      "end": 30.862809856123953,
+      "words": [
+        {
+          "text": "Que",
+          "start": 26.339466777340547,
+          "end": 26.419525946876536
+        },
+        {
+          "text": "sabe",
+          "start": 26.579644285948515,
+          "end": 26.979940133628464
+        },
+        {
+          "text": "ben",
+          "start": 27.140058472700442,
+          "end": 27.640428282300377
+        },
+        {
+          "text": "a",
+          "start": 28.561108731964254,
+          "end": 28.581123524348254
+        },
+        {
+          "text": "liña",
+          "start": 28.701212278652235,
+          "end": 29.36170042732415
+        },
+        {
+          "text": "que",
+          "start": 30.522558385595996,
+          "end": 30.60261755513199
+        },
+        {
+          "text": "me",
+          "start": 30.782750686587963,
+          "end": 30.862809856123953
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "agarda mentres setendo chega vestido de vermello",
+      "start": 30.96288381804394,
+      "end": 37.96806115244302,
+      "words": [
+        {
+          "text": "agarda",
+          "start": 30.96288381804394,
+          "end": 31.72344592863584
+        },
+        {
+          "text": "mentres",
+          "start": 32.18378615346778,
+          "end": 33.044422225979666
+        },
+        {
+          "text": "setendo",
+          "start": 33.22455535743564,
+          "end": 33.845013921339564
+        },
+        {
+          "text": "chega",
+          "start": 34.205280184251514,
+          "end": 34.805723955771434
+        },
+        {
+          "text": "vestido",
+          "start": 35.246049388219376,
+          "end": 35.846493159739296
+        },
+        {
+          "text": "de",
+          "start": 36.82721798655517,
+          "end": 36.90727715609116
+        },
+        {
+          "text": "vermello",
+          "start": 37.10742507993113,
+          "end": 37.96806115244302
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Este aire cheo de setembro de nubes devólveme",
+      "start": 38.96880077164289,
+      "end": 46.81459938616986,
+      "words": [
+        {
+          "text": "Este",
+          "start": 38.96880077164289,
+          "end": 39.22899307263486
+        },
+        {
+          "text": "aire",
+          "start": 39.749377674618785,
+          "end": 40.06961435276275
+        },
+        {
+          "text": "cheo",
+          "start": 40.4098658232907,
+          "end": 41.050339179578614
+        },
+        {
+          "text": "de",
+          "start": 41.2104575186506,
+          "end": 41.290516688186585
+        },
+        {
+          "text": "setembro",
+          "start": 41.45063502725856,
+          "end": 42.21119713785046
+        },
+        {
+          "text": "de",
+          "start": 43.31201071897032,
+          "end": 43.41208468089031
+        },
+        {
+          "text": "nubes",
+          "start": 43.592217812346284,
+          "end": 45.333504749754056
+        },
+        {
+          "text": "devólveme",
+          "start": 45.41356391929005,
+          "end": 46.81459938616986
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "ao perfume dos teus soños e o vaco",
+      "start": 47.05477689477783,
+      "end": 52.53883000799311,
+      "words": [
+        {
+          "text": "ao",
+          "start": 47.05477689477783,
+          "end": 47.2749396110018
+        },
+        {
+          "text": "perfume",
+          "start": 47.51511711960977,
+          "end": 48.335723607353664
+        },
+        {
+          "text": "dos",
+          "start": 49.03624134079357,
+          "end": 49.39650760370552
+        },
+        {
+          "text": "teus",
+          "start": 49.5566259427775,
+          "end": 49.95692179045745
+        },
+        {
+          "text": "soños",
+          "start": 50.077010544761436,
+          "end": 51.01770578680931
+        },
+        {
+          "text": "e",
+          "start": 51.678193935481225,
+          "end": 51.69820872786522
+        },
+        {
+          "text": "o",
+          "start": 51.77826789740121,
+          "end": 51.79828268978521
+        },
+        {
+          "text": "vaco",
+          "start": 51.95840102885719,
+          "end": 52.53883000799311
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Encernamente, ocultándome ao camiño",
+      "start": 53.55958441957698,
+      "end": 58.923548778488275,
+      "words": [
+        {
+          "text": "Encernamente,",
+          "start": 53.55958441957698,
+          "end": 54.66039800069683
+        },
+        {
+          "text": "ocultándome",
+          "start": 55.420960111288736,
+          "end": 57.26232101061649
+        },
+        {
+          "text": "ao",
+          "start": 57.54252810399245,
+          "end": 57.722661235448435
+        },
+        {
+          "text": "camiño",
+          "start": 57.9428239516724,
+          "end": 58.923548778488275
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "De a penas sabendo",
+      "start": 59.94430319007214,
+      "end": 62.94652204767175,
+      "words": [
+        {
+          "text": "De",
+          "start": 59.94430319007214,
+          "end": 60.024362359608126
+        },
+        {
+          "text": "a",
+          "start": 60.10442152914412,
+          "end": 60.124436321528115
+        },
+        {
+          "text": "penas",
+          "start": 60.2645398682161,
+          "end": 61.08514635595999
+        },
+        {
+          "text": "sabendo",
+          "start": 62.025841598007865,
+          "end": 62.94652204767175
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Soñou de volta, volta, era de alá",
+      "start": 66.60922905394327,
+      "end": 71.6729715270946,
+      "words": [
+        {
+          "text": "Soñou",
+          "start": 66.60922905394327,
+          "end": 66.98951010923922
+        },
+        {
+          "text": "de",
+          "start": 67.0695692787752,
+          "end": 67.14962844831119
+        },
+        {
+          "text": "volta,",
+          "start": 67.56993908837514,
+          "end": 68.41056036850303
+        },
+        {
+          "text": "volta,",
+          "start": 68.710782254263,
+          "end": 69.31122602578291
+        },
+        {
+          "text": "era",
+          "start": 70.39202481451876,
+          "end": 70.59217273835874
+        },
+        {
+          "text": "de",
+          "start": 70.75229107743073,
+          "end": 70.8723798317347
+        },
+        {
+          "text": "alá",
+          "start": 71.29269047179865,
+          "end": 71.6729715270946
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sobran",
+      "start": 75.09550102475815,
+      "end": 75.61588562674208,
+      "words": [
+        {
+          "text": "Sobran",
+          "start": 75.09550102475815,
+          "end": 75.61588562674208
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Foga que tiven as man alá",
+      "start": 75.91610751250205,
+      "end": 79.17851867109361,
+      "words": [
+        {
+          "text": "Foga",
+          "start": 75.91610751250205,
+          "end": 76.77674358501393
+        },
+        {
+          "text": "que",
+          "start": 76.91684713170191,
+          "end": 77.09698026315789
+        },
+        {
+          "text": "tiven",
+          "start": 77.7374536194458,
+          "end": 78.37792697573373
+        },
+        {
+          "text": "as",
+          "start": 78.43797135288571,
+          "end": 78.57807489957369
+        },
+        {
+          "text": "man",
+          "start": 78.63811927672569,
+          "end": 78.79823761579767
+        },
+        {
+          "text": "alá",
+          "start": 78.95835595486965,
+          "end": 79.17851867109361
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sexábel",
+      "start": 83.72187654226103,
+      "end": 87.7448498114445,
+      "words": [
+        {
+          "text": "Sexábel",
+          "start": 83.72187654226103,
+          "end": 87.7448498114445
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "En aledo, vai a danxa",
+      "start": 89.18591486309231,
+      "end": 93.62919877233972,
+      "words": [
+        {
+          "text": "En",
+          "start": 89.18591486309231,
+          "end": 89.26597403262829
+        },
+        {
+          "text": "aledo,",
+          "start": 89.54618112600426,
+          "end": 90.28672844421216
+        },
+        {
+          "text": "vai",
+          "start": 91.12734972434005,
+          "end": 91.60770474155599
+        },
+        {
+          "text": "a",
+          "start": 91.86789704254795,
+          "end": 91.88791183493196
+        },
+        {
+          "text": "danxa",
+          "start": 92.2281633054599,
+          "end": 93.62919877233972
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Aredor, agardelo, agardelo, agardelo, agardelo, agardelo.",
+      "start": 93.7893171114117,
+      "end": 104.13696477393835,
+      "words": [
+        {
+          "text": "Aredor,",
+          "start": 93.7893171114117,
+          "end": 95.15032299352352
+        },
+        {
+          "text": "agardelo,",
+          "start": 95.3304561249795,
+          "end": 96.65143242232332
+        },
+        {
+          "text": "agardelo,",
+          "start": 97.89234955013116,
+          "end": 98.65291166072306
+        },
+        {
+          "text": "agardelo,",
+          "start": 99.53356252561895,
+          "end": 100.73445006865879
+        },
+        {
+          "text": "agardelo,",
+          "start": 101.65513051832266,
+          "end": 102.75594409944253
+        },
+        {
+          "text": "agardelo.",
+          "start": 103.7366689262584,
+          "end": 104.13696477393835
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Di que non me fixo",
+      "start": 104.77743813022626,
+      "end": 109.36082558616167,
+      "words": [
+        {
+          "text": "Di",
+          "start": 104.77743813022626,
+          "end": 108.60026347556976
+        },
+        {
+          "text": "que",
+          "start": 108.68032264510575,
+          "end": 108.76038181464173
+        },
+        {
+          "text": "non",
+          "start": 108.84044098417773,
+          "end": 108.92050015371372
+        },
+        {
+          "text": "me",
+          "start": 109.0005593232497,
+          "end": 109.0405889080177
+        },
+        {
+          "text": "fixo",
+          "start": 109.10063328516969,
+          "end": 109.36082558616167
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sóbrame tempo",
+      "start": 111.00203856164944,
+      "end": 111.68254150270536,
+      "words": [
+        {
+          "text": "Sóbrame",
+          "start": 111.00203856164944,
+          "end": 111.3422900321774
+        },
+        {
+          "text": "tempo",
+          "start": 111.42234920171339,
+          "end": 111.68254150270536
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Vou",
+      "start": 114.22442013547303,
+      "end": 114.62471598315297,
+      "words": [
+        {
+          "text": "Vou",
+          "start": 114.22442013547303,
+          "end": 114.62471598315297
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Aquí non me pillas Sóbrame aquí non me pillas, vou!",
+      "start": 117.26666857784062,
+      "end": 121.2896418470241,
+      "words": [
+        {
+          "text": "Aquí",
+          "start": 117.26666857784062,
+          "end": 117.4468017092966
+        },
+        {
+          "text": "non",
+          "start": 117.5268608788326,
+          "end": 117.60692004836858
+        },
+        {
+          "text": "me",
+          "start": 117.66696442552058,
+          "end": 117.72700880267256
+        },
+        {
+          "text": "pillas",
+          "start": 117.78705317982455,
+          "end": 118.12730465035251
+        },
+        {
+          "text": "Sóbrame",
+          "start": 119.34820698577634,
+          "end": 119.6884584563043
+        },
+        {
+          "text": "aquí",
+          "start": 119.8085472106083,
+          "end": 119.98868034206427
+        },
+        {
+          "text": "non",
+          "start": 120.00869513444826,
+          "end": 120.14879868113624
+        },
+        {
+          "text": "me",
+          "start": 120.16881347352025,
+          "end": 120.38897618974421
+        },
+        {
+          "text": "pillas,",
+          "start": 120.60913890596818,
+          "end": 120.84931641457615
+        },
+        {
+          "text": "vou!",
+          "start": 120.92937558411214,
+          "end": 121.2896418470241
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sóbrame aquí non me pillas, vou!",
+      "start": 121.70995248708805,
+      "end": 123.5112838016478,
+      "words": [
+        {
+          "text": "Sóbrame",
+          "start": 121.70995248708805,
+          "end": 122.07021875
+        },
+        {
+          "text": "aquí",
+          "start": 122.15027791953598,
+          "end": 122.33041105099196
+        },
+        {
+          "text": "non",
+          "start": 122.39045542814395,
+          "end": 122.49052939006394
+        },
+        {
+          "text": "me",
+          "start": 122.53055897483193,
+          "end": 122.61061814436792
+        },
+        {
+          "text": "pillas,",
+          "start": 122.89082523774388,
+          "end": 123.15101753873586
+        },
+        {
+          "text": "vou!",
+          "start": 123.19104712350385,
+          "end": 123.5112838016478
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Estráñate a túa voz, o teu olor, de quentura felida",
+      "start": 125.11246719236759,
+      "end": 134.01904980324642,
+      "words": [
+        {
+          "text": "Estráñate",
+          "start": 125.11246719236759,
+          "end": 126.09319201918346
+        },
+        {
+          "text": "a",
+          "start": 127.3741387317593,
+          "end": 127.39415352414329
+        },
+        {
+          "text": "túa",
+          "start": 127.57428665559927,
+          "end": 127.81446416420724
+        },
+        {
+          "text": "voz,",
+          "start": 128.1347008423512,
+          "end": 128.65508544433513
+        },
+        {
+          "text": "o",
+          "start": 128.69511502910314,
+          "end": 128.71512982148712
+        },
+        {
+          "text": "teu",
+          "start": 128.8752481605591,
+          "end": 129.01535170724708
+        },
+        {
+          "text": "olor,",
+          "start": 129.21549963108706,
+          "end": 129.815943402607
+        },
+        {
+          "text": "de",
+          "start": 130.69659426750286,
+          "end": 130.77665343703885
+        },
+        {
+          "text": "quentura",
+          "start": 130.95678656849483,
+          "end": 132.41786641252665
+        },
+        {
+          "text": "felida",
+          "start": 133.07835456119855,
+          "end": 134.01904980324642
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Saberro",
+      "start": 135.13987817675027,
+      "end": 136.10058821118216,
+      "words": [
+        {
+          "text": "Saberro",
+          "start": 135.13987817675027,
+          "end": 136.10058821118216
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Pico",
+      "start": 137.74180118666993,
+      "end": 138.68249642871783,
+      "words": [
+        {
+          "text": "Pico",
+          "start": 137.74180118666993,
+          "end": 138.68249642871783
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Dátego",
+      "start": 139.88338397175767,
+      "end": 140.9241531757255,
+      "words": [
+        {
+          "text": "Dátego",
+          "start": 139.88338397175767,
+          "end": 140.9241531757255
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Digo",
+      "start": 141.9849371720774,
+      "end": 142.42526260452533,
+      "words": [
+        {
+          "text": "Digo",
+          "start": 141.9849371720774,
+          "end": 142.42526260452533
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Que amable!",
+      "start": 143.4860466008772,
+      "end": 144.44675663530907,
+      "words": [
+        {
+          "text": "Que",
+          "start": 143.4860466008772,
+          "end": 143.56610577041317
+        },
+        {
+          "text": "amable!",
+          "start": 143.60613535518118,
+          "end": 144.44675663530907
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Leto a",
+      "start": 146.10798440318084,
+      "end": 147.06869443761272,
+      "words": [
+        {
+          "text": "Leto",
+          "start": 146.10798440318084,
+          "end": 146.54830983562877
+        },
+        {
+          "text": "a",
+          "start": 147.04867964522873,
+          "end": 147.06869443761272
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Dea serrexa",
+      "start": 148.18952281111657,
+      "end": 150.21101684190032,
+      "words": [
+        {
+          "text": "Dea",
+          "start": 148.18952281111657,
+          "end": 148.8099813750205
+        },
+        {
+          "text": "serrexa",
+          "start": 149.01012929886045,
+          "end": 150.21101684190032
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Boal",
+      "start": 151.89225940215607,
+      "end": 152.61279192798,
+      "words": [
+        {
+          "text": "Boal",
+          "start": 151.89225940215607,
+          "end": 152.61279192798
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Intermináme da",
+      "start": 153.73362030148385,
+      "end": 155.37483327697163,
+      "words": [
+        {
+          "text": "Intermináme",
+          "start": 153.73362030148385,
+          "end": 154.8744634673717
+        },
+        {
+          "text": "da",
+          "start": 155.25474452266764,
+          "end": 155.37483327697163
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Túa man",
+      "start": 156.55570602762748,
+      "end": 158.29699296503523,
+      "words": [
+        {
+          "text": "Túa",
+          "start": 156.55570602762748,
+          "end": 157.37631251537135
+        },
+        {
+          "text": "man",
+          "start": 158.03680066404328,
+          "end": 158.29699296503523
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Golias da choiva",
+      "start": 158.51715568125923,
+      "end": 161.09906389879487,
+      "words": [
+        {
+          "text": "Golias",
+          "start": 158.51715568125923,
+          "end": 160.138353864363
+        },
+        {
+          "text": "da",
+          "start": 160.198398241515,
+          "end": 160.29847220343498
+        },
+        {
+          "text": "choiva",
+          "start": 160.45859054250695,
+          "end": 161.09906389879487
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sabendo",
+      "start": 162.19987747991473,
+      "end": 163.1405727219626,
+      "words": [
+        {
+          "text": "Sabendo",
+          "start": 162.19987747991473,
+          "end": 163.1405727219626
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Dou volta á gorra",
+      "start": 167.22359036829806,
+      "end": 169.46524711530577,
+      "words": [
+        {
+          "text": "Dou",
+          "start": 167.22359036829806,
+          "end": 167.46376787690605
+        },
+        {
+          "text": "volta",
+          "start": 167.804019347434,
+          "end": 168.6446406275619
+        },
+        {
+          "text": "á",
+          "start": 168.76472938186586,
+          "end": 168.78474417424988
+        },
+        {
+          "text": "gorra",
+          "start": 168.88481813616986,
+          "end": 169.46524711530577
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sobre a lúa que ti mes malá tes",
+      "start": 175.289551699049,
+      "end": 180.0730870788244,
+      "words": [
+        {
+          "text": "Sobre",
+          "start": 175.289551699049,
+          "end": 175.70986233911296
+        },
+        {
+          "text": "a",
+          "start": 175.91001026295294,
+          "end": 175.93002505533693
+        },
+        {
+          "text": "lúa",
+          "start": 176.0901433944089,
+          "end": 176.9707942593048
+        },
+        {
+          "text": "que",
+          "start": 177.11089780599278,
+          "end": 177.27101614506475
+        },
+        {
+          "text": "ti",
+          "start": 177.93150429373668,
+          "end": 178.07160784042466
+        },
+        {
+          "text": "mes",
+          "start": 178.23172617949663,
+          "end": 178.77212557386457
+        },
+        {
+          "text": "malá",
+          "start": 178.87219953578455,
+          "end": 179.1724214215445
+        },
+        {
+          "text": "tes",
+          "start": 179.25248059108048,
+          "end": 180.0730870788244
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Eches a mobe?",
+      "start": 183.49561657648795,
+      "end": 187.75876735427937,
+      "words": [
+        {
+          "text": "Eches",
+          "start": 183.49561657648795,
+          "end": 185.69724373872765
+        },
+        {
+          "text": "a",
+          "start": 185.85736207779962,
+          "end": 185.87737687018364
+        },
+        {
+          "text": "mobe?",
+          "start": 187.31844192183144,
+          "end": 187.75876735427937
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Dou volta a volta a inhalar",
+      "start": 192.26209564067878,
+      "end": 196.1049357784063,
+      "words": [
+        {
+          "text": "Dou",
+          "start": 192.26209564067878,
+          "end": 192.52228794167075
+        },
+        {
+          "text": "volta",
+          "start": 192.8225098274307,
+          "end": 193.7031606923266
+        },
+        {
+          "text": "a",
+          "start": 193.8232494466306,
+          "end": 193.8432642390146
+        },
+        {
+          "text": "volta",
+          "start": 193.92332340855057,
+          "end": 194.5237671800705
+        },
+        {
+          "text": "a",
+          "start": 195.50449200688635,
+          "end": 195.52450679927037
+        },
+        {
+          "text": "inhalar",
+          "start": 195.60456596880636,
+          "end": 196.1049357784063
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Sobre a lúa que é ti mesma dará",
+      "start": 200.32805697142973,
+      "end": 204.4110746177652,
+      "words": [
+        {
+          "text": "Sobre",
+          "start": 200.32805697142973,
+          "end": 200.76838240387767
+        },
+        {
+          "text": "a",
+          "start": 200.92850074294967,
+          "end": 200.94851553533366
+        },
+        {
+          "text": "lúa",
+          "start": 201.12864866678962,
+          "end": 202.0092995316855
+        },
+        {
+          "text": "que",
+          "start": 202.16941787075748,
+          "end": 202.28950662506148
+        },
+        {
+          "text": "é",
+          "start": 202.88995039658138,
+          "end": 202.9099651889654
+        },
+        {
+          "text": "ti",
+          "start": 202.9700095661174,
+          "end": 203.11011311280538
+        },
+        {
+          "text": "mesma",
+          "start": 203.27023145187735,
+          "end": 203.99076397770125
+        },
+        {
+          "text": "dará",
+          "start": 204.09083793962125,
+          "end": 204.4110746177652
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Chese sámoche-lo e-lo e-lo e-lo e-lo e-lo e-lo e-lo e-lo.",
+      "start": 208.9344176965486,
+      "end": 221.82394399184292,
+      "words": [
+        {
+          "text": "Chese",
+          "start": 208.9344176965486,
+          "end": 210.61566025680438
+        },
+        {
+          "text": "sámoche-lo",
+          "start": 210.71573421872438,
+          "end": 213.07747972003605
+        },
+        {
+          "text": "e-lo",
+          "start": 213.37770160579603,
+          "end": 214.77873707267582
+        },
+        {
+          "text": "e-lo",
+          "start": 215.0989737508198,
+          "end": 215.53929918326773
+        },
+        {
+          "text": "e-lo",
+          "start": 216.43996484054762,
+          "end": 216.98036423491556
+        },
+        {
+          "text": "e-lo",
+          "start": 217.14048257398753,
+          "end": 217.54077842166748
+        },
+        {
+          "text": "e-lo",
+          "start": 218.86175471901132,
+          "end": 219.04188785046728
+        },
+        {
+          "text": "e-lo",
+          "start": 219.26205056669124,
+          "end": 219.6623464143712
+        },
+        {
+          "text": "e-lo",
+          "start": 220.5630120716511,
+          "end": 221.103411466019
+        },
+        {
+          "text": "e-lo.",
+          "start": 221.34358897462698,
+          "end": 221.82394399184292
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    },
+    {
+      "text": "Galedo, soa edade, soa edade, soa edadelo, bañar",
+      "start": 223.06486111965074,
+      "end": 244.120422707616,
+      "words": [
+        {
+          "text": "Galedo,",
+          "start": 223.06486111965074,
+          "end": 223.84543802262664
+        },
+        {
+          "text": "soa",
+          "start": 224.64602971798655,
+          "end": 224.8261628494425
+        },
+        {
+          "text": "edade,",
+          "start": 225.0663403580505,
+          "end": 225.6067397524184
+        },
+        {
+          "text": "soa",
+          "start": 225.8469172610264,
+          "end": 226.90770125737825
+        },
+        {
+          "text": "edade,",
+          "start": 227.04780480406623,
+          "end": 227.56818940605015
+        },
+        {
+          "text": "soa",
+          "start": 227.84839649942612,
+          "end": 229.00925445769798
+        },
+        {
+          "text": "edadelo,",
+          "start": 229.18938758915394,
+          "end": 229.78983136067387
+        },
+        {
+          "text": "bañar",
+          "start": 229.90992011497787,
+          "end": 244.120422707616
+        }
+      ],
+      "status": "draft",
+      "anchor": null,
+      "note": null,
+      "revised": false
+    }
+  ]
+}

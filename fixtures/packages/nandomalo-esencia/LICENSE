@@ -1,0 +1,9 @@
+Song: Esencia by NANDOMALO
+Licence: CC BY-SA
+Source: https://www.jamendo.com/track/1348566/esencia/lyrics
+
+Word timings: JamendoLyrics MultiLang (Durand, Stoller and Ewert, ICASSP 2023).
+Lyrics text and line timings: Jam-ALT (Cífka et al., 2023 and 2025).
+
+The audio (vocals.wav, instrumental.wav) is never versioned. To rebuild it:
+  uv run karaoke-bench package jamendo/Esencia_-_NandoMalo_ --pipeline bench/pipelines/base-turbo.toml --out <this folder>

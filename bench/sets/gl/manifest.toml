@@ -1,0 +1,65 @@
+# Galician songs with free licences. Audio is downloaded by `karaoke-bench fetch --set gl` and
+# checked against sha256; lyrics, references and licence notes live next to this file.
+# Fields per song: id, title, artist, language, style, license, license_url, source, audio_url,
+# sha256, and optionally clip = [start, end] to keep one song of a longer recording.
+
+
+[[songs]]
+id = "pantis-un-aire"
+title = "un aire"
+artist = "Pantis"
+language = "gl"
+style = "pop-rock"
+license = "CC BY-NC-SA 4.0"
+license_url = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+source = "https://archive.org/details/pantis-memoria-nova"
+audio_url = "https://archive.org/download/pantis-memoria-nova/Pantis%20-%20memoria%20nova%20-%2001%20-%20un%20aire.flac"
+sha256 = "5262d25c292f9505f750aebd31bd9901ce0fb03bcdfe93fec2f10c97d72a2757"
+
+[[songs]]
+id = "cibran-o-mundo-do-motor"
+title = "O mundo do motor"
+artist = "Cibrán"
+language = "gl"
+style = "lo-fi pop with rap"
+license = "CC BY-NC-SA 4.0"
+license_url = "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+source = "https://archive.org/details/saudade-sempre-master-propio-2"
+audio_url = "https://archive.org/download/saudade-sempre-master-propio-2/06.%20O%20mundo%20do%20motor.wav"
+sha256 = "1a3915f5c68e0e6151d9e4b13eade9ac9816ffb2dda867959366cb1fba0d4fce"
+
+[[songs]]
+id = "cloplas-laverca"
+title = "laverca"
+artist = "Clo Plas"
+language = "gl"
+style = "lo-fi midi-pop and rap, two voices"
+license = "CC BY-SA 4.0"
+license_url = "https://creativecommons.org/licenses/by-sa/4.0/"
+source = "https://archive.org/details/bafi_20220513"
+audio_url = "https://archive.org/download/bafi_20220513/2_laverca.mp3"
+sha256 = "f09538e4d840fc44d53ddfa16a4757851be54b6272d811dba6266e1b765d0c74"
+
+[[songs]]
+id = "fanny-alexander-lene"
+title = "Lene"
+artist = "Fanny + Alexander"
+language = "gl"
+style = "indie pop"
+license = "CC BY-NC-SA 3.0"
+license_url = "https://creativecommons.org/licenses/by-nc-sa/3.0/"
+source = "https://archive.org/details/fanny_alexander_lusco_e_fusco"
+audio_url = "https://archive.org/download/fanny_alexander_lusco_e_fusco/01_Lene.mp3"
+sha256 = "14140d799e65fd1ece93c4452f057372f6ec0e37fb37cdea592776e936c12a0e"
+
+[[songs]]
+id = "mortos-en-vida-chapapote"
+title = "Chapapote"
+artist = "Mortos En Vida"
+language = "gl"
+style = "hardcore punk, shouted vocals"
+license = "CC BY-NC-ND 3.0"
+license_url = "https://creativecommons.org/licenses/by-nc-nd/3.0/"
+source = "https://archive.org/details/jamendo-147154"
+audio_url = "https://archive.org/download/jamendo-147154/04-1226844-Mortos%20En%20Vida-Chapapote.mp3"
+sha256 = "ce5890239cbb5262bbeaab4af5f2d24075bbbac6ad8c3a3fea28aaaf9d1d1985"

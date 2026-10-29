@@ -1,0 +1,17 @@
+# The v2 pipeline rebuilt with current libraries: Demucs, Whisper small guessing the language,
+# and the default per-language CTC aligner (fed the guessed language, as v2 did).
+name = "base-legacy"
+description = "Demucs + Whisper small (language detected) + default CTC aligner, like v2"
+
+[steps.separator]
+target = "karaoke_bench.baseline.separation:DemucsSeparator"
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "small", detect_language = true }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"
