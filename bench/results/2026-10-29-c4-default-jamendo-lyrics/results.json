@@ -1,11 +1,11 @@
 {
   "bench_version": "0.1.0",
   "normalization_version": 1,
-  "created": "2026-10-29T16:32:06+01:00",
-  "git_commit": "9f19305",
+  "created": "2026-10-29T20:06:14+01:00",
+  "git_commit": "6a96d21-dirty",
   "pipeline": {
     "name": "c4-default",
-    "description": "Mel-Band RoFormer (Kim, 8 s) + Whisper large-v3-turbo + lyrics aligner (each language's default CTC model)",
+    "description": "Mel-Band RoFormer (Kim, 8 s) + Whisper (HiTZ large-v3 for Galician, large-v3-turbo otherwise) + lyrics aligner (each language's default CTC model)",
     "steps": {
       "separator": {
         "target": "karaoke_engine.separation:RoformerSeparator",
@@ -16,21 +16,19 @@
         "version": "2"
       },
       "transcriber": {
-        "target": "karaoke_bench.baseline.whisper:FasterWhisperTranscriber",
-        "params": {
-          "model": "large-v3-turbo"
-        },
-        "version": "1"
+        "target": "karaoke_engine.transcribe:WhisperTranscriber",
+        "params": {},
+        "version": "2"
       },
       "segmenter": {
-        "target": "karaoke_bench.baseline.segment:SegmentPerLine",
+        "target": "karaoke_engine.transcribe:LineSegmenter",
         "params": {},
         "version": "1"
       },
       "aligner": {
         "target": "karaoke_engine.align.aligner:LyricsAligner",
         "params": {},
-        "version": "6"
+        "version": "11"
       }
     }
   },
@@ -63,9 +61,9 @@
       "ram_peak_mb": 2388.078125
     },
     "aligner": {
-      "load_seconds": 0.07836613499966916,
+      "load_seconds": 0.07050409599469276,
       "vram_peak_mb": 1558.50390625,
-      "ram_peak_mb": 4438.6796875
+      "ram_peak_mb": 3725.94140625
     }
   },
   "songs": [
@@ -83,7 +81,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.88781823699901,
+          "seconds": 4.121869508002419,
           "cached": true,
           "error": null
         }
@@ -106,7 +104,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.020499999999991303,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -127,7 +125,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 9.21887805300139,
+          "seconds": 14.296471613000904,
           "cached": true,
           "error": null
         }
@@ -150,7 +148,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.04049999999999798,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -171,7 +169,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.4915422670019325,
+          "seconds": 4.760139004996745,
           "cached": false,
           "error": null
         }
@@ -215,7 +213,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.021581603999948,
+          "seconds": 3.244524341003853,
           "cached": true,
           "error": null
         }
@@ -238,7 +236,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.012999999999998124,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -259,7 +257,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 5.254326431000663,
+          "seconds": 5.152210122003453,
           "cached": false,
           "error": null
         }
@@ -282,7 +280,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02999999999999936,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -303,7 +301,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 10.679861108001205,
+          "seconds": 13.411149892999674,
           "cached": false,
           "error": null
         }
@@ -326,7 +324,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02599999999999625,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00033778078027360244,
@@ -347,7 +345,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.9019862900022417,
+          "seconds": 3.9902518410017365,
           "cached": false,
           "error": null
         }
@@ -370,7 +368,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.036000000000001364,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00033439224209998327,
@@ -391,7 +389,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.9031232060006005,
+          "seconds": 5.165894565994677,
           "cached": false,
           "error": null
         }
@@ -435,7 +433,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.9605489509995095,
+          "seconds": 2.974384209999698,
           "cached": false,
           "error": null
         }
@@ -458,7 +456,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02499999999999858,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00030759766225776686,
@@ -479,7 +477,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.079746086998057,
+          "seconds": 3.1331956190042547,
           "cached": true,
           "error": null
         }
@@ -502,7 +500,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.06399999999999295,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -523,7 +521,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.081227714999841,
+          "seconds": 4.554774049996922,
           "cached": true,
           "error": null
         }
@@ -546,7 +544,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02450000000000152,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -567,7 +565,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.763899631998356,
+          "seconds": 3.8789212460033013,
           "cached": false,
           "error": null
         }
@@ -590,7 +588,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.03200000000000003,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00031191515907673113,
@@ -611,7 +609,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.2088603660013177,
+          "seconds": 3.25841790499544,
           "cached": false,
           "error": null
         }
@@ -634,7 +632,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.1360000000000241,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -655,7 +653,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.2115807730006054,
+          "seconds": 2.3112754199974006,
           "cached": true,
           "error": null
         }
@@ -699,7 +697,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.519900406998204,
+          "seconds": 3.6655809200019576,
           "cached": true,
           "error": null
         }
@@ -722,7 +720,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.0449999999999946,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -743,7 +741,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.7502876090002246,
+          "seconds": 2.843255094005144,
           "cached": false,
           "error": null
         }
@@ -787,7 +785,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.515071934001753,
+          "seconds": 3.6683069500068086,
           "cached": false,
           "error": null
         }
@@ -831,7 +829,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.6800609080019058,
+          "seconds": 2.815458519005915,
           "cached": false,
           "error": null
         }
@@ -854,7 +852,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.030000000000001137,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -875,7 +873,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.858611881998513,
+          "seconds": 2.964352950999455,
           "cached": false,
           "error": null
         }
@@ -898,7 +896,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.028999999999996362,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0003077870113881194,
@@ -919,7 +917,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.19950904599682,
+          "seconds": 4.362574620994565,
           "cached": true,
           "error": null
         }
@@ -942,7 +940,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.021000000000000796,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -963,7 +961,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.219860406999942,
+          "seconds": 2.3076580299966736,
           "cached": false,
           "error": null
         }
@@ -1007,7 +1005,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.1330161049991148,
+          "seconds": 3.2041922749995138,
           "cached": false,
           "error": null
         }
@@ -1051,7 +1049,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.409855707999668,
+          "seconds": 4.5454503709988785,
           "cached": false,
           "error": null
         }
@@ -1074,7 +1072,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.031500000000001194,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1095,7 +1093,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.385572957999102,
+          "seconds": 3.5315724320025765,
           "cached": false,
           "error": null
         }
@@ -1118,7 +1116,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.03249999999999531,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00018811136192626034,
@@ -1139,7 +1137,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.9152594719998888,
+          "seconds": 4.082170726993354,
           "cached": true,
           "error": null
         }
@@ -1162,7 +1160,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.036000000000001364,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00018971732119142478,
@@ -1183,7 +1181,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.0265818359985133,
+          "seconds": 3.0649590350003564,
           "cached": false,
           "error": null
         }
@@ -1227,7 +1225,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.127154176003387,
+          "seconds": 2.116467479005223,
           "cached": false,
           "error": null
         }
@@ -1271,7 +1269,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.390249005999067,
+          "seconds": 3.417750963999424,
           "cached": false,
           "error": null
         }
@@ -1294,7 +1292,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.041499999999999204,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1315,7 +1313,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.157616376000078,
+          "seconds": 3.1905503930029226,
           "cached": false,
           "error": null
         }
@@ -1338,7 +1336,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02549999999999386,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0007301046483329277,
@@ -1359,7 +1357,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.484783107000112,
+          "seconds": 2.3827427130017895,
           "cached": false,
           "error": null
         }
@@ -1403,7 +1401,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.386530154002685,
+          "seconds": 3.5387158829980763,
           "cached": false,
           "error": null
         }
@@ -1447,7 +1445,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.6605207019965746,
+          "seconds": 2.7998530289987684,
           "cached": true,
           "error": null
         }
@@ -1470,7 +1468,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.023499999999998522,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1491,7 +1489,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.4430918610014487,
+          "seconds": 3.4544940990017494,
           "cached": false,
           "error": null
         }
@@ -1514,7 +1512,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.038499999999991985,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1535,7 +1533,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.028182818001369,
+          "seconds": 3.01539173200581,
           "cached": false,
           "error": null
         }
@@ -1579,7 +1577,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 1.9500005330010026,
+          "seconds": 1.955137172000832,
           "cached": false,
           "error": null
         }
@@ -1602,7 +1600,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.031500000000001194,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1623,7 +1621,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.219494952001696,
+          "seconds": 3.476988127004006,
           "cached": false,
           "error": null
         }
@@ -1667,7 +1665,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.968737542996678,
+          "seconds": 4.078999917001056,
           "cached": true,
           "error": null
         }
@@ -1711,7 +1709,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.611658191999595,
+          "seconds": 4.232265873004508,
           "cached": true,
           "error": null
         }
@@ -1734,7 +1732,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02750000000000341,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.006578947368421052,
@@ -1755,7 +1753,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.132111986000382,
+          "seconds": 3.3348165069983224,
           "cached": false,
           "error": null
         }
@@ -1778,7 +1776,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.04899999999999949,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1799,7 +1797,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.6909107159990526,
+          "seconds": 2.693812736994005,
           "cached": false,
           "error": null
         }
@@ -1822,7 +1820,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.02400000000000091,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0005154639175257732,
@@ -1843,7 +1841,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.6309847259981325,
+          "seconds": 2.7884952340027667,
           "cached": true,
           "error": null
         }
@@ -1866,7 +1864,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.017499999999998295,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1887,7 +1885,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.273056619000272,
+          "seconds": 2.3579325800019433,
           "cached": false,
           "error": null
         }
@@ -1910,7 +1908,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.04049999999999976,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -1931,7 +1929,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.9002175070017984,
+          "seconds": 2.9955993050025427,
           "cached": false,
           "error": null
         }
@@ -1975,7 +1973,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.508593432001362,
+          "seconds": 3.742456549000053,
           "cached": false,
           "error": null
         }
@@ -1998,7 +1996,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.036999999999999034,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2019,7 +2017,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.4569582129988703,
+          "seconds": 2.564766414994665,
           "cached": false,
           "error": null
         }
@@ -2042,7 +2040,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.055999999999997385,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2063,7 +2061,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.425268404000235,
+          "seconds": 2.462662181998894,
           "cached": false,
           "error": null
         }
@@ -2107,7 +2105,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.1269435879985394,
+          "seconds": 3.2084147200002917,
           "cached": false,
           "error": null
         }
@@ -2130,7 +2128,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.030000000000001137,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2151,7 +2149,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.1391863909993845,
+          "seconds": 4.151767053997901,
           "cached": false,
           "error": null
         }
@@ -2174,7 +2172,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.022499999999979536,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0009165902841429881,
@@ -2195,7 +2193,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.11643610900137,
+          "seconds": 3.3408525440027006,
           "cached": true,
           "error": null
         }
@@ -2218,7 +2216,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.045000000000001705,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.000251004016064257,
@@ -2239,7 +2237,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.774127499000315,
+          "seconds": 2.7438326939955004,
           "cached": false,
           "error": null
         }
@@ -2262,7 +2260,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.040500000000001535,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0023148148148148147,
@@ -2283,7 +2281,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.946361151000019,
+          "seconds": 2.94541142500384,
           "cached": false,
           "error": null
         }
@@ -2306,7 +2304,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.04399999999999693,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2327,7 +2325,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.951561469999433,
+          "seconds": 3.213130830001319,
           "cached": true,
           "error": null
         }
@@ -2371,7 +2369,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.6980932379992737,
+          "seconds": 2.619259640996461,
           "cached": false,
           "error": null
         }
@@ -2394,7 +2392,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.06550000000000189,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0016165535079211122,
@@ -2415,7 +2413,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.3170397079993563,
+          "seconds": 3.4376766869972926,
           "cached": false,
           "error": null
         }
@@ -2459,7 +2457,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.5487609800002247,
+          "seconds": 2.5889379900036147,
           "cached": false,
           "error": null
         }
@@ -2482,7 +2480,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.055999999999997385,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2503,7 +2501,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.271361039998737,
+          "seconds": 4.388545640998927,
           "cached": false,
           "error": null
         }
@@ -2547,7 +2545,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.9876466509995225,
+          "seconds": 4.184206848003669,
           "cached": true,
           "error": null
         }
@@ -2591,7 +2589,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.381436087998736,
+          "seconds": 3.4793061220043455,
           "cached": false,
           "error": null
         }
@@ -2635,7 +2633,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.4815440969978226,
+          "seconds": 3.4988949399994453,
           "cached": false,
           "error": null
         }
@@ -2658,7 +2656,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.0379999999999967,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2679,7 +2677,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.883350326002983,
+          "seconds": 2.891811854999105,
           "cached": false,
           "error": null
         }
@@ -2702,7 +2700,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.038000000000010914,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2723,7 +2721,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.007223659002193,
+          "seconds": 3.255540258003748,
           "cached": true,
           "error": null
         }
@@ -2746,7 +2744,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.028999999999996362,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2767,7 +2765,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.1701833570004965,
+          "seconds": 3.1842808070068713,
           "cached": false,
           "error": null
         }
@@ -2811,7 +2809,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.0028265439977986,
+          "seconds": 3.017656142998021,
           "cached": false,
           "error": null
         }
@@ -2834,7 +2832,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.044999999999987494,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2855,7 +2853,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.8944707970003947,
+          "seconds": 2.937204717003624,
           "cached": false,
           "error": null
         }
@@ -2878,7 +2876,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.03599999999998715,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -2899,7 +2897,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.515516146999289,
+          "seconds": 2.4844233580006403,
           "cached": false,
           "error": null
         }
@@ -2943,7 +2941,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.1517614789991057,
+          "seconds": 3.286956199000997,
           "cached": true,
           "error": null
         }
@@ -2987,7 +2985,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.30212556600236,
+          "seconds": 2.3125804719966254,
           "cached": false,
           "error": null
         }
@@ -3031,7 +3029,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.107527526000922,
+          "seconds": 3.276059287993121,
           "cached": true,
           "error": null
         }
@@ -3075,7 +3073,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.191076973002055,
+          "seconds": 4.205738115000713,
           "cached": false,
           "error": null
         }
@@ -3119,7 +3117,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.610672365000937,
+          "seconds": 4.5908732099997,
           "cached": false,
           "error": null
         }
@@ -3142,7 +3140,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.024000000000002686,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -3163,7 +3161,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 5.5809825340002135,
+          "seconds": 5.563274154999817,
           "cached": false,
           "error": null
         }
@@ -3207,7 +3205,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.6503973589969974,
+          "seconds": 2.6674915620023967,
           "cached": false,
           "error": null
         }
@@ -3230,7 +3228,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.03300000000000125,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0004968944099378882,
@@ -3251,7 +3249,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.9414710290002404,
+          "seconds": 3.0882317869982217,
           "cached": true,
           "error": null
         }
@@ -3295,7 +3293,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.587738825000997,
+          "seconds": 2.598564419997274,
           "cached": false,
           "error": null
         }
@@ -3339,7 +3337,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.301426573001663,
+          "seconds": 2.301006559995585,
           "cached": false,
           "error": null
         }
@@ -3362,7 +3360,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.03049999999999997,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -3383,7 +3381,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.5196564569996553,
+          "seconds": 2.5308851139998296,
           "cached": false,
           "error": null
         }
@@ -3406,7 +3404,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.03499999999999659,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00042211903756859433,
@@ -3427,7 +3425,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.1268611490013427,
+          "seconds": 3.15670641700126,
           "cached": false,
           "error": null
         }
@@ -3450,7 +3448,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.04450000000000642,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0,
@@ -3471,7 +3469,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.59834101999877,
+          "seconds": 2.5705485209982726,
           "cached": false,
           "error": null
         }
@@ -3494,7 +3492,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.04100000000001103,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0013979496738117428,
@@ -3515,7 +3513,7 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.4333692280015384,
+          "seconds": 2.4146368599976995,
           "cached": false,
           "error": null
         }
@@ -3538,7 +3536,7 @@
       "scored_share": 1.0,
       "reference_validated": null,
       "reference_timing": "manual",
-      "line_start_median": 0.041999999999999815,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0004894762604013706,
@@ -3563,13 +3561,13 @@
         "end_mean": 0.16672698104911854,
         "start_bias": 0.04840431877968252
       },
-      "line_start_median": 0.0329999999999977,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.2044457523780086,
-        "aligner": 0.014355571902627887
+        "aligner": 0.014830257872202381
       },
-      "est_seconds_4min": 59.46585221835202,
+      "est_seconds_4min": 59.57191481204492,
       "outside_voice": 0.0006372835257588615,
       "low_confidence": 0.2505621843056144
     },
@@ -3589,13 +3587,13 @@
         "end_mean": 0.12420403864125384,
         "start_bias": 0.025761788025075866
       },
-      "line_start_median": 0.030999999999998806,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.20456434753710234,
-        "aligner": 0.013668858035934529
+        "aligner": 0.014006831269230646
       },
-      "est_seconds_4min": 59.32950372852812,
+      "est_seconds_4min": 59.4027552655142,
       "outside_voice": 0.00017728342068720515,
       "low_confidence": 0.18805217080979486
     },
@@ -3615,13 +3613,13 @@
         "end_mean": 0.20284972562283007,
         "start_bias": 0.0978254548965204
       },
-      "line_start_median": 0.046999999999997044,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.2044423912728473,
-        "aligner": 0.014334694230156245
+        "aligner": 0.014922972698935309
       },
-      "est_seconds_4min": 59.460034911720115,
+      "est_seconds_4min": 59.59335970522211,
       "outside_voice": 0.0010093556070512632,
       "low_confidence": 0.33005174512407986
     },
@@ -3641,13 +3639,13 @@
         "end_mean": 0.1884049527481189,
         "start_bias": 0.06098640757999998
       },
-      "line_start_median": 0.027999999999991587,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.204249298371232,
-        "aligner": 0.014289428889080502
+        "aligner": 0.014338280268912774
       },
-      "est_seconds_4min": 59.40282893347427,
+      "est_seconds_4min": 59.40669122562903,
       "outside_voice": 0.000904579555438819,
       "low_confidence": 0.18773361514649492
     },
@@ -3667,13 +3665,13 @@
         "end_mean": 0.14857453123834646,
         "start_bias": 0.004694601211136718
       },
-      "line_start_median": 0.033999999999991815,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.20455363261095522,
-        "aligner": 0.014827648856163863
+        "aligner": 0.015152987746375786
       },
-      "est_seconds_4min": 59.60504194310784,
+      "est_seconds_4min": 59.67526123775373,
       "outside_voice": 0.0004484750984949635,
       "low_confidence": 0.2988243125545339
     }
