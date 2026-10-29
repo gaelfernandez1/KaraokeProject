@@ -350,10 +350,11 @@ def _write(
         f"{results.set_name.replace('/', '_')}-{results.mode}"
     )
     name, n = base, 1
-    while (paths.results / name).exists():
+    folder = paths.private_results if results.set_name.split("/")[0] == "private" else paths.results
+    while (folder / name).exists():
         n += 1
         name = f"{base}-{n}"
-    out = paths.results / name
+    out = folder / name
     out.mkdir(parents=True)
     write_text_atomic(out / "results.json", results.model_dump_json(indent=2) + "\n")
     write_text_atomic(out / "report.md", render_report(results))

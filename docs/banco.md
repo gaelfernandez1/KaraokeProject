@@ -96,7 +96,8 @@ canción. Cada canción terminada entra en la caché en el momento, así que una
 
 Cada ejecución deja:
 
-- `bench/results/<fecha>-<pipeline>-<conjunto>-<modo>/report.md`: el informe (se versiona);
+- `bench/results/<fecha>-<pipeline>-<conjunto>-<modo>/report.md`: el informe (se versiona). Los
+  del conjunto `private` van a `bench/data/results/`, que no se versiona: son tus canciones;
 - `.../results.json`: todos los números, el entorno, el commit y la versión de la normalización (se
   versiona);
 - `bench/data/runs/<mismo nombre>/<canción>.json`: las salidas completas (no se versiona).

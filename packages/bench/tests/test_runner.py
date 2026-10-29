@@ -38,7 +38,8 @@ def test_run_lyrics_mode_with_smoke_pipeline(paths: BenchPaths) -> None:
     results = load_results(out / "results.json")
     [song] = results.songs
     assert (out / "report.md").is_file()
-    assert out.parent == paths.results
+    # The private set holds the user's own songs: its reports stay out of the versioned folder.
+    assert out.parent == paths.private_results
     assert song.error is None
     assert song.timing is not None
     assert song.timing.coverage == pytest.approx(1.0)
@@ -262,3 +263,13 @@ def test_aligner_sees_songs_grouped_by_language(
     run(RunOptions(pipeline, "private", "lyrics"), paths)
 
     assert record.read_text(encoding="utf-8").split() == ["es", "es", "gl", "gl"]
+
+
+def test_public_sets_report_into_the_versioned_folder(paths: BenchPaths) -> None:
+    import shutil
+
+    shutil.copytree(paths.data / "private" / "demo", paths.data / "stress" / "demo")
+
+    out = run(RunOptions(load_pipeline(SMOKE), "stress", "lyrics"), paths)
+
+    assert out.parent == paths.results
