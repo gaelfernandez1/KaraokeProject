@@ -8,9 +8,11 @@ wants. Which one is best is decided with the bench, not here.
 from pathlib import Path
 from typing import Any
 
+from karaoke_engine.audio import decode
 from karaoke_engine.steps import Stems
 
 DEFAULT_MODEL_DIR = Path.home() / ".cache" / "karaoke" / "models" / "audio-separator"
+_LIBSNDFILE_FORMATS = {".wav", ".flac"}
 
 
 def stem_roles(primary: str, secondary: str, vocals_stem: str) -> dict[str, str]:
@@ -82,6 +84,9 @@ class RoformerSeparator:
         roles = stem_roles(instance.primary_stem_name, instance.secondary_stem_name,
                            self.vocals_stem)  # fmt: skip
         work_dir.mkdir(parents=True, exist_ok=True)
+        # audio-separator reads through libsndfile, which cannot open AAC (YouTube's .m4a).
+        if audio.suffix.lower() not in _LIBSNDFILE_FORMATS:
+            audio = decode(audio, work_dir / "input.wav")
         separator.output_dir = instance.output_dir = str(work_dir)
         separator.separate(str(audio), custom_output_names=roles)
         stems = Stems(vocals=work_dir / "vocals.wav", instrumental=work_dir / "instrumental.wav")
