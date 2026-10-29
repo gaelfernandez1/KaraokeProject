@@ -223,6 +223,17 @@ class LyricsAligner:
             for piece, (a, b) in zip(pieces, itertools.pairwise(bounds), strict=True)
         ]
 
+    def model_for_language(self, language: str) -> str:
+        """The model this aligner uses for a language, as repo@revision (for provenance)."""
+        spec = MODELS[self.model or DEFAULT_BY_LANGUAGE.get(language, FALLBACK_MODEL)]
+        return f"{spec.repo}@{spec.revision[:12]}"
+
+    def unload(self) -> None:
+        """Frees the loaded model, so the next step has the GPU and the memory."""
+        if self._loaded is not None:
+            self._loaded[1].unload()
+            self._loaded = None
+
     def _model_for(self, language: str) -> _Model:
         if self._injected is not None:
             return self._injected

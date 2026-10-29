@@ -100,6 +100,15 @@ el silencio. Fuera de voz pasó del 6–7 % al 0,1 %.
 - **Gallego (5 con licencia libre)**: 98,6 % a ≤ 0,3 s en las dos validadas, empatado con la
   línea base (sección siguiente).
 
+## `karaoke make`
+
+`karaoke make canción.m4a --lyrics letra.txt [--lang gl] [--out carpeta]` hace el paquete completo
+en un proceso, liberando la GPU entre pasos: decodifica, separa con Kim, alinea, deja el audio a
+−14 LUFS en m4a y escribe `karaoke.json` el último. Con una canción gallega de 3 min en la RTX 3050
+tarda 70 s en total, cargas incluidas (unos 85 s para 4 min, meta ≤ 2 min ✓), con un pico de RAM
+de 3,8 GB (meta ≤ 4 GB ✓). Las palabras de dos o más sílabas llevan `parts` con tiempo (las de esa
+canción, 65 de 123).
+
 ## Validación automática del gallego
 
 Los borradores de las 5 canciones gallegas con licencia libre se validaron con `triangulate`, sin

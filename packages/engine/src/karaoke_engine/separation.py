@@ -76,6 +76,20 @@ class RoformerSeparator:
         separator.load_model(model_filename=self.model)
         self._separator = separator
 
+    def unload(self) -> None:
+        """Frees the model and the GPU memory it holds, so the next step can load its own."""
+        import gc
+
+        self._separator = None
+        gc.collect()
+        try:
+            import torch
+
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except ImportError:
+            pass
+
     def separate(self, audio: Path, work_dir: Path) -> Stems:
         if self._separator is None:
             self.load()

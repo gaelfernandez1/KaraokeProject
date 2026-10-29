@@ -169,3 +169,12 @@ def test_decoded_input_is_not_left_behind(tmp_path: Path) -> None:
     _separate_with_recorder(source, work_dir)
 
     assert sorted(p.name for p in work_dir.iterdir()) == ["instrumental.wav", "vocals.wav"]
+
+
+def test_unload_drops_the_loaded_model() -> None:
+    separator = RoformerSeparator(model="m.ckpt")
+    separator._separator = _RecordingSeparator()
+
+    separator.unload()
+
+    assert separator._separator is None

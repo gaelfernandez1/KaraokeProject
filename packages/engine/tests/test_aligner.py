@@ -198,3 +198,12 @@ def test_parts_skip_words_whose_letters_do_not_map(tmp_path: Path) -> None:
     [line] = _aligner(peaks).align_text(vocals, "2020\n", "gl")
 
     assert line.words[0].parts == []
+
+
+def test_model_for_language_names_the_pinned_model() -> None:
+    aligner = LyricsAligner()
+
+    assert aligner.model_for_language("gl").startswith(
+        "proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl@"
+    )
+    assert aligner.model_for_language("eu").startswith("aadel4/omniASR-CTC-300M-v2@")
