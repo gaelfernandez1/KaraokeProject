@@ -245,3 +245,20 @@ def test_report_flags_words_outside_the_voice(paths: BenchPaths) -> None:
     assert song.outside_voice > 0.1
     assert results.summary["all"].outside_voice == pytest.approx(song.outside_voice)
     assert "Fuera de voz" in (out / "report.md").read_text(encoding="utf-8")
+
+
+def test_aligner_sees_songs_grouped_by_language(
+    paths: BenchPaths, add_demo_song: DemoSongAdder, tmp_path: Path
+) -> None:
+    # Per-language models load once per language when songs come grouped.
+    for song_id, language in (("a", "es"), ("b", "gl"), ("c", "es")):
+        add_demo_song(paths, song_id)
+        meta = paths.data / "private" / song_id / "meta.toml"
+        meta.write_text(f'title = "Demo"\nlanguage = "{language}"\n', encoding="utf-8")
+    record = tmp_path / "order.txt"
+    aligner = 'target = "karaoke_bench.fakes:TextEvenSplitAligner"'
+    pipeline = _pipeline(tmp_path, f'{aligner}\nparams = {{ languages_to = "{record}" }}')
+
+    run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    assert record.read_text(encoding="utf-8").split() == ["es", "es", "gl", "gl"]

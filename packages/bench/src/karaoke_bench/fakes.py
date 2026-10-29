@@ -61,13 +61,19 @@ class TextEvenSplitAligner(EvenSplitAligner):
 
     name = "text-even-split"
 
-    def __init__(self, record_to: str | None = None, repeat: int = 1) -> None:
+    def __init__(
+        self, record_to: str | None = None, repeat: int = 1, languages_to: str | None = None
+    ) -> None:
         self.record_to = record_to
         self.repeat = repeat
+        self.languages_to = languages_to
 
     def align_text(self, vocals: Path, lyrics: str, language: str) -> list[Line]:
         if self.record_to:
             Path(self.record_to).write_text(lyrics, encoding="utf-8")
+        if self.languages_to:
+            with Path(self.languages_to).open("a", encoding="utf-8") as out:
+                out.write(f"{language}\n")
         lines = [line for line in lyrics_lines(lyrics) for _ in range(self.repeat)]
         return self.align(vocals, lines, language)
 
