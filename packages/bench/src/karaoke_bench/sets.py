@@ -64,10 +64,13 @@ def load_set(name: str, paths: BenchPaths) -> list[Song]:
         return _quick(paths)
     if name == "private":
         return _private(paths)
+    if name == "stress":
+        return _local_dirs("stress", paths)
     if (paths.sets / name / "manifest.toml").is_file():
         return _manifest_set(name, paths)
     raise SetError(
-        f"unknown set '{name}' (try jamendo, jamendo-<{'|'.join(LANGUAGES)}>, quick, gl, private)"
+        f"unknown set '{name}' "
+        f"(try jamendo, jamendo-<{'|'.join(LANGUAGES)}>, quick, gl, stress, private)"
     )
 
 
@@ -117,9 +120,13 @@ def _quick(paths: BenchPaths) -> list[Song]:
 
 
 def _private(paths: BenchPaths) -> list[Song]:
-    root = paths.data / "private"
+    return _local_dirs("private", paths)
+
+
+def _local_dirs(set_name: str, paths: BenchPaths) -> list[Song]:
+    root = paths.data / set_name
     return [
-        _song_from_dir("private", d) for d in sorted(root.glob("*")) if (d / "meta.toml").is_file()
+        _song_from_dir(set_name, d) for d in sorted(root.glob("*")) if (d / "meta.toml").is_file()
     ]
 
 
