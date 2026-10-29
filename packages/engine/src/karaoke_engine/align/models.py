@@ -48,6 +48,16 @@ MODELS: dict[str, CtcModelSpec] = {
     "w2v2-en": CtcModelSpec(
         "facebook/wav2vec2-base-960h", "22aad52d435eb6dbaf354bdad9b0da84ce7d6156", "Apache-2.0"
     ),
+    "w2v2-large-en": CtcModelSpec(
+        "facebook/wav2vec2-large-960h-lv60-self",
+        "54074b1c16f4de6a5ad59affb4caa8f2ea03a119",
+        "Apache-2.0",
+    ),
+    "xlsr-en": CtcModelSpec(
+        "jonatasgrosman/wav2vec2-large-xlsr-53-english",
+        "569a6236e92bd5f7652a0420bfe9bb94c5664080",
+        "Apache-2.0",
+    ),
     "xlsr-es": CtcModelSpec(
         "jonatasgrosman/wav2vec2-large-xlsr-53-spanish",
         "96d7e9b4e4a78af515a3c6d3cee7c0826045d276",
@@ -72,7 +82,7 @@ MODELS: dict[str, CtcModelSpec] = {
 
 DEFAULT_BY_LANGUAGE: dict[str, str] = {
     "gl": "nos-xlsr-300m-gl",
-    "en": "w2v2-en",
+    "en": "w2v2-large-en",
     "es": "xlsr-es",
     "fr": "xlsr-fr",
     "de": "xlsr-de",

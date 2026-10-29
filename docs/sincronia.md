@@ -48,21 +48,25 @@ valor por defecto de cada idioma sale del banco (decisión 005).
 | `nos-xlsr-300m-gl` | [proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl](https://huggingface.co/proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl) | Apache-2.0 | gallego |
 | `nos-w2vbert-gl` | [proxectonos/w2v-bert-2.0-gl](https://huggingface.co/proxectonos/w2v-bert-2.0-gl) | Apache-2.0 | gallego |
 | `omni-ctc-300m`, `omni-ctc-1b` | Omnilingual ASR CTC de Meta ([original](https://github.com/facebookresearch/omnilingual-asr), Apache-2.0), en la conversión a `Wav2Vec2ForCTC` de [aadel4](https://huggingface.co/aadel4/omniASR-CTC-1B-v2) | Apache-2.0 | cualquier idioma (unos 1600) |
-| `w2v2-en` | [facebook/wav2vec2-base-960h](https://huggingface.co/facebook/wav2vec2-base-960h) | Apache-2.0 | inglés |
+| `w2v2-large-en` | [facebook/wav2vec2-large-960h-lv60-self](https://huggingface.co/facebook/wav2vec2-large-960h-lv60-self) | Apache-2.0 | inglés |
+| `w2v2-en`, `xlsr-en` | [facebook/wav2vec2-base-960h](https://huggingface.co/facebook/wav2vec2-base-960h), [jonatasgrosman/wav2vec2-large-xlsr-53-english](https://huggingface.co/jonatasgrosman/wav2vec2-large-xlsr-53-english) | Apache-2.0 | inglés (comparación) |
 | `xlsr-es`, `xlsr-fr`, `xlsr-de`, `xlsr-pt` | [jonatasgrosman/wav2vec2-large-xlsr-53-*](https://huggingface.co/jonatasgrosman) | Apache-2.0 | castellano, francés, alemán, portugués |
 | `ifrz-gl` | [ifrz/wav2vec2-large-xlsr-galician](https://huggingface.co/ifrz/wav2vec2-large-xlsr-galician) | sin licencia publicada | solo para comparar en el banco |
 
 ## Parámetros (`LyricsAligner`)
 
-Los valores por defecto salen del barrido de la decisión 005: relleno 3, salto de línea 200,
-salto de coro 60, silencio 4 y sin mover los inicios.
+Los valores por defecto salen de los barridos de la decisión 005: relleno 3 por tramo, saltar una
+línea 6 por letra (un coro, 4), silencio 4, sin saltos baratos en los bordes y sin mover los
+inicios. Los saltos cuestan por letra: con un coste fijo por línea, el camino más barato metía
+muchas líneas cortas en el audio en vez de las largas que de verdad se cantan.
 
 | Parámetro | Qué hace |
 |---|---|
 | `model` | nombre de la tabla; sin él, el del idioma (y Omnilingual si el idioma no tiene uno) |
 | `filler_penalty` | coste por tramo de explicar un sonido con el relleno; más alto obliga a la letra a cubrir más |
-| `skip_penalty` | coste de saltarse una línea principal |
-| `backing_skip_penalty` | coste de saltarse una línea de coro (más bajo: los coros a menudo se pisan con la voz o no se oyen) |
+| `skip_penalty` | coste por letra de saltarse una línea principal |
+| `backing_skip_penalty` | coste por letra de saltarse una línea de coro (más bajo: los coros a menudo se pisan con la voz o no se oyen) |
+| `edge_skip_penalty` | coste por letra de dejar fuera líneas al principio o al final de la letra (para recortes o versiones cortas); desactivado, porque en canciones enteras puede tirar una estrofa cantada |
 | `silence_penalty` | coste extra por letra en un tramo sin voz |
 | `refine_onsets` | mover los inicios al arranque de la voz |
 | `char_map` | letras que se escriben de otra forma para alinear, por ejemplo `{ j = "x" }` para la gheada |
