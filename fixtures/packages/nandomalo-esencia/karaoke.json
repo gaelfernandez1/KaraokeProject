@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "id": "esencia-nandomalo",
   "title": "Esencia",
   "artist": "NANDOMALO",
@@ -25,6 +25,7 @@
       "start": 19.467755102,
       "end": 23.935510204,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Ya",
@@ -96,6 +97,7 @@
       "start": 24.290612245,
       "end": 28.715102041,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Ya",
@@ -167,6 +169,7 @@
       "start": 29.057959184,
       "end": 33.427301587,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Las",
@@ -245,6 +248,7 @@
       "start": 33.880816327,
       "end": 38.298412698,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Las",
@@ -323,6 +327,7 @@
       "start": 38.703673469,
       "end": 43.212698413,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Afinaba",
@@ -380,6 +385,7 @@
       "start": 43.503673469,
       "end": 48.02031746,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Afinaba",
@@ -437,6 +443,7 @@
       "start": 48.290612245,
       "end": 52.380952381,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Llenaba",
@@ -501,6 +508,7 @@
       "start": 53.087346939,
       "end": 57.053877551,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Llenaba",
@@ -565,6 +573,7 @@
       "start": 57.266938776,
       "end": 60.142222222,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Y",
@@ -608,6 +617,7 @@
       "start": 60.297142857,
       "end": 62.201904762,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "De",
@@ -651,6 +661,7 @@
       "start": 62.266122449,
       "end": 64.815238095,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -687,6 +698,7 @@
       "start": 65.073922902,
       "end": 66.946031746,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Canciones",
@@ -737,6 +749,7 @@
       "start": 67.053061224,
       "end": 69.87755102,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -773,6 +786,7 @@
       "start": 69.87755102,
       "end": 71.753650794,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Al",
@@ -809,6 +823,7 @@
       "start": 71.897687075,
       "end": 74.445714286,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -845,6 +860,7 @@
       "start": 74.666666667,
       "end": 76.672290249,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Canciones",
@@ -895,6 +911,7 @@
       "start": 98.034285714,
       "end": 99.510204082,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Y",
@@ -938,6 +955,7 @@
       "start": 99.963356009,
       "end": 101.48244898,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "La",
@@ -981,6 +999,7 @@
       "start": 102.240362812,
       "end": 104.36244898,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "La",
@@ -1003,6 +1022,7 @@
       "start": 105.155918367,
       "end": 105.893877551,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¡Ay,",
@@ -1025,6 +1045,7 @@
       "start": 125.064489796,
       "end": 129.312653061,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Ya",
@@ -1096,6 +1117,7 @@
       "start": 129.854693878,
       "end": 134.292244898,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Ya",
@@ -1167,6 +1189,7 @@
       "start": 134.646712018,
       "end": 139.188027211,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Se",
@@ -1252,6 +1275,7 @@
       "start": 139.486621315,
       "end": 143.987755102,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Se",
@@ -1337,6 +1361,7 @@
       "start": 144.290612245,
       "end": 148.803265306,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Alista",
@@ -1408,6 +1433,7 @@
       "start": 149.088072562,
       "end": 153.596734694,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Alista",
@@ -1479,6 +1505,7 @@
       "start": 153.853968254,
       "end": 158.262857143,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Le",
@@ -1571,6 +1598,7 @@
       "start": 158.702585034,
       "end": 162.940226757,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Le",
@@ -1663,6 +1691,7 @@
       "start": 162.940226757,
       "end": 165.769795918,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Y",
@@ -1706,6 +1735,7 @@
       "start": 165.887346939,
       "end": 167.728979592,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Al",
@@ -1742,6 +1772,7 @@
       "start": 167.869387755,
       "end": 170.422857143,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -1778,6 +1809,7 @@
       "start": 170.689886621,
       "end": 172.679546485,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "La",
@@ -1835,6 +1867,7 @@
       "start": 172.679546485,
       "end": 175.826938776,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -1871,6 +1904,7 @@
       "start": 175.5,
       "end": 177.332244898,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Al",
@@ -1907,6 +1941,7 @@
       "start": 177.485714286,
       "end": 180.032653061,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -1943,6 +1978,7 @@
       "start": 180.27755102,
       "end": 182.256326531,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "La",
@@ -2000,6 +2036,7 @@
       "start": 201.878639456,
       "end": 206.336870748,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Hoy",
@@ -2071,6 +2108,7 @@
       "start": 206.679365079,
       "end": 211.066122449,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Le",
@@ -2163,6 +2201,7 @@
       "start": 211.441632653,
       "end": 215.888979592,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Y",
@@ -2248,6 +2287,7 @@
       "start": 216.290612245,
       "end": 220.414693878,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Hoy",
@@ -2326,6 +2366,7 @@
       "start": 220.414693878,
       "end": 223.30122449,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Y",
@@ -2369,6 +2410,7 @@
       "start": 223.484081633,
       "end": 225.39755102,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "De",
@@ -2412,6 +2454,7 @@
       "start": 225.459591837,
       "end": 228.016326531,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -2448,6 +2491,7 @@
       "start": 228.271020408,
       "end": 230.164897959,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Canciones",
@@ -2498,6 +2542,7 @@
       "start": 230.233469388,
       "end": 233.441814059,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -2534,6 +2579,7 @@
       "start": 233.08,
       "end": 234.948208617,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Al",
@@ -2570,6 +2616,7 @@
       "start": 235.08244898,
       "end": 237.635918367,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¿Qué",
@@ -2606,6 +2653,7 @@
       "start": 237.864489796,
       "end": 239.947755102,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "La",
@@ -2663,6 +2711,7 @@
       "start": 241.466122449,
       "end": 243.160816327,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¡Cumbia!",
@@ -2678,6 +2727,7 @@
       "start": 243.905306122,
       "end": 248.610612245,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¡Con",
@@ -2735,6 +2785,7 @@
       "start": 248.999183673,
       "end": 250.233469388,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "¡Sí,",

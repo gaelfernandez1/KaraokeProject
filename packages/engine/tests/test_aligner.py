@@ -100,7 +100,7 @@ def test_backing_line_is_marked(tmp_path: Path) -> None:
 
     lines = _aligner(peaks).align_text(vocals, "ola (mar)\n", "gl")
 
-    assert [line.model_extra.get("role") for line in lines] == [None, "backing"]  # type: ignore[union-attr]
+    assert [line.role for line in lines] == ["lead", "backing"]
 
 
 def test_words_without_tokens_get_neighbour_times(tmp_path: Path) -> None:

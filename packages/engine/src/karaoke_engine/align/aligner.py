@@ -136,15 +136,15 @@ class LyricsAligner:
             words = self._words(
                 lines[i], tokens[i], path.spans, emissions, column, active, language
             )
-            fields: dict[str, Any] = {
-                "id": f"l{len(out) + 1}",
-                "start": words[0].start,
-                "end": max(word.end for word in words),
-                "words": words,
-            }
-            if lines[i].backing:
-                fields["role"] = "backing"
-            out.append(Line.model_validate(fields))
+            out.append(
+                Line(
+                    id=f"l{len(out) + 1}",
+                    start=words[0].start,
+                    end=max(word.end for word in words),
+                    role="backing" if lines[i].backing else "lead",
+                    words=words,
+                )
+            )
         return out
 
     def _tokens(self, line: LyricLine, vocab: Vocab, language: str) -> _Tokens:
