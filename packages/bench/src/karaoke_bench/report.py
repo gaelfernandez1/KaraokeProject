@@ -55,8 +55,8 @@ def render_report(results: RunResults) -> str:
         "## Por canción",
         "",
         "| Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | Cobertura "
-        "| Idioma devuelto | Tiempo (s) | Error |",
-        "|---|---|---|---|---|---|---|---|---|---|",
+        "| Referencia | Idioma devuelto | Tiempo (s) | Error |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
         *(_song_row(song) for song in results.songs),
         "",
         "## Peores casos",
@@ -109,6 +109,7 @@ def _song_row(s: SongResult) -> str:
         _num(_stat(t, "start_median")),
         _pct(_stat(t, "start_within")),
         _pct(_stat(t, "coverage")),
+        _reference_cell(s),
         s.language_reported or "—",
         _num(seconds, 1) + cached,
         error,
@@ -140,17 +141,32 @@ def _notes(results: RunResults) -> list[str]:
     notes = [f"- {note}" for note in results.notes]
     failed = [s for s in results.songs if s.error]
     notes += [f"- Falló {s.song_id}: {s.error}" for s in failed]
-    semi = [lang for lang, kind in results.reference_kind.items() if kind != "manual"]
-    if semi:
+    validated = [s.song_id for s in results.songs if s.reference_validated]
+    pending = [s.song_id for s in results.songs if s.reference_validated is False]
+    if validated:
         notes.append(
-            f"- Referencia semiautomática validada de oído en {', '.join(semi)}: fiable a unos "
-            "±0,1 s, así que ahí manda el % ≤ 0,3 s más que la mediana."
+            f"- Referencia semiautomática validada de oído en {', '.join(validated)}: fiable a "
+            "unos ±0,1 s, así que ahí manda el % ≤ 0,3 s más que la mediana. Solo cuentan las "
+            "líneas marcadas «bien» (columna Referencia)."
+        )
+    if pending:
+        notes.append(
+            f"- Referencia sin validar de oído en {', '.join(pending)}: no cuenta para la "
+            "sincronía hasta que se valide."
         )
     notes.append(
         "- Sincronía: error absoluto de inicio y fin de las palabras emparejadas con la "
         "referencia (sin tildes); sesgo = media con signo (positivo = tarde)."
     )
     return notes
+
+
+def _reference_cell(s: SongResult) -> str:
+    if s.reference_validated is None:
+        return "manual" if s.scored_share is not None else "—"
+    if not s.reference_validated:
+        return "sin validar"
+    return f"validada ({_pct(s.scored_share)})"
 
 
 def _reference_kinds(results: RunResults) -> str:
