@@ -87,7 +87,8 @@ def test_unsung_line_is_left_out(tmp_path: Path) -> None:
     vocals = _vocals(tmp_path, [(0.0, 6.0)])
     peaks = _spell("ola mar", 20) + _spell("adeus", 200)
 
-    lines = _aligner(peaks).align_text(vocals, "ola mar\nnunca se canta isto\nadeus\n", "gl")
+    aligner = _aligner(peaks, skip_penalty=40.0)
+    lines = aligner.align_text(vocals, "ola mar\nnunca se canta isto\nadeus\n", "gl")
 
     assert [line.words[0].text for line in lines] == ["ola", "adeus"]
 
@@ -117,8 +118,8 @@ def test_onset_refinement_moves_line_start_to_voice_onset(tmp_path: Path) -> Non
     vocals = _vocals(tmp_path, [(1.0, 3.0)])
     peaks = _spell("ola", 60)
 
-    [refined] = _aligner(peaks).align_text(vocals, "ola\n", "gl")
-    [plain] = _aligner(peaks, refine_onsets=False).align_text(vocals, "ola\n", "gl")
+    [refined] = _aligner(peaks, refine_onsets=True).align_text(vocals, "ola\n", "gl")
+    [plain] = _aligner(peaks).align_text(vocals, "ola\n", "gl")
 
     assert refined.start == pytest.approx(1.0, abs=HOP)
     assert plain.start == pytest.approx(1.2, abs=HOP)
@@ -147,7 +148,7 @@ def test_onset_refinement_applies_after_a_pause_inside_a_line(tmp_path: Path) ->
     vocals = _vocals(tmp_path, [(0.4, 1.0), (2.4, 3.0)])
     peaks = _spell("ola", 20) + _spell("mar", 130)
 
-    [line] = _aligner(peaks).align_text(vocals, "ola mar\n", "gl")
+    [line] = _aligner(peaks, refine_onsets=True).align_text(vocals, "ola mar\n", "gl")
 
     assert line.words[1].start == pytest.approx(2.4, abs=HOP)
 

@@ -29,9 +29,9 @@ cifras están en `docs/plan-v3/decisiones/005-sincronia.md`, y la forma de medir
    - **saltarse una línea** entera por un coste: líneas que trae la web y nadie canta;
    - **coste extra por cada letra** donde la voz calla, para que la letra no se meta en los
      instrumentales.
-6. **Ajusta los bordes**. El CTC suele poner la primera letra tarde: si una palabra llega tras
-   ≥ 0,2 s de silencio y la voz arranca hasta 0,5 s antes, su inicio pasa a ese arranque. Los
-   finales de palabra no pasan de 0,1 s después de que la voz calle.
+6. **Ajusta los finales**: una palabra acaba donde su voz se para (en la primera pausa de más de
+   0,3 s), con 0,1 s de margen. Mover también los inicios al arranque de la voz
+   (`refine_onsets`) está disponible, pero empeora JamendoLyrics y no va activado.
 
 La **confianza** de cada palabra es la media geométrica de la probabilidad CTC de sus letras. Una
 palabra sin ninguna letra que el modelo conozca (un número en un idioma sin reglas, un emoji) se
@@ -53,6 +53,9 @@ valor por defecto de cada idioma sale del banco (decisión 005).
 | `ifrz-gl` | [ifrz/wav2vec2-large-xlsr-galician](https://huggingface.co/ifrz/wav2vec2-large-xlsr-galician) | sin licencia publicada | solo para comparar en el banco |
 
 ## Parámetros (`LyricsAligner`)
+
+Los valores por defecto salen del barrido de la decisión 005: relleno 3, salto de línea 200,
+salto de coro 60, silencio 4 y sin mover los inicios.
 
 | Parámetro | Qué hace |
 |---|---|
