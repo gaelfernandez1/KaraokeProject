@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="gl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revisión de tempos</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1 id="title">Cargando…</h1>
+      <p id="summary"></p>
+    </div>
+    <div class="actions">
+      <button id="play" title="Espazo">▶ Reproducir</button>
+      <button id="speed" title="V">Velocidade 1×</button>
+      <button id="source" title="M" hidden>Escoitando: mestura</button>
+      <button id="save" title="Ctrl+S">Gardar</button>
+      <button id="approve" class="primary">Canción validada</button>
+    </div>
+  </header>
+  <main>
+    <section id="now">
+      <canvas id="wave" height="120" aria-label="Forma de onda arredor do momento actual"></canvas>
+      <p id="current" class="current-line"></p>
+      <p id="time">0:00.00</p>
+    </section>
+    <section id="help">
+      <strong>Teclas:</strong>
+      <kbd>Espazo</kbd> reproducir ou parar ·
+      clic nunha liña: escoitala ·
+      <kbd>1</kbd> ben · <kbd>2</kbd> mal (cunha nota) · <kbd>3</kbd> dubidosa ·
+      <kbd>A</kbd> a liña empeza aquí ·
+      clic nunha palabra e <kbd>←</kbd>/<kbd>→</kbd> move o inicio (con <kbd>Maiús</kbd>, o final) ·
+      dobre clic no texto: corrixilo ·
+      <kbd>V</kbd> máis amodo ·
+      <kbd>Ctrl</kbd>+<kbd>S</kbd> gardar
+    </section>
+    <ol id="lines"></ol>
+  </main>
+  <audio id="audio" preload="auto"></audio>
+  <script src="/app.js"></script>
+</body>
+</html>

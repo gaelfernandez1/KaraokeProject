@@ -1,0 +1,12 @@
+# Drafts the Galician reference timings that the user then checks by ear. It uses a Proxecto
+# Nós model that no baseline pipeline uses, so the baselines are never scored against their own
+# output.
+name = "draft-gl"
+description = "Demucs + CTC aligner with the Nós wav2vec2 XLS-R 300M Galician model"
+
+[steps.separator]
+target = "karaoke_bench.baseline.separation:DemucsSeparator"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"
+params = { model = "proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl", revision = "05a9b49121aadff50c84bb78fa9462769c8b17d8" }

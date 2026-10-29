@@ -1,0 +1,303 @@
+{
+  "bench_version": "0.1.0",
+  "normalization_version": 1,
+  "created": "2026-10-29T09:53:17+01:00",
+  "git_commit": "2244468",
+  "pipeline": {
+    "name": "base-legacy",
+    "description": "Demucs + Whisper small (language detected) + default CTC aligner, like v2",
+    "steps": {
+      "separator": {
+        "target": "karaoke_bench.baseline.separation:DemucsSeparator",
+        "params": {},
+        "version": "2"
+      },
+      "transcriber": {
+        "target": "karaoke_bench.baseline.whisper:FasterWhisperTranscriber",
+        "params": {
+          "model": "small",
+          "detect_language": true
+        },
+        "version": "1"
+      },
+      "segmenter": {
+        "target": "karaoke_bench.baseline.segment:SegmentPerLine",
+        "params": {},
+        "version": "1"
+      },
+      "aligner": {
+        "target": "karaoke_bench.baseline.ctc:CtcAligner",
+        "params": {},
+        "version": "1"
+      }
+    }
+  },
+  "set_name": "gl",
+  "mode": "asr",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "torch": "2.14.1+cu130",
+    "transformers": "5.21.0",
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.8.4",
+    "demucs": "4.0.1",
+    "numpy": "2.5.4",
+    "jiwer": "4.0.0",
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "driver": "617.42",
+    "gpu_memory_mb": "4096"
+  },
+  "reference_kind": {
+    "gl": "semiautomatic"
+  },
+  "stages": {
+    "separator": {
+      "load_seconds": 3.6556334519999893,
+      "vram_peak_mb": 796.50390625,
+      "ram_peak_mb": 2950.12109375
+    },
+    "transcriber": {
+      "load_seconds": 2.631143465000605,
+      "vram_peak_mb": 790.50390625,
+      "ram_peak_mb": 1319.5078125
+    },
+    "segmenter": {
+      "load_seconds": null,
+      "vram_peak_mb": 0.0,
+      "ram_peak_mb": 75.28515625
+    },
+    "aligner": {
+      "load_seconds": null,
+      "vram_peak_mb": 1548.50390625,
+      "ram_peak_mb": 2694.71484375
+    }
+  },
+  "songs": [
+    {
+      "song_id": "pantis-un-aire",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 287.333333,
+      "mode": "asr",
+      "steps": {
+        "separator": {
+          "seconds": 17.528705368000004,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 34.403331565999906,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.00008470099965052214,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 0.0,
+          "cached": false,
+          "error": "ValueError: no default alignment model for language 'nn'"
+        }
+      },
+      "wer": 0.755011135857461,
+      "cer": 0.3676215277777778,
+      "ref_words": 449,
+      "ref_chars": 2304,
+      "timing": null,
+      "scored_share": 0.0,
+      "line_start_median": null,
+      "language_reported": "nn",
+      "language_switch": true,
+      "error": "aligner: ValueError: no default alignment model for language 'nn'"
+    },
+    {
+      "song_id": "cibran-o-mundo-do-motor",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 195.2,
+      "mode": "asr",
+      "steps": {
+        "separator": {
+          "seconds": 11.800374574999978,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 16.27771153499998,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 4.739000360132195e-6,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": 1.0,
+      "cer": 1.0,
+      "ref_words": 241,
+      "ref_chars": 1291,
+      "timing": null,
+      "scored_share": 0.0,
+      "line_start_median": null,
+      "language_reported": "ko",
+      "language_switch": true,
+      "error": null
+    },
+    {
+      "song_id": "cloplas-laverca",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 313.032,
+      "mode": "asr",
+      "steps": {
+        "separator": {
+          "seconds": 18.692975323000013,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 35.43608189899987,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.000041478999264654703,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 0.0,
+          "cached": false,
+          "error": "ValueError: no default alignment model for language 'nn'"
+        }
+      },
+      "wer": 0.6543535620052771,
+      "cer": 0.28858350951374206,
+      "ref_words": 379,
+      "ref_chars": 1892,
+      "timing": null,
+      "scored_share": 0.0,
+      "line_start_median": null,
+      "language_reported": "nn",
+      "language_switch": true,
+      "error": "aligner: ValueError: no default alignment model for language 'nn'"
+    },
+    {
+      "song_id": "fanny-alexander-lene",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 244.145708,
+      "mode": "asr",
+      "steps": {
+        "separator": {
+          "seconds": 14.510664282000022,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 22.278132708999692,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.000026050000087707303,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 0.0,
+          "cached": false,
+          "error": "ValueError: no default alignment model for language 'la'"
+        }
+      },
+      "wer": 0.988950276243094,
+      "cer": 0.6209944751381216,
+      "ref_words": 181,
+      "ref_chars": 905,
+      "timing": null,
+      "scored_share": 0.0,
+      "line_start_median": null,
+      "language_reported": "la",
+      "language_switch": true,
+      "error": "aligner: ValueError: no default alignment model for language 'la'"
+    },
+    {
+      "song_id": "mortos-en-vida-chapapote",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 162.431791,
+      "mode": "asr",
+      "steps": {
+        "separator": {
+          "seconds": 9.88047486299999,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 20.17797551500007,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.000042239999856974464,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 9.353865180999492,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": 0.9057239057239057,
+      "cer": 0.4877024595080984,
+      "ref_words": 297,
+      "ref_chars": 1667,
+      "timing": null,
+      "scored_share": 0.0,
+      "line_start_median": null,
+      "language_reported": "es",
+      "language_switch": true,
+      "error": null
+    }
+  ],
+  "summary": {
+    "all": {
+      "songs": 5,
+      "failed": 3,
+      "wer": 0.8248222365869424,
+      "cer": 0.5036605037845887,
+      "timing": null,
+      "line_start_median": null,
+      "language_switches": 5,
+      "rtf_median": {
+        "separator": 0.06045273860143432,
+        "transcriber": 0.11320274572248165,
+        "segmenter": 1.325072173600613e-7,
+        "aligner": 0.05758641903418704
+      },
+      "est_seconds_4min": 61.784865524677485
+    },
+    "gl": {
+      "songs": 5,
+      "failed": 3,
+      "wer": 0.8248222365869424,
+      "cer": 0.5036605037845887,
+      "timing": null,
+      "line_start_median": null,
+      "language_switches": 5,
+      "rtf_median": {
+        "separator": 0.06045273860143432,
+        "transcriber": 0.11320274572248165,
+        "segmenter": 1.325072173600613e-7,
+        "aligner": 0.05758641903418704
+      },
+      "est_seconds_4min": 61.784865524677485
+    }
+  },
+  "notes": []
+}
