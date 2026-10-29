@@ -12,7 +12,7 @@ from karaoke_engine.audio import decode
 from karaoke_engine.steps import Stems
 
 DEFAULT_MODEL_DIR = Path.home() / ".cache" / "karaoke" / "models" / "audio-separator"
-_LIBSNDFILE_FORMATS = {".wav", ".flac"}
+_LIBSNDFILE_FORMATS = {".wav", ".flac", ".mp3", ".ogg"}
 
 
 def stem_roles(primary: str, secondary: str, vocals_stem: str) -> dict[str, str]:
@@ -85,10 +85,15 @@ class RoformerSeparator:
                            self.vocals_stem)  # fmt: skip
         work_dir.mkdir(parents=True, exist_ok=True)
         # audio-separator reads through libsndfile, which cannot open AAC (YouTube's .m4a).
+        decoded = None
         if audio.suffix.lower() not in _LIBSNDFILE_FORMATS:
-            audio = decode(audio, work_dir / "input.wav")
+            decoded = audio = decode(audio, work_dir / "input.wav")
         separator.output_dir = instance.output_dir = str(work_dir)
-        separator.separate(str(audio), custom_output_names=roles)
+        try:
+            separator.separate(str(audio), custom_output_names=roles)
+        finally:
+            if decoded is not None:
+                decoded.unlink(missing_ok=True)
         stems = Stems(vocals=work_dir / "vocals.wav", instrumental=work_dir / "instrumental.wav")
         for path in (stems.vocals, stems.instrumental):
             if not path.is_file():

@@ -315,7 +315,8 @@ def _score(
         scored = ref.scored_words()
         timing[song.song_id] = timing_errors(pair_words(scored, words), len(scored))
         result.timing = timing_stats([timing[song.song_id]])
-        if mode == "lyrics":
+        # Lines pair by position, which only means something when the aligner kept the lines.
+        if mode == "lyrics" and state.lyrics_text is None:
             starts = line_start_errors(ref.lines, state.aligned)
             if starts is not None:
                 ok = [e for e, line in zip(starts, ref.lines, strict=True) if line.status == "ok"]

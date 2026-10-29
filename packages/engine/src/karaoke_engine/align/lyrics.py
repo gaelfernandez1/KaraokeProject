@@ -10,9 +10,12 @@ import re
 from dataclasses import dataclass
 
 _HEADER = re.compile(r"^\[([^\]]*)\]$")
-_REPEAT = r"(?:[x\u00d7]\s?(\d+)|\(\s*[x\u00d7]\s?(\d+)\s*\)|\(\s*bis\s*\)|bis)"
+_REPEAT = r"(?:[x\u00d7]\s?(\d+)|\(\s*[x\u00d7]\s?(\d+)\s*\)|\(\s*bis\s*\))"
 _TRAILING_REPEAT = re.compile(rf"\s+{_REPEAT}\s*$", re.IGNORECASE)
-_ONLY_REPEAT = re.compile(rf"^{_REPEAT}$", re.IGNORECASE)
+# A bare "bis" only counts alone on its line: at the end of a sung line it may be a word.
+_ONLY_REPEAT = re.compile(rf"^(?:{_REPEAT}|bis)$", re.IGNORECASE)
+# Zero-width characters and stray byte order marks that web pages leave in copied text.
+_INVISIBLE = re.compile("[\u200b-\u200d\u2060\ufeff]")
 _PARENS = re.compile(r"\(([^()]*)\)")
 _INLINE_BRACKETS = re.compile(r"\[[^\]]*\]")
 _SPACES = re.compile(r"\s+")
@@ -38,22 +41,27 @@ class _Section:
 def parse_lyrics(text: str) -> list[LyricLine]:
     sections: list[_Section] = [_Section(None, None, 1, [])]
     stanza: list[LyricLine] = []
-    for raw in text.lstrip("﻿").replace("\r", "").split("\n"):
+    # A repeat mark alone after a blank line repeats the stanza before the blank.
+    previous: list[LyricLine] = []
+    for raw in _INVISIBLE.sub("", text).splitlines():
         row = raw.strip()
         header = _HEADER.match(row)
         if header:
             sections.append(_header_section(header.group(1)))
-            stanza = []
+            stanza, previous = [], []
             continue
         if not row:
+            if stanza:
+                previous = stanza
             stanza = []
             continue
         current = sections[-1]
         only = _ONLY_REPEAT.match(row)
         if only:
-            extra = stanza * (_count(only) - 1)
+            source = stanza or previous
+            extra = source * (_count(only) - 1)
             current.lines += extra
-            stanza = stanza + extra
+            stanza = source + extra
             continue
         count = 1
         trailing = _TRAILING_REPEAT.search(row)

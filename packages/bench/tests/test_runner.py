@@ -273,3 +273,14 @@ def test_public_sets_report_into_the_versioned_folder(paths: BenchPaths) -> None
     out = run(RunOptions(load_pipeline(SMOKE), "stress", "lyrics"), paths)
 
     assert out.parent == paths.results
+
+
+def test_text_aligners_get_no_positional_line_metric(paths: BenchPaths, tmp_path: Path) -> None:
+    # Its lines need not be the lyrics' lines even when there are as many of them.
+    pipeline = _pipeline(tmp_path, 'target = "karaoke_bench.fakes:TextEvenSplitAligner"')
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.timing is not None
+    assert song.line_start_median is None

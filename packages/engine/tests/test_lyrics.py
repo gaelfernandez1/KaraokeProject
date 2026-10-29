@@ -75,8 +75,30 @@ def test_empty_chorus_header_repeats_previous_chorus() -> None:
 
 
 def test_crlf_bom_and_punctuation_lines() -> None:
-    assert _texts(parse_lyrics("﻿A\r\n...\r\n♪\r\nB")) == ["A", "B"]
+    assert _texts(parse_lyrics("\ufeffA\r\n...\r\n♪\r\nB")) == ["A", "B"]
 
 
 def test_inline_square_brackets_are_dropped() -> None:
     assert _texts(parse_lyrics("Vou [?] contigo\n")) == ["Vou contigo"]
+
+
+def test_x2_alone_after_a_blank_line_repeats_the_stanza_before_it() -> None:
+    assert _texts(parse_lyrics("A\nB\n\nx2\nC\n")) == ["A", "B", "A", "B", "C"]
+
+
+def test_bis_ending_a_sung_line_is_part_of_the_lyrics() -> None:
+    assert _texts(parse_lyrics("Quero un bis\n")) == ["Quero un bis"]
+
+
+def test_bis_alone_or_in_parentheses_repeats() -> None:
+    assert _texts(parse_lyrics("Ola (bis)\n\nMar\nbis\n")) == ["Ola", "Ola", "Mar", "Mar"]
+
+
+def test_invisible_characters_from_web_pages_are_ignored() -> None:
+    text = "[Estribillo]\u200b\nA\n\n[Verso]\nB\n\n\ufeff[Estribillo]\n"
+
+    assert _texts(parse_lyrics(text)) == ["A", "B", "A"]
+
+
+def test_unusual_line_breaks_split_lines() -> None:
+    assert _texts(parse_lyrics("A\rB\u2028C")) == ["A", "B", "C"]
