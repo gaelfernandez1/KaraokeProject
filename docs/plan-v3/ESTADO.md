@@ -6,7 +6,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | Conv. | Área | Estado | Rama | Último hito | Interfaces que expone | Pendiente para otras |
 |---|---|---|---|---|---|---|
 | C1 | Arquitectura, repo y cimientos | hecho | `v3/c1-cimientos` (PR #1) | workspace uv, contratos v0, web SvelteKit, CI, entorno GPU comprobado | `karaoke_contracts` (`KaraokeDoc`, `Theme`, `validate_doc`, `validate_package`, `load_doc`, `dump_doc`); `schemas/*.schema.json`; `#lib/contracts` (tipos TS + `PlaybackClock`); `karaoke_engine.steps` (`Separator`, `Transcriber`, `Segmenter`, `Aligner`); CLI `karaoke validate|demo`; `fixtures/packages/demo-sintetico`; `fixtures/themes/basico.json`; `make ci|contracts|check-env` | C2: crear `packages/bench` y su comando; C5/C7: pueden empezar con el demo sintético |
-| C2 | Banco de pruebas y métricas | en curso | `v3/c2-banco` | banco completo: JamendoLyrics (79 y rápido 20) y 5 gallegas con licencia libre, métricas, runner con caché, informes, comparación, línea base (`base-legacy`, `base-turbo`), página de revisión de oído y 3 paquetes reales; falta que el usuario valide de oído las referencias gallegas | `karaoke-bench fetch\|run\|compare\|draft\|review\|realign\|package`; pipelines TOML en `bench/pipelines/` (cualquier clase que cumpla `karaoke_engine.steps`); `karaoke_bench.baseline` (Demucs, faster-whisper, alineador CTC); guía en `docs/banco.md` | ver notas C2 → C3, C4, C5/C7 |
+| C2 | Banco de pruebas y métricas | en curso | `v3/c2-banco` | banco completo: JamendoLyrics (79 y rápido 20) y 5 gallegas con licencia libre, métricas, runner con caché, informes, comparación, línea base medida y metas fijadas (`decisiones/003`), página de revisión de oído y 3 paquetes reales; falta que el usuario valide de oído las 5 referencias gallegas | `karaoke-bench fetch\|run\|compare\|draft\|review\|realign\|package`; pipelines TOML en `bench/pipelines/` (cualquier clase que cumpla `karaoke_engine.steps`); `karaoke_bench.baseline` (Demucs, faster-whisper, alineador CTC); guía en `docs/banco.md` | ver notas C2 → C3, C4, C5/C7 |
 | C3 | Audio: separación y sonido | sin empezar | — | — | — | — |
 | C4 | Transcripción y sincronización | sin empezar | — | — | — | — |
 | C5 | Subtítulos animados | sin empezar | — | — | — | — |
@@ -35,7 +35,9 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   entera en la GPU llegó a ir 20 veces más lento en 4 GB: mezcla en RAM y trozos a la GPU.
 - C2 → C4: faster-whisper 1.2.1 (CTranslate2 4.8) es CUDA 12: precarga `libcublas.so.12` y recibe
   audio decodificado (ver `karaoke_bench/baseline/whisper.py`). Whisper `small` adivinando el idioma
-  confunde el gallego con castellano o catalán; `large-v3-turbo` con el idioma dado, no. Los
+  confunde el gallego (5 de 5) con noruego, coreano, latín o castellano; `large-v3-turbo` con el
+  idioma dado, nunca (`decisiones/003`). El alineador CTC de la línea base llega a 4,6–5,9 GB de RAM:
+  hay que bajarlo. Los
   borradores de las referencias gallegas salen del alineador con
   `proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl` y la letra de 3 canciones, de
   `proxectonos/whisper-large-v3-turbo-gl-v1.0`: si C4 usa esos modelos, sus cifras en `gl` pueden

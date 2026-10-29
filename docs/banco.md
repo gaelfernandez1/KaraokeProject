@@ -155,8 +155,10 @@ No hay tiempos publicados para canciones en gallego, así que se crean así:
    las anclas. Esas líneas quedan como «revisar» para volver a escucharlas.
 4. Cuando no queda nada sin revisar ni mal, el botón **Canción validada** la da por buena.
 
-Solo cuentan para la sincronía las líneas marcadas «bien». Una referencia validada de oído es fiable
-a unos ±0,1 s, así que en `gl` manda el % ≤ 0,3 s más que la mediana. `draft` no sobrescribe una
+Solo cuentan para la sincronía las líneas marcadas «bien», y solo cuando la canción está validada:
+hasta entonces el informe la marca «sin validar» y no entra en la sincronía. El texto corregido en la
+página es el que vale para el WER y el que recibe el alineador. Una referencia validada de oído es
+fiable a unos ±0,1 s, así que en `gl` manda el % ≤ 0,3 s más que la mediana. `draft` no sobrescribe una
 referencia con líneas ya revisadas salvo con `--force`.
 
 ## Añadir canciones

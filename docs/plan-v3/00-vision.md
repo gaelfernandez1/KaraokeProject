@@ -23,14 +23,15 @@ funcionar **con cualquier canción** y **en cualquier contexto: en el móvil, en
 tele conectando el HDMI**, con **un sonido que funcione bien en todo y tenga algo chulo**. Da igual
 cómo se haga: si algo (por ejemplo, las sílabas) no tiene sentido, se hace de otra forma mejor.
 
-Qué significa éxito (metas **provisionales**; C2 las fija tras medir la línea base):
+Qué significa éxito (metas fijadas tras medir la línea base: `decisiones/003-banco-y-metas.md`):
 
-| Qué | Meta provisional |
+| Qué | Meta |
 |---|---|
-| Sincronía con letra dada | mediana del error de inicio de palabra ≤ 0,10 s y ≥ 90 % de palabras a ≤ 0,30 s, en es/en (JamendoLyrics) y en el conjunto gallego propio |
-| Transcripción sin letra (gl) | WER claramente menor que la línea base; cifra fijada tras medir |
+| Sincronía con letra dada | JamendoLyrics (79): mediana del error de inicio de palabra ≤ 0,03 s, media ≤ 0,10 s y ≥ 98 % de palabras a ≤ 0,30 s, sin ningún idioma por debajo del 96 %; gallego validado de oído: ≥ 95 % a ≤ 0,30 s y nunca peor que `base-turbo` |
+| Transcripción sin letra | gallego: WER ≤ 0,7 × el de `base-turbo` (hoy 35,9 % → ≤ 25 %); JamendoLyrics: WER ≤ 30 % |
 | Idioma | 0 casos de cambio silencioso de idioma en todo el banco |
-| Velocidad | canción de 4 min lista en ≤ 4 min en la RTX 3050 (sin contar la primera descarga de modelos); MP4 1080p de 4 min en ≤ 1 min |
+| Velocidad | canción de 4 min lista en ≤ 2 min en la RTX 3050, con letra o sin ella (con la carga de modelos, sin la primera descarga); MP4 1080p de 4 min en ≤ 1 min |
+| Memoria | cada paso del motor ≤ 3 GB de VRAM y ≤ 4 GB de RAM |
 | Reproductor | animación fluida (60 fps) en un móvil medio; legible a 3 m en una tele 1080p; desfase entre audio y letra ajustable |
 | Corrección | arreglar una palabra o un tiempo en segundos, sin reprocesar la canción |
 
