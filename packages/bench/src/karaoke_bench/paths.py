@@ -28,6 +28,11 @@ class BenchPaths:
         return self.root / "data"
 
     @property
+    def private_results(self) -> Path:
+        """Reports of the private set: the user's own songs never reach the versioned results."""
+        return self.data / "results"
+
+    @property
     def cache(self) -> Path:
         return self.data / "cache"
 
