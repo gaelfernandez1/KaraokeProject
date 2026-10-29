@@ -58,7 +58,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "10"
+    version = "11"
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -71,6 +71,7 @@ class LyricsAligner:
         filler_penalty: float = 3.0,
         skip_penalty: float = 6.0,
         backing_skip_penalty: float = 4.0,
+        overlap_backing: bool = False,
         overlap_absent_penalty: float = 6.0,
         backing_min_confidence: float = 0.05,
         edge_skip_penalty: float = math.inf,
@@ -86,6 +87,7 @@ class LyricsAligner:
         self.filler_penalty = filler_penalty
         self.skip_penalty = skip_penalty
         self.backing_skip_penalty = backing_skip_penalty
+        self.overlap_backing = overlap_backing
         self.overlap_absent_penalty = overlap_absent_penalty
         self.backing_min_confidence = backing_min_confidence
         self.edge_skip_penalty = edge_skip_penalty
@@ -121,8 +123,9 @@ class LyricsAligner:
         penalty = np.where(frame_active, 0.0, self.silence_penalty).astype(np.float32)
 
         # One path through every line, backing parts in their written place (mostly echoes and
-        # answers right after the lead). A backing part that does not fit there may be sung over
-        # the lead: it then gets a second chance alone in the stretch around its lead line.
+        # answers right after the lead). With overlap_backing, a backing part that does not fit
+        # there gets a second chance alone, over its lead line; off by default, because on the
+        # public songs it placed more words wrong than right (decision 006).
         order = [i for i in range(len(lines)) if tokens[i].ids]
         segments = {i: self._segment(lines[i], tokens[i], column) for i in order}
         paths = align_segments(
@@ -131,7 +134,8 @@ class LyricsAligner:
         placed = {i: p.spans for i, p in zip(order, paths, strict=True) if p.spans is not None}
         first_pass = set(placed)
         leads = [i for i in order if not lines[i].backing]
-        for i in (i for i in order if lines[i].backing and i not in placed):
+        skipped = [i for i in order if lines[i].backing and i not in placed]
+        for i in skipped if self.overlap_backing else []:
             first, last = _backing_window(i, leads, placed, len(emissions.log_probs),
                                           emissions.frame_seconds)  # fmt: skip
             cost = self.overlap_absent_penalty * len(tokens[i].ids)

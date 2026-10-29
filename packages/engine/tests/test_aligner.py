@@ -228,7 +228,7 @@ def test_backing_line_overlapping_the_lead_is_placed(tmp_path: Path) -> None:
     peaks = [("o", 20), ("l", 23), ("a", 26), ("v", 30), ("i", 33),
              ("m", 40), ("a", 43), ("r", 46)]  # fmt: skip
 
-    lines = _aligner(peaks).align_text(vocals, "ola mar (vi)\n", "gl")
+    lines = _aligner(peaks, overlap_backing=True).align_text(vocals, "ola mar (vi)\n", "gl")
 
     lead, backing = lines
     assert (lead.role, backing.role) == ("lead", "backing")
@@ -241,6 +241,6 @@ def test_unsung_backing_line_is_left_out(tmp_path: Path) -> None:
     vocals = _vocals(tmp_path, [(0.0, 6.0)])
     peaks = _spell("ola mar", 20)
 
-    lines = _aligner(peaks).align_text(vocals, "ola mar (yeah)\n", "gl")
+    lines = _aligner(peaks, overlap_backing=True).align_text(vocals, "ola mar (yeah)\n", "gl")
 
     assert [line.role for line in lines] == ["lead"]
