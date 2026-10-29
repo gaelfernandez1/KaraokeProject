@@ -263,6 +263,7 @@ def _score(
         mode=mode,
         steps=state.steps,
         scored_share=ref.scored_share() if ref else None,
+        reference_validated=ref.approved if ref and ref.timing == "semiautomatic" else None,
         error=state.error,
     )
     if state.transcript is not None:
@@ -280,7 +281,8 @@ def _score(
     if problem:
         result.error = f"aligner: {problem}"
         return result
-    if ref is not None:
+    # A draft nobody has finished checking by ear is not a reference yet.
+    if ref is not None and result.reference_validated is not False:
         words = [word for line in state.aligned for word in line.words]
         scored = ref.scored_words()
         timing[song.song_id] = timing_errors(pair_words(scored, words), len(scored))

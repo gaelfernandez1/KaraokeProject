@@ -52,3 +52,44 @@ def test_quick_requires_fetch(tmp_path: Path) -> None:
 def test_unknown_set(tmp_path: Path) -> None:
     with pytest.raises(SetError, match="unknown set"):
         load_set("nada", BenchPaths(tmp_path))
+
+
+def _with_reference(paths: BenchPaths, song_id: str, timing: str) -> None:
+    from karaoke_bench.reference import Reference, dump_reference
+
+    song_dir = paths.data / "private" / song_id
+    (song_dir / "lyrics.txt").write_text("vou ao mar\n", encoding="utf-8")
+    ref = Reference.model_validate(
+        {
+            "song_id": song_id, "language": "gl", "duration": 1.0, "timing": timing,
+            "approved": False,
+            "lines": [{"text": "vou ó mar", "start": 0.1, "end": 0.9, "words": []}],
+        }
+    )  # fmt: skip
+    dump_reference(ref, song_dir / "reference.json")
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_text_corrected_in_a_semiautomatic_reference_wins(
+    tmp_path: Path, make_tone: ToneMaker
+) -> None:
+    # The review page saves text fixes in reference.json, not in the lyrics file it drafted from.
+    paths = BenchPaths(tmp_path / "bench")
+    _private_song(paths, "x", make_tone)
+    _with_reference(paths, "x", "semiautomatic")
+
+    [song] = load_set("private/x", paths)
+
+    assert song.lyrics_text() == "vou ó mar"
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_lyrics_file_wins_over_a_manual_reference(tmp_path: Path, make_tone: ToneMaker) -> None:
+    # JamendoLyrics word texts are lowercase without accents; the lyrics file is the display text.
+    paths = BenchPaths(tmp_path / "bench")
+    _private_song(paths, "x", make_tone)
+    _with_reference(paths, "x", "manual")
+
+    [song] = load_set("private/x", paths)
+
+    assert song.lyrics_text() == "vou ao mar\n"

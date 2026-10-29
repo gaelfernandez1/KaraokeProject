@@ -31,10 +31,16 @@ class Song:
         return load_reference(self.reference) if self.reference else None
 
     def lyrics_text(self) -> str | None:
-        """The lyrics a user would paste: the lyrics file, or the reference's line texts."""
+        """The lyrics a user would paste: the lyrics file, or the reference's line texts.
+
+        A semiautomatic reference wins over the lyrics file: it was drafted from that file and
+        then corrected by ear, and the review page saves text fixes only in the reference.
+        """
+        ref = self.load_reference()
+        if ref is not None and ref.timing == "semiautomatic":
+            return ref.lyrics_text()
         if self.lyrics:
             return self.lyrics.read_text(encoding="utf-8")
-        ref = self.load_reference()
         return ref.lyrics_text() if ref else None
 
 

@@ -119,3 +119,34 @@ def test_report_has_fixed_sections(paths: BenchPaths) -> None:
 def test_songs_filter_and_unknown_song(paths: BenchPaths) -> None:
     with pytest.raises(ValueError, match="nope"):
         run(RunOptions(load_pipeline(SMOKE), "private", "lyrics", songs=["nope"]), paths)
+
+
+def _set_review(paths: BenchPaths, approved: bool) -> None:
+    from karaoke_bench.reference import dump_reference, load_reference
+
+    path = paths.data / "private" / "demo" / "reference.json"
+    ref = load_reference(path)
+    dump_reference(ref.model_copy(update={"timing": "semiautomatic", "approved": approved}), path)
+
+
+def test_unvalidated_reference_does_not_score_timing(paths: BenchPaths) -> None:
+    _set_review(paths, approved=False)
+
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.reference_validated is False
+    assert song.timing is None
+    assert song.line_start_median is None
+    assert "sin validar" in (out / "report.md").read_text(encoding="utf-8")
+
+
+def test_validated_reference_scores_timing(paths: BenchPaths) -> None:
+    _set_review(paths, approved=True)
+
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.reference_validated is True
+    assert song.timing is not None
+    assert song.scored_share == pytest.approx(1.0)
