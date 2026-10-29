@@ -32,7 +32,6 @@ cifras están en `docs/plan-v3/decisiones/005-sincronia.md`, y la forma de medir
 6. **Ajusta los finales**: una palabra acaba donde su voz se para (en la primera pausa de más de
    0,3 s), con 0,1 s de margen. Mover también los inicios al arranque de la voz
    (`refine_onsets`) está disponible, pero empeora JamendoLyrics y no va activado.
-
 7. **Sílabas** (`syllables.syllables`, gallego, castellano y portugués): cada palabra de dos o más
    sílabas cuyas letras tienen cada una su token recibe `parts`. Cada parte empieza cuando el CTC
    pone su primera letra y acaba donde empieza la siguiente. Una palabra con números o con letras
@@ -41,7 +40,7 @@ cifras están en `docs/plan-v3/decisiones/005-sincronia.md`, y la forma de medir
 La **confianza** de cada palabra es la media geométrica de la probabilidad CTC de sus letras. Una
 palabra sin ninguna letra que el modelo conozca (un número en un idioma sin reglas, un emoji) se
 queda pegada a su vecina con confianza 0. Las líneas saltadas no salen. Las de coro salen con
-`role: "backing"` (campo extra hasta que el contrato lo formalice).
+`role: "backing"` (contrato 1.1.0), y las de una cabecera con cantante, su `singer`.
 
 ## Modelos
 
@@ -75,13 +74,29 @@ muchas líneas cortas en el audio en vez de las largas que de verdad se cantan.
 | `silence_penalty` | coste extra por letra en un tramo sin voz |
 | `refine_onsets` | mover los inicios al arranque de la voz |
 | `parts` | dar sílabas con tiempo a las palabras (gl, es, pt) |
+| `overlap_backing` | dar a los coros que no caben en su sitio una segunda pasada en la que pueden solaparse con la voz principal (desactivado: con las canciones públicas coloca más palabras mal que bien, `decisiones/006`) |
 | `char_map` | letras que se escriben de otra forma para alinear, por ejemplo `{ j = "x" }` para la gheada |
 
 ## Hacer un karaoke
 
 ```bash
 uv run karaoke make cancion.m4a --lyrics letra.txt --lang gl --out mi-karaoke
+uv run karaoke make cancion.m4a --lrclib --title "Título" --artist "Grupo"   # letra de LRCLIB
+uv run karaoke make cancion.m4a                                               # sin letra: transcribe
 ```
+
+- **Con `--lyrics`**: la letra tal como se pega de una web.
+- **Con `--lrclib`**: busca la letra en [LRCLIB](https://lrclib.net), una base de letras abierta y
+  gratuita. Solo envía el título y el artista, y nada si no se pide. Se queda con la entrada de
+  duración más cercana (±5 s); si no hay ninguna, transcribe.
+- **Sin letra**: transcribe la voz separada con Whisper (para el gallego, el modelo gallego que
+  elige el banco), siempre en el idioma pedido. Quita los trozos donde la voz calla, porque Whisper
+  rellena los silencios con frases hechas, y las repeticiones en bucle. Corta el texto en líneas
+  por frases y cada nueve palabras más o menos, y lo alinea como una letra pegada.
+
+`provenance` del paquete dice de dónde salió la letra (`user`, `lrclib` o `asr`) y qué modelos se
+usaron. Los cantantes de las cabeceras (`[Verso: Ana]`) pasan a `singers`, y las líneas de coro
+llevan `role: "backing"` (contrato 1.1.0, `decisiones/006`).
 
 Acepta cualquier audio o vídeo que lea ffmpeg. Separa la voz, alinea la letra, deja el audio
 nivelado en m4a y escribe `karaoke.json` el último: si algo falla a medias, no queda un paquete
