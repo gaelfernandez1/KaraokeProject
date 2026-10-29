@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from karaoke_contracts import Line, Word
-from karaoke_engine.steps import Aligner, Separator
+from karaoke_engine.steps import Aligner, Separator, TextAligner
 
 
 class FakeAligner:
@@ -18,3 +18,13 @@ def test_fake_aligner_satisfies_protocol() -> None:
 
     assert isinstance(aligner, Aligner)
     assert not isinstance(aligner, Separator)
+
+
+class FakeTextAligner(FakeAligner):
+    def align_text(self, vocals: Path, lyrics: str, language: str) -> list[Line]:
+        return self.align(vocals, lyrics.splitlines(), language)
+
+
+def test_text_aligner_protocol_needs_align_text() -> None:
+    assert isinstance(FakeTextAligner(), TextAligner)
+    assert not isinstance(FakeAligner(), TextAligner)
