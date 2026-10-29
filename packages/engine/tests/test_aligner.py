@@ -220,3 +220,27 @@ def test_header_singer_reaches_the_line(tmp_path: Path) -> None:
     )
 
     assert [line.singer for line in lines] == [singer_id("Ana"), singer_id("Brais")]
+
+
+def test_backing_line_overlapping_the_lead_is_placed(tmp_path: Path) -> None:
+    # The backing part is written after the lead line but sung in the middle of it.
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = [("o", 20), ("l", 23), ("a", 26), ("v", 30), ("i", 33),
+             ("m", 40), ("a", 43), ("r", 46)]  # fmt: skip
+
+    lines = _aligner(peaks).align_text(vocals, "ola mar (vi)\n", "gl")
+
+    lead, backing = lines
+    assert (lead.role, backing.role) == ("lead", "backing")
+    assert [w.start for w in lead.words] == pytest.approx([20 * HOP, 40 * HOP])
+    assert backing.start == pytest.approx(30 * HOP)
+    assert backing.start < lead.end
+
+
+def test_unsung_backing_line_is_left_out(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = _spell("ola mar", 20)
+
+    lines = _aligner(peaks).align_text(vocals, "ola mar (yeah)\n", "gl")
+
+    assert [line.role for line in lines] == ["lead"]
