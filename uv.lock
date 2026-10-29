@@ -740,18 +740,22 @@ dependencies = [
 ml = [
     { name = "audio-separator", extra = ["cpu"] },
     { name = "audioread" },
+    { name = "huggingface-hub" },
     { name = "torch" },
     { name = "torchvision" },
+    { name = "transformers" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "audio-separator", extras = ["cpu"], marker = "extra == 'ml'", specifier = "==0.47.1" },
     { name = "audioread", marker = "extra == 'ml'", specifier = ">=3.1" },
+    { name = "huggingface-hub", marker = "extra == 'ml'" },
     { name = "karaoke-contracts", editable = "packages/contracts" },
     { name = "pydantic", specifier = ">=2.12" },
     { name = "torch", marker = "extra == 'ml'", specifier = ">=2.8", index = "https://download.pytorch.org/whl/cu130" },
     { name = "torchvision", marker = "extra == 'ml'", index = "https://download.pytorch.org/whl/cu130" },
+    { name = "transformers", marker = "extra == 'ml'", specifier = ">=5.21" },
 ]
 provides-extras = ["ml"]
 
