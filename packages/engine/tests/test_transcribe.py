@@ -1,3 +1,4 @@
+import subprocess
 import wave
 from dataclasses import dataclass
 from pathlib import Path
@@ -75,16 +76,26 @@ def test_transcriber_drops_segments_without_voice(tmp_path: Path) -> None:
 
 
 @pytest.mark.usefixtures("ffmpeg")
-def test_transcriber_drops_looping_repeats(tmp_path: Path) -> None:
+def test_transcriber_drops_loops_where_the_voice_barely_sounds(tmp_path: Path) -> None:
     segments = [
         FakeSegment(0.0, 1.0, "vai o vento"),
-        FakeSegment(1.0, 2.0, "la la la la la la la la la la la la"),
-        *(FakeSegment(2.0 + i, 3.0 + i, "e ti que fas") for i in range(5)),
+        FakeSegment(1.0, 3.0, "la la la la la la la la la la la la"),
+        *(FakeSegment(3.0 + i, 4.0 + i, "e ti que fas") for i in range(4)),
     ]
+
+    # Voice under the first line, then only in short bursts.
+    transcript, _ = _transcribe(tmp_path, segments, [(0, 1.5), (3.0, 3.5), (4.0, 4.5)])
+
+    assert [s.text for s in transcript.segments] == ["vai o vento", "e ti que fas", "e ti que fas"]
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_a_chorus_sung_again_and_again_is_kept(tmp_path: Path) -> None:
+    segments = [FakeSegment(float(i), i + 1.0, "e ti que fas") for i in range(4)]
 
     transcript, _ = _transcribe(tmp_path, segments, [(0, 8)])
 
-    assert [s.text for s in transcript.segments] == ["vai o vento", "e ti que fas", "e ti que fas"]
+    assert [s.text for s in transcript.segments] == ["e ti que fas"] * 4
 
 
 def test_transcriber_is_a_transcriber() -> None:
@@ -139,6 +150,7 @@ def test_conversion_runs_in_its_own_process(
     monkeypatch.setattr(transcribe, "CACHE", tmp_path)
     monkeypatch.setattr(transcribe.subprocess, "run", fake_run)
     monkeypatch.setattr(transcribe, "_download", lambda spec: tmp_path / "hf")
+    monkeypatch.setattr(transcribe, "_available_memory_gb", lambda: 7.5)
 
     target = transcribe.prepare("hitz-large-v3-gl")
 
@@ -146,3 +158,51 @@ def test_conversion_runs_in_its_own_process(
     assert ran[0][1:3] == ["-m", "karaoke_engine.transcribe"]
     assert transcribe.prepare("hitz-large-v3-gl") == target
     assert len(ran) == 1
+
+
+def test_segmenter_drops_transcription_notes() -> None:
+    from karaoke_engine.steps import Transcript, TranscriptSegment
+    from karaoke_engine.transcribe import LineSegmenter
+
+    transcript = Transcript(
+        language="es",
+        segments=(
+            TranscriptSegment(0.0, 2.0, "[Música] ♪ (risas) Ola mar x2"),
+            TranscriptSegment(2.0, 3.0, "♪♪"),
+            TranscriptSegment(3.0, 4.0, "Estribillo: vai (o vento)"),
+        ),
+    )
+
+    assert LineSegmenter().segment(transcript) == ["Ola mar", "Estribillo: vai o vento"]
+
+
+def test_conversion_happens_aside_and_lands_whole(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.transcribe as transcribe
+
+    def failing_run(command: list[str], check: bool) -> None:
+        Path(command[-1]).mkdir(parents=True)
+        (Path(command[-1]) / "model.bin").write_bytes(b"half")
+        raise subprocess.CalledProcessError(-9, command)
+
+    monkeypatch.setattr(transcribe, "CACHE", tmp_path)
+    monkeypatch.setattr(transcribe.subprocess, "run", failing_run)
+    monkeypatch.setattr(transcribe, "_download", lambda spec: tmp_path / "hf")
+    monkeypatch.setattr(transcribe, "_available_memory_gb", lambda: 7.5)
+
+    with pytest.raises(transcribe.ModelError, match="convert"):
+        transcribe.prepare("hitz-large-v3-gl")
+
+    assert not list(tmp_path.glob("hitz-large-v3-gl-*/model.bin"))
+
+
+def test_conversion_needs_free_memory(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import karaoke_engine.transcribe as transcribe
+
+    monkeypatch.setattr(transcribe, "CACHE", tmp_path)
+    monkeypatch.setattr(transcribe, "_download", lambda spec: tmp_path / "hf")
+    monkeypatch.setattr(transcribe, "_available_memory_gb", lambda: 4.0)
+
+    with pytest.raises(transcribe.ModelError, match="GB"):
+        transcribe.prepare("hitz-large-v3-gl")

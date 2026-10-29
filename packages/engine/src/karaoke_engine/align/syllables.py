@@ -48,7 +48,7 @@ def _units(word: str, letters: list[int]) -> list[tuple[int, str, bool]]:
         nxt = word[letters[i + 1]].lower() if i + 1 < len(letters) else ""
         after = word[letters[i + 2]].lower() if i + 2 < len(letters) else ""
         pair = ch + nxt
-        if pair in _DIGRAPHS or (ch in "qg" and nxt == "u" and after in "eiéí"):
+        if pair in _DIGRAPHS or (ch in "qg" and nxt == "u" and after and after in "eiéí"):
             units.append((index, pair, False))
             i += 2
             continue

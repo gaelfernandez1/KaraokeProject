@@ -38,3 +38,8 @@ def test_parts_always_spell_the_word() -> None:
 @pytest.mark.parametrize(("word", "language"), [("ma", "gl"), ("de", "en"), ("2024", "gl")])
 def test_no_parts(word: str, language: str) -> None:
     assert syllables(word, language) is None
+
+
+def test_qu_ending_a_word_keeps_its_vowel() -> None:
+    assert syllables("caqui", "gl") == ["ca", "qui"]
+    assert syllables("tegu", "gl") == ["te", "gu"]

@@ -52,3 +52,13 @@ def test_gives_up_after_three_busy_answers() -> None:
 
     with pytest.raises(OSError, match="busy"):
         find_lyrics("Canción", "Grupo", 180.0, fetch=web, wait=lambda s: None)
+
+
+def test_no_wait_after_the_last_attempt() -> None:
+    waits: list[float] = []
+    web = FakeWeb(*[(503, {})] * 3)
+
+    with pytest.raises(OSError, match="busy"):
+        find_lyrics("Canción", "Grupo", 180.0, fetch=web, wait=waits.append)
+
+    assert len(waits) == 2

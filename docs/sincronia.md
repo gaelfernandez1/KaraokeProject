@@ -83,6 +83,7 @@ muchas líneas cortas en el audio en vez de las largas que de verdad se cantan.
 uv run karaoke make cancion.m4a --lyrics letra.txt --lang gl --out mi-karaoke
 uv run karaoke make cancion.m4a --lrclib --title "Título" --artist "Grupo"   # letra de LRCLIB
 uv run karaoke make cancion.m4a                                               # sin letra: transcribe
+uv run karaoke make cancion.m4a --lyrics letra.txt --overlap-backing          # coros solapables
 ```
 
 - **Con `--lyrics`**: la letra tal como se pega de una web.
@@ -93,6 +94,10 @@ uv run karaoke make cancion.m4a                                               # 
   elige el banco), siempre en el idioma pedido. Quita los trozos donde la voz calla, porque Whisper
   rellena los silencios con frases hechas, y las repeticiones en bucle. Corta el texto en líneas
   por frases y cada nueve palabras más o menos, y lo alinea como una letra pegada.
+
+La primera vez que se transcribe en gallego se descarga y se convierte el modelo de HiTZ (unos
+6 GB). La conversión necesita unos 6 GB de memoria libre durante unos minutos: hay que cerrar
+otros programas. Se hace en un proceso aparte, y si se corta, se repite entera la vez siguiente.
 
 `provenance` del paquete dice de dónde salió la letra (`user`, `lrclib` o `asr`) y qué modelos se
 usaron. Los cantantes de las cabeceras (`[Verso: Ana]`) pasan a `singers`, y las líneas de coro
