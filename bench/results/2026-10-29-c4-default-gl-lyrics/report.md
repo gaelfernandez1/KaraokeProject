@@ -1,7 +1,7 @@
 # Banco · c4-default · gl · con letra
 
-- Fecha: 2026-10-29T16:37:51+01:00
-- Commit: 9f19305-dirty
+- Fecha: 2026-10-29T20:06:47+01:00
+- Commit: 6a96d21-dirty
 - Banco 0.1.0, normalización v1
 - Referencias: gl semiautomática
 
@@ -24,36 +24,36 @@
 
 ## Pipeline
 
-Mel-Band RoFormer (Kim, 8 s) + Whisper large-v3-turbo + lyrics aligner (each language's default CTC model)
+Mel-Band RoFormer (Kim, 8 s) + Whisper (HiTZ large-v3 for Galician, large-v3-turbo otherwise) + lyrics aligner (each language's default CTC model)
 
 - **separator**: `karaoke_engine.separation:RoformerSeparator` v2 {'model': 'vocals_mel_band_roformer.ckpt', 'segment_size': 801}
-- **transcriber**: `karaoke_bench.baseline.whisper:FasterWhisperTranscriber` v1 {'model': 'large-v3-turbo'}
-- **segmenter**: `karaoke_bench.baseline.segment:SegmentPerLine` v1
-- **aligner**: `karaoke_engine.align.aligner:LyricsAligner` v6
+- **transcriber**: `karaoke_engine.transcribe:WhisperTranscriber` v2
+- **segmenter**: `karaoke_engine.transcribe:LineSegmenter` v1
+- **aligner**: `karaoke_engine.align.aligner:LyricsAligner` v11
 
 ## Resumen
 
 | Grupo | Canciones | Fallos | WER | CER | Inicio mediana | Inicio media | ≤ 0,3 s | ≤ 0,5 s | Fin mediana | Sesgo | Cobertura | Línea mediana | Cambios de idioma | 4 min (s) | Fuera de voz | Confianza < 0,3 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| gl | 5 | 0 | — | — | 0.020 | 0.038 | 98.6 % | 98.7 % | 0.020 | -0.011 | 100.0 % | 0.020 | 0 | 61 | 0.0 % | 23.9 % |
-| total | 5 | 0 | — | — | 0.020 | 0.038 | 98.6 % | 98.7 % | 0.020 | -0.011 | 100.0 % | 0.020 | 0 | 61 | 0.0 % | 23.9 % |
+| gl | 5 | 0 | — | — | 0.020 | 0.038 | 98.6 % | 98.7 % | 0.020 | -0.011 | 100.0 % | — | 0 | 61 | 0.0 % | 23.9 % |
+| total | 5 | 0 | — | — | 0.020 | 0.038 | 98.6 % | 98.7 % | 0.020 | -0.011 | 100.0 % | — | 0 | 61 | 0.0 % | 23.9 % |
 
 ## Etapas
 
 | Paso | Carga (s) | VRAM pico (MiB) | RAM pico (MiB) | Mediana tiempo/duración |
 |---|---|---|---|---|
 | separator | 8.2 | 2867 | 2372 | 0.205 |
-| aligner | 0.1 | 1553 | 2735 | 0.015 |
+| aligner | 0.1 | 1555 | 2733 | 0.015 |
 
 ## Por canción
 
 | Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | ≤ 0,5 s | Cobertura | Referencia | Fuera de voz | Confianza < 0,3 | Idioma devuelto | Tiempo (s) | Error |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| pantis-un-aire | gl | 287 | — | 0.020 | 97.9 % | 98.2 % | 100.0 % | validada (75.7 %) | 0.0 % | 14.0 % | — | 73.8 (caché) |  |
-| cibran-o-mundo-do-motor | gl | 195 | — | — | — | — | — | sin validar | 0.0 % | 9.1 % | — | 42.3 (caché) |  |
-| cloplas-laverca | gl | 313 | — | 0.020 | 99.3 % | 99.3 % | 100.0 % | validada (75.1 %) | 0.1 % | 7.7 % | — | 69.7 (caché) |  |
-| fanny-alexander-lene | gl | 244 | — | — | — | — | — | sin validar | 0.0 % | 45.6 % | — | 53.6 (caché) |  |
-| mortos-en-vida-chapapote | gl | 162 | — | — | — | — | — | sin validar | 0.0 % | 42.9 % | — | 35.4 (caché) |  |
+| pantis-un-aire | gl | 287 | — | 0.020 | 97.9 % | 98.2 % | 100.0 % | validada (75.7 %) | 0.0 % | 14.0 % | — | 73.4 |  |
+| cibran-o-mundo-do-motor | gl | 195 | — | — | — | — | — | sin validar | 0.0 % | 9.1 % | — | 42.4 |  |
+| cloplas-laverca | gl | 313 | — | 0.020 | 99.3 % | 99.3 % | 100.0 % | validada (75.1 %) | 0.1 % | 7.7 % | — | 69.6 |  |
+| fanny-alexander-lene | gl | 244 | — | — | — | — | — | sin validar | 0.0 % | 45.6 % | — | 53.3 |  |
+| mortos-en-vida-chapapote | gl | 162 | — | — | — | — | — | sin validar | 0.0 % | 42.9 % | — | 35.4 |  |
 
 ## Peores casos
 

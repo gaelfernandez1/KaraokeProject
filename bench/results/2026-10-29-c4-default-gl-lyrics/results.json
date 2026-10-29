@@ -1,11 +1,11 @@
 {
   "bench_version": "0.1.0",
   "normalization_version": 1,
-  "created": "2026-10-29T16:37:51+01:00",
-  "git_commit": "9f19305-dirty",
+  "created": "2026-10-29T20:06:47+01:00",
+  "git_commit": "6a96d21-dirty",
   "pipeline": {
     "name": "c4-default",
-    "description": "Mel-Band RoFormer (Kim, 8 s) + Whisper large-v3-turbo + lyrics aligner (each language's default CTC model)",
+    "description": "Mel-Band RoFormer (Kim, 8 s) + Whisper (HiTZ large-v3 for Galician, large-v3-turbo otherwise) + lyrics aligner (each language's default CTC model)",
     "steps": {
       "separator": {
         "target": "karaoke_engine.separation:RoformerSeparator",
@@ -16,21 +16,19 @@
         "version": "2"
       },
       "transcriber": {
-        "target": "karaoke_bench.baseline.whisper:FasterWhisperTranscriber",
-        "params": {
-          "model": "large-v3-turbo"
-        },
-        "version": "1"
+        "target": "karaoke_engine.transcribe:WhisperTranscriber",
+        "params": {},
+        "version": "2"
       },
       "segmenter": {
-        "target": "karaoke_bench.baseline.segment:SegmentPerLine",
+        "target": "karaoke_engine.transcribe:LineSegmenter",
         "params": {},
         "version": "1"
       },
       "aligner": {
         "target": "karaoke_engine.align.aligner:LyricsAligner",
         "params": {},
-        "version": "6"
+        "version": "11"
       }
     }
   },
@@ -60,9 +58,9 @@
       "ram_peak_mb": 2371.95703125
     },
     "aligner": {
-      "load_seconds": 0.05816510200020275,
-      "vram_peak_mb": 1552.50390625,
-      "ram_peak_mb": 2735.1328125
+      "load_seconds": 0.056827042004442774,
+      "vram_peak_mb": 1554.50390625,
+      "ram_peak_mb": 2732.9140625
     }
   },
   "songs": [
@@ -80,8 +78,8 @@
           "error": null
         },
         "aligner": {
-          "seconds": 14.338486628003011,
-          "cached": true,
+          "seconds": 13.931169152994698,
+          "cached": false,
           "error": null
         }
       },
@@ -103,7 +101,7 @@
       "scored_share": 0.7572383073496659,
       "reference_validated": true,
       "reference_timing": "semiautomatic",
-      "line_start_median": 0.01999999999999602,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.00016144656118824668,
@@ -124,8 +122,8 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.736844866001775,
-          "cached": true,
+          "seconds": 2.84311044900096,
+          "cached": false,
           "error": null
         }
       },
@@ -158,8 +156,8 @@
           "error": null
         },
         "aligner": {
-          "seconds": 4.959909142999095,
-          "cached": true,
+          "seconds": 4.821677871994325,
+          "cached": false,
           "error": null
         }
       },
@@ -181,7 +179,7 @@
       "scored_share": 0.7513227513227513,
       "reference_validated": true,
       "reference_timing": "semiautomatic",
-      "line_start_median": 0.01999999999999602,
+      "line_start_median": null,
       "language_reported": null,
       "language_switch": null,
       "outside_voice": 0.0005780346820809249,
@@ -202,8 +200,8 @@
           "error": null
         },
         "aligner": {
-          "seconds": 3.438917526997102,
-          "cached": true,
+          "seconds": 3.223418870999012,
+          "cached": false,
           "error": null
         }
       },
@@ -236,8 +234,8 @@
           "error": null
         },
         "aligner": {
-          "seconds": 2.3857461890002014,
-          "cached": true,
+          "seconds": 2.3933769279974513,
+          "cached": false,
           "error": null
         }
       },
@@ -274,13 +272,13 @@
         "end_mean": 0.03958653846153718,
         "start_bias": -0.011474358974358929
       },
-      "line_start_median": 0.01999999999999602,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.20529212294815222,
-        "aligner": 0.01468768012907154
+        "aligner": 0.0147346582418552
       },
-      "est_seconds_4min": 61.00685428053451,
+      "est_seconds_4min": 61.01679096760682,
       "outside_voice": 0.000252291337225319,
       "low_confidence": 0.23860589344620978
     },
@@ -300,13 +298,13 @@
         "end_mean": 0.03958653846153718,
         "start_bias": -0.011474358974358929
       },
-      "line_start_median": 0.01999999999999602,
+      "line_start_median": null,
       "language_switches": 0,
       "rtf_median": {
         "separator": 0.20529212294815222,
-        "aligner": 0.01468768012907154
+        "aligner": 0.0147346582418552
       },
-      "est_seconds_4min": 61.00685428053451,
+      "est_seconds_4min": 61.01679096760682,
       "outside_voice": 0.000252291337225319,
       "low_confidence": 0.23860589344620978
     }
