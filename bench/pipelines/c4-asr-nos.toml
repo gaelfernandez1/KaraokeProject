@@ -1,0 +1,17 @@
+# Transcription without lyrics with Proxecto Nós Whisper large-v3-turbo Galician, then the lyrics aligner on the transcribed lines.
+name = "c4-asr-nos"
+description = "Mel-Band RoFormer (Kim, 8 s) + Proxecto Nós Whisper large-v3-turbo Galician (VAD, voice check, fixed seed) + line segmenter + lyrics aligner"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "vocals_mel_band_roformer.ckpt", segment_size = 801 }
+
+[steps.transcriber]
+target = "karaoke_engine.transcribe:WhisperTranscriber"
+params = { model = "nos-turbo-gl" }
+
+[steps.segmenter]
+target = "karaoke_engine.transcribe:LineSegmenter"
+
+[steps.aligner]
+target = "karaoke_engine.align.aligner:LyricsAligner"

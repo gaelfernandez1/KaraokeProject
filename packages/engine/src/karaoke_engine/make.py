@@ -58,6 +58,12 @@ def make_package(
     artist: str | None = None,
 ) -> KaraokeDoc:
     probe(source)  # fails early, and clearly, on files without audio
+    if lyrics is None:
+        transcriber = transcriber or default_transcriber()
+        # A model converted on first use needs the memory before anything else is loaded.
+        prepare_model = getattr(transcriber, "prepare_for", None)
+        if callable(prepare_model):
+            prepare_model(language)
     separator = separator or default_separator()
     aligner = aligner or default_aligner()
     out_dir.mkdir(parents=True, exist_ok=True)

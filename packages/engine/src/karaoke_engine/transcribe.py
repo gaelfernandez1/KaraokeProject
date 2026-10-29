@@ -8,6 +8,8 @@ loops on repeats, so segments where the separated voice is silent and runaway re
 
 import ctypes
 import importlib.util
+import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -60,13 +62,13 @@ MODELS: dict[str, WhisperSpec] = {
     ),
 }
 # Chosen with the bench (decision 005); everything else uses large-v3-turbo.
-DEFAULT_BY_LANGUAGE: dict[str, str] = {"gl": "nos-turbo-gl"}
+DEFAULT_BY_LANGUAGE: dict[str, str] = {"gl": "hitz-large-v3-gl"}
 
 
 class WhisperTranscriber:
     name = "whisper"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "1"
+    version = "2"
 
     def __init__(
         self,
@@ -92,6 +94,11 @@ class WhisperTranscriber:
     def load(self) -> None:
         if self._injected is None and self.model != "auto":
             self._whisper_for(self.model)
+
+    def prepare_for(self, language: str) -> None:
+        """Downloads (and converts once) the model a language will use, before anything loads."""
+        if self._injected is None:
+            prepare(self._name_for(language))
 
     def model_for_language(self, language: str) -> str:
         name = (
@@ -188,30 +195,50 @@ def _sentences(text: str) -> list[str]:
 
 def _ct2_dir(name: str) -> Path:
     """The model in CTranslate2 format: downloaded as is, or converted once from transformers."""
-    from huggingface_hub import snapshot_download
-
     spec = MODELS[name]
     if spec.converted:
-        return Path(snapshot_download(spec.repo, revision=spec.revision))
+        return _download(spec)
+    return prepare(name)
+
+
+def prepare(name: str) -> Path:
+    """Converts a transformers model to CTranslate2 once, in a process of its own.
+
+    The converter holds the PyTorch model and its converted copy at once (6.7 GB for a large-v3):
+    run alone, all of it goes back to the system when it ends. `karaoke make` prepares the model
+    before loading anything else.
+    """
+    spec = MODELS[name]
+    if spec.converted:
+        return _download(spec)
     target = CACHE / f"{name}-{spec.revision[:12]}"
     if (target / "model.bin").is_file():
         return target
-    source = snapshot_download(
-        spec.repo,
-        revision=spec.revision,
-        # Weights and tokenizer only: some repos also carry multi-gigabyte optimizer states.
-        allow_patterns=["*.json", "model*.safetensors", "pytorch_model*.bin", "*.txt"],
+    source = _download(spec)
+    subprocess.run(
+        [sys.executable, "-m", "karaoke_engine.transcribe", str(source), str(target)], check=True
     )
+    return target
+
+
+def _download(spec: WhisperSpec) -> Path:
+    from huggingface_hub import snapshot_download
+
+    if spec.converted:
+        return Path(snapshot_download(spec.repo, revision=spec.revision))
+    # Weights and tokenizer only: some repos also carry multi-gigabyte optimizer states.
+    patterns = ["*.json", "model*.safetensors", "pytorch_model*.bin", "*.txt"]
+    return Path(snapshot_download(spec.repo, revision=spec.revision, allow_patterns=patterns))
+
+
+def _convert(source: Path, target: Path) -> None:
     from ctranslate2.converters import TransformersConverter
 
-    copy = [
-        f for f in ("tokenizer.json", "preprocessor_config.json") if (Path(source) / f).is_file()
-    ]
+    copy = [f for f in ("tokenizer.json", "preprocessor_config.json") if (source / f).is_file()]
     converter = TransformersConverter(
-        source, copy_files=copy, load_as_float16=True, low_cpu_mem_usage=True
+        str(source), copy_files=copy, load_as_float16=True, low_cpu_mem_usage=True
     )
     converter.convert(str(target), quantization="int8_float16", force=True)
-    return target
 
 
 def _voice_share(active: npt.NDArray[np.bool_], start: float, end: float) -> float:
@@ -246,3 +273,7 @@ def _preload_cuda12() -> None:
         lib_dir = Path(next(iter(spec.submodule_search_locations))) / "lib"
         for lib in sorted(lib_dir.glob(pattern), key=lambda p: (len(p.name), p.name)):
             ctypes.CDLL(str(lib), mode=ctypes.RTLD_GLOBAL)
+
+
+if __name__ == "__main__":
+    _convert(Path(sys.argv[1]), Path(sys.argv[2]))
