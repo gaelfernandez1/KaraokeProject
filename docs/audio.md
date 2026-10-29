@@ -37,16 +37,18 @@ valores por defecto en la clave de la caché.
 - decodifica cualquier cosa que lea ffmpeg, vídeo incluido;
 - mide la sonoridad (EBU R128);
 - escribe los stems del paquete en `instrumental.m4a` y `vocals.m4a`: AAC-LC a 44,1 kHz,
-  `+faststart`, la mezcla a −14 LUFS y como mucho −1 dBTP.
+  `+faststart`, la mezcla a −14 LUFS, y ni la mezcla ni los stems pasan de −1 dBTP.
 
-Para pasar al formato del paquete uno que ya tiene stems en otro formato (WAV, por ejemplo):
+Para pasar al formato del paquete uno que ya tiene stems en otro formato (WAV, por ejemplo), sobre
+una copia fuera del repo, porque el comando reescribe `karaoke.json`:
 
 ```bash
-uv run karaoke audio fixtures/packages/cortez-feel-stripped --mix bench/data/jamendo/Cortez_-_Feel__Stripped_/audio.mp3
+cp -r fixtures/packages/cortez-feel-stripped bench/data/paquetes/cortez-feel-stripped-m4a
+uv run karaoke audio bench/data/paquetes/cortez-feel-stripped-m4a --mix bench/data/jamendo/Cortez_-_Feel__Stripped_/audio.mp3
 ```
 
 Sin `--mix`, la mezcla se reconstruye sumando los stems. El comando actualiza `audio` en
-`karaoke.json` y valida el paquete.
+`karaoke.json` y valida el paquete; los ficheros viejos se quedan y se pueden borrar.
 
 ## Reproducir en la web
 
