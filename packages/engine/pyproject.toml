@@ -8,6 +8,8 @@ dependencies = ["karaoke-contracts", "pydantic>=2.12"]
 [project.optional-dependencies]
 ml = [
     "torch>=2.8",
+    "transformers>=5.21",
+    "huggingface-hub",
     "audio-separator[cpu]==0.47.1",
     # Declared so they resolve like torch: torchvision from the CUDA index, and audioread,
     # which audio-separator imports without declaring it.
