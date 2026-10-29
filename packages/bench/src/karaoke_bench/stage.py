@@ -1,4 +1,4 @@
-"""Runs one pipeline step over many songs: cache first, then a single worker process.
+"""Runs one pipeline step over many songs: cache first, then a worker process.
 
 One process per step keeps a single model on the 4 GB GPU, frees all of it when the step
 ends, measures memory per step cleanly, and keeps CUDA libraries of different steps apart.
@@ -8,6 +8,7 @@ import json
 import subprocess
 import sys
 import tempfile
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,6 +19,10 @@ from karaoke_bench.codec import decode_output
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.pipeline import StepSpec, step_version
 from karaoke_bench.resources import GpuSampler
+
+# A worker that keeps dying is broken for every song, not just one.
+MAX_CRASHES = 3
+POLL_SECONDS = 0.2
 
 
 @dataclass(frozen=True)
@@ -66,10 +71,8 @@ def run_stage(
         records, stage, vram = _run_worker(spec, todo, keys, cache, paths)
         fresh = []
         for item in todo:
-            record = records.get(item.key)
-            if record is None:
-                outcomes[item.key] = ItemOutcome(item.key, None, 0.0, False, stage["error"])
-            elif record["error"]:
+            record = records[item.key]
+            if record["error"]:
                 outcomes[item.key] = ItemOutcome(item.key, None, 0.0, False, record["error"])
             else:
                 output = decode_output(spec.kind, record["output"])
@@ -101,7 +104,65 @@ def _run_worker(
     cache: Cache,
     paths: BenchPaths,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any], float | None]:
+    """Runs the items in worker processes and returns one record per item.
+
+    The worker handles the items in order, so when it dies (an OOM kill, a crash in CUDA) the
+    first item without a record is the one it died on: that one fails and a new worker carries on
+    with the rest, up to MAX_CRASHES times.
+    """
+    records: dict[str, dict[str, Any]] = {}
+    stages: list[dict[str, Any]] = []
+    peaks: list[float | None] = []
+    remaining = list(items)
+    crashes = 0
+    while remaining:
+        found, stage, code, peak = _launch(spec, remaining, keys, cache, paths)
+        records.update(found)
+        stages.append(stage)
+        peaks.append(peak)
+        remaining = [item for item in remaining if item.key not in found]
+        if not remaining:
+            break
+        crashes += 1
+        culprit = remaining.pop(0)
+        records[culprit.key] = _failed(culprit, f"worker exited with code {code} on this song")
+        if crashes >= MAX_CRASHES:
+            for item in remaining:
+                records[item.key] = _failed(
+                    item, f"not run: the worker exited with code {code} {crashes} times"
+                )
+            break
+    merged = {
+        name: _max(stage.get(name) for stage in stages)
+        for name in ("load_seconds", "ram_peak_mb", "torch_peak_mb")
+    }
+    return records, merged, _max([*peaks, merged["torch_peak_mb"]])
+
+
+def _launch(
+    spec: StepSpec,
+    items: Sequence[StageItem],
+    keys: dict[str, str],
+    cache: Cache,
+    paths: BenchPaths,
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any], int, float | None]:
+    """One worker process. Each finished item is cached as soon as its line appears, so a run
+    stopped half way (Ctrl+C, a killed terminal) keeps what it already did."""
     paths.data.mkdir(parents=True, exist_ok=True)
+    records: dict[str, dict[str, Any]] = {}
+    stage: dict[str, Any] = {}
+
+    def collect(lines: list[str]) -> None:
+        for line in lines:
+            record = json.loads(line)
+            if "stage" in record:
+                stage.update(record["stage"])
+                continue
+            records[record["key"]] = record
+            if record["error"] is None:
+                entry = CacheEntry(output=record["output"], seconds=record["seconds"])
+                cache.put(spec.kind, keys[record["key"]], entry)
+
     with tempfile.TemporaryDirectory(dir=paths.data, prefix="job-") as tmp:
         job, out = Path(tmp) / "job.json", Path(tmp) / "out.jsonl"
         job.write_text(
@@ -122,21 +183,43 @@ def _run_worker(
             ),
             encoding="utf-8",
         )
+        reader = _LineReader(out)
         with GpuSampler() as sampler:
             process = subprocess.Popen([sys.executable, "-m", "karaoke_bench.worker", str(job)])
-            code = process.wait()
-        records: dict[str, dict[str, Any]] = {}
-        stage: dict[str, Any] = {}
-        if out.is_file():
-            for line in out.read_text(encoding="utf-8").splitlines():
-                record = json.loads(line)
-                if "stage" in record:
-                    stage = record["stage"]
-                else:
-                    records[record["key"]] = record
-    stage["error"] = f"worker exited with code {code}"
-    vram = _max([sampler.peak_mb, stage.get("torch_peak_mb")])
-    return records, stage, vram
+            try:
+                while process.poll() is None:
+                    collect(reader.read())
+                    time.sleep(POLL_SECONDS)
+            finally:
+                if process.poll() is None:
+                    process.terminate()
+                    process.wait()
+                # Also on Ctrl+C: whatever the worker finished is kept.
+                collect(reader.read())
+    return records, stage, process.returncode, sampler.peak_mb
+
+
+class _LineReader:
+    """Complete lines appended to a file since the last read; a half-written last line waits."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.offset = 0
+        self.partial = b""
+
+    def read(self) -> list[str]:
+        if not self.path.is_file():
+            return []
+        with self.path.open("rb") as handle:
+            handle.seek(self.offset)
+            data = self.partial + handle.read()
+            self.offset = handle.tell()
+        *lines, self.partial = data.split(b"\n")
+        return [line.decode("utf-8") for line in lines if line.strip()]
+
+
+def _failed(item: StageItem, error: str) -> dict[str, Any]:
+    return {"key": item.key, "output": None, "seconds": 0.0, "error": error}
 
 
 def _max(values: Any) -> float | None:

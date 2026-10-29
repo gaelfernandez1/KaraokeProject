@@ -82,8 +82,10 @@ GPU limpia al acabar y su memoria se mide sola. El resultado de cada paso se gua
 alineador no repite la separación. `--no-cache` lo recalcula todo.
 
 Si un paso falla en una canción (excepción, falta de memoria o proceso muerto), esa canción sale con
-su error y las demás siguen. También se marca como error un alineador que devuelve otro número de
-líneas o tiempos fuera de la canción.
+su error y las demás siguen: si el proceso muere, se relanza para las que faltan (hasta 3 veces).
+También se marca como error un alineador que devuelve otro número de líneas o tiempos fuera de la
+canción. Cada canción terminada entra en la caché en el momento, así que una ejecución cortada
+(`Ctrl`+`C`, un apagón) sigue donde iba al relanzarla.
 
 Cada ejecución deja:
 
