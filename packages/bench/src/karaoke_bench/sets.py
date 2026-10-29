@@ -26,6 +26,9 @@ class Song:
     audio: Path
     reference: Path | None
     lyrics: Path | None
+    # Reports group songs by this when given (e.g. the kind of trouble in the stress set),
+    # otherwise by language.
+    group: str | None = None
 
     def load_reference(self) -> Reference | None:
         return load_reference(self.reference) if self.reference else None
@@ -131,6 +134,7 @@ def _song_from_dir(set_name: str, song_dir: Path) -> Song:
         audio=_audio_in(song_dir, set_name),
         reference=_optional(song_dir / "reference.json"),
         lyrics=_optional(song_dir / "lyrics.txt"),
+        group=meta.get("group"),
     )
 
 

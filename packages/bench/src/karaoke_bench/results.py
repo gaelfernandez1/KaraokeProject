@@ -30,6 +30,7 @@ class SongResult(BaseModel):
     language: str
     duration: float
     mode: Literal["lyrics", "asr"]
+    group: str | None = None
     steps: dict[str, SongStep]
     wer: float | None = None
     cer: float | None = None

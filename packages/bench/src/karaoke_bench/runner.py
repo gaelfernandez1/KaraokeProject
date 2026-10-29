@@ -115,8 +115,8 @@ def run(options: RunOptions, paths: BenchPaths) -> Path:
         for kind, outcome in stages.items()
     }
     groups = {"all": results}
-    for language in sorted({r.language for r in results}):
-        groups[language] = [r for r in results if r.language == language]
+    for name in sorted({r.group or r.language for r in results}):
+        groups[name] = [r for r in results if (r.group or r.language) == name]
     summary = {
         name: summarize(group, timing, line_errors, stage_records) for name, group in groups.items()
     }
@@ -272,6 +272,7 @@ def _score(
         language=song.language,
         duration=state.duration,
         mode=mode,
+        group=song.group,
         steps=state.steps,
         scored_share=ref.scored_share() if ref else None,
         reference_validated=ref.approved if ref and ref.timing == "semiautomatic" else None,
