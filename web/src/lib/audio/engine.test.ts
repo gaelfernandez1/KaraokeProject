@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AudioEngine, START_DELAY } from './engine';
+import { AudioEngine, MAX_SEMITONES, START_DELAY, type PitchNode } from './engine';
 
 // A tiny stand-in for the Web Audio API: just what the engine touches, and records of it.
 class FakeParam {
@@ -188,5 +188,74 @@ describe('AudioEngine', () => {
 		expect(playing()).toHaveLength(0);
 		expect(engine.playing).toBe(false);
 		expect(engine.position()).toBe(0);
+	});
+});
+
+class FakePitch extends FakeNode {
+	scheduled: Record<string, unknown>[] = [];
+	running = false;
+	schedule(change: Record<string, unknown>) {
+		this.scheduled.push(change);
+	}
+	start() {
+		this.running = true;
+	}
+	stop() {
+		this.running = false;
+	}
+	latency() {
+		return 0.12;
+	}
+}
+
+describe('AudioEngine pitch', () => {
+	let pitch: FakePitch;
+	let made: number;
+
+	beforeEach(async () => {
+		pitch = new FakePitch();
+		made = 0;
+		const createPitchNode = async () => {
+			made++;
+			return pitch as unknown as PitchNode;
+		};
+		context = new FakeContext();
+		engine = new AudioEngine(context as unknown as AudioContext, { fetchBytes, createPitchNode });
+		await engine.load({ instrumental: 'inst.m4a', vocals: 'voc.m4a' });
+	});
+
+	const master = () => context.gains[0];
+
+	it('plays straight to the speakers while the pitch is untouched', () => {
+		expect(master().connections).toEqual([context.destination]);
+		expect(made).toBe(0);
+	});
+
+	it('routes through the pitch shifter and delays the lyrics by its latency', async () => {
+		await engine.setPitch(2);
+		await engine.play();
+		context.currentTime += START_DELAY + 10;
+
+		expect(master().connections).toEqual([pitch]);
+		expect(pitch.connections).toEqual([context.destination]);
+		expect(pitch.running).toBe(true);
+		expect(pitch.scheduled.at(-1)).toMatchObject({ semitones: 2 });
+		expect(engine.now()).toBeCloseTo(10 - 0.12, 6);
+	});
+
+	it('creates the shifter once and bypasses it again at zero', async () => {
+		await engine.setPitch(-3);
+		await engine.setPitch(1);
+		await engine.setPitch(0);
+
+		expect(made).toBe(1);
+		expect(master().connections).toEqual([context.destination]);
+		expect(pitch.running).toBe(false);
+	});
+
+	it('keeps the shift within a sensible range', async () => {
+		await engine.setPitch(40);
+
+		expect(pitch.scheduled.at(-1)).toMatchObject({ semitones: MAX_SEMITONES });
 	});
 });

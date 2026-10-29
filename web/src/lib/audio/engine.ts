@@ -5,6 +5,17 @@ import { SongClock, audioTimeSource } from './clock';
 export const START_DELAY = 0.05;
 /** Time constant of volume changes: quick, but without clicks. */
 const VOLUME_SMOOTHING = 0.02;
+/** A full octave either way; beyond that voices sound like cartoons. */
+export const MAX_SEMITONES = 12;
+
+/** What the engine needs from a pitch shifter (signalsmith-stretch in live input mode). */
+export interface PitchNode extends AudioNode {
+	schedule(change: { semitones?: number; formantCompensation?: boolean }): void;
+	start(when?: number): void;
+	stop(when?: number): void;
+	/** Delay it adds, in seconds. */
+	latency(): number;
+}
 
 export interface StemUrls {
 	instrumental: string;
@@ -14,12 +25,20 @@ export interface StemUrls {
 export interface EngineOptions {
 	/** How audio files are fetched; tests replace it. */
 	fetchBytes?: (url: string) => Promise<ArrayBuffer>;
+	/** Makes the pitch shifter the first time it is needed; tests replace it. */
+	createPitchNode?: (context: AudioContext) => Promise<PitchNode>;
 }
 
 const fetchArrayBuffer = async (url: string): Promise<ArrayBuffer> => {
 	const response = await fetch(url);
 	if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
 	return response.arrayBuffer();
+};
+
+// Signalsmith Stretch (MIT): WASM in an AudioWorklet, loaded only when someone changes the key.
+const loadStretch = async (context: AudioContext): Promise<PitchNode> => {
+	const { default: SignalsmithStretch } = await import('signalsmith-stretch');
+	return SignalsmithStretch(context);
 };
 
 /**
@@ -40,10 +59,15 @@ export class AudioEngine implements PlaybackClock {
 	#clock: SongClock;
 	#endedListeners: (() => void)[] = [];
 	#manualOffset = 0;
+	#extraLatency = 0;
+	readonly #createPitchNode: (context: AudioContext) => Promise<PitchNode>;
+	#pitch: Promise<PitchNode> | null = null;
+	#pitchActive = false;
 
 	constructor(context: AudioContext, options: EngineOptions = {}) {
 		this.#context = context;
 		this.#fetchBytes = options.fetchBytes ?? fetchArrayBuffer;
+		this.#createPitchNode = options.createPitchNode ?? loadStretch;
 		this.#master = context.createGain();
 		this.#master.connect(context.destination);
 		this.#vocalGain = context.createGain();
@@ -83,6 +107,7 @@ export class AudioEngine implements PlaybackClock {
 		this.#vocals = vocals;
 		this.#clock = new SongClock(audioTimeSource(this.#context), instrumental.duration);
 		this.#clock.setManualOffset(this.#manualOffset);
+		this.#clock.setExtraLatency(this.#extraLatency);
 	}
 
 	async play(): Promise<void> {
@@ -122,8 +147,46 @@ export class AudioEngine implements PlaybackClock {
 		this.#clock.setManualOffset(seconds);
 	}
 
+	/**
+	 * Moves the key by `semitones` (0 = original). The shifter delays the sound a little, and the
+	 * clock delays the lyrics by the same amount; at 0 it is taken out of the path altogether.
+	 */
+	async setPitch(semitones: number): Promise<void> {
+		const value = Math.min(Math.max(semitones, -MAX_SEMITONES), MAX_SEMITONES);
+		if (value === 0) {
+			if (this.#pitchActive && this.#pitch) {
+				const node = await this.#pitch;
+				this.#master.disconnect();
+				this.#master.connect(this.#context.destination);
+				node.stop();
+				this.#pitchActive = false;
+			}
+			this.#setExtraLatency(0);
+			return;
+		}
+		this.#pitch ??= this.#createPitchNode(this.#context).then((node) => {
+			node.connect(this.#context.destination);
+			return node;
+		});
+		const node = await this.#pitch;
+		// Formant compensation keeps the shifted guide vocals from sounding like a chipmunk.
+		node.schedule({ semitones: value, formantCompensation: true });
+		if (!this.#pitchActive) {
+			node.start();
+			this.#master.disconnect();
+			this.#master.connect(node);
+			this.#pitchActive = true;
+		}
+		this.#setExtraLatency(node.latency());
+	}
+
 	onEnded(listener: () => void): void {
 		this.#endedListeners.push(listener);
+	}
+
+	#setExtraLatency(seconds: number): void {
+		this.#extraLatency = seconds;
+		this.#clock.setExtraLatency(seconds);
 	}
 
 	#start(from: number): void {
