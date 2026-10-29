@@ -217,3 +217,19 @@ def test_plain_aligners_still_get_clean_lines(paths: BenchPaths, tmp_path: Path)
     assert song.error is None
     raw = (paths.runs / out.name / "demo.json").read_text(encoding="utf-8")
     assert "Estribillo" not in raw
+
+
+def test_summary_groups_by_group_when_present(
+    paths: BenchPaths, add_demo_song: DemoSongAdder
+) -> None:
+    add_demo_song(paths, "other")
+    for song_id, group in (("demo", "gap"), ("other", "echo")):
+        meta = paths.data / "private" / song_id / "meta.toml"
+        meta.write_text(meta.read_text(encoding="utf-8") + f'group = "{group}"\n', encoding="utf-8")
+
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    results = load_results(out / "results.json")
+    assert set(results.summary) == {"all", "gap", "echo"}
+    assert results.summary["gap"].songs == 1
+    assert {song.group for song in results.songs} == {"gap", "echo"}
