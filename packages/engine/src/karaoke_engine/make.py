@@ -11,7 +11,7 @@ import tempfile
 import unicodedata
 from importlib import metadata
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from karaoke_contracts import (
     KaraokeDoc,
@@ -27,7 +27,8 @@ from karaoke_engine.align.lyrics import parse_lyrics, singer_id
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL
 from karaoke_engine.audio import decode, package_audio, probe
 from karaoke_engine.separation import RoformerSeparator
-from karaoke_engine.steps import Separator, TextAligner
+from karaoke_engine.steps import Separator, TextAligner, Transcriber
+from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber
 
 
 def default_separator() -> Separator:
@@ -39,14 +40,20 @@ def default_aligner() -> TextAligner:
     return LyricsAligner()
 
 
+def default_transcriber() -> Transcriber:
+    return WhisperTranscriber()
+
+
 def make_package(
     source: Path,
     out_dir: Path,
     language: str,
-    lyrics: str,
+    lyrics: str | None,
     *,
     separator: Separator | None = None,
     aligner: TextAligner | None = None,
+    transcriber: Transcriber | None = None,
+    lyrics_source: Literal["user", "lrclib"] = "user",
     title: str | None = None,
     artist: str | None = None,
 ) -> KaraokeDoc:
@@ -59,6 +66,15 @@ def make_package(
         mix = decode(source, work / "mix.wav")
         stems = separator.separate(mix, work / "stems")
         _unload(separator)
+        asr_model = None
+        source_kind: Literal["user", "asr", "lrclib"] = lyrics_source
+        if lyrics is None:
+            transcriber = transcriber or default_transcriber()
+            transcript = transcriber.transcribe(stems.vocals, language)
+            asr_model = _model_name(transcriber, language)
+            _unload(transcriber)
+            lyrics = "\n".join(LineSegmenter().segment(transcript))
+            source_kind = "asr"
         lines = aligner.align_text(stems.vocals, lyrics, language)
         _unload(aligner)
         refs = package_audio(mix, stems, out_dir)
@@ -74,9 +90,10 @@ def make_package(
         singers=_singers(lyrics),
         lines=_numbered(lines),
         provenance=Provenance(
-            lyrics_source="user",
+            lyrics_source=source_kind,
             separation_model=str(getattr(separator, "model", separator.name)),
-            align_model=_align_model(aligner, language),
+            asr_model=asr_model,
+            align_model=_model_name(aligner, language),
             engine_version=f"karaoke-engine {metadata.version('karaoke-engine')}",
             language_fallbacks=_fallbacks(language),
         ),
@@ -114,11 +131,11 @@ def _singers(lyrics: str) -> list[Singer]:
     return singers
 
 
-def _align_model(aligner: Any, language: str) -> str:
-    describe = getattr(aligner, "model_for_language", None)
+def _model_name(step: Any, language: str) -> str:
+    describe = getattr(step, "model_for_language", None)
     if callable(describe):
         return str(describe(language))
-    return str(getattr(aligner, "model_name", aligner.name))
+    return str(getattr(step, "model_name", step.name))
 
 
 def _fallbacks(language: str) -> list[LanguageFallback]:

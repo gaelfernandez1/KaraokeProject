@@ -4,10 +4,12 @@ import argparse
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Literal
 
 from karaoke_contracts import validate_file, validate_package
-from karaoke_engine.audio import AudioError, convert_package
+from karaoke_engine.audio import AudioError, convert_package, probe
 from karaoke_engine.demo import synthesize_package_audio
+from karaoke_engine.lyrics_lookup import find_lyrics
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -32,11 +34,18 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     make = commands.add_parser("make", help="make a karaoke package from a song and its lyrics")
     make.add_argument("source", type=Path, help="the song: any audio or video file ffmpeg reads")
-    make.add_argument("--lyrics", type=Path, help="text file with the lyrics, as pasted")
+    make.add_argument(
+        "--lyrics", type=Path, help="text file with the lyrics, as pasted (default: transcribe)"
+    )
     make.add_argument("--lang", default="gl", help="language of the lyrics (default: gl)")
     make.add_argument("--out", type=Path, help="package folder (default: named after the song)")
     make.add_argument("--title")
     make.add_argument("--artist")
+    make.add_argument(
+        "--lrclib",
+        action="store_true",
+        help="look the lyrics up on lrclib.net (sends --title and --artist, both needed)",
+    )
 
     args = parser.parse_args(argv)
     if args.command == "make":
@@ -57,15 +66,23 @@ def main(argv: Sequence[str] | None = None) -> int:
 def _make(args: argparse.Namespace) -> int:
     from karaoke_engine.make import make_package, slug
 
-    if args.lyrics is None:
-        print("error: give the lyrics with --lyrics letra.txt", file=sys.stderr)
+    if args.lrclib and not (args.title and args.artist):
+        print("error: --lrclib needs --title and --artist", file=sys.stderr)
         return 2
     out = args.out or Path(slug(args.title or args.source.stem) or "karaoke")
     try:
-        lyrics = args.lyrics.read_text(encoding="utf-8")
+        lyrics = args.lyrics.read_text(encoding="utf-8") if args.lyrics else None
+        source: Literal["user", "lrclib"] = "user"
+        if lyrics is None and args.lrclib:
+            found = find_lyrics(args.title, args.artist, probe(args.source).duration)
+            if found is None:
+                print("LRCLIB has no lyrics for this song; transcribing instead", file=sys.stderr)
+            else:
+                lyrics, source = found.text, "lrclib"
         doc = make_package(
-            args.source, out, args.lang, lyrics, title=args.title, artist=args.artist
-        )
+            args.source, out, args.lang, lyrics, title=args.title, artist=args.artist,
+            lyrics_source=source,
+        )  # fmt: skip
     except (OSError, ValueError, AudioError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
