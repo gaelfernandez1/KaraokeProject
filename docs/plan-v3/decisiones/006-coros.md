@@ -19,6 +19,22 @@ como líneas normales.
 - El texto de una línea de coro va sin los paréntesis; cómo se marca en pantalla (corchetes, otro
   color, más pequeño) lo decide C5.
 
+## Coros que se pisan con la voz principal
+
+En una sola pasada, un coro solo puede ir antes o después de su línea principal. Se probó una
+segunda pasada que alinea cada coro solo, en el tramo de su línea principal, y le deja solaparse:
+
+| | ≤ 0,3 s (jamendo · stress · quick) | Cobertura (jamendo) |
+|---|---|---|
+| Una pasada (coros en su sitio escrito) | 98,8 · 99,2 · 99,3 % | 92,3 % |
+| Todos los coros solos, solapables | 97,6 % en jamendo | 92,3 % |
+| Solo los que no caben en su sitio, solapables | 98,5 · 98,9 · 99,0 % | 92,6 % |
+
+En estas canciones los paréntesis son sobre todo ecos y respuestas justo después de la voz
+principal, y alineados solos se pegan a las mismas palabras de la voz principal. La segunda pasada
+queda como opción (`overlap_backing`), desactivada; para activarla por defecto hace falta escucharla
+en canciones con coros simultáneos.
+
 ## Consecuencias
 
 - `schemas/karaoke.schema.json` y los tipos TS se regeneran (`make contracts`); en TS, `role` es
