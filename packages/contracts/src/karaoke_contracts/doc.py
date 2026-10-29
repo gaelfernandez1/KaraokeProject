@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 
 Seconds = Annotated[float, Field(ge=0, description="Seconds from the start of the song audio.")]
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
@@ -51,6 +51,10 @@ class Line(_Model):
     start: Seconds
     end: Seconds
     singer: str | None = None
+    role: Literal["lead", "backing"] = Field(
+        default="lead",
+        description="backing: backing vocals (written in parentheses); they may overlap the lead.",
+    )
     words: Annotated[list[Word], Field(min_length=1)]
 
 

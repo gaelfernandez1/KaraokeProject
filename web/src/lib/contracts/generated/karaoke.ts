@@ -40,6 +40,10 @@ export interface Line {
 	end: number;
 	singer: string | null;
 	/**
+	 * backing: backing vocals (written in parentheses); they may overlap the lead.
+	 */
+	role: 'lead' | 'backing';
+	/**
 	 * @minItems 1
 	 */
 	words: Word[];

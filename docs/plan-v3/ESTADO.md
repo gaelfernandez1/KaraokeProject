@@ -60,7 +60,9 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   (`decisiones/005`); Cibrán, Fanny + Alexander y Mortos en Vida, no.
 - C4 → C3: `RoformerSeparator` decodifica con ffmpeg lo que no es WAV ni FLAC (fallaba con
   `.m4a`, el formato de YouTube).
-- C4 → C5/C7: las líneas de coro salen como líneas propias con el campo extra `role: "backing"`
-  (se formalizará en el contrato con una versión menor); `confidence` por palabra para el editor.
+- C4 → C5/C7: contrato **1.1.0** (`decisiones/006`): `Line.role` es `"lead"` o `"backing"`, y los
+  coros pueden solaparse con la línea principal (un `role` ausente en paquetes 1.0.0 es `"lead"`).
+  Las palabras de dos o más sílabas traen `parts` con tiempo real (gl, es, pt), y `confidence` por
+  palabra sirve al editor. `karaoke make` ya hace paquetes de canciones reales para probar.
 - C4 → C8: alinear cuesta unos 5 s y 2,7 GB de RAM por canción con un modelo; los modelos van a la
   caché de Hugging Face (Nós XLS-R gallego, wav2vec2 large inglés, XLS-R es/fr/de/pt).
