@@ -3,7 +3,12 @@
 	// its calibration. The lyrics here are plain text to judge sync; the real renderer is C5's.
 	import type { KaraokeDoc } from '#lib/contracts';
 	import { AudioEngine } from '#lib/audio/engine.js';
-	import { clickTimes, estimateLatency, manualOffset } from '#lib/audio/calibration.js';
+	import {
+		CLICK_INTERVAL,
+		clickTimes,
+		estimateLatency,
+		manualOffset
+	} from '#lib/audio/calibration.js';
 
 	const OFFSET_KEY = 'karaoke.latency-offset-ms';
 
@@ -105,6 +110,8 @@
 		try {
 			await engine?.setPitch(pitch);
 		} catch (error) {
+			// Without a working shifter the song stays in its key, and later loads must not retry it.
+			pitch = 0;
 			message = `O cambio de ton non funciona neste navegador: ${error}`;
 		}
 	}
@@ -125,12 +132,13 @@
 		player.pause();
 		const ctx = context!;
 		await ctx.resume();
-		clicks = clickTimes(ctx.currentTime, 10, 0.6, 1);
+		clicks = clickTimes(ctx.currentTime, 10, CLICK_INTERVAL, 1);
 		for (const at of clicks) beep(ctx, at);
 		taps = [];
 		calibrating = true;
 		message = 'Toca o botón (ou a barra de espazo) xusto cando oias cada clic.';
-		setTimeout(finishCalibration, (clicks[clicks.length - 1] - ctx.currentTime + 0.8) * 1000);
+		const last = clicks[clicks.length - 1];
+		setTimeout(finishCalibration, (last - ctx.currentTime + CLICK_INTERVAL) * 1000);
 	}
 
 	function tap() {

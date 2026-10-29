@@ -83,7 +83,10 @@ class FakeContext {
 }
 
 const files: Record<string, number> = { 'inst.m4a': 180, 'voc.m4a': 180 };
-const fetchBytes = async (url: string) => new ArrayBuffer(files[url]);
+const fetchBytes = async (url: string) => {
+	if (!(url in files)) throw new Error(`${url}: HTTP 404`);
+	return new ArrayBuffer(files[url]);
+};
 
 let context: FakeContext;
 let engine: AudioEngine;
@@ -181,6 +184,62 @@ describe('AudioEngine', () => {
 		expect(playing()).toHaveLength(1);
 	});
 
+	it('starts once when play is pressed twice before the audio wakes up', async () => {
+		await Promise.all([engine.play(), engine.play()]);
+
+		expect(playing()).toHaveLength(2);
+		engine.pause();
+		expect(playing()).toHaveLength(0);
+	});
+
+	it('stays paused when paused while the audio wakes up', async () => {
+		const starting = engine.play();
+		engine.pause();
+		await starting;
+
+		expect(engine.playing).toBe(false);
+		expect(playing()).toHaveLength(0);
+	});
+
+	it('does not bring back the old song when seeking during a load', async () => {
+		await engine.play();
+		const loading = engine.load({ instrumental: 'inst.m4a', vocals: 'voc.m4a' });
+		engine.seek(30);
+		await loading;
+
+		expect(playing()).toHaveLength(0);
+		await engine.play();
+		expect(playing()).toHaveLength(2);
+	});
+
+	it('keeps the song asked for last when loads overlap', async () => {
+		let release = () => {};
+		const slow = new Promise<void>((resolve) => (release = resolve));
+		const sized: Record<string, number> = { 'a.m4a': 200, 'b.m4a': 50 };
+		const picky = new AudioEngine(context as unknown as AudioContext, {
+			fetchBytes: async (url) => {
+				if (url === 'a.m4a') await slow;
+				return new ArrayBuffer(sized[url]);
+			}
+		});
+		const first = picky.load({ instrumental: 'a.m4a' });
+		await picky.load({ instrumental: 'b.m4a' });
+		release();
+		await first;
+
+		expect(picky.duration).toBe(50);
+	});
+
+	it('is left empty and paused when a load fails', async () => {
+		await engine.play();
+		await expect(engine.load({ instrumental: 'missing.m4a' })).rejects.toThrow();
+
+		expect(engine.playing).toBe(false);
+		expect(engine.duration).toBe(0);
+		await engine.play();
+		expect(playing()).toHaveLength(0);
+	});
+
 	it('stops the old song when a new one loads', async () => {
 		await engine.play();
 		await engine.load({ instrumental: 'inst.m4a', vocals: 'voc.m4a' });
@@ -191,19 +250,20 @@ describe('AudioEngine', () => {
 	});
 });
 
+// Like signalsmith-stretch, every call is a message to the worklet and answers with a promise.
 class FakePitch extends FakeNode {
 	scheduled: Record<string, unknown>[] = [];
 	running = false;
-	schedule(change: Record<string, unknown>) {
+	async schedule(change: Record<string, unknown>) {
 		this.scheduled.push(change);
 	}
-	start() {
+	async start() {
 		this.running = true;
 	}
-	stop() {
+	async stop() {
 		this.running = false;
 	}
-	latency() {
+	async latency() {
 		return 0.12;
 	}
 }
@@ -251,6 +311,32 @@ describe('AudioEngine pitch', () => {
 		expect(made).toBe(1);
 		expect(master().connections).toEqual([context.destination]);
 		expect(pitch.running).toBe(false);
+	});
+
+	it('applies the last key asked for when changes overlap', async () => {
+		await Promise.all([engine.setPitch(2), engine.setPitch(0)]);
+
+		expect(master().connections).toEqual([context.destination]);
+		expect(pitch.running).toBe(false);
+		await engine.play();
+		context.currentTime += START_DELAY + 10;
+		expect(engine.now()).toBeCloseTo(10, 6);
+	});
+
+	it('can try the shifter again after it failed to load', async () => {
+		let attempts = 0;
+		const flaky = new AudioEngine(context as unknown as AudioContext, {
+			fetchBytes,
+			createPitchNode: async () => {
+				if (attempts++ === 0) throw new Error('no AudioWorklet here');
+				return pitch as unknown as PitchNode;
+			}
+		});
+		await flaky.load({ instrumental: 'inst.m4a' });
+
+		await expect(flaky.setPitch(1)).rejects.toThrow('no AudioWorklet');
+		await flaky.setPitch(1);
+		expect(pitch.running).toBe(true);
 	});
 
 	it('keeps the shift within a sensible range', async () => {

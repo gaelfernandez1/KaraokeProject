@@ -7,11 +7,12 @@ declare module 'signalsmith-stretch' {
 		formantCompensation?: boolean;
 	}
 	export interface StretchNode extends AudioWorkletNode {
-		schedule(change: StretchChange): void;
-		start(when?: number): void;
-		stop(when?: number): void;
+		// Every method is a message to the worklet and answers with a promise.
+		schedule(change: StretchChange): Promise<unknown>;
+		start(when?: number): Promise<unknown>;
+		stop(when?: number): Promise<unknown>;
 		/** Delay added in live input mode, in seconds. */
-		latency(): number;
+		latency(): Promise<number>;
 	}
 	export default function SignalsmithStretch(
 		context: BaseAudioContext,
