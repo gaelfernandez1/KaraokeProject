@@ -10,7 +10,7 @@ from karaoke_engine.align.lyrics import parse_lyrics, singer_id
 from karaoke_engine.audio import AudioError
 from karaoke_engine.cli import main
 from karaoke_engine.make import make_package
-from karaoke_engine.steps import Stems
+from karaoke_engine.steps import Stems, Transcript, TranscriptSegment
 
 pytestmark = pytest.mark.usefixtures("ffmpeg")
 
@@ -137,11 +137,47 @@ def test_make_writes_karaoke_json_last(tmp_path: Path) -> None:
     assert not (out / "karaoke.json").exists()
 
 
-def test_cli_make_needs_lyrics(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    code = main(["make", str(_song(tmp_path)), "--out", str(tmp_path / "pkg")])
+class FakeTranscriber:
+    name = "fake-asr"
 
-    assert code == 2
-    assert "--lyrics" in capsys.readouterr().err
+    def __init__(self) -> None:
+        self.unloaded = False
+
+    def transcribe(self, vocals: Path, language: str) -> Transcript:
+        segments = (TranscriptSegment(0.5, 1.5, "Ola mar."), TranscriptSegment(2.0, 3.0, "Vai"))
+        return Transcript(language=language, segments=segments)
+
+    def model_for_language(self, language: str) -> str:
+        return "fake-asr-model@1"
+
+    def unload(self) -> None:
+        self.unloaded = True
+
+
+def test_make_without_lyrics_transcribes(tmp_path: Path) -> None:
+    transcriber = FakeTranscriber()
+
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "gl", None, separator=CopySeparator(),
+                       aligner=EvenAligner(), transcriber=transcriber)  # fmt: skip
+
+    assert [" ".join(w.text for w in line.words) for line in doc.lines] == ["Ola mar.", "Vai"]
+    assert doc.provenance.lyrics_source == "asr"
+    assert doc.provenance.asr_model == "fake-asr-model@1"
+    assert transcriber.unloaded
+
+
+def test_cli_make_without_lyrics_transcribes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.make as make_module
+
+    monkeypatch.setattr(make_module, "default_separator", CopySeparator)
+    monkeypatch.setattr(make_module, "default_aligner", EvenAligner)
+    monkeypatch.setattr(make_module, "default_transcriber", FakeTranscriber)
+    out = tmp_path / "pkg"
+
+    assert main(["make", str(_song(tmp_path)), "--out", str(out)]) == 0
+    assert load_doc(out / "karaoke.json").provenance.lyrics_source == "asr"
 
 
 def test_cli_make_reads_the_lyrics_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -168,3 +204,38 @@ def test_make_lists_singers(tmp_path: Path) -> None:
     names = {singer.id: singer.name for singer in doc.singers}
     assert names == {"s1": None, singer_id("Ana"): "Ana", singer_id("Brais"): "Brais"}
     assert [line.singer for line in doc.lines] == [singer_id("Ana"), singer_id("Brais"), "s1"]
+
+
+def test_cli_make_looks_lyrics_up_when_asked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.cli as cli_module
+    import karaoke_engine.make as make_module
+    from karaoke_engine.lyrics_lookup import FoundLyrics
+
+    monkeypatch.setattr(make_module, "default_separator", CopySeparator)
+    monkeypatch.setattr(make_module, "default_aligner", EvenAligner)
+    asked: list[tuple[str, str, float]] = []
+
+    def fake_find(title: str, artist: str, duration: float) -> FoundLyrics:
+        asked.append((title, artist, duration))
+        return FoundLyrics(text="Ola mar\n", synced=None, source_id=7, duration=duration)
+
+    monkeypatch.setattr(cli_module, "find_lyrics", fake_find)
+    out = tmp_path / "pkg"
+
+    code = main(["make", str(_song(tmp_path)), "--lrclib", "--title", "Canción", "--artist",
+                 "Grupo", "--out", str(out)])  # fmt: skip
+
+    assert code == 0
+    assert asked
+    assert asked[0][:2] == ("Canción", "Grupo")
+    doc = load_doc(out / "karaoke.json")
+    assert doc.provenance.lyrics_source == "lrclib"
+
+
+def test_cli_lrclib_needs_title_and_artist(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert main(["make", str(_song(tmp_path)), "--lrclib", "--out", str(tmp_path / "p")]) == 2
+    assert "--artist" in capsys.readouterr().err
