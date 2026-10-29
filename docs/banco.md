@@ -24,6 +24,7 @@ El audio nunca entra en git: todo lo descargado o calculado va a `bench/data/` (
 | `jamendo-<idioma>` | las de un idioma | medir un idioma |
 | `quick` | 20 fijas (5 por idioma, géneros variados), en `bench/sets/quick.txt` | prueba rápida diaria |
 | `gl` | canciones en gallego con licencia libre y tiempos validados de oído (`bench/sets/gl/`) | la meta principal |
+| `stress` | 24 canciones de `quick` con perrerías de las canciones reales (instrumental de 30 s, adlibs, ecos, letra «de web» con cabeceras y `x2`, una línea que falta o dos que sobran), con los tiempos exactos de JamendoLyrics desplazados; receta en `bench/sets/stress.toml`, se construye con `fetch --set stress` | robustez del alineador, por grupo |
 | `private` | tus canciones, en `bench/data/private/` | solo en local |
 | `<conjunto>/<id>` | una canción suelta | depurar |
 

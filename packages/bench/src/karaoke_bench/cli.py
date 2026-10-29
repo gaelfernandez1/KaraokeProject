@@ -23,6 +23,7 @@ from karaoke_bench.results import load_results
 from karaoke_bench.runner import RunOptions, run
 from karaoke_bench.sets import SetError, Song, load_set
 from karaoke_bench.srt import parse_srt, reference_from_srt
+from karaoke_bench.stress import build_stress
 from karaoke_bench.textnorm import lyrics_lines
 
 
@@ -36,7 +37,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
 
     fetch = commands.add_parser("fetch", help="download a song set into bench/data")
-    fetch.add_argument("--set", dest="set_name", default="all", help="jamendo, gl or all")
+    fetch.add_argument("--set", dest="set_name", default="all", help="jamendo, gl, stress or all")
 
     run_cmd = commands.add_parser("run", help="run a pipeline over a set and write a report")
     run_cmd.add_argument("--pipeline", type=Path, required=True, help="pipeline TOML file")
@@ -110,7 +111,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _fetch(paths: BenchPaths, set_name: str) -> int:
     manifest_sets = sorted(p.parent.name for p in paths.sets.glob("*/manifest.toml"))
-    if set_name not in ("all", "jamendo", *manifest_sets):
+    if set_name not in ("all", "jamendo", "stress", *manifest_sets):
         print(f"error: unknown set '{set_name}'", file=sys.stderr)
         return 2
     if set_name in ("all", "jamendo"):
@@ -118,6 +119,8 @@ def _fetch(paths: BenchPaths, set_name: str) -> int:
     for name in manifest_sets:
         if set_name in ("all", name):
             print(f"{name}: {len(fetch_manifest_set(name, paths))} songs")
+    if set_name in ("all", "stress"):
+        print(f"stress: {len(build_stress(paths, paths.sets / 'stress.toml'))} songs")
     return 0
 
 

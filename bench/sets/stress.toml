@@ -1,0 +1,160 @@
+# Stress set: songs of the quick set with the trouble real karaoke songs bring, built locally
+# with `karaoke-bench fetch --set stress` (needs the jamendo set). Every edit knows how far it
+# moves the audio, so the hand-made word timings stay exact. One group per kind of trouble, one
+# song per language in each group:
+#   gap           30 s of the song's own instrumental inserted before a middle line
+#   adlib         a sung phrase from elsewhere pasted into a pause (not in the lyrics there)
+#   echo          4 lines echoed 0.8 s later at -8 dB, like backing vocals answering
+#   web           lyrics as lyrics sites give them: section labels, "x2" and "(yeah)" ad-libs
+#   missing-line  one sung line left out of the lyrics
+#   extra-lines   two lines of another song added to the lyrics, never sung
+# Bump `version` after changing anything here or in stress.py: songs are rebuilt.
+version = 1
+
+[[songs]]
+id = "gap-kinematic"
+source = "Kinematic_-_Peyote"
+group = "gap"
+seed = 1
+
+[[songs]]
+id = "gap-esencia"
+source = "Esencia_-_NandoMalo_"
+group = "gap"
+seed = 2
+
+[[songs]]
+id = "gap-keine-lust"
+source = "Keine_Lust_-_Jonny_M"
+group = "gap"
+seed = 3
+
+[[songs]]
+id = "gap-capotes"
+source = "Capotes_à_un_Franc_-_elmanu"
+group = "gap"
+seed = 4
+
+[[songs]]
+id = "adlib-ridgway"
+source = "Ridgway_-_Fire_Inside"
+group = "adlib"
+seed = 5
+
+[[songs]]
+id = "adlib-te-recuerdo"
+source = "Te_Recuerdo_-_Wilson_Way"
+group = "adlib"
+seed = 6
+
+[[songs]]
+id = "adlib-der-musiker"
+source = "Der_Musiker_-_d-music"
+group = "adlib"
+seed = 7
+
+[[songs]]
+id = "adlib-pas-que-tes-pas"
+source = "Pas_que_tes_pas_-_AZUL"
+group = "adlib"
+seed = 8
+
+[[songs]]
+id = "echo-cortez"
+source = "Cortez_-_Feel__Stripped_"
+group = "echo"
+seed = 9
+
+[[songs]]
+id = "echo-hablame"
+source = "Háblame_-_(Talk_to_me)_-_Brunela_Crochenci"
+group = "echo"
+seed = 10
+
+[[songs]]
+id = "echo-cafe-jenseitz"
+source = "Cafe_Jenseitz_Bebelstraße_-_kangaroo.musique"
+group = "echo"
+seed = 11
+
+[[songs]]
+id = "echo-mere-nature"
+source = "Mère_nature_-_Law'"
+group = "echo"
+seed = 12
+
+[[songs]]
+id = "web-wordsmith"
+source = "Wordsmith_-_The_Statement"
+group = "web"
+seed = 13
+
+[[songs]]
+id = "web-10-disparan"
+source = "10._Disparan_-_criatura"
+group = "web"
+seed = 14
+
+[[songs]]
+id = "web-1-freak"
+source = "1_Freak_-_Automatisch_Gekommen"
+group = "web"
+seed = 15
+
+[[songs]]
+id = "web-confession"
+source = "Confession_-_Quesabe"
+group = "web"
+seed = 16
+
+[[songs]]
+id = "missing-line-the-rinn"
+source = "The_Rinn_-_Voices__2017_Version_"
+group = "missing-line"
+seed = 17
+
+[[songs]]
+id = "missing-line-baila"
+source = "Baila_-_Alfonso_Lugo"
+group = "missing-line"
+seed = 18
+
+[[songs]]
+id = "missing-line-sehnsucht"
+source = "Sehnsucht-Unplugged_-_REH-TORTE"
+group = "missing-line"
+seed = 19
+
+[[songs]]
+id = "missing-line-le-musee"
+source = "Le_musée_d'air_contemporain_-_KPTN"
+group = "missing-line"
+seed = 20
+
+[[songs]]
+id = "extra-lines-kinematic"
+source = "Kinematic_-_Peyote"
+group = "extra-lines"
+seed = 21
+foreign = "Wordsmith_-_The_Statement"
+
+[[songs]]
+id = "extra-lines-esencia"
+source = "Esencia_-_NandoMalo_"
+group = "extra-lines"
+seed = 22
+foreign = "Baila_-_Alfonso_Lugo"
+
+[[songs]]
+id = "extra-lines-der-musiker"
+source = "Der_Musiker_-_d-music"
+group = "extra-lines"
+seed = 23
+foreign = "Keine_Lust_-_Jonny_M"
+
+[[songs]]
+id = "extra-lines-mere-nature"
+source = "Mère_nature_-_Law'"
+group = "extra-lines"
+seed = 24
+foreign = "Confession_-_Quesabe"
