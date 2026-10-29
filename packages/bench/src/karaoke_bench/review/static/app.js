@@ -25,6 +25,7 @@ let selectedWord = null; // [line, word]
 let dirty = false;
 const urls = {};
 let source = "mix";
+let currentKey = "";
 
 async function load() {
   [ref, song, peaks] = await Promise.all(
@@ -102,24 +103,34 @@ function lineAt(t) {
 
 function renderCurrent(t, index) {
   const line = ref.lines[index];
+  const sung = line.words.filter((word) => word.start <= t).length;
+  // Rebuilding the spans on every frame would swallow clicks, so only redraw on a change.
+  const key = [index, sung, selectedWord, line.words.map((w) => w.start).join()].join("|");
+  if (key === currentKey) return;
+  currentKey = key;
   currentEl.replaceChildren(
     ...line.words.map((word, w) => {
       const span = document.createElement("span");
       span.className = "word";
+      span.dataset.line = index;
+      span.dataset.word = w;
       if (word.start <= t) span.classList.add("sung");
       if (selectedWord && selectedWord[0] === index && selectedWord[1] === w) {
         span.classList.add("selected");
       }
       span.textContent = word.text + " ";
-      span.addEventListener("click", () => {
-        selectedWord = [index, w];
-        selectedLine = index;
-      });
       return span;
     }),
   );
   if (!line.words.length) currentEl.textContent = line.text;
 }
+
+currentEl.addEventListener("pointerdown", (e) => {
+  const span = e.target.closest(".word");
+  if (!span) return;
+  selectedWord = [Number(span.dataset.line), Number(span.dataset.word)];
+  selectedLine = selectedWord[0];
+});
 
 function drawWave(t) {
   const ctx = canvas.getContext("2d");
@@ -253,18 +264,29 @@ function toggleSource() {
   const t = audio.currentTime;
   const playing = !audio.paused;
   source = source === "mix" ? "vocals" : "mix";
+  const rate = audio.playbackRate;
   audio.src = urls[source];
   audio.currentTime = t;
+  audio.playbackRate = rate; // loading a new source resets it
   if (playing) audio.play();
   buttons.source.textContent = `Escoitando: ${source === "mix" ? "mestura" : "só a voz"}`;
 }
 
 document.addEventListener("keydown", (e) => {
-  if (e.target.isContentEditable) return;
   if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
     e.preventDefault();
+    if (e.target.isContentEditable) e.target.blur();
     save();
-  } else if (e.key === " ") {
+    return;
+  }
+  if (e.target.isContentEditable) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.target.blur();
+    }
+    return;
+  }
+  if (e.key === " ") {
     e.preventDefault();
     audio.paused ? audio.play() : audio.pause();
   } else if (e.key === "1") setStatus(selectedLine, "ok");
