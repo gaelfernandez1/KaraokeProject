@@ -84,7 +84,7 @@ el silencio. Fuera de voz pasó del 6–7 % al 0,1 %.
 | stress (24): ≤ 0,3 s · media | 98,0 % · 0,124 s | **99,2 % · 0,068 s** | — |
 | Fuera de voz (stress) | 8,8 % | 0,1 % | — |
 | Canción de 4 min, con letra (con cargas) | 60 s | 59 s | ≤ 2 min ✓ |
-| Alinear: VRAM pico / RAM pico | 1,6 / 4,8 GB | 1,6 / 2,7 GB con un modelo; 4,4 GB si un proceso carga cuatro idiomas seguidos | ≤ 3 / ≤ 4 GB: VRAM ✓; RAM ✓ con un modelo, ✗ con varios (arreglo pendiente de medir) |
+| Alinear: VRAM pico / RAM pico | 1,6 / 4,8 GB | 1,6 / 2,7 GB con un modelo; 3,7 GB si un proceso carga cuatro idiomas seguidos | ≤ 3 / ≤ 4 GB ✓ |
 
 - **Mediana**: no baja de 0,03 s porque el modelo inglés grande pone los inicios unos 7 ms más
   tarde. La línea base tampoco la cumplía (0,033 s); la media y el % sí mejoran.
@@ -147,7 +147,9 @@ Con las dos validadas (624 palabras):
 - C5/C7: las líneas de coro llevan `role: "backing"` (campo extra; el contrato lo formalizará con
   una versión menor cuando llegue la segunda pasada de coros). `confidence` por palabra sirve para
   marcar dudas en el editor.
-- C8: alinear una canción cuesta unos 5 s y unos 2,7 GB de RAM con un modelo; los modelos se
-  bajan una vez a la caché de Hugging Face.
+- C8: alinear una canción cuesta unos 5 s y unos 2,7 GB de RAM con un modelo. Al cambiar de
+  idioma, el modelo anterior se libera del todo (también la memoria del proceso): cuatro idiomas
+  seguidos se quedan en 3,7 GB (antes, 4,4 GB). Los modelos se bajan una vez a la caché de Hugging
+  Face.
 - Pendiente en C4: coros solapados y repeticiones que la letra no dice, transcripción sin letra
   (gallego), `parts` (sílabas) y `karaoke make`.
