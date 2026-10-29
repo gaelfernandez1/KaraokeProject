@@ -72,6 +72,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     package.add_argument("--out", type=Path, required=True)
 
+    tri = commands.add_parser(
+        "triangulate", help="validate a drafted reference where several aligners agree"
+    )
+    tri.add_argument("song", help="set/song, e.g. gl/some-song")
+    tri.add_argument("--pipelines", type=Path, nargs="+", required=True)
+    tri.add_argument("--tolerance", type=float, default=0.15, help="seconds (default 0.15)")
+
     import_srt = commands.add_parser(
         "import-srt", help="make a private song's reference from word-timed subtitles"
     )
@@ -91,6 +98,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _realign(paths, _one_song(args.song, paths), args.pipeline)
         if args.command == "package":
             return _package(paths, _one_song(args.song, paths), args.pipeline, args.out)
+        if args.command == "triangulate":
+            song = _one_song(args.song, paths)
+            return _triangulate(paths, song, args.pipelines, args.tolerance)
         if args.command == "import-srt":
             return _import_srt(paths, args.song, args.srt)
         if args.command == "review":
@@ -207,6 +217,31 @@ def _package(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> i
     stems = separated_stems(song, load_pipeline(pipeline_path), paths)
     doc = build_package(song, ref, stems, out, credits)
     print(f"{out}: {len(doc.lines)} lines")
+    return 0
+
+
+def _triangulate(paths: BenchPaths, song: Song, pipelines: list[Path], tolerance: float) -> int:
+    from karaoke_bench.runner import run_lyrics_stages
+    from karaoke_bench.triangulate import triangulate
+
+    target = reference_path(song, paths)
+    ref = load_reference(target)
+    texts = [line.text for line in ref.lines]
+    runs = []
+    for pipeline_path in pipelines:
+        pipeline = load_pipeline(pipeline_path)
+        _, aligned, _ = run_lyrics_stages([song], pipeline, paths, lines={song.song_id: texts})
+        outcome = aligned[song.song_id]
+        if outcome.output is None:
+            raise DraftError(f"{pipeline.name} failed on {song.song_id}: {outcome.error}")
+        runs.append(outcome.output)
+    fixed = triangulate(ref, runs, tolerance)
+    dump_reference(fixed, target)
+    unsure = [line for line in fixed.lines if line.status == "unsure"]
+    state = "validated" if fixed.approved else "not validated"
+    print(f"{target}: {state}, {len(unsure)} lines to listen to")
+    for line in unsure:
+        print(f"  {line.start:7.2f}  {line.text}")
     return 0
 
 

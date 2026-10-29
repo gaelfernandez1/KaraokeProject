@@ -162,6 +162,15 @@ No hay tiempos publicados para canciones en gallego, así que se crean así:
    las anclas. Esas líneas quedan como «revisar» para volver a escucharlas.
 4. Cuando no queda nada sin revisar ni mal, el botón **Canción validada** la da por buena.
 
+**Sin escuchar todo**: `uv run karaoke-bench triangulate gl/<id> --pipelines a.toml b.toml c.toml`
+alinea la letra con varios alineadores independientes (modelos distintos). Las líneas en borrador
+en las que todos ponen cada palabra a ≤ 0,15 s de la mediana quedan «bien», con los tiempos de la
+mediana y una nota `auto: …`. El resto quedan «dudosas» y el comando las lista: son las únicas que
+hace falta escuchar en la página de revisión. Si ≥ 70 % de las palabras quedan bien, la canción
+cuenta como validada. Las líneas ya revisadas a oído no se tocan. Ojo: puntuar después uno de esos
+alineadores contra esa referencia lo favorece un poco; mejor usar alineadores distintos del que se
+mide.
+
 Solo cuentan para la sincronía las líneas marcadas «bien», y solo cuando la canción está validada:
 hasta entonces el informe la marca «sin validar» y no entra en la sincronía. El texto corregido en la
 página es el que vale para el WER y el que recibe el alineador. Una referencia validada de oído es
