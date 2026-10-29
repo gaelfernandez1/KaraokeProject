@@ -1,6 +1,6 @@
 # 006 · Coros en el documento de karaoke (contrato 1.1.0)
 
-- **Fecha**: 30/10/2026
+- **Fecha**: 29/10/2026
 - **Estado**: propuesta (área C4); se aprueba con su PR
 - **Afecta a**: C5 y C7 (pintan la letra), C6 (el MP4), C8 (guarda paquetes)
 
@@ -32,12 +32,13 @@ segunda pasada que alinea cada coro solo, en el tramo de su línea principal, y 
 
 En estas canciones los paréntesis son sobre todo ecos y respuestas justo después de la voz
 principal, y alineados solos se pegan a las mismas palabras de la voz principal. La segunda pasada
-queda como opción (`overlap_backing`), desactivada; para activarla por defecto hace falta escucharla
-en canciones con coros simultáneos.
+queda como opción, desactivada: `karaoke make … --overlap-backing` (o `overlap_backing = true` en una
+pipeline). Para activarla por defecto hace falta escucharla en canciones con coros simultáneos.
 
 ## Consecuencias
 
-- `schemas/karaoke.schema.json` y los tipos TS se regeneran (`make contracts`); en TS, `role` es
-  obligatorio porque el motor siempre lo escribe. Quien lea paquetes 1.0.0 en el navegador debe
-  tratar un `role` ausente como `"lead"`.
+- `schemas/karaoke.schema.json` y los tipos TS se regeneran (`make contracts`). En el esquema y en
+  TS, `role` es obligatorio porque el motor siempre lo escribe. Por eso un documento 1.0.0 no pasa
+  el esquema 1.1.0 tal cual: quien valide con el esquema (ajv) o lea en TS un paquete 1.0.0 debe
+  poner antes `role: "lead"` en cada línea. Los modelos de Python ya lo hacen solos.
 - C5: pintar las líneas `backing` de otra forma y permitir que convivan con la línea principal.

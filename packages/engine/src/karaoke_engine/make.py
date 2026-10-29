@@ -20,6 +20,7 @@ from karaoke_contracts import (
     Provenance,
     Singer,
     dump_doc,
+    validate_doc,
     validate_package,
 )
 from karaoke_engine.align.aligner import LyricsAligner
@@ -30,14 +31,16 @@ from karaoke_engine.separation import RoformerSeparator
 from karaoke_engine.steps import Separator, TextAligner, Transcriber
 from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber
 
+_LANGUAGE = re.compile(r"^[a-z]{2,3}$")
+
 
 def default_separator() -> Separator:
     """The separator chosen with the bench (decision 004): Kim's Mel-Band RoFormer, 8 s chunks."""
     return RoformerSeparator(model="vocals_mel_band_roformer.ckpt", segment_size=801)
 
 
-def default_aligner() -> TextAligner:
-    return LyricsAligner()
+def default_aligner(**options: Any) -> TextAligner:
+    return LyricsAligner(**options)
 
 
 def default_transcriber() -> Transcriber:
@@ -54,10 +57,16 @@ def make_package(
     aligner: TextAligner | None = None,
     transcriber: Transcriber | None = None,
     lyrics_source: Literal["user", "lrclib"] = "user",
+    overlap_backing: bool = False,
     title: str | None = None,
     artist: str | None = None,
 ) -> KaraokeDoc:
-    probe(source)  # fails early, and clearly, on files without audio
+    # Everything that can fail cheaply fails before the long steps start.
+    if not _LANGUAGE.match(language):
+        raise ValueError(f"language must be a two or three letter code like gl, not {language!r}")
+    probe(source)  # files without audio
+    if lyrics is not None and not parse_lyrics(lyrics):
+        raise ValueError("the lyrics have no sung lines (only labels or symbols)")
     if lyrics is None:
         transcriber = transcriber or default_transcriber()
         # A model converted on first use needs the memory before anything else is loaded.
@@ -65,8 +74,11 @@ def make_package(
         if callable(prepare_model):
             prepare_model(language)
     separator = separator or default_separator()
-    aligner = aligner or default_aligner()
+    if aligner is None:
+        aligner = default_aligner(overlap_backing=True) if overlap_backing else default_aligner()
     out_dir.mkdir(parents=True, exist_ok=True)
+    # An old document next to new audio would look like a finished package.
+    (out_dir / "karaoke.json").unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(dir=out_dir, prefix=".make-") as tmp:
         work = Path(tmp)
         mix = decode(source, work / "mix.wav")
@@ -75,7 +87,7 @@ def make_package(
         asr_model = None
         source_kind: Literal["user", "asr", "lrclib"] = lyrics_source
         if lyrics is None:
-            transcriber = transcriber or default_transcriber()
+            assert transcriber is not None
             transcript = transcriber.transcribe(stems.vocals, language)
             asr_model = _model_name(transcriber, language)
             _unload(transcriber)
@@ -104,6 +116,9 @@ def make_package(
             language_fallbacks=_fallbacks(language),
         ),
     )
+    issues = validate_doc(doc)
+    if issues:
+        raise ValueError("; ".join(f"{i.path}: {i.message}" for i in issues[:5]))
     staged = out_dir / ".karaoke.json.tmp"
     dump_doc(doc, staged)
     staged.replace(out_dir / "karaoke.json")

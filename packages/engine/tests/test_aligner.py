@@ -244,3 +244,12 @@ def test_unsung_backing_line_is_left_out(tmp_path: Path) -> None:
     lines = _aligner(peaks, overlap_backing=True).align_text(vocals, "ola mar (yeah)\n", "gl")
 
     assert [line.role for line in lines] == ["lead"]
+
+
+def test_parts_skip_words_with_a_letter_the_model_lacks(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = _spell("sla", 20)
+
+    [line] = _aligner(peaks).align_text(vocals, "søla\n", "gl")
+
+    assert line.words[0].parts == []

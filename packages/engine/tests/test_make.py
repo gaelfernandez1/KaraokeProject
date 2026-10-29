@@ -239,3 +239,69 @@ def test_cli_lrclib_needs_title_and_artist(
 ) -> None:
     assert main(["make", str(_song(tmp_path)), "--lrclib", "--out", str(tmp_path / "p")]) == 2
     assert "--artist" in capsys.readouterr().err
+
+
+def test_make_drops_an_old_document_first(tmp_path: Path) -> None:
+    out = tmp_path / "pkg"
+    make_package(_song(tmp_path), out, "gl", "Ola\n", separator=CopySeparator(),
+                 aligner=EvenAligner())  # fmt: skip
+
+    with pytest.raises(RuntimeError):
+        make_package(_song(tmp_path), out, "gl", "Ola\n", separator=CopySeparator(),
+                     aligner=EvenAligner(fail=True))  # fmt: skip
+
+    assert not (out / "karaoke.json").exists()
+
+
+def test_make_rejects_lyrics_without_sung_lines(tmp_path: Path) -> None:
+    separator = CopySeparator()
+
+    with pytest.raises(ValueError, match="no sung lines"):
+        make_package(_song(tmp_path), tmp_path / "pkg", "gl", "[Estribillo]\n♪\n",
+                     separator=separator, aligner=EvenAligner())  # fmt: skip
+
+
+def test_make_rejects_a_bad_language_before_working(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="language"):
+        make_package(_song(tmp_path), tmp_path / "pkg", "Galego", "Ola\n",
+                     separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
+
+
+def test_cli_reports_runtime_errors_cleanly(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import karaoke_engine.make as make_module
+
+    monkeypatch.setattr(make_module, "default_separator", CopySeparator)
+    monkeypatch.setattr(make_module, "default_aligner", lambda **kw: EvenAligner(fail=True))
+    lyrics = tmp_path / "letra.txt"
+    lyrics.write_text("Ola\n", encoding="utf-8")
+
+    code = main(
+        ["make", str(_song(tmp_path)), "--lyrics", str(lyrics), "--out", str(tmp_path / "p")]
+    )
+
+    assert code == 1
+    assert "out of memory" in capsys.readouterr().err
+
+
+def test_cli_can_let_backing_vocals_overlap(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.make as make_module
+
+    seen: list[dict[str, object]] = []
+
+    def aligner(**options: object) -> EvenAligner:
+        seen.append(options)
+        return EvenAligner()
+
+    monkeypatch.setattr(make_module, "default_separator", CopySeparator)
+    monkeypatch.setattr(make_module, "default_aligner", aligner)
+    lyrics = tmp_path / "letra.txt"
+    lyrics.write_text("Ola (mar)\n", encoding="utf-8")
+
+    main(["make", str(_song(tmp_path)), "--lyrics", str(lyrics), "--out", str(tmp_path / "p"),
+          "--overlap-backing"])  # fmt: skip
+
+    assert seen == [{"overlap_backing": True}]

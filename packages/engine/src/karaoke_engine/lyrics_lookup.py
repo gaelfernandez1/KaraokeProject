@@ -65,7 +65,8 @@ def _ask(url: str, fetch: Fetch, wait: Callable[[float], None]) -> list[dict[str
             return data if isinstance(data, list) else []
         if status not in (429, 502, 503):
             raise OSError(f"LRCLIB answered {status}")
-        wait(2.0 * (attempt + 1))
+        if attempt + 1 < _ATTEMPTS:
+            wait(2.0 * (attempt + 1))
     raise OSError("LRCLIB is busy; try again later or pass the lyrics with --lyrics")
 
 

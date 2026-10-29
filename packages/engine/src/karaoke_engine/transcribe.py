@@ -8,6 +8,8 @@ loops on repeats, so segments where the separated voice is silent and runaway re
 
 import ctypes
 import importlib.util
+import re
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -22,9 +24,17 @@ from karaoke_engine.align.audio import SAMPLE_RATE, load_mono16k
 from karaoke_engine.steps import Transcript, TranscriptSegment
 
 CACHE = Path.home() / ".cache" / "karaoke" / "models" / "ct2"
+_NOTE_BRACKETS = re.compile(r"\[[^\]]*\]|[♪♫]")
+_NOTE_WORD = re.compile(r"\(\s*[^()\s]+\s*\)")
+_REPEAT_MARK = re.compile(r"^[x\u00d7]\d+$", re.IGNORECASE)
 _HOP = 0.02
 # A segment needs at least this share of voiced time; Whisper fills silences with stock phrases.
 MIN_VOICE_SHARE = 0.3
+# Repeats and loops only count as made up where the voice sounds less than this: a chorus sung
+# over and over is real.
+_SURE_VOICE_SHARE = 0.6
+# Converting a large-v3 holds two copies of it at once (6.7 GB at peak).
+CONVERSION_MEMORY_GB = 6.0
 # The same text this many times in a row is a loop; and a long run of one or two words is too.
 _MAX_SAME_IN_A_ROW = 2
 _LOOP_WORDS = 10
@@ -68,7 +78,7 @@ DEFAULT_BY_LANGUAGE: dict[str, str] = {"gl": "hitz-large-v3-gl"}
 class WhisperTranscriber:
     name = "whisper"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "2"
+    version = "3"
 
     def __init__(
         self,
@@ -130,9 +140,11 @@ class WhisperTranscriber:
         kept: list[TranscriptSegment] = []
         for segment in segments:
             text = " ".join(segment.text.split())
-            if not text or _voice_share(active, segment.start, segment.end) < MIN_VOICE_SHARE:
+            share = _voice_share(active, segment.start, segment.end)
+            if not text or share < MIN_VOICE_SHARE:
                 continue
-            if _is_loop(text) or _repeats(kept, text) >= _MAX_SAME_IN_A_ROW:
+            looping = _is_loop(text) or _repeats(kept, text) >= _MAX_SAME_IN_A_ROW
+            if looping and share < _SURE_VOICE_SHARE:
                 continue
             kept.append(TranscriptSegment(segment.start, segment.end, text))
         return Transcript(language=language, segments=tuple(kept))
@@ -173,12 +185,22 @@ class LineSegmenter:
     def segment(self, transcript: Transcript) -> list[str]:
         lines: list[str] = []
         for segment in transcript.segments:
-            for sentence in _sentences(segment.text):
+            for sentence in _sentences(_without_notes(segment.text)):
                 words = sentence.split()
                 chunks = -(-len(words) // self.MAX_WORDS)
                 size = -(-len(words) // chunks)
                 lines += [" ".join(words[i : i + size]) for i in range(0, len(words), size)]
         return lines
+
+
+def _without_notes(text: str) -> str:
+    """Drops what transcribers add that is not sung ([Música], (risas), ♪) and anything the lyrics
+    parser would read as a label, a repeat mark or a backing part."""
+    text = _NOTE_BRACKETS.sub(" ", text)
+    text = _NOTE_WORD.sub(" ", text)
+    text = text.replace("(", " ").replace(")", " ")
+    words = [w for w in text.split() if not _REPEAT_MARK.match(w) and any(c.isalnum() for c in w)]
+    return " ".join(words)
 
 
 def _sentences(text: str) -> list[str]:
@@ -205,8 +227,9 @@ def prepare(name: str) -> Path:
     """Converts a transformers model to CTranslate2 once, in a process of its own.
 
     The converter holds the PyTorch model and its converted copy at once (6.7 GB for a large-v3):
-    run alone, all of it goes back to the system when it ends. `karaoke make` prepares the model
-    before loading anything else.
+    run alone, all of it goes back to the system when it ends. It writes into a side folder that
+    only takes the final name once the conversion has finished, so an interrupted one is redone.
+    `karaoke make` prepares the model before loading anything else.
     """
     spec = MODELS[name]
     if spec.converted:
@@ -214,11 +237,40 @@ def prepare(name: str) -> Path:
     target = CACHE / f"{name}-{spec.revision[:12]}"
     if (target / "model.bin").is_file():
         return target
+    free = _available_memory_gb()
+    if free < CONVERSION_MEMORY_GB:
+        raise ModelError(
+            f"converting {spec.repo} the first time needs about {CONVERSION_MEMORY_GB:.0f} GB of "
+            f"free memory and {free:.1f} GB are free: close other programs and try again"
+        )
+    print(f"First use of {spec.repo}: downloading and converting it once.", file=sys.stderr)
     source = _download(spec)
-    subprocess.run(
-        [sys.executable, "-m", "karaoke_engine.transcribe", str(source), str(target)], check=True
-    )
+    side = target.with_name(target.name + ".partial")
+    shutil.rmtree(side, ignore_errors=True)
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "karaoke_engine.transcribe", str(source), str(side)],
+            check=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        shutil.rmtree(side, ignore_errors=True)
+        raise ModelError(f"could not convert {spec.repo} (exit code {exc.returncode})") from exc
+    side.replace(target)
     return target
+
+
+class ModelError(RuntimeError):
+    pass
+
+
+def _available_memory_gb() -> float:
+    try:
+        for row in Path("/proc/meminfo").read_text().splitlines():
+            if row.startswith("MemAvailable:"):
+                return int(row.split()[1]) / 2**20
+    except OSError:
+        pass
+    return float("inf")
 
 
 def _download(spec: WhisperSpec) -> Path:

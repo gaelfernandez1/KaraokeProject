@@ -1,6 +1,7 @@
 """The `karaoke` command. `render` (video) comes later."""
 
 import argparse
+import subprocess
 import sys
 from collections.abc import Sequence
 from pathlib import Path
@@ -42,6 +43,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     make.add_argument("--title")
     make.add_argument("--artist")
     make.add_argument(
+        "--overlap-backing",
+        action="store_true",
+        help="let backing vocals that do not fit in their written place overlap the lead line",
+    )
+    make.add_argument(
         "--lrclib",
         action="store_true",
         help="look the lyrics up on lrclib.net (sends --title and --artist, both needed)",
@@ -81,9 +87,10 @@ def _make(args: argparse.Namespace) -> int:
                 lyrics, source = found.text, "lrclib"
         doc = make_package(
             args.source, out, args.lang, lyrics, title=args.title, artist=args.artist,
-            lyrics_source=source,
+            lyrics_source=source, overlap_backing=args.overlap_backing,
         )  # fmt: skip
-    except (OSError, ValueError, AudioError) as exc:
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+        # RuntimeError covers AudioError, a model that fails to convert, and CUDA out of memory.
         print(f"error: {exc}", file=sys.stderr)
         return 1
     words = sum(len(line.words) for line in doc.lines)
