@@ -99,7 +99,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         "source", type=Path, help="a video, or a song file with cover art, or a picture"
     )
 
+    clitics = commands.add_parser(
+        "join-clitics",
+        help="write Galician pronouns onto their verb (dixo lle → díxolle) in a package",
+    )
+    clitics.add_argument("package", type=Path)
+
     args = parser.parse_args(argv)
+    if args.command == "join-clitics":
+        return _join_clitics(args.package)
     if args.command == "render":
         return _render(args)
     if args.command == "background":
@@ -234,6 +242,29 @@ def _background(package: Path, source: Path) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     print(f"{package}: background {doc.video.background if doc.video else None}, cover {doc.cover}")
+    return 0
+
+
+def _join_clitics(package: Path) -> int:
+    from karaoke_contracts import dump_doc, load_doc
+    from karaoke_engine.align.clitics import join_clitics
+
+    path = package / "karaoke.json"
+    try:
+        doc = load_doc(path)
+        if doc.language != "gl":
+            print(f"{package}: the lyrics are not Galician ({doc.language}); nothing to do")
+            return 0
+        lines = join_clitics(doc.lines)
+        joined = sum(len(a.words) - len(b.words) for a, b in zip(doc.lines, lines, strict=True))
+        if joined:
+            staged = package / ".karaoke.json.tmp"
+            dump_doc(doc.model_copy(update={"lines": lines}), staged)
+            staged.replace(path)
+    except (OSError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"{package}: {joined} pronouns joined to their verb")
     return 0
 
 

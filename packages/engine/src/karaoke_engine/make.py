@@ -28,6 +28,7 @@ from karaoke_contracts import (
     validate_package,
 )
 from karaoke_engine.align.aligner import LyricsAligner
+from karaoke_engine.align.clitics import join_clitics
 from karaoke_engine.align.lyrics import parse_lyrics, singer_id
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL
 from karaoke_engine.audio import decode, package_audio, probe
@@ -105,6 +106,8 @@ def make_package(
         step("align")
         lines = aligner.align_text(stems.vocals, lyrics, language)
         _unload(aligner)
+        if language == "gl":
+            lines = join_clitics(lines)
         step("encode")
         refs = package_audio(mix, stems, out_dir)
         duration = probe(mix).duration

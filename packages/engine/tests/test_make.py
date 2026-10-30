@@ -410,3 +410,32 @@ def test_a_failing_cover_or_background_does_not_lose_the_package(
     assert doc.video is None
     assert doc.cover is None
     assert validate_package(out) == []
+
+
+def test_make_joins_galician_pronouns_to_their_verb(tmp_path: Path) -> None:
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "gl", "Collín che o mar\n",
+                       separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
+
+    assert [w.text for w in doc.lines[0].words] == ["Collinche", "o", "mar"]
+
+
+def test_make_leaves_other_languages_alone(tmp_path: Path) -> None:
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "es", "Dime te quiero\n",
+                       separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
+
+    assert [w.text for w in doc.lines[0].words] == ["Dime", "te", "quiero"]
+
+
+def test_cli_joins_pronouns_in_a_made_package(tmp_path: Path) -> None:
+    out = tmp_path / "pkg"
+    make_package(_song(tmp_path), out, "es", "Dixo lle\n", separator=CopySeparator(),
+                 aligner=EvenAligner())  # fmt: skip
+    doc = load_doc(out / "karaoke.json")
+    (out / "karaoke.json").write_text(
+        doc.model_copy(update={"language": "gl"}).model_dump_json(), encoding="utf-8"
+    )
+
+    assert main(["join-clitics", str(out)]) == 0
+
+    assert [w.text for w in load_doc(out / "karaoke.json").lines[0].words] == ["Díxolle"]
+    assert validate_package(out) == []
