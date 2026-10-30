@@ -8,6 +8,7 @@ the song, as on the web.
 Render with ffmpeg's `subtitles` filter and `fontsdir=` set to `themes.fonts_dir()`.
 """
 
+from collections.abc import Sequence
 from itertools import pairwise
 
 from karaoke_contracts import KaraokeDoc, Theme
@@ -51,7 +52,7 @@ def _cs(seconds: float) -> int:
     return max(0, round(seconds * 100))
 
 
-def _stamp(cs: int) -> str:
+def ass_time(cs: int) -> str:
     hours, rest = divmod(cs, 360000)
     minutes, rest = divmod(rest, 6000)
     seconds, hundredths = divmod(rest, 100)
@@ -63,12 +64,12 @@ def _one_line(text: str) -> str:
     return " ".join(text.splitlines())
 
 
-def _escape(text: str) -> str:
+def escape_text(text: str) -> str:
     # Braces open override blocks and a backslash starts a tag: neither may reach libass raw.
     return _one_line(text).replace("{", "(").replace("}", ")").replace("\\", "/")
 
 
-def _num(value: float) -> str:
+def ass_number(value: float) -> str:
     return f"{value:.2f}".rstrip("0").rstrip(".")
 
 
@@ -99,28 +100,34 @@ def _karaoke(row: Row, start_cs: int, theme: Theme) -> str:
                 out.append(f"{{\\k{gap}}}")
             cursor = max(cursor, begin)
             tag = "k" if word_mode else "kf"
-            out.append(f"{{\\{tag}{max(0, finish - cursor)}}}{_escape(text)}")
+            out.append(f"{{\\{tag}{max(0, finish - cursor)}}}{escape_text(text)}")
             cursor = max(cursor, finish)
     return "".join(out)
 
 
 def _look(row: Row, row_px: float, theme: Theme, m: FontMetrics) -> str:
     """Size, sung colour, border and shadow of a row (its alphas go apart: they can change)."""
+    return look_tags(row.color, row_px, theme, m)
+
+
+def look_tags(color: str, px: float, theme: Theme, m: FontMetrics) -> str:
+    """Size, main colour, border and shadow of text `px` pixels per em in the theme's style."""
     colors = theme.colors
-    sung, _ = ass_color(row.color)
-    tags = f"\\fs{m.ass_font_size(row_px):.2f}\\1c{sung}"
+    row_px = px
+    main, _ = ass_color(color)
+    tags = f"\\fs{m.ass_font_size(row_px):.2f}\\1c{main}"
     if colors.box is not None:
-        return tags + f"\\bord{_num(0.18 * row_px)}\\shad0"
+        return tags + f"\\bord{ass_number(0.18 * row_px)}\\shad0"
     if theme.layout.outline_width > 0:
-        tags += f"\\bord{_num(theme.layout.outline_width * row_px)}"
+        tags += f"\\bord{ass_number(theme.layout.outline_width * row_px)}"
         if colors.shadow is not None and theme.layout.shadow_offset > 0:
-            return tags + f"\\shad{_num(theme.layout.shadow_offset * row_px)}"
+            return tags + f"\\shad{ass_number(theme.layout.shadow_offset * row_px)}"
         return tags + "\\shad0"
     if colors.shadow is not None and theme.layout.shadow_blur > 0:
         # A soft halo: a border in the shadow colour, blurred (the web uses a blurred text-shadow).
         blur = theme.layout.shadow_blur * row_px
         shadow, _ = ass_color(colors.shadow)
-        return tags + f"\\bord{_num(blur)}\\3c{shadow}\\blur{_num(blur)}\\shad0"
+        return tags + f"\\bord{ass_number(blur)}\\3c{shadow}\\blur{ass_number(blur)}\\shad0"
     return tags + "\\bord0\\shad0"
 
 
@@ -145,7 +152,7 @@ def _alphas(row: Row, theme: Theme, opacity: float) -> str:
 def _dialogue(row: Row, start: int, end: int, tags: str, theme: Theme) -> str:
     style = "Backing" if row.role == "backing" else "Lead"
     text = "{" + tags + "}" + _karaoke(row, start, theme)
-    return f"Dialogue: 0,{_stamp(start)},{_stamp(end)},{style},,0,0,0,,{text}"
+    return f"Dialogue: 0,{ass_time(start)},{ass_time(end)},{style},,0,0,0,,{text}"
 
 
 def _page_event(
@@ -157,7 +164,7 @@ def _page_event(
     row_px = font_px * row.scale
     y = row.y - m.ass_center_shift(row_px)
     tags = (
-        f"\\an5\\pos({_num(row.x)},{_num(y)})\\fad({fade},{fade})"
+        f"\\an5\\pos({ass_number(row.x)},{ass_number(y)})\\fad({fade},{fade})"
         + _look(row, row_px, theme, m)
         + _alphas(row, theme, 1.0)
     )
@@ -192,9 +199,10 @@ def _scroll_events(
         before = scroll_opacity(group.index - scroll_focus(layout, a), plan.visible)
         after = scroll_opacity(group.index - scroll_focus(layout, b), plan.visible)
         if abs(first - last) < 0.01 and abs(middle - first) < 0.01:
-            place = f"\\an5\\pos({_num(row.x)},{_num(y + first)})"
+            place = f"\\an5\\pos({ass_number(row.x)},{ass_number(y + first)})"
         else:
-            place = f"\\an5\\move({_num(row.x)},{_num(y + first)},{_num(row.x)},{_num(y + last)})"
+            x = ass_number(row.x)
+            place = f"\\an5\\move({x},{ass_number(y + first)},{x},{ass_number(y + last)})"
         tags = place + look + _alphas(row, theme, before)
         if abs(after - before) > 0.005:
             tags += f"\\t({_alphas(row, theme, after)})"
@@ -248,12 +256,12 @@ def _dot_events(countdown: Countdown, font_px: float, theme: Theme) -> list[str]
         if end <= start:
             continue
         tags = (
-            f"\\an7\\pos({_num(dot.x - dot.r)},{_num(dot.y - dot.r)})\\p3"
+            f"\\an7\\pos({ass_number(dot.x - dot.r)},{ass_number(dot.y - dot.r)})\\p3"
             f"\\1c{sung}\\1a{sung_alpha}\\3c{outline}\\3a{outline_alpha}"
-            f"\\bord{_num(border)}\\shad0"
+            f"\\bord{ass_number(border)}\\shad0"
         )
         events.append(
-            f"Dialogue: 1,{_stamp(start)},{_stamp(end)},Dots,,0,0,0,,"
+            f"Dialogue: 1,{ass_time(start)},{ass_time(end)},Dots,,0,0,0,,"
             f"{{{tags}}}{_circle(dot.r)}{{\\p0}}"
         )
     return events
@@ -266,21 +274,25 @@ def _bar_events(bar: BreakBar, theme: Theme) -> list[str]:
     shape = _pill(bar.width, bar.height)
     track, _ = ass_color(theme.colors.unsung)
     sung, sung_alpha = ass_color(theme.colors.sung)
-    place = f"\\an7\\pos({_num(x0)},{_num(y0)})\\p3\\bord0\\shad0"
-    clip_from = f"\\clip({_num(x0)},{_num(y0)},{_num(x0)},{_num(y0 + bar.height)})"
-    clip_to = f"\\clip({_num(x0)},{_num(y0)},{_num(x0 + bar.width)},{_num(y0 + bar.height)})"
+    place = f"\\an7\\pos({ass_number(x0)},{ass_number(y0)})\\p3\\bord0\\shad0"
+    clip_from = (
+        f"\\clip({ass_number(x0)},{ass_number(y0)},{ass_number(x0)},{ass_number(y0 + bar.height)})"
+    )
+    right, bottom = ass_number(x0 + bar.width), ass_number(y0 + bar.height)
+    clip_to = f"\\clip({ass_number(x0)},{ass_number(y0)},{right},{bottom})"
     duration = (end - start) * 10
     return [
-        f"Dialogue: 1,{_stamp(start)},{_stamp(end)},Dots,,0,0,0,,"
+        f"Dialogue: 1,{ass_time(start)},{ass_time(end)},Dots,,0,0,0,,"
         f"{{{place}\\1c{track}\\1a{_alpha(theme.colors.unsung, BAR_TRACK_OPACITY)}}}"
         f"{shape}{{\\p0}}",
-        f"Dialogue: 2,{_stamp(start)},{_stamp(end)},Dots,,0,0,0,,"
+        f"Dialogue: 2,{ass_time(start)},{ass_time(end)},Dots,,0,0,0,,"
         f"{{{place}\\1c{sung}\\1a{sung_alpha}{clip_from}\\t(0,{duration},{clip_to})}}"
         f"{shape}{{\\p0}}",
     ]
 
 
-def _style(name: str, theme: Theme, size: float) -> str:
+def style_line(name: str, theme: Theme, size: float) -> str:
+    """An ASS style line in the theme's font and colours (alignment centred, no border)."""
     sung, sung_alpha = ass_color(theme.colors.sung)
     unsung, unsung_alpha = ass_color(theme.colors.unsung)
     outline, outline_alpha = ass_color(theme.colors.box or theme.colors.outline)
@@ -299,7 +311,15 @@ def _style(name: str, theme: Theme, size: float) -> str:
     )
 
 
-def layout_to_ass(layout: Layout, doc: KaraokeDoc, theme: Theme, metrics: FontMetrics) -> str:
+def layout_to_ass(
+    layout: Layout,
+    doc: KaraokeDoc,
+    theme: Theme,
+    metrics: FontMetrics,
+    extra_styles: Sequence[str] = (),
+    extra_events: Sequence[str] = (),
+) -> str:
+    """The ASS file; the video export adds its own styles and events (title, credits)."""
     size = metrics.ass_font_size(layout.font_px)
     lines = [
         "[Script Info]",
@@ -315,9 +335,10 @@ def layout_to_ass(layout: Layout, doc: KaraokeDoc, theme: Theme, metrics: FontMe
         "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, "
         "BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, "
         "BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding",
-        _style("Lead", theme, size),
-        _style("Backing", theme, size * theme.backing.scale),
-        _style("Dots", theme, size),
+        style_line("Lead", theme, size),
+        style_line("Backing", theme, size * theme.backing.scale),
+        style_line("Dots", theme, size),
+        *extra_styles,
         "",
         "[Events]",
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text",
@@ -334,6 +355,7 @@ def layout_to_ass(layout: Layout, doc: KaraokeDoc, theme: Theme, metrics: FontMe
         lines += _dot_events(countdown, layout.font_px, theme)
     for bar in layout.bars:
         lines += _bar_events(bar, theme)
+    lines += extra_events
     return "\n".join(lines) + "\n"
 
 

@@ -73,7 +73,37 @@ def main(argv: Sequence[str] | None = None) -> int:
     preview.add_argument("--duration", type=float, help="seconds to render")
     preview.add_argument("-o", "--out", type=Path, help="default: preview-<theme>-<size>.mp4")
 
+    render = commands.add_parser(
+        "render", help="export a package as an MP4 with its animated lyrics, title and credits"
+    )
+    render.add_argument("package", type=Path)
+    render.add_argument("--theme", default="clasico", help="theme id or theme.json path")
+    render.add_argument("--aspect", default="16:9", choices=["16:9", "9:16"])
+    render.add_argument("--size", help="instead of 1920x1080 or 1080x1920, e.g. 1280x720")
+    render.add_argument(
+        "--background",
+        default="auto",
+        help="auto, video, cover, gradient or a picture or video file",
+    )
+    render.add_argument("--vocals", type=float, default=0.0, help="guide vocals level, 0 to 1")
+    render.add_argument(
+        "--dim", type=float, help="background brightness 0.3-1 (default: by its light)"
+    )
+    render.add_argument("-o", "--out", type=Path, help="default: <package>-16x9.mp4 (and .jpg)")
+
+    background = commands.add_parser(
+        "background", help="give a package a background video (and cover) or a cover picture"
+    )
+    background.add_argument("package", type=Path)
+    background.add_argument(
+        "source", type=Path, help="a video, or a song file with cover art, or a picture"
+    )
+
     args = parser.parse_args(argv)
+    if args.command == "render":
+        return _render(args)
+    if args.command == "background":
+        return _background(args.package, args.source)
     if args.command in ("subtitles", "preview"):
         return _subtitles(args)
     if args.command == "make":
@@ -168,6 +198,42 @@ def _subtitles(args: argparse.Namespace) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     print(f"Written {out}")
+    return 0
+
+
+def _render(args: argparse.Namespace) -> int:
+    from karaoke_engine.subtitles.themes import load_theme
+    from karaoke_engine.video.render import render
+
+    size = None
+    if args.size:
+        match = re.fullmatch(r"(\d{2,5})x(\d{2,5})", args.size)
+        if match is None:
+            print(f"error: --size must look like 1280x720, not {args.size!r}", file=sys.stderr)
+            return 2
+        size = (int(match[1]), int(match[2]))
+    out = args.out or Path(f"{args.package.resolve().name}-{args.aspect.replace(':', 'x')}.mp4")
+    try:
+        report = render(
+            args.package, out, load_theme(args.theme), aspect=args.aspect,
+            background=args.background, vocals=args.vocals, dim=args.dim, size=size,
+        )  # fmt: skip
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"{report.out}: {report.background} background, {report.encoder}, {report.seconds:.0f} s")
+    return 0
+
+
+def _background(package: Path, source: Path) -> int:
+    from karaoke_engine.video.media import add_background
+
+    try:
+        doc = add_background(package, source)
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"{package}: background {doc.video.background if doc.video else None}, cover {doc.cover}")
     return 0
 
 

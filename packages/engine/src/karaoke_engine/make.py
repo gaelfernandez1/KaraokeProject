@@ -6,7 +6,9 @@ level and encode the stems, and only then write karaoke.json, so an interrupted 
 a package that looks complete.
 """
 
+import logging
 import re
+import subprocess
 import tempfile
 import unicodedata
 from collections.abc import Callable
@@ -20,6 +22,7 @@ from karaoke_contracts import (
     Line,
     Provenance,
     Singer,
+    VideoRefs,
     dump_doc,
     validate_doc,
     validate_package,
@@ -31,8 +34,12 @@ from karaoke_engine.audio import decode, package_audio, probe
 from karaoke_engine.separation import RoformerSeparator
 from karaoke_engine.steps import Separator, TextAligner, Transcriber
 from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber, transcribe_in_child
+from karaoke_engine.video.media import extract_background, extract_cover, probe_video
 
 _LANGUAGE = re.compile(r"^[a-z]{2,3}$")
+
+
+logger = logging.getLogger(__name__)
 
 
 def default_separator() -> Separator:
@@ -101,6 +108,7 @@ def make_package(
         step("encode")
         refs = package_audio(mix, stems, out_dir)
         duration = probe(mix).duration
+        video, cover = _keep_pictures(source, out_dir)
     name = title or source.stem
     doc = KaraokeDoc(
         id=slug(name) or "karaoke",
@@ -109,6 +117,8 @@ def make_package(
         language=language,
         duration=duration,
         audio=refs,
+        video=video,
+        cover=cover,
         singers=_singers(lyrics),
         lines=_numbered(lines),
         provenance=Provenance(
@@ -130,6 +140,29 @@ def make_package(
     if issues:
         raise ValueError("; ".join(f"{i.path}: {i.message}" for i in issues[:5]))
     return doc
+
+
+def _keep_pictures(source: Path, out_dir: Path) -> tuple[VideoRefs | None, str | None]:
+    """The song's video as the package background and its cover art (or a frame) as cover."""
+    for old in ("background.mp4", "cover.jpg"):
+        (out_dir / old).unlink(missing_ok=True)
+    # Both are extras: a file whose pictures ffmpeg cannot handle still makes its karaoke.
+    video = None
+    try:
+        if probe_video(source) is not None:
+            extract_background(source, out_dir / "background.mp4")
+            video = VideoRefs(background="background.mp4")
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+        logger.warning("could not keep the video of %s: %s", source.name, exc)
+        (out_dir / "background.mp4").unlink(missing_ok=True)
+    cover = None
+    try:
+        if extract_cover(source, out_dir / "cover.jpg") is not None:
+            cover = "cover.jpg"
+    except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+        logger.warning("could not keep the cover of %s: %s", source.name, exc)
+        (out_dir / "cover.jpg").unlink(missing_ok=True)
+    return video, cover
 
 
 def slug(text: str) -> str:
