@@ -13,7 +13,9 @@ cifras están en `docs/plan-v3/decisiones/005-sincronia.md`, y la forma de medir
      tenía ese nombre;
    - coros entre paréntesis: salen como líneas aparte, marcadas como coro.
 
-   El texto que se muestra no cambia nunca, ni la gheada, ni el seseo, ni la puntuación.
+   El texto que se muestra no cambia, ni la gheada, ni el seseo, ni la puntuación, con una
+   excepción en gallego: los pronombres escritos aparte detrás de su verbo se le juntan, como pide
+   la norma («dixo lle» → «díxolle», «collín che» → «collinche»; ver «Pronombres» abajo).
 2. **Pasa cada palabra a lo que se dice** (`spoken.spoken`), solo para alinear: minúsculas, sin
    puntuación, y números y símbolos en palabras en gallego, castellano, portugués e inglés
    (`2024` → «dous mil vinte e catro»; `&` → «e»).
@@ -115,3 +117,23 @@ uv run karaoke-bench run --pipeline bench/pipelines/<pipeline>.toml --set quick 
 uv run karaoke-bench run --pipeline bench/pipelines/<pipeline>.toml --set stress --mode lyrics
 uv run karaoke-bench compare bench/results/<antes> bench/results/<después>
 ```
+
+## Pronombres pegados al verbo (gallego)
+
+Las webs de letras escriben a menudo el pronombre aparte, como en castellano: «dixo lle»,
+«collín che», «quero te». En gallego va pegado al verbo que tiene delante (énclise), y la palabra
+junta sigue las reglas de acentuación: «díxolle», «collinche», «quérote», «darache» (pierde la
+tilde de «dará»), «dálle» (conserva la diacrítica). `align.clitics.join_clitics` lo hace después de
+alinear, en `karaoke make` con `--lang gl`, sin tocar los tiempos: el verbo y el pronombre quedan
+como sílabas de la palabra nueva.
+
+Para no equivocarse, solo junta:
+
+- pronombres que no pueden ser otra cosa (che, lle, lles, cho, llo, me, te, vos…; no «o», «a»,
+  «nos» ni «se», que también son artículos, contracciones o conjunciones);
+- detrás de una forma verbal conocida (verbos frecuentes conjugados, irregulares y gerundios),
+  también con gheada o seseo («jaño che» → «jáñoche»);
+- nunca detrás de las palabras que llaman al pronombre delante del verbo siguiente: «non che
+  digo», «que che quero», «xa che dixen» se quedan como están.
+
+Para un paquete ya hecho: `uv run karaoke join-clitics <paquete>`.
