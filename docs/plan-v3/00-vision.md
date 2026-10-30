@@ -180,6 +180,8 @@ los consumidores aceptan versiones menores nuevas.
 
 Tokens compartidos por los dos renderizadores: fuente, tamaños relativos, colores (cantado, por
 cantar, contorno, sombra), estilo de animación, líneas visibles, posición, cuenta atrás. Dueña: C5.
+Versión 1.1.0 (modos páginas y desplazamiento, coros, colores por cantante, tiempos de entrada):
+`decisiones/007-subtitulos.md`.
 
 ### 6.4 Reloj de reproducción (web)
 
