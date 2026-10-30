@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.1.0",
+  "id": "contraste",
+  "name": "Alto contraste",
+  "font": {
+    "family": "Atkinson Hyperlegible Next ExtraBold",
+    "weight": 800,
+    "file": "AtkinsonHyperlegibleNext-ExtraBold.ttf"
+  },
+  "colors": {
+    "sung": "#FFE600",
+    "unsung": "#FFFFFF",
+    "outline": "#000000",
+    "shadow": null,
+    "box": "#000000E0",
+    "singers": ["#FFE600", "#00E5FF", "#FF7AD9", "#9BFF6A"]
+  },
+  "layout": {
+    "visible_lines": 2,
+    "position": "bottom",
+    "font_size": 0.085,
+    "line_spacing": 1.35,
+    "mode": "pages",
+    "margin": 0.05,
+    "min_row_chars": 18,
+    "max_rows": 2,
+    "outline_width": 0.0,
+    "shadow_offset": 0.0,
+    "shadow_blur": 0.0
+  },
+  "animation": {
+    "fill": "word",
+    "countdown_min_gap": 5.0,
+    "lead_in": 3.5,
+    "hold": 0.4,
+    "transition": 0.2,
+    "anticipation": 0.05,
+    "countdown_dots": 3,
+    "countdown_step": 1.0,
+    "break_bar_min": 8.0
+  },
+  "backing": { "scale": 0.8, "brackets": true, "opacity": 1.0 }
+}

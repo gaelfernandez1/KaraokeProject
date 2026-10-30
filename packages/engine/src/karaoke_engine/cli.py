@@ -1,6 +1,7 @@
 """The `karaoke` command. `render` (video) comes later."""
 
 import argparse
+import re
 import subprocess
 import sys
 import time
@@ -54,7 +55,27 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="look the lyrics up on lrclib.net (sends --title and --artist, both needed)",
     )
 
+    subtitles = commands.add_parser(
+        "subtitles", help="write the animated lyrics of a package as ASS subtitles for a video"
+    )
+    subtitles.add_argument("package", type=Path)
+    subtitles.add_argument("--theme", default="clasico", help="theme id or theme.json path")
+    subtitles.add_argument("--size", default="1920x1080", help="video size, e.g. 1080x1920")
+    subtitles.add_argument("-o", "--out", type=Path, help="default: lyrics-<theme>-<size>.ass")
+
+    preview = commands.add_parser(
+        "preview", help="a quick MP4 of a package's lyrics on a plain background, with its audio"
+    )
+    preview.add_argument("package", type=Path)
+    preview.add_argument("--theme", default="clasico", help="theme id or theme.json path")
+    preview.add_argument("--size", default="1920x1080", help="video size, e.g. 1080x1920")
+    preview.add_argument("--start", type=float, help="seconds into the song")
+    preview.add_argument("--duration", type=float, help="seconds to render")
+    preview.add_argument("-o", "--out", type=Path, help="default: preview-<theme>-<size>.mp4")
+
     args = parser.parse_args(argv)
+    if args.command in ("subtitles", "preview"):
+        return _subtitles(args)
     if args.command == "make":
         return _make(args)
     if args.command == "validate":
@@ -120,6 +141,33 @@ def _audio(package: Path, mix: Path | None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     print(f"{package}: {refs.instrumental}, {refs.vocals} at {refs.loudness_lufs} LUFS")
+    return 0
+
+
+def _subtitles(args: argparse.Namespace) -> int:
+    from karaoke_contracts import load_doc
+    from karaoke_engine.subtitles.ass import build_ass
+    from karaoke_engine.subtitles.preview import render_preview
+    from karaoke_engine.subtitles.themes import load_theme
+
+    size = re.fullmatch(r"(\d{2,5})x(\d{2,5})", args.size)
+    if size is None:
+        print(f"error: --size must look like 1920x1080, not {args.size!r}", file=sys.stderr)
+        return 2
+    width, height = int(size[1]), int(size[2])
+    try:
+        theme = load_theme(args.theme)
+        if args.command == "preview":
+            out = args.out or Path(f"preview-{theme.id}-{args.size}.mp4")
+            render_preview(args.package, theme, width, height, out, args.start, args.duration)
+        else:
+            doc = load_doc(args.package / "karaoke.json")
+            out = args.out or args.package / f"lyrics-{theme.id}-{args.size}.ass"
+            out.write_text(build_ass(doc, theme, width, height), encoding="utf-8")
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    print(f"Written {out}")
     return 0
 
 

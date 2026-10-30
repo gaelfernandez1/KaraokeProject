@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1.0",
+  "id": "clasico",
+  "name": "Clásico",
+  "font": { "family": "Nunito Black", "weight": 900, "file": "Nunito-Black.ttf" },
+  "colors": {
+    "sung": "#FFC531",
+    "unsung": "#FFFFFF",
+    "outline": "#17112B",
+    "shadow": "#000000A0",
+    "box": null,
+    "singers": ["#FFC531", "#4FD1FF", "#FF6FB5", "#7CE38B"]
+  },
+  "layout": {
+    "visible_lines": 2,
+    "position": "bottom",
+    "font_size": 0.075,
+    "line_spacing": 1.25,
+    "mode": "pages",
+    "margin": 0.05,
+    "min_row_chars": 22,
+    "max_rows": 2,
+    "outline_width": 0.08,
+    "shadow_offset": 0.05,
+    "shadow_blur": 0.0
+  },
+  "animation": {
+    "fill": "wipe",
+    "countdown_min_gap": 5.0,
+    "lead_in": 3.0,
+    "hold": 0.4,
+    "transition": 0.25,
+    "anticipation": 0.05,
+    "countdown_dots": 3,
+    "countdown_step": 1.0,
+    "break_bar_min": 8.0
+  },
+  "backing": { "scale": 0.72, "brackets": true, "opacity": 0.85 }
+}
