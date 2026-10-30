@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Any
 
@@ -147,9 +148,9 @@ def test_missing_document_is_reported(tmp_path: Path) -> None:
 
 def test_schema_errors_are_reported_not_raised(demo_package: Path) -> None:
     doc_path = demo_package / "karaoke.json"
-    doc_path.write_text(
-        doc_path.read_text(encoding="utf-8").replace('"1.0.0"', '"2.0.0"'), encoding="utf-8"
-    )
+    data = json.loads(doc_path.read_text(encoding="utf-8"))
+    data["schema_version"] = "2.0.0"
+    doc_path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
     issues = validate_package(demo_package)
 

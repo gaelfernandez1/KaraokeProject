@@ -13,3 +13,10 @@ def bare_package(tmp_path: Path) -> Path:
     package.mkdir()
     shutil.copy(DEMO_JSON, package / "karaoke.json")
     return package
+
+
+@pytest.fixture
+def ffmpeg() -> None:
+    """Skips the test when ffmpeg is missing (CI images may not have it)."""
+    if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
+        pytest.skip("ffmpeg and ffprobe are not installed")

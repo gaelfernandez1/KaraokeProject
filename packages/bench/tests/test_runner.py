@@ -38,7 +38,8 @@ def test_run_lyrics_mode_with_smoke_pipeline(paths: BenchPaths) -> None:
     results = load_results(out / "results.json")
     [song] = results.songs
     assert (out / "report.md").is_file()
-    assert out.parent == paths.results
+    # The private set holds the user's own songs: its reports stay out of the versioned folder.
+    assert out.parent == paths.private_results
     assert song.error is None
     assert song.timing is not None
     assert song.timing.coverage == pytest.approx(1.0)
@@ -150,3 +151,136 @@ def test_validated_reference_scores_timing(paths: BenchPaths) -> None:
     assert song.reference_validated is True
     assert song.timing is not None
     assert song.scored_share == pytest.approx(1.0)
+
+
+def test_approximate_reference_scores_and_says_so(paths: BenchPaths) -> None:
+    from karaoke_bench.reference import dump_reference, load_reference
+
+    path = paths.data / "private" / "demo" / "reference.json"
+    dump_reference(load_reference(path).model_copy(update={"timing": "approximate"}), path)
+
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    report = (out / "report.md").read_text(encoding="utf-8")
+    assert song.timing is not None
+    assert song.timing.start_within_wide is not None
+    assert song.reference_timing == "approximate"
+    assert "| aproximada |" in report
+    assert "≤ 0,5 s" in report
+
+
+def _web_lyrics(paths: BenchPaths) -> str:
+    """Gives the demo song pasted-from-the-web lyrics: a section label and a repeat mark."""
+    from karaoke_bench.reference import load_reference
+
+    song_dir = paths.data / "private" / "demo"
+    lines = [line.text for line in load_reference(song_dir / "reference.json").lines]
+    text = "\n".join(["[Estribillo]", *lines[:-1], f"{lines[-1]} x2"]) + "\n"
+    (song_dir / "lyrics.txt").write_text(text, encoding="utf-8")
+    return text
+
+
+def test_runner_passes_raw_lyrics_to_text_aligners(paths: BenchPaths, tmp_path: Path) -> None:
+    text = _web_lyrics(paths)
+    record = tmp_path / "seen.txt"
+    aligner = 'target = "karaoke_bench.fakes:TextEvenSplitAligner"'
+    pipeline = _pipeline(tmp_path, f'{aligner}\nparams = {{ record_to = "{record}" }}')
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.error is None
+    assert record.read_text(encoding="utf-8") == text
+
+
+def test_text_aligner_may_return_more_lines(paths: BenchPaths, tmp_path: Path) -> None:
+    _web_lyrics(paths)
+    pipeline = _pipeline(
+        tmp_path, 'target = "karaoke_bench.fakes:TextEvenSplitAligner"\nparams = { repeat = 2 }'
+    )
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.error is None
+    assert song.timing is not None
+    assert song.line_start_median is None
+
+
+def test_plain_aligners_still_get_clean_lines(paths: BenchPaths, tmp_path: Path) -> None:
+    _web_lyrics(paths)
+    pipeline = _pipeline(tmp_path, 'target = "karaoke_bench.fakes:EvenSplitAligner"')
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.error is None
+    raw = (paths.runs / out.name / "demo.json").read_text(encoding="utf-8")
+    assert "Estribillo" not in raw
+
+
+def test_summary_groups_by_group_when_present(
+    paths: BenchPaths, add_demo_song: DemoSongAdder
+) -> None:
+    add_demo_song(paths, "other")
+    for song_id, group in (("demo", "gap"), ("other", "echo")):
+        meta = paths.data / "private" / song_id / "meta.toml"
+        meta.write_text(meta.read_text(encoding="utf-8") + f'group = "{group}"\n', encoding="utf-8")
+
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    results = load_results(out / "results.json")
+    assert set(results.summary) == {"all", "gap", "echo"}
+    assert results.summary["gap"].songs == 1
+    assert {song.group for song in results.songs} == {"gap", "echo"}
+
+
+def test_report_flags_words_outside_the_voice(paths: BenchPaths) -> None:
+    # The smoke aligner spreads the words over the whole song, breaks included.
+    out = run(RunOptions(load_pipeline(SMOKE), "private", "lyrics"), paths)
+
+    results = load_results(out / "results.json")
+    [song] = results.songs
+    assert song.outside_voice is not None
+    assert song.outside_voice > 0.1
+    assert results.summary["all"].outside_voice == pytest.approx(song.outside_voice)
+    assert "Fuera de voz" in (out / "report.md").read_text(encoding="utf-8")
+
+
+def test_aligner_sees_songs_grouped_by_language(
+    paths: BenchPaths, add_demo_song: DemoSongAdder, tmp_path: Path
+) -> None:
+    # Per-language models load once per language when songs come grouped.
+    for song_id, language in (("a", "es"), ("b", "gl"), ("c", "es")):
+        add_demo_song(paths, song_id)
+        meta = paths.data / "private" / song_id / "meta.toml"
+        meta.write_text(f'title = "Demo"\nlanguage = "{language}"\n', encoding="utf-8")
+    record = tmp_path / "order.txt"
+    aligner = 'target = "karaoke_bench.fakes:TextEvenSplitAligner"'
+    pipeline = _pipeline(tmp_path, f'{aligner}\nparams = {{ languages_to = "{record}" }}')
+
+    run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    assert record.read_text(encoding="utf-8").split() == ["es", "es", "gl", "gl"]
+
+
+def test_public_sets_report_into_the_versioned_folder(paths: BenchPaths) -> None:
+    import shutil
+
+    shutil.copytree(paths.data / "private" / "demo", paths.data / "stress" / "demo")
+
+    out = run(RunOptions(load_pipeline(SMOKE), "stress", "lyrics"), paths)
+
+    assert out.parent == paths.results
+
+
+def test_text_aligners_get_no_positional_line_metric(paths: BenchPaths, tmp_path: Path) -> None:
+    # Its lines need not be the lyrics' lines even when there are as many of them.
+    pipeline = _pipeline(tmp_path, 'target = "karaoke_bench.fakes:TextEvenSplitAligner"')
+
+    out = run(RunOptions(pipeline, "private", "lyrics"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.timing is not None
+    assert song.line_start_median is None

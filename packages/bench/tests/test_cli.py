@@ -162,3 +162,34 @@ def test_package_credits_quote_the_song_id() -> None:
 
     command = next(line for line in credits.splitlines() if "karaoke-bench package" in line)
     assert shlex.split(command)[4] == "jamendo/Mère_nature_-_Law'"
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_package_with_align_uses_the_pipeline_aligner(
+    demo_bench: BenchPaths, tmp_path: Path
+) -> None:
+    from karaoke_contracts import load_doc, validate_package
+
+    song_dir = demo_bench.data / "private" / "demo"
+    (song_dir / "lyrics.txt").write_text("[Estribillo]\nola mar\nvai o vento\n", encoding="utf-8")
+    pipeline = tmp_path / "align.toml"
+    pipeline.write_text(
+        'name = "align"\n[steps.separator]\ntarget = "karaoke_bench.fakes:PassthroughSeparator"\n'
+        '[steps.aligner]\ntarget = "karaoke_bench.fakes:TextEvenSplitAligner"\n',
+        encoding="utf-8",
+    )
+    out = tmp_path / "pkg"
+
+    code = main(
+        ["--bench-dir", str(demo_bench.root), "package", "private/demo", "--pipeline",
+         str(pipeline), "--out", str(out), "--align"]
+    )  # fmt: skip
+
+    assert code == 0
+    assert validate_package(out) == []
+    doc = load_doc(out / "karaoke.json")
+    assert [" ".join(w.text for w in line.words) for line in doc.lines] == [
+        "ola mar",
+        "vai o vento",
+    ]
+    assert "TextEvenSplitAligner" in (doc.provenance.align_model or "")

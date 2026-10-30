@@ -8,9 +8,11 @@ wants. Which one is best is decided with the bench, not here.
 from pathlib import Path
 from typing import Any
 
+from karaoke_engine.audio import decode
 from karaoke_engine.steps import Stems
 
 DEFAULT_MODEL_DIR = Path.home() / ".cache" / "karaoke" / "models" / "audio-separator"
+_LIBSNDFILE_FORMATS = {".wav", ".flac", ".mp3", ".ogg"}
 
 
 def stem_roles(primary: str, secondary: str, vocals_stem: str) -> dict[str, str]:
@@ -74,6 +76,20 @@ class RoformerSeparator:
         separator.load_model(model_filename=self.model)
         self._separator = separator
 
+    def unload(self) -> None:
+        """Frees the model and the GPU memory it holds, so the next step can load its own."""
+        import gc
+
+        self._separator = None
+        gc.collect()
+        try:
+            import torch
+
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except ImportError:
+            pass
+
     def separate(self, audio: Path, work_dir: Path) -> Stems:
         if self._separator is None:
             self.load()
@@ -82,8 +98,16 @@ class RoformerSeparator:
         roles = stem_roles(instance.primary_stem_name, instance.secondary_stem_name,
                            self.vocals_stem)  # fmt: skip
         work_dir.mkdir(parents=True, exist_ok=True)
+        # audio-separator reads through libsndfile, which cannot open AAC (YouTube's .m4a).
+        decoded = None
+        if audio.suffix.lower() not in _LIBSNDFILE_FORMATS:
+            decoded = audio = decode(audio, work_dir / "input.wav")
         separator.output_dir = instance.output_dir = str(work_dir)
-        separator.separate(str(audio), custom_output_names=roles)
+        try:
+            separator.separate(str(audio), custom_output_names=roles)
+        finally:
+            if decoded is not None:
+                decoded.unlink(missing_ok=True)
         stems = Stems(vocals=work_dir / "vocals.wav", instrumental=work_dir / "instrumental.wav")
         for path in (stems.vocals, stems.instrumental):
             if not path.is_file():

@@ -1,0 +1,377 @@
+{
+  "bench_version": "0.1.0",
+  "normalization_version": 1,
+  "created": "2026-10-29T20:53:29+01:00",
+  "git_commit": "acd55fa-dirty",
+  "pipeline": {
+    "name": "c4-default",
+    "description": "Mel-Band RoFormer (Kim, 8 s) + Whisper (HiTZ large-v3 for Galician, large-v3-turbo otherwise) + lyrics aligner (each language's default CTC model)",
+    "steps": {
+      "separator": {
+        "target": "karaoke_engine.separation:RoformerSeparator",
+        "params": {
+          "model": "vocals_mel_band_roformer.ckpt",
+          "segment_size": 801
+        },
+        "version": "2"
+      },
+      "transcriber": {
+        "target": "karaoke_engine.transcribe:WhisperTranscriber",
+        "params": {},
+        "version": "5"
+      },
+      "segmenter": {
+        "target": "karaoke_engine.transcribe:LineSegmenter",
+        "params": {},
+        "version": "2"
+      },
+      "aligner": {
+        "target": "karaoke_engine.align.aligner:LyricsAligner",
+        "params": {},
+        "version": "11"
+      }
+    }
+  },
+  "set_name": "gl",
+  "mode": "asr",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "torch": "2.14.1+cu130",
+    "transformers": "5.21.0",
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.8.4",
+    "demucs": "4.0.1",
+    "numpy": "2.5.4",
+    "jiwer": "4.0.0",
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "driver": "617.42",
+    "gpu_memory_mb": "4096"
+  },
+  "reference_kind": {
+    "gl": "semiautomatic"
+  },
+  "stages": {
+    "separator": {
+      "load_seconds": 8.153536440000607,
+      "vram_peak_mb": 2866.50390625,
+      "ram_peak_mb": 2371.95703125
+    },
+    "transcriber": {
+      "load_seconds": 0.06306503399537178,
+      "vram_peak_mb": 3318.50390625,
+      "ram_peak_mb": 2542.6328125
+    },
+    "segmenter": {
+      "load_seconds": null,
+      "vram_peak_mb": 0.0,
+      "ram_peak_mb": 75.80859375
+    },
+    "aligner": {
+      "load_seconds": 0.07606864600529661,
+      "vram_peak_mb": 1554.50390625,
+      "ram_peak_mb": 2734.96484375
+    }
+  },
+  "songs": [
+    {
+      "song_id": "pantis-un-aire",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 287.333333,
+      "mode": "asr",
+      "group": null,
+      "steps": {
+        "separator": {
+          "seconds": 59.49784914100019,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 73.44288934200449,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.001419947002432309,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 14.186619721993338,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": 0.30957683741648107,
+      "cer": 0.1410590277777778,
+      "ref_words": 449,
+      "ref_chars": 2304,
+      "timing": {
+        "words": 263,
+        "coverage": 0.7735294117647059,
+        "start_median": 0.01999999999998181,
+        "start_mean": 0.06605703422053268,
+        "start_within": 0.9695817490494296,
+        "start_within_wide": 0.9695817490494296,
+        "end_median": 0.01999999999999602,
+        "end_mean": 0.06827756653992295,
+        "start_bias": -0.01226996197718599
+      },
+      "scored_share": 0.7572383073496659,
+      "reference_validated": true,
+      "reference_timing": "semiautomatic",
+      "line_start_median": null,
+      "language_reported": "gl",
+      "language_switch": false,
+      "outside_voice": 0.0001753155680224404,
+      "low_confidence": 0.12,
+      "error": null
+    },
+    {
+      "song_id": "cibran-o-mundo-do-motor",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 195.2,
+      "mode": "asr",
+      "group": null,
+      "steps": {
+        "separator": {
+          "seconds": 39.52322370600086,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 15.268483598003513,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.0003952100014430471,
+          "cached": true,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 2.7487869990000036,
+          "cached": true,
+          "error": null
+        }
+      },
+      "wer": 0.1825726141078838,
+      "cer": 0.10224632068164213,
+      "ref_words": 241,
+      "ref_chars": 1291,
+      "timing": null,
+      "scored_share": 0.6182572614107884,
+      "reference_validated": false,
+      "reference_timing": "semiautomatic",
+      "line_start_median": null,
+      "language_reported": "gl",
+      "language_switch": false,
+      "outside_voice": 0.00026624068157614486,
+      "low_confidence": 0.08627450980392157,
+      "error": null
+    },
+    {
+      "song_id": "cloplas-laverca",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 313.032,
+      "mode": "asr",
+      "group": null,
+      "steps": {
+        "separator": {
+          "seconds": 64.73361921800097,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 18.85420428400539,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.0005512770003406331,
+          "cached": true,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 4.755749146002927,
+          "cached": true,
+          "error": null
+        }
+      },
+      "wer": 0.15567282321899736,
+      "cer": 0.052854122621564484,
+      "ref_words": 379,
+      "ref_chars": 1892,
+      "timing": {
+        "words": 257,
+        "coverage": 0.9049295774647887,
+        "start_median": 0.01999999999999602,
+        "start_mean": 0.05534630350194645,
+        "start_within": 0.9844357976653697,
+        "start_within_wide": 0.9844357976653697,
+        "end_median": 0.010000000000019327,
+        "end_mean": 0.05247470817120508,
+        "start_bias": 0.04031906614786054
+      },
+      "scored_share": 0.7513227513227513,
+      "reference_validated": true,
+      "reference_timing": "semiautomatic",
+      "line_start_median": null,
+      "language_reported": "gl",
+      "language_switch": false,
+      "outside_voice": 0.00029120559114735004,
+      "low_confidence": 0.05570291777188329,
+      "error": null
+    },
+    {
+      "song_id": "fanny-alexander-lene",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 244.145708,
+      "mode": "asr",
+      "group": null,
+      "steps": {
+        "separator": {
+          "seconds": 50.12119070399967,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 9.932999972996186,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.000252990001172293,
+          "cached": true,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.18140546700306,
+          "cached": true,
+          "error": null
+        }
+      },
+      "wer": 0.6906077348066298,
+      "cer": 0.4,
+      "ref_words": 181,
+      "ref_chars": 905,
+      "timing": null,
+      "scored_share": 0.1871345029239766,
+      "reference_validated": false,
+      "reference_timing": "semiautomatic",
+      "line_start_median": null,
+      "language_reported": "gl",
+      "language_switch": false,
+      "outside_voice": 0.0,
+      "low_confidence": 0.2847682119205298,
+      "error": null
+    },
+    {
+      "song_id": "mortos-en-vida-chapapote",
+      "set_name": "gl",
+      "language": "gl",
+      "duration": 162.431791,
+      "mode": "asr",
+      "group": null,
+      "steps": {
+        "separator": {
+          "seconds": 33.017759681000825,
+          "cached": true,
+          "error": null
+        },
+        "transcriber": {
+          "seconds": 15.21886854400509,
+          "cached": false,
+          "error": null
+        },
+        "segmenter": {
+          "seconds": 0.00047513200115645304,
+          "cached": true,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 2.4052490150061203,
+          "cached": true,
+          "error": null
+        }
+      },
+      "wer": 0.5084175084175084,
+      "cer": 0.27534493101379726,
+      "ref_words": 297,
+      "ref_chars": 1667,
+      "timing": null,
+      "scored_share": 0.31313131313131315,
+      "reference_validated": false,
+      "reference_timing": "semiautomatic",
+      "line_start_median": null,
+      "language_reported": "gl",
+      "language_switch": false,
+      "outside_voice": 0.00022815423226100844,
+      "low_confidence": 0.3651877133105802,
+      "error": null
+    }
+  ],
+  "summary": {
+    "all": {
+      "songs": 5,
+      "failed": 0,
+      "wer": 0.334841628959276,
+      "cer": 0.1709889564462092,
+      "timing": {
+        "words": 520,
+        "coverage": 0.8333333333333334,
+        "start_median": 0.01999999999998181,
+        "start_mean": 0.060763461538462175,
+        "start_within": 0.9769230769230769,
+        "start_within_wide": 0.9769230769230769,
+        "end_median": 0.01999999999998181,
+        "end_mean": 0.06046730769230662,
+        "start_bias": 0.013721153846154313
+      },
+      "line_start_median": null,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.20529212294815222,
+        "transcriber": 0.0782196905635426,
+        "segmenter": 2.0246414008352824e-6,
+        "aligner": 0.01480774791805454
+      },
+      "est_seconds_4min": 79.88985077707731,
+      "outside_voice": 0.00019218321460138876,
+      "low_confidence": 0.18238667056138297
+    },
+    "gl": {
+      "songs": 5,
+      "failed": 0,
+      "wer": 0.334841628959276,
+      "cer": 0.1709889564462092,
+      "timing": {
+        "words": 520,
+        "coverage": 0.8333333333333334,
+        "start_median": 0.01999999999998181,
+        "start_mean": 0.060763461538462175,
+        "start_within": 0.9769230769230769,
+        "start_within_wide": 0.9769230769230769,
+        "end_median": 0.01999999999998181,
+        "end_mean": 0.06046730769230662,
+        "start_bias": 0.013721153846154313
+      },
+      "line_start_median": null,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.20529212294815222,
+        "transcriber": 0.0782196905635426,
+        "segmenter": 2.0246414008352824e-6,
+        "aligner": 0.01480774791805454
+      },
+      "est_seconds_4min": 79.88985077707731,
+      "outside_voice": 0.00019218321460138876,
+      "low_confidence": 0.18238667056138297
+    }
+  },
+  "notes": []
+}

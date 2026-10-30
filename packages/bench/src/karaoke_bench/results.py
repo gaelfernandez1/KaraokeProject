@@ -30,6 +30,7 @@ class SongResult(BaseModel):
     language: str
     duration: float
     mode: Literal["lyrics", "asr"]
+    group: str | None = None
     steps: dict[str, SongStep]
     wer: float | None = None
     cer: float | None = None
@@ -39,9 +40,14 @@ class SongResult(BaseModel):
     scored_share: float | None = None
     # None for manual references; for semiautomatic ones, whether they were validated by ear.
     reference_validated: bool | None = None
+    reference_timing: str | None = None
     line_start_median: float | None = None
     language_reported: str | None = None
     language_switch: bool | None = None
+    # Reference-free warnings: share of word time where the vocals are silent, and share of
+    # words the aligner rated below 0.3.
+    outside_voice: float | None = None
+    low_confidence: float | None = None
     error: str | None = None
 
 
@@ -55,6 +61,8 @@ class GroupSummary(BaseModel):
     language_switches: int
     rtf_median: dict[str, float]
     est_seconds_4min: float | None
+    outside_voice: float | None = None
+    low_confidence: float | None = None
 
 
 class RunResults(BaseModel):
@@ -109,7 +117,14 @@ def summarize(
         language_switches=sum(s.language_switch is True for s in songs),
         rtf_median=rtf,
         est_seconds_4min=sum(rtf.values()) * FOUR_MINUTES + loads if rtf else None,
+        outside_voice=_mean([s.outside_voice for s in songs]),
+        low_confidence=_mean([s.low_confidence for s in songs]),
     )
+
+
+def _mean(values: Sequence[float | None]) -> float | None:
+    known = [value for value in values if value is not None]
+    return sum(known) / len(known) if known else None
 
 
 def _weighted(songs: Sequence[SongResult], value: str, weight: str) -> float | None:

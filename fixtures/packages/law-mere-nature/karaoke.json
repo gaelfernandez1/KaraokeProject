@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "id": "mere-nature-law",
   "title": "Mère nature",
   "artist": "LAW'",
@@ -25,6 +25,7 @@
       "start": 18.27845805,
       "end": 22.086530612,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "La",
@@ -82,6 +83,7 @@
       "start": 22.650340136,
       "end": 26.187755102,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -146,6 +148,7 @@
       "start": 27.027664399,
       "end": 30.654693878,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Quand",
@@ -203,6 +206,7 @@
       "start": 31.326984127,
       "end": 35.282721088,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Un",
@@ -253,6 +257,7 @@
       "start": 35.763809524,
       "end": 39.814965986,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -324,6 +329,7 @@
       "start": 40.106666667,
       "end": 44.151292517,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'vais",
@@ -381,6 +387,7 @@
       "start": 45.576417234,
       "end": 49.74585034,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -445,6 +452,7 @@
       "start": 49.906575964,
       "end": 54.27845805,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -509,6 +517,7 @@
       "start": 54.27845805,
       "end": 58.635827664,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -573,6 +582,7 @@
       "start": 58.635827664,
       "end": 64.700952381,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -630,6 +640,7 @@
       "start": 66.318367347,
       "end": 69.864489796,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'ai",
@@ -694,6 +705,7 @@
       "start": 70.66,
       "end": 74.157278912,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Prends",
@@ -751,6 +763,7 @@
       "start": 75.034920635,
       "end": 78.367346939,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Après,",
@@ -801,6 +814,7 @@
       "start": 79.37,
       "end": 83.369795918,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Prends",
@@ -865,6 +879,7 @@
       "start": 83.765986395,
       "end": 87.33170068,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Des",
@@ -915,6 +930,7 @@
       "start": 88.112471655,
       "end": 92.59537415,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'prévois",
@@ -958,6 +974,7 @@
       "start": 93.563718821,
       "end": 97.793741497,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1022,6 +1039,7 @@
       "start": 97.904761905,
       "end": 102.283900227,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -1086,6 +1104,7 @@
       "start": 102.283900227,
       "end": 106.487528345,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1150,6 +1169,7 @@
       "start": 106.619501134,
       "end": 113.066666667,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -1207,6 +1227,7 @@
       "start": 114.341950113,
       "end": 117.838367347,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'aime",
@@ -1271,6 +1292,7 @@
       "start": 118.641269841,
       "end": 122.540408163,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'aime",
@@ -1335,6 +1357,7 @@
       "start": 123.049433107,
       "end": 126.44,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Même",
@@ -1392,6 +1415,7 @@
       "start": 127.366530612,
       "end": 131.731156463,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Fais",
@@ -1449,6 +1473,7 @@
       "start": 132.819954649,
       "end": 137.179138322,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1513,6 +1538,7 @@
       "start": 137.179138322,
       "end": 141.444353741,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -1577,6 +1603,7 @@
       "start": 141.578231293,
       "end": 145.944671202,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1641,6 +1668,7 @@
       "start": 145.944671202,
       "end": 150.285714286,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -1698,6 +1726,7 @@
       "start": 150.285714286,
       "end": 154.483809524,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1762,6 +1791,7 @@
       "start": 154.653968254,
       "end": 158.876734694,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'en",
@@ -1812,6 +1842,7 @@
       "start": 159.018594104,
       "end": 163.252244898,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "J'y",
@@ -1862,6 +1893,7 @@
       "start": 163.379591837,
       "end": 169.894603175,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1919,6 +1951,7 @@
       "start": 204.819954649,
       "end": 209.030385488,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -1962,6 +1995,7 @@
       "start": 209.18276644,
       "end": 213.569160998,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Tu",
@@ -1998,6 +2032,7 @@
       "start": 213.569160998,
       "end": 217.741496599,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Je",
@@ -2041,6 +2076,7 @@
       "start": 217.917460317,
       "end": 222.679365079,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Tu",

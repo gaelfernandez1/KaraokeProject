@@ -85,9 +85,14 @@ class TimingStats(BaseModel):
     start_median: float
     start_mean: float
     start_within: float
+    # Share within WIDE_TOLERANCE: what an approximate reference can still vouch for.
+    start_within_wide: float | None = None
     end_median: float
     end_mean: float
     start_bias: float
+
+
+WIDE_TOLERANCE = 0.5
 
 
 def timing_stats(errors: Sequence[TimingErrors], tolerance: float = 0.3) -> TimingStats | None:
@@ -105,6 +110,7 @@ def timing_stats(errors: Sequence[TimingErrors], tolerance: float = 0.3) -> Timi
         start_median=median(abs_starts),
         start_mean=mean(abs_starts),
         start_within=sum(e <= tolerance for e in abs_starts) / len(starts),
+        start_within_wide=sum(e <= WIDE_TOLERANCE for e in abs_starts) / len(starts),
         end_median=median(abs_ends),
         end_mean=mean(abs_ends),
         start_bias=mean(starts),

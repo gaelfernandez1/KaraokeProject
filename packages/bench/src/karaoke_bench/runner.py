@@ -18,8 +18,9 @@ from statistics import median
 from typing import Any
 
 from karaoke_bench import __version__
-from karaoke_bench.audio import duration, file_sha256
+from karaoke_bench.audio import SAMPLE_RATE, duration, file_sha256, load_mono16k
 from karaoke_bench.cache import cache_key
+from karaoke_bench.checks import low_confidence, outside_voice
 from karaoke_bench.codec import encode_output
 from karaoke_bench.files import write_text_atomic
 from karaoke_bench.metrics import (
@@ -31,7 +32,7 @@ from karaoke_bench.metrics import (
     timing_stats,
 )
 from karaoke_bench.paths import BenchPaths
-from karaoke_bench.pipeline import Mode, Pipeline, StepKind, step_version
+from karaoke_bench.pipeline import Mode, Pipeline, StepKind, step_class, step_version
 from karaoke_bench.reference import Reference
 from karaoke_bench.report import render_report
 from karaoke_bench.results import RunResults, SongResult, SongStep, StageRecord, summarize
@@ -39,10 +40,12 @@ from karaoke_bench.sets import SetError, Song, load_set
 from karaoke_bench.stage import ItemOutcome, StageItem, StageOutcome, run_stage
 from karaoke_bench.textnorm import NORMALIZATION_VERSION, lyrics_lines
 from karaoke_contracts import Line
+from karaoke_engine.align.activity import vocal_activity
 from karaoke_engine.steps import Stems, Transcript
 
 # Aligners may overshoot the end of the audio slightly; more than this is a bug.
 _END_SLACK = 0.5
+_HOP = 0.02
 _PACKAGES = ("torch", "transformers", "faster-whisper", "ctranslate2", "demucs", "numpy", "jiwer")
 
 
@@ -62,6 +65,8 @@ class _SongState:
     duration: float
     steps: dict[str, SongStep]
     lines_in: list[str] | None = None
+    # Set when the aligner reads pasted lyrics as they are (a TextAligner).
+    lyrics_text: str | None = None
     vocals: Path | None = None
     vocals_fp: str = ""
     transcript: Transcript | None = None
@@ -82,6 +87,7 @@ def run(options: RunOptions, paths: BenchPaths) -> Path:
 
     notes: list[str] = []
     states = []
+    text_aligner = _reads_text(options.pipeline)
     for song in songs:
         reference = song.load_reference()
         lyrics = song.lyrics_text()
@@ -95,10 +101,11 @@ def run(options: RunOptions, paths: BenchPaths) -> Path:
                 duration=reference.duration if reference else duration(song.audio),
                 steps={},
                 lines_in=lyrics_lines(lyrics) if lyrics else None,
+                lyrics_text=lyrics if text_aligner and options.mode == "lyrics" else None,
             )
         )
 
-    stages = _run_steps(states, options, paths)
+    stages = _run_steps(states, options, paths, text_aligner)
     timing: dict[str, TimingErrors] = {}
     line_errors: dict[str, list[float]] = {}
     results = [_score(state, options.mode, timing, line_errors) for state in states]
@@ -111,8 +118,8 @@ def run(options: RunOptions, paths: BenchPaths) -> Path:
         for kind, outcome in stages.items()
     }
     groups = {"all": results}
-    for language in sorted({r.language for r in results}):
-        groups[language] = [r for r in results if r.language == language]
+    for name in sorted({r.group or r.language for r in results}):
+        groups[name] = [r for r in results if (r.group or r.language) == name]
     summary = {
         name: summarize(group, timing, line_errors, stage_records) for name, group in groups.items()
     }
@@ -140,12 +147,18 @@ def run_lyrics_stages(
     paths: BenchPaths,
     use_cache: bool = True,
     lines: dict[str, list[str]] | None = None,
+    raw_text: bool = False,
 ) -> tuple[dict[str, Stems], dict[str, ItemOutcome], dict[str, StageOutcome]]:
-    """Separator (if any) and aligner with the songs' lyrics; for drafts and packages."""
+    """Separator (if any) and aligner with the songs' lyrics; for drafts and packages.
+
+    With `raw_text`, an aligner that reads pasted lyrics gets the song's lyrics as they are.
+    """
+    text_aligner = raw_text and _reads_text(pipeline)
     states = []
     for song in songs:
         given = lines[song.song_id] if lines else lyrics_lines(song.lyrics_text() or "")
-        states.append(_SongState(song, None, 0.0, {}, lines_in=given))
+        text = song.lyrics_text() if text_aligner else None
+        states.append(_SongState(song, None, 0.0, {}, lines_in=given, lyrics_text=text))
     options = RunOptions(pipeline, "", "lyrics", use_cache=use_cache)
     stages = _run_steps(states, options, paths)
     stems = {
@@ -158,7 +171,7 @@ def run_lyrics_stages(
 
 
 def _run_steps(
-    states: list[_SongState], options: RunOptions, paths: BenchPaths
+    states: list[_SongState], options: RunOptions, paths: BenchPaths, text_aligner: bool = False
 ) -> dict[str, StageOutcome]:
     pipeline, cache = options.pipeline, options.use_cache
     stages: dict[str, StageOutcome] = {}
@@ -195,20 +208,29 @@ def _run_steps(
         outcome = stages["segmenter"] = _stage(pipeline, "segmenter", live, args, paths, cache)
         for state in live:
             state.lines_in = _take(state, "segmenter", outcome)
+            if text_aligner and state.lines_in:
+                state.lyrics_text = "\n".join(state.lines_in)
 
+    # Grouped by language, so an aligner with a model per language loads each one once.
     live = [s for s in states if s.error is None and s.lines_in]
-    args = {
-        s.song.song_id: {
-            "vocals": str(s.vocals),
-            "lines": s.lines_in,
-            "language": s.transcript.language if s.transcript else s.song.language,
-        }
-        for s in live
-    }
+    args = {s.song.song_id: _aligner_args(s) for s in live}
+    live.sort(key=lambda s: args[s.song.song_id]["language"])
     outcome = stages["aligner"] = _stage(pipeline, "aligner", live, args, paths, cache)
     for state in live:
         state.aligned = _take(state, "aligner", outcome)
     return stages
+
+
+def _aligner_args(state: _SongState) -> dict[str, Any]:
+    language = state.transcript.language if state.transcript else state.song.language
+    if state.lyrics_text is not None:
+        return {"vocals": str(state.vocals), "lyrics": state.lyrics_text, "language": language}
+    return {"vocals": str(state.vocals), "lines": state.lines_in, "language": language}
+
+
+def _reads_text(pipeline: Pipeline) -> bool:
+    spec = pipeline.steps.get("aligner")
+    return spec is not None and callable(getattr(step_class(spec), "align_text", None))
 
 
 def _stage(
@@ -261,9 +283,11 @@ def _score(
         language=song.language,
         duration=state.duration,
         mode=mode,
+        group=song.group,
         steps=state.steps,
         scored_share=ref.scored_share() if ref else None,
         reference_validated=ref.approved if ref and ref.timing == "semiautomatic" else None,
+        reference_timing=ref.timing if ref else None,
         error=state.error,
     )
     if state.transcript is not None:
@@ -281,13 +305,18 @@ def _score(
     if problem:
         result.error = f"aligner: {problem}"
         return result
+    words = [word for line in state.aligned for word in line.words]
+    if state.vocals is not None:
+        active = vocal_activity(load_mono16k(state.vocals), SAMPLE_RATE, _HOP)
+        result.outside_voice = outside_voice(words, active, _HOP)
+    result.low_confidence = low_confidence(words)
     # A draft nobody has finished checking by ear is not a reference yet.
     if ref is not None and result.reference_validated is not False:
-        words = [word for line in state.aligned for word in line.words]
         scored = ref.scored_words()
         timing[song.song_id] = timing_errors(pair_words(scored, words), len(scored))
         result.timing = timing_stats([timing[song.song_id]])
-        if mode == "lyrics":
+        # Lines pair by position, which only means something when the aligner kept the lines.
+        if mode == "lyrics" and state.lyrics_text is None:
             starts = line_start_errors(ref.lines, state.aligned)
             if starts is not None:
                 ok = [e for e, line in zip(starts, ref.lines, strict=True) if line.status == "ok"]
@@ -298,7 +327,11 @@ def _score(
 
 def _check_aligned(state: _SongState) -> str | None:
     aligned = state.aligned or []
-    if state.lines_in is not None and len(aligned) != len(state.lines_in):
+    if (
+        state.lyrics_text is None
+        and state.lines_in is not None
+        and len(aligned) != len(state.lines_in)
+    ):
         return f"returned {len(aligned)} lines for {len(state.lines_in)} lyric lines"
     for line in aligned:
         for word in line.words:
@@ -318,10 +351,11 @@ def _write(
         f"{results.set_name.replace('/', '_')}-{results.mode}"
     )
     name, n = base, 1
-    while (paths.results / name).exists():
+    folder = paths.private_results if results.set_name.split("/")[0] == "private" else paths.results
+    while (folder / name).exists():
         n += 1
         name = f"{base}-{n}"
-    out = paths.results / name
+    out = folder / name
     out.mkdir(parents=True)
     write_text_atomic(out / "results.json", results.model_dump_json(indent=2) + "\n")
     write_text_atomic(out / "report.md", render_report(results))

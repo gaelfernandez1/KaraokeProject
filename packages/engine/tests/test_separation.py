@@ -1,4 +1,6 @@
 import shutil
+import subprocess
+import types
 from pathlib import Path
 from typing import ClassVar
 
@@ -101,3 +103,78 @@ def test_a_segment_size_overrides_the_model_chunk_length(
 
     assert params["override_model_segment_size"] is True  # type: ignore[index]
     assert params["segment_size"] == 551  # type: ignore[index]
+
+
+class _RecordingSeparator:
+    """A loaded audio_separator stand-in: keeps the input path and writes both stems."""
+
+    def __init__(self) -> None:
+        self.model_instance = types.SimpleNamespace(
+            primary_stem_name="Vocals", secondary_stem_name="Instrumental", output_dir=""
+        )
+        self.output_dir = ""
+        self.inputs: list[Path] = []
+        self.sizes: list[int] = []
+
+    def separate(self, audio: str, custom_output_names: dict[str, str]) -> None:
+        self.inputs.append(Path(audio))
+        self.sizes.append(Path(audio).stat().st_size)
+        for name in custom_output_names.values():
+            (Path(self.output_dir) / f"{name}.wav").write_bytes(b"RIFF")
+
+
+def _separate_with_recorder(source: Path, work_dir: Path) -> tuple[Path, int]:
+    """The input path the separator got and its size at that moment."""
+    separator = RoformerSeparator(model="m.ckpt")
+    recorder = _RecordingSeparator()
+    separator._separator = recorder
+    separator.separate(source, work_dir)
+    return recorder.inputs[-1], recorder.sizes[-1]
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+def test_separate_decodes_inputs_libsndfile_cannot_open(tmp_path: Path) -> None:
+    source = tmp_path / "song.m4a"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=1",
+         "-c:a", "aac", str(source)],
+        check=True,
+    )  # fmt: skip
+    work_dir = tmp_path / "work"
+
+    used, size = _separate_with_recorder(source, work_dir)
+
+    assert used.suffix == ".wav"
+    assert used.parent == work_dir
+    assert size > 1000
+
+
+def test_separate_keeps_wav_inputs_as_they_are(tmp_path: Path) -> None:
+    source = tmp_path / "song.wav"
+    source.write_bytes(b"RIFF")
+
+    assert _separate_with_recorder(source, tmp_path / "work")[0] == source
+
+
+@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+def test_decoded_input_is_not_left_behind(tmp_path: Path) -> None:
+    source = tmp_path / "song.m4a"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440:duration=1",
+         "-c:a", "aac", str(source)],
+        check=True,
+    )  # fmt: skip
+    work_dir = tmp_path / "work"
+
+    _separate_with_recorder(source, work_dir)
+
+    assert sorted(p.name for p in work_dir.iterdir()) == ["instrumental.wav", "vocals.wav"]
+
+
+def test_unload_drops_the_loaded_model() -> None:
+    separator = RoformerSeparator(model="m.ckpt")
+    separator._separator = _RecordingSeparator()
+
+    separator.unload()
+
+    assert separator._separator is None

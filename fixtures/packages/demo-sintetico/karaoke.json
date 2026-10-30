@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "id": "demo-sintetico",
   "title": "Mar de Vigo (demo sintética)",
   "artist": null,
@@ -30,6 +30,7 @@
       "start": 4.0,
       "end": 7.0,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "Ola,",
@@ -88,6 +89,7 @@
       "start": 7.5,
       "end": 11.5,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "cántame",
@@ -162,6 +164,7 @@
       "start": 12.0,
       "end": 15.5,
       "singer": "s2",
+      "role": "lead",
       "words": [
         {
           "text": "co",
@@ -220,6 +223,7 @@
       "start": 23.0,
       "end": 27.0,
       "singer": "s1",
+      "role": "lead",
       "words": [
         {
           "text": "volvo",
