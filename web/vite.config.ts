@@ -12,7 +12,9 @@ const PACKAGE_DIRS = [resolve(ROOT, 'fixtures/packages'), resolve(ROOT, 'bench/d
 const TYPES: Record<string, string> = {
 	'.json': 'application/json',
 	'.m4a': 'audio/mp4',
-	'.wav': 'audio/wav'
+	'.wav': 'audio/wav',
+	'.mp4': 'video/mp4',
+	'.jpg': 'image/jpeg'
 };
 
 function packageIds(): string[] {
@@ -48,6 +50,24 @@ function servePackages(): Plugin {
 						continue;
 					}
 					res.setHeader('Content-Type', type);
+					res.setHeader('Accept-Ranges', 'bytes');
+					// Browsers seek in videos with byte ranges; without them they cannot jump.
+					const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? '');
+					if (range && (range[1] || range[2])) {
+						const start = range[1] ? Number(range[1]) : size - Number(range[2]);
+						const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+						if (start > end || start >= size) {
+							res.statusCode = 416;
+							res.setHeader('Content-Range', `bytes */${size}`);
+							res.end();
+							return;
+						}
+						res.statusCode = 206;
+						res.setHeader('Content-Range', `bytes ${start}-${end}/${size}`);
+						res.setHeader('Content-Length', end - start + 1);
+						createReadStream(path, { start, end }).pipe(res);
+						return;
+					}
 					res.setHeader('Content-Length', size);
 					createReadStream(path).pipe(res);
 					return;

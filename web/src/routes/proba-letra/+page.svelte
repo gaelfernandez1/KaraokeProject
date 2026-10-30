@@ -6,6 +6,7 @@
 	import type { KaraokeDoc, PlaybackClock } from '#lib/contracts';
 	import { AudioEngine } from '#lib/audio/engine.js';
 	import { DEFAULT_THEME, Lyrics, THEMES, normalizeDoc } from '#lib/lyrics';
+	import { BackgroundSync } from '#lib/video/background.js';
 
 	const FRAMES: Record<string, { label: string; size: [number, number] | null }> = {
 		completa: { label: 'Pantalla completa', size: null },
@@ -36,6 +37,9 @@
 	let stage = $state<HTMLElement | null>(null);
 	let stageWidth = $state(0);
 	let stageHeight = $state(0);
+
+	let video = $state<HTMLVideoElement | null>(null);
+	let sync: BackgroundSync | null = null;
 
 	let context: AudioContext | null = null;
 	let engine: AudioEngine | null = null;
@@ -75,14 +79,29 @@
 			.catch((error) => (message = `Non se puido cargar ${id}: ${error}`));
 	});
 
+	// The package's video follows the song (paused and on the right frame when frozen).
+	$effect(() => {
+		sync = video
+			? new BackgroundSync(video, {
+					now: () => clock.now(),
+					get playing() {
+						return frozen === null && (engine?.playing ?? false);
+					}
+				})
+			: null;
+	});
+
 	$effect(() => {
 		let raf = requestAnimationFrame(function tick() {
 			now = clock.now();
 			playing = engine?.playing ?? false;
+			sync?.tick();
 			raf = requestAnimationFrame(tick);
 		});
 		return () => cancelAnimationFrame(raf);
 	});
+
+	const media = (file: string | null | undefined) => (file ? `/paquetes/${chosen}/${file}` : null);
 
 	async function toggle() {
 		if (!doc) return;
@@ -184,6 +203,29 @@
 			style:height={frame.size ? `${frame.size[1]}px` : '100%'}
 			style:transform={frame.size ? `scale(${scale})` : 'none'}
 		>
+			{#if doc && !plain}
+				{@const cover = media(doc.cover)}
+				{@const backgroundVideo = media(doc.video?.background)}
+				{#if cover}
+					<div class="backdrop" style:background-image={`url("${cover}")`}></div>
+				{/if}
+				{#if backgroundVideo}
+					<video
+						class="picture"
+						src={backgroundVideo}
+						muted
+						loop
+						playsinline
+						preload="auto"
+						bind:this={video}
+					></video>
+				{:else if cover}
+					<img class="picture" src={cover} alt="" />
+				{/if}
+				{#if cover || backgroundVideo}
+					<div class="scrim" class:band={theme.layout.mode === 'scroll'}></div>
+				{/if}
+			{/if}
 			{#if doc}
 				<Lyrics {doc} {theme} {clock} />
 			{/if}
@@ -250,6 +292,47 @@
 		background:
 			radial-gradient(circle at 30% 20%, #3b2a6b, transparent 60%),
 			radial-gradient(circle at 80% 90%, #1d4b6b, transparent 55%), #141428;
+	}
+
+	/* The background of the exported video, in CSS: the picture whole, over a blurred copy, darker,
+	   with a dark gradient behind the lyrics. */
+	.backdrop,
+	.picture,
+	.scrim {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.backdrop {
+		background-size: cover;
+		background-position: center;
+		filter: blur(24px) brightness(0.45);
+		transform: scale(1.1);
+	}
+
+	.picture {
+		object-fit: contain;
+		filter: brightness(0.7);
+	}
+
+	.scrim {
+		background: linear-gradient(to bottom, transparent 55%, rgb(0 0 0 / 0.67));
+	}
+
+	.scrim.band {
+		background: linear-gradient(
+			to bottom,
+			transparent 22%,
+			rgb(0 0 0 / 0.55) 42%,
+			rgb(0 0 0 / 0.55) 55%,
+			transparent 75%
+		);
+	}
+
+	.screen {
+		overflow: hidden;
 	}
 
 	.screen.plain {
