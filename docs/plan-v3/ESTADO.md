@@ -10,7 +10,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | C3 | Audio: separación y sonido | en revisión (PR #3) | `v3/c3-audio` | separador elegido con el banco (Mel-Band RoFormer de Kim en trozos de 8 s, `decisiones/004`), audio del paquete a −14 LUFS en m4a, motor de audio web con voz guía, tono, reloj con latencia y calibración, y página `/proba-audio`; falta que el usuario lo pruebe en aparatos reales y escuche la separación | `karaoke_engine.separation.RoformerSeparator`; `karaoke_engine.audio` (`decode`, `measure`, `plan_gain`, `package_audio`, `convert_package`); CLI `karaoke audio`; `#lib/audio/engine.js` (`AudioEngine`, cumple `PlaybackClock`), `clock.js` (`SongClock`), `calibration.js`; guía en `docs/audio.md` | ver notas C3 → C4, C5/C7, C8 |
 | C4 | Transcripción y sincronización | en revisión (PR #4) | `v3/c4-sincronia` | `karaoke make` de punta a punta (con letra, `--lrclib` o sin letra), alineador nuevo, sílabas, coros (contrato 1.1.0) y cantantes; con letra: jamendo 98,8 % a ≤ 0,3 s, media 0,093 s, inglés 97,6 %, gallego 98,6 %; sin letra: WER jamendo 23,2 %, gallego 26,5 % (meta 25 %); 0 cambios de idioma; `make` de 4 min: ~91 s con letra, 105–155 s sin letra (`decisiones/005` y `006`) | `karaoke make`; `karaoke_engine.make.make_package`; `karaoke_engine.align` (`LyricsAligner`, `parse_lyrics`, `syllables`…); `karaoke_engine.transcribe` (`WhisperTranscriber`, `LineSegmenter`); `karaoke_engine.lyrics_lookup`; `steps.TextAligner`; contrato 1.1.0 (`Line.role`); guía `docs/sincronia.md` | ver notas C4 → C2, C3, C5/C7, C8 |
 | C5 | Subtítulos animados | en revisión (PR #5); el usuario lo vio el 30/10 y se queda con `clasico` y `moderno` (`contraste`, como opción) | `v3/c5-subtitulos` | maquetación única en Python y TS con casos compartidos, modos páginas y desplazamiento, cuenta atrás, barra de pausa, coros y colores por cantante; componente web a 60 fps; generador ASS que coincide con la web a 1–3 px; 3 temas con fuentes OFL; tema 1.1.0 (`decisiones/007`) | `karaoke_engine.subtitles` (`build_layout`, `build_ass`, `load_theme`, `fonts_dir`, `render_preview`); CLI `karaoke subtitles\|preview`; `#lib/lyrics` (`Lyrics`, `THEMES`, `normalizeDoc`, `buildLayout`); página `/proba-letra`; guía `docs/subtitulos.md` | ver notas C5 → C6, C7, C4 |
-| C6 | Vídeo | sin empezar | — | — | — | — |
+| C6 | Vídeo | en revisión (PR #6) | `v3/c6-video` | `make` guarda vídeo y portada; `karaoke render` 16:9 y 9:16 con fondo de vídeo, portada o degradado, oscurecido según su brillo, franja bajo la letra, título, créditos y miniatura, en 27–45 s para 4 min con NVENC (`decisiones/008`); vídeo de fondo sincronizado en la web | `karaoke_engine.video` (`render`, `add_background`, `extract_background`, `extract_cover`, `choose_background`); CLI `karaoke render\|background`; `#lib/video/background.js` (`BackgroundSync`); guía `docs/video.md` | ver notas C6 → C7, C8, C4 |
 | C7 | Frontend | sin empezar | — | — | — | — |
 | C8 | Backend, servidor y despliegue | sin empezar | — | — | — | — |
 | C9 | Calidad de código | sin empezar | — | — | — | — |
@@ -79,3 +79,13 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   (`docs/subtitulos.md`).
 - C5 → C4: el barrido pinta los tiempos tal cual (sin retoques); lo que se vea adelantado o atrasado se
   arregla en el motor o en el editor. Una cuenta atrás a tempo necesitaría los pulsos en el documento.
+- C6 → C7: el reproductor pone detrás de la letra el `<video muted playsinline>` del paquete
+  (`video.background`) con `BackgroundSync` y, si no hay vídeo, la portada; `/proba-letra` lo enseña
+  (portada desenfocada detrás, oscurecido y franja bajo la letra).
+- C6 → C8: hay que servir los `.mp4` con peticiones Range (206), o el navegador no puede saltar en el
+  vídeo; la exportación es `karaoke_engine.video.render.render(paquete, salida, tema, aspect=...)`.
+- C6 → C4: `make_package` guarda `background.mp4` y `cover.jpg` si la canción trae vídeo o carátula
+  (unos 7 s más para 3 min de vídeo).
+- C6 → C4: `make` en gallego junta ahora los pronombres enclíticos escritos aparte a su verbo
+  (`dixo lle` → `díxolle`, `decisiones/009`), después de alinear; `karaoke join-clitics` arregla
+  paquetes ya hechos. El banco no cambia (mide el alineador).
