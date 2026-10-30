@@ -341,3 +341,72 @@ def test_the_default_transcriber_runs_in_a_child_process(
 
     assert calls == [("vocals.wav", "gl")]
     assert doc.provenance.asr_model == "child-model@1"
+
+
+def test_make_keeps_the_video_as_background_and_a_cover(tmp_path: Path) -> None:
+    clip = tmp_path / "Videoclip.mp4"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "testsrc2=s=640x360:d=6", "-f", "lavfi",
+         "-i", "sine=frequency=330:duration=6", "-ac", "2", "-shortest", str(clip)],
+        check=True,
+    )  # fmt: skip
+    out = tmp_path / "pkg"
+
+    doc = make_package(
+        clip, out, "gl", "Ola mar\n", separator=CopySeparator(), aligner=EvenAligner()
+    )
+
+    assert doc.video is not None
+    assert doc.video.background == "background.mp4"
+    assert doc.cover == "cover.jpg"
+    assert validate_package(out) == []
+
+
+def test_make_keeps_the_cover_art_of_a_song(tmp_path: Path) -> None:
+    art = tmp_path / "art.png"
+    subprocess.run(["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "color=red:s=300x300",
+                    "-frames:v", "1", str(art)], check=True)  # fmt: skip
+    song = tmp_path / "Canción.mp3"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "sine=duration=6", "-i", str(art),
+         "-map", "0:a", "-map", "1:v", "-c:v", "png", "-disposition:v", "attached_pic", str(song)],
+        check=True,
+    )  # fmt: skip
+
+    doc = make_package(song, tmp_path / "pkg", "gl", "Ola\n", separator=CopySeparator(),
+                       aligner=EvenAligner())  # fmt: skip
+
+    assert doc.video is None
+    assert doc.cover == "cover.jpg"
+
+
+def test_make_without_pictures_has_neither(tmp_path: Path) -> None:
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "gl", "Ola\n", separator=CopySeparator(),
+                       aligner=EvenAligner())  # fmt: skip
+
+    assert doc.video is None
+    assert doc.cover is None
+
+
+def test_a_failing_cover_or_background_does_not_lose_the_package(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    clip = tmp_path / "Videoclip.mp4"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "testsrc2=s=320x240:d=6", "-f", "lavfi",
+         "-i", "sine=duration=6", "-ac", "2", "-shortest", str(clip)],
+        check=True,
+    )  # fmt: skip
+
+    def broken(source: Path, out: Path) -> Path:
+        raise RuntimeError("ffmpeg failed")
+
+    monkeypatch.setattr("karaoke_engine.make.extract_background", broken)
+    monkeypatch.setattr("karaoke_engine.make.extract_cover", broken)
+    out = tmp_path / "pkg"
+
+    doc = make_package(clip, out, "gl", "Ola\n", separator=CopySeparator(), aligner=EvenAligner())
+
+    assert doc.video is None
+    assert doc.cover is None
+    assert validate_package(out) == []
