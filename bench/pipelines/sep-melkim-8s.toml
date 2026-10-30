@@ -1,0 +1,19 @@
+# The Mel-Band vocals model separating in 8 s chunks, the inference chunk its config ships with.
+# audio-separator derives the chunk from the config's dim_t instead (11 s), which peaks at 3.2 GB
+# of VRAM; 8 s peaks at 2.9 GB, under the 3 GB per step of decision 003, at the same speed.
+name = "sep-melkim-8s"
+description = "Mel-Band RoFormer vocals model (Kimberley Jensen, 8 s chunks) + Whisper large-v3-turbo + default CTC aligner"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "vocals_mel_band_roformer.ckpt", segment_size = 801 }
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "large-v3-turbo" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"

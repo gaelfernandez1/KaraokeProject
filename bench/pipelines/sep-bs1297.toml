@@ -1,0 +1,18 @@
+# Separation candidate: base-turbo with the separator swapped, so a compare against base-turbo
+# shows only the effect of the separation.
+name = "sep-bs1297"
+description = "BS-RoFormer vocals model (viperx, SDR 12.97) + Whisper large-v3-turbo + default CTC aligner"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "model_bs_roformer_ep_317_sdr_12.9755.ckpt" }
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "large-v3-turbo" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"
