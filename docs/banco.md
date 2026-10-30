@@ -24,6 +24,7 @@ El audio nunca entra en git: todo lo descargado o calculado va a `bench/data/` (
 | `jamendo-<idioma>` | las de un idioma | medir un idioma |
 | `quick` | 20 fijas (5 por idioma, géneros variados), en `bench/sets/quick.txt` | prueba rápida diaria |
 | `gl` | canciones en gallego con licencia libre y tiempos validados de oído (`bench/sets/gl/`) | la meta principal |
+| `stress` | 24 canciones de `quick` con perrerías de las canciones reales (instrumental de 30 s, adlibs, ecos, letra «de web» con cabeceras y `x2`, una línea que falta o dos que sobran), con los tiempos exactos de JamendoLyrics desplazados; receta en `bench/sets/stress.toml`, se construye con `fetch --set stress` | robustez del alineador, por grupo |
 | `private` | tus canciones, en `bench/data/private/` | solo en local |
 | `<conjunto>/<id>` | una canción suelta | depurar |
 
@@ -64,6 +65,12 @@ protocolos de `karaoke_engine.steps`. Para que el banco la use bien:
   métodos, porque el banco importa la clase para leer `version`.
 - Opcional: un método `load()` sin argumentos. El banco lo cronometra aparte como «carga».
 - Fija la revisión de los modelos de Hugging Face.
+- Si el alineador tiene además `align_text(vocals, lyrics, language)` (protocolo
+  `karaoke_engine.steps.TextAligner`), recibe la letra tal como se pegó, con cabeceras
+  (`[Estribillo]`), repeticiones (`x2`) y coros entre paréntesis, y puede devolver otro número de
+  líneas, por ejemplo si repite un estribillo o se salta una línea que no se canta. En modo `asr`
+  recibe las líneas del segmentador unidas por saltos de línea. Los demás alineadores siguen
+  recibiendo las líneas limpias.
 
 Pipelines incluidos:
 
@@ -89,7 +96,8 @@ canción. Cada canción terminada entra en la caché en el momento, así que una
 
 Cada ejecución deja:
 
-- `bench/results/<fecha>-<pipeline>-<conjunto>-<modo>/report.md`: el informe (se versiona);
+- `bench/results/<fecha>-<pipeline>-<conjunto>-<modo>/report.md`: el informe (se versiona). Los
+  del conjunto `private` van a `bench/data/results/`, que no se versiona: son tus canciones;
 - `.../results.json`: todos los números, el entorno, el commit y la versión de la normalización (se
   versiona);
 - `bench/data/runs/<mismo nombre>/<canción>.json`: las salidas completas (no se versiona).
@@ -155,6 +163,15 @@ No hay tiempos publicados para canciones en gallego, así que se crean así:
    las anclas. Esas líneas quedan como «revisar» para volver a escucharlas.
 4. Cuando no queda nada sin revisar ni mal, el botón **Canción validada** la da por buena.
 
+**Sin escuchar todo**: `uv run karaoke-bench triangulate gl/<id> --pipelines a.toml b.toml c.toml`
+alinea la letra con varios alineadores independientes (modelos distintos). Las líneas en borrador
+en las que todos ponen cada palabra a ≤ 0,15 s de la mediana quedan «bien», con los tiempos de la
+mediana y una nota `auto: …`. El resto quedan «dudosas» y el comando las lista: son las únicas que
+hace falta escuchar en la página de revisión. Si ≥ 70 % de las palabras quedan bien, la canción
+cuenta como validada. Las líneas ya revisadas a oído no se tocan. Ojo: puntuar después uno de esos
+alineadores contra esa referencia lo favorece un poco; mejor usar alineadores distintos del que se
+mide.
+
 Solo cuentan para la sincronía las líneas marcadas «bien», y solo cuando la canción está validada:
 hasta entonces el informe la marca «sin validar» y no entra en la sincronía. El texto corregido en la
 página es el que vale para el WER y el que recibe el alineador. Una referencia validada de oído es
@@ -184,6 +201,17 @@ referencia con líneas ya revisadas salvo con `--force`.
 - `reference.json` si tienes los tiempos. Un `karaoke.json` corregido a mano también sirve: se
   convierte con `karaoke_bench.reference.reference_from_doc`.
 
+Si tienes los tiempos en un subtítulo `.srt` hecho a mano palabra a palabra (una entrada por
+palabra; vale que alguna lleve dos palabras o que una palabra vaya partida en sílabas), crea antes
+el `lyrics.txt` con las líneas de la canción y conviértelo:
+
+```bash
+uv run karaoke-bench import-srt private/<id> mis-tiempos.srt
+```
+
+La referencia queda como **aproximada**: un subtítulo hecho a mano es fiable a unas décimas de
+segundo, así que en esas canciones el informe da también el % de palabras a ≤ 0,5 s.
+
 Sin referencia, el banco solo mide velocidad, memoria e idioma. Con `draft` y `review` puedes
 crearla igual que para el conjunto gallego.
 
@@ -192,7 +220,7 @@ crearla igual que para el conjunto gallego.
 ```json
 {
   "song_id": "…", "language": "gl", "duration": 215.3,
-  "timing": "manual | semiautomatic", "approved": true,
+  "timing": "manual | semiautomatic | approximate", "approved": true,
   "lines": [
     { "text": "Vou-te ver, d'aquí", "start": 12.3, "end": 15.8,
       "status": "draft | ok | wrong | unsure", "anchor": null, "note": null, "revised": false,

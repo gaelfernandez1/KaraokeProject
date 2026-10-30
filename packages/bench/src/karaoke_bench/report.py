@@ -37,8 +37,9 @@ def render_report(results: RunResults) -> str:
         "## Resumen",
         "",
         "| Grupo | Canciones | Fallos | WER | CER | Inicio mediana | Inicio media | ≤ 0,3 s "
-        "| Fin mediana | Sesgo | Cobertura | Línea mediana | Cambios de idioma | 4 min (s) |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "| ≤ 0,5 s | Fin mediana | Sesgo | Cobertura | Línea mediana | Cambios de idioma "
+        "| 4 min (s) | Fuera de voz | Confianza < 0,3 |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         *(_summary_row(name, group) for name, group in _ordered(results.summary)),
         "",
         "## Etapas",
@@ -54,9 +55,9 @@ def render_report(results: RunResults) -> str:
         "",
         "## Por canción",
         "",
-        "| Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | Cobertura "
-        "| Referencia | Idioma devuelto | Tiempo (s) | Error |",
-        "|---|---|---|---|---|---|---|---|---|---|---|",
+        "| Canción | Idioma | Duración | WER | Inicio mediana | ≤ 0,3 s | ≤ 0,5 s | Cobertura "
+        "| Referencia | Fuera de voz | Confianza < 0,3 | Idioma devuelto | Tiempo (s) | Error |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         *(_song_row(song) for song in results.songs),
         "",
         "## Peores casos",
@@ -86,12 +87,15 @@ def _summary_row(name: str, g: GroupSummary) -> str:
         _num(_stat(t, "start_median")),
         _num(_stat(t, "start_mean")),
         _pct(_stat(t, "start_within")),
+        _pct(_stat(t, "start_within_wide")),
         _num(_stat(t, "end_median")),
         _num(_stat(t, "start_bias")),
         _pct(_stat(t, "coverage")),
         _num(g.line_start_median),
         str(g.language_switches),
         _num(g.est_seconds_4min, 0),
+        _pct(g.outside_voice),
+        _pct(g.low_confidence),
     ]
     return _row(cells)
 
@@ -108,8 +112,11 @@ def _song_row(s: SongResult) -> str:
         _pct(s.wer),
         _num(_stat(t, "start_median")),
         _pct(_stat(t, "start_within")),
+        _pct(_stat(t, "start_within_wide")),
         _pct(_stat(t, "coverage")),
         _reference_cell(s),
+        _pct(s.outside_voice),
+        _pct(s.low_confidence),
         s.language_reported or "—",
         _num(seconds, 1) + cached,
         error,
@@ -149,6 +156,12 @@ def _notes(results: RunResults) -> list[str]:
             "unos ±0,1 s, así que ahí manda el % ≤ 0,3 s más que la mediana. Solo cuentan las "
             "líneas marcadas «bien» (columna Referencia)."
         )
+    approximate = [s.song_id for s in results.songs if s.reference_timing == "approximate"]
+    if approximate:
+        notes.append(
+            f"- Referencia aproximada (subtítulos hechos a mano) en {', '.join(approximate)}: "
+            "fiable a unas décimas de segundo, así que ahí cuenta más el % ≤ 0,5 s."
+        )
     if pending:
         notes.append(
             f"- Referencia sin validar de oído en {', '.join(pending)}: no cuenta para la "
@@ -158,10 +171,16 @@ def _notes(results: RunResults) -> list[str]:
         "- Sincronía: error absoluto de inicio y fin de las palabras emparejadas con la "
         "referencia (sin tildes); sesgo = media con signo (positivo = tarde)."
     )
+    notes.append(
+        "- Sin referencia: «Fuera de voz» es la parte del tiempo de las palabras en la que la voz "
+        "(separada) calla; «Confianza < 0,3», la parte de las palabras con confianza baja."
+    )
     return notes
 
 
 def _reference_cell(s: SongResult) -> str:
+    if s.reference_timing == "approximate":
+        return "aproximada"
     if s.reference_validated is None:
         return "manual" if s.scored_share is not None else "—"
     if not s.reference_validated:
@@ -170,13 +189,19 @@ def _reference_cell(s: SongResult) -> str:
 
 
 def _reference_kinds(results: RunResults) -> str:
-    kinds = {"manual": "manual", "semiautomatic": "semiautomática", "mixed": "mixta"}
+    kinds = {
+        "manual": "manual",
+        "semiautomatic": "semiautomática",
+        "approximate": "aproximada",
+        "mixed": "mixta",
+    }
     items = [f"{lang} {kinds.get(kind, kind)}" for lang, kind in results.reference_kind.items()]
     return ", ".join(items) or "—"
 
 
 def _stat(stats: TimingStats | None, name: str) -> float | None:
-    return None if stats is None else float(getattr(stats, name))
+    value = None if stats is None else getattr(stats, name)
+    return None if value is None else float(value)
 
 
 def _num(value: float | None, digits: int = 3) -> str:

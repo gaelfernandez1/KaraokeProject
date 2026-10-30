@@ -26,6 +26,9 @@ class Song:
     audio: Path
     reference: Path | None
     lyrics: Path | None
+    # Reports group songs by this when given (e.g. the kind of trouble in the stress set),
+    # otherwise by language.
+    group: str | None = None
 
     def load_reference(self) -> Reference | None:
         return load_reference(self.reference) if self.reference else None
@@ -61,10 +64,13 @@ def load_set(name: str, paths: BenchPaths) -> list[Song]:
         return _quick(paths)
     if name == "private":
         return _private(paths)
+    if name == "stress":
+        return _local_dirs("stress", paths)
     if (paths.sets / name / "manifest.toml").is_file():
         return _manifest_set(name, paths)
     raise SetError(
-        f"unknown set '{name}' (try jamendo, jamendo-<{'|'.join(LANGUAGES)}>, quick, gl, private)"
+        f"unknown set '{name}' "
+        f"(try jamendo, jamendo-<{'|'.join(LANGUAGES)}>, quick, gl, stress, private)"
     )
 
 
@@ -114,9 +120,13 @@ def _quick(paths: BenchPaths) -> list[Song]:
 
 
 def _private(paths: BenchPaths) -> list[Song]:
-    root = paths.data / "private"
+    return _local_dirs("private", paths)
+
+
+def _local_dirs(set_name: str, paths: BenchPaths) -> list[Song]:
+    root = paths.data / set_name
     return [
-        _song_from_dir("private", d) for d in sorted(root.glob("*")) if (d / "meta.toml").is_file()
+        _song_from_dir(set_name, d) for d in sorted(root.glob("*")) if (d / "meta.toml").is_file()
     ]
 
 
@@ -131,6 +141,7 @@ def _song_from_dir(set_name: str, song_dir: Path) -> Song:
         audio=_audio_in(song_dir, set_name),
         reference=_optional(song_dir / "reference.json"),
         lyrics=_optional(song_dir / "lyrics.txt"),
+        group=meta.get("group"),
     )
 
 

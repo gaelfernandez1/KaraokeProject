@@ -14,6 +14,7 @@ _METRICS: list[_Metric] = [
     ("CER", lambda g: g.cer, "pct"),
     ("Inicio mediana (s)", lambda g: g.timing.start_median if g.timing else None, "num"),
     ("Inicio ≤ 0,3 s", lambda g: g.timing.start_within if g.timing else None, "pct"),
+    ("Inicio ≤ 0,5 s", lambda g: g.timing.start_within_wide if g.timing else None, "pct"),
     ("Cobertura", lambda g: g.timing.coverage if g.timing else None, "pct"),
     ("Cambios de idioma", lambda g: float(g.language_switches), "int"),
     ("Tiempo estimado 4 min (s)", lambda g: g.est_seconds_4min, "num"),

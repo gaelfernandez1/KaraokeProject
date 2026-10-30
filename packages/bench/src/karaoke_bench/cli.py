@@ -6,7 +6,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from karaoke_bench.audio import AudioError
+from karaoke_bench.audio import AudioError, duration
 from karaoke_bench.compare import compare_runs
 from karaoke_bench.drafting import (
     DraftError,
@@ -22,6 +22,9 @@ from karaoke_bench.reference import dump_reference, load_reference
 from karaoke_bench.results import load_results
 from karaoke_bench.runner import RunOptions, run
 from karaoke_bench.sets import SetError, Song, load_set
+from karaoke_bench.srt import parse_srt, reference_from_srt
+from karaoke_bench.stress import build_stress
+from karaoke_bench.textnorm import lyrics_lines
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -34,7 +37,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
 
     fetch = commands.add_parser("fetch", help="download a song set into bench/data")
-    fetch.add_argument("--set", dest="set_name", default="all", help="jamendo, gl or all")
+    fetch.add_argument("--set", dest="set_name", default="all", help="jamendo, gl, stress or all")
 
     run_cmd = commands.add_parser("run", help="run a pipeline over a set and write a report")
     run_cmd.add_argument("--pipeline", type=Path, required=True, help="pipeline TOML file")
@@ -68,6 +71,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--pipeline", type=Path, required=True, help="its separator makes the stems"
     )
     package.add_argument("--out", type=Path, required=True)
+    package.add_argument(
+        "--align", action="store_true", help="time the lyrics with the pipeline's aligner"
+    )
+
+    tri = commands.add_parser(
+        "triangulate", help="validate a drafted reference where several aligners agree"
+    )
+    tri.add_argument("song", help="set/song, e.g. gl/some-song")
+    tri.add_argument("--pipelines", type=Path, nargs="+", required=True)
+    tri.add_argument("--tolerance", type=float, default=0.15, help="seconds (default 0.15)")
+
+    import_srt = commands.add_parser(
+        "import-srt", help="make a private song's reference from word-timed subtitles"
+    )
+    import_srt.add_argument("song", help="private/song")
+    import_srt.add_argument("srt", type=Path, help="subtitle file with one entry per word")
 
     args = parser.parse_args(argv)
     paths = BenchPaths(args.bench_dir)
@@ -81,7 +100,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "realign":
             return _realign(paths, _one_song(args.song, paths), args.pipeline)
         if args.command == "package":
-            return _package(paths, _one_song(args.song, paths), args.pipeline, args.out)
+            song = _one_song(args.song, paths)
+            if args.align:
+                return _package_aligned(paths, song, args.pipeline, args.out)
+            return _package(paths, song, args.pipeline, args.out)
+        if args.command == "triangulate":
+            song = _one_song(args.song, paths)
+            return _triangulate(paths, song, args.pipelines, args.tolerance)
+        if args.command == "import-srt":
+            return _import_srt(paths, args.song, args.srt)
         if args.command == "review":
             return _review(paths, _one_song(args.song, paths), args.port, args.pipeline)
         return _run(paths, args)
@@ -100,7 +127,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _fetch(paths: BenchPaths, set_name: str) -> int:
     manifest_sets = sorted(p.parent.name for p in paths.sets.glob("*/manifest.toml"))
-    if set_name not in ("all", "jamendo", *manifest_sets):
+    if set_name not in ("all", "jamendo", "stress", *manifest_sets):
         print(f"error: unknown set '{set_name}'", file=sys.stderr)
         return 2
     if set_name in ("all", "jamendo"):
@@ -108,6 +135,8 @@ def _fetch(paths: BenchPaths, set_name: str) -> int:
     for name in manifest_sets:
         if set_name in ("all", name):
             print(f"{name}: {len(fetch_manifest_set(name, paths))} songs")
+    if set_name in ("all", "stress"):
+        print(f"stress: {len(build_stress(paths, paths.sets / 'stress.toml'))} songs")
     return 0
 
 
@@ -193,6 +222,79 @@ def _package(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> i
     credits = _credits(song, meta, pipeline_path)
     stems = separated_stems(song, load_pipeline(pipeline_path), paths)
     doc = build_package(song, ref, stems, out, credits)
+    print(f"{out}: {len(doc.lines)} lines")
+    return 0
+
+
+def _triangulate(paths: BenchPaths, song: Song, pipelines: list[Path], tolerance: float) -> int:
+    from karaoke_bench.runner import run_lyrics_stages
+    from karaoke_bench.triangulate import triangulate
+
+    target = reference_path(song, paths)
+    ref = load_reference(target)
+    texts = [line.text for line in ref.lines]
+    runs = []
+    for pipeline_path in pipelines:
+        pipeline = load_pipeline(pipeline_path)
+        _, aligned, _ = run_lyrics_stages([song], pipeline, paths, lines={song.song_id: texts})
+        outcome = aligned[song.song_id]
+        if outcome.output is None:
+            raise DraftError(f"{pipeline.name} failed on {song.song_id}: {outcome.error}")
+        runs.append(outcome.output)
+    fixed = triangulate(ref, runs, tolerance)
+    dump_reference(fixed, target)
+    unsure = [line for line in fixed.lines if line.status == "unsure"]
+    state = "validated" if fixed.approved else "not validated"
+    print(f"{target}: {state}, {len(unsure)} lines to listen to")
+    for line in unsure:
+        print(f"  {line.start:7.2f}  {line.text}")
+    return 0
+
+
+def _import_srt(paths: BenchPaths, name: str, srt: Path) -> int:
+    if not name.startswith("private/"):
+        raise SetError(
+            f"subtitle timings are approximate: only private songs take them, not {name}"
+        )
+    song = _one_song(name, paths)
+    if song.lyrics is None:
+        raise SetError(f"{song.song_id} needs a lyrics.txt with the lines of the song")
+    try:
+        entries = parse_srt(srt.read_text(encoding="utf-8"))
+        ref = reference_from_srt(
+            entries, lyrics_lines(song.lyrics_text() or ""), song.song_id, song.language,
+            duration(song.audio),
+        )  # fmt: skip
+    except ValueError as exc:
+        raise SetError(f"{srt}: {exc}") from exc
+    target = song.audio.parent / "reference.json"
+    dump_reference(ref, target)
+    print(f"{target}: {len(ref.lines)} lines, {len(ref.scored_words())} words")
+    return 0
+
+
+def _package_aligned(paths: BenchPaths, song: Song, pipeline_path: Path, out: Path) -> int:
+    from karaoke_bench.package import write_package
+    from karaoke_bench.runner import run_lyrics_stages
+    from karaoke_bench.sets import read_meta
+
+    pipeline = load_pipeline(pipeline_path)
+    if "aligner" not in pipeline.steps:
+        raise PackageError(f"{pipeline.name} has no aligner")
+    stems, aligned, _ = run_lyrics_stages([song], pipeline, paths, raw_text=True)
+    outcome = aligned.get(song.song_id)
+    if song.song_id not in stems or outcome is None or outcome.output is None:
+        raise PackageError(f"aligning {song.song_id}: {outcome.error if outcome else 'no lyrics'}")
+    spec = pipeline.steps["aligner"]
+    separator = pipeline.steps.get("separator")
+    meta_path = song.audio.parent / "meta.toml"
+    meta = read_meta(meta_path) if meta_path.is_file() else {}
+    credits = _credits(song, meta, pipeline_path).replace(" --out ", " --align --out ")
+    doc = write_package(
+        song, outcome.output, duration(song.audio), stems[song.song_id], out, credits,
+        f"{separator.target} {separator.params or ''}".strip() if separator else None,
+        f"{spec.target} {spec.params or ''}".strip(),
+    )  # fmt: skip
     print(f"{out}: {len(doc.lines)} lines")
     return 0
 

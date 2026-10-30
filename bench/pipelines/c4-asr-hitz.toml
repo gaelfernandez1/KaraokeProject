@@ -1,0 +1,17 @@
+# Transcription without lyrics with HiTZ Whisper large-v3 Galician, then the lyrics aligner on the transcribed lines.
+name = "c4-asr-hitz"
+description = "Mel-Band RoFormer (Kim, 8 s) + HiTZ Whisper large-v3 Galician (VAD, voice check, fixed seed) + line segmenter + lyrics aligner"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "vocals_mel_band_roformer.ckpt", segment_size = 801 }
+
+[steps.transcriber]
+target = "karaoke_engine.transcribe:WhisperTranscriber"
+params = { model = "hitz-large-v3-gl" }
+
+[steps.segmenter]
+target = "karaoke_engine.transcribe:LineSegmenter"
+
+[steps.aligner]
+target = "karaoke_engine.align.aligner:LyricsAligner"

@@ -19,6 +19,10 @@ Seconds = Annotated[float, Field(ge=0)]
 # draft: not reviewed yet (or changed since); ok: approved by ear; wrong: flagged, waiting for a
 # realign; unsure: the reviewer could not tell, so it is left out of the scores.
 LineStatus = Literal["draft", "ok", "wrong", "unsure"]
+# manual: timed by hand with care (JamendoLyrics); semiautomatic: drafted by an aligner and
+# checked by ear line by line; approximate: timed by hand in a subtitle editor, good to a few
+# tenths of a second.
+Timing = Literal["manual", "semiautomatic", "approximate"]
 
 
 class _Model(BaseModel):
@@ -48,7 +52,7 @@ class Reference(_Model):
     song_id: Annotated[str, Field(min_length=1)]
     language: Annotated[str, Field(pattern=r"^[a-z]{2,3}$")]
     duration: Annotated[float, Field(gt=0)]
-    timing: Literal["manual", "semiautomatic"]
+    timing: Timing
     approved: bool = False
     lines: list[RefLine]
 
@@ -75,7 +79,7 @@ def dump_reference(ref: Reference, path: Path) -> None:
     write_text_atomic(path, text)
 
 
-def reference_from_doc(doc: KaraokeDoc, timing: Literal["manual", "semiautomatic"]) -> Reference:
+def reference_from_doc(doc: KaraokeDoc, timing: Timing) -> Reference:
     """A karaoke.json someone corrected by hand is a valid reference for its song."""
     lines = [
         RefLine(

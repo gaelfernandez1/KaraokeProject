@@ -40,6 +40,16 @@ def load_mono16k(path: Path) -> Samples:
     return np.frombuffer(out, dtype=np.float32).copy()
 
 
+def load_stereo(path: Path, rate: int = 44_100) -> npt.NDArray[np.float32]:
+    """Decodes any format ffmpeg reads into (frames, 2) float32 samples."""
+    out = _run(
+        path,
+        ["ffmpeg", "-nostdin", "-v", "error", "-i", str(path), "-f", "f32le", "-ac", "2", "-ar",
+         str(rate), "pipe:1"],
+    )  # fmt: skip
+    return np.frombuffer(out, dtype=np.float32).reshape(-1, 2).copy()
+
+
 def cut(path: Path, start: float, end: float, dest: Path) -> Path:
     """Writes the [start, end] stretch of `path` as a mono 16 kHz WAV."""
     dest.parent.mkdir(parents=True, exist_ok=True)
