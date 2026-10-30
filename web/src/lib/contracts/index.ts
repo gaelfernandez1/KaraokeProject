@@ -9,5 +9,12 @@ export type {
 	VideoRefs,
 	Word
 } from './generated/karaoke';
-export type { Theme, ThemeAnimation, ThemeColors, ThemeFont, ThemeLayout } from './generated/theme';
+export type {
+	Theme,
+	ThemeAnimation,
+	ThemeBacking,
+	ThemeColors,
+	ThemeFont,
+	ThemeLayout
+} from './generated/theme';
 export type { PlaybackClock } from './clock';

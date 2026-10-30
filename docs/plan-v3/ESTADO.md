@@ -9,7 +9,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | C2 | Banco de pruebas y métricas | en revisión (PR #2) | `v3/c2-banco` | banco completo: JamendoLyrics (79 y rápido 20) y 5 gallegas con licencia libre, métricas, runner con caché, informes, comparación, línea base medida y metas fijadas (`decisiones/003`), página de revisión de oído y 3 paquetes reales; falta que el usuario valide de oído las 5 referencias gallegas | `karaoke-bench fetch\|run\|compare\|draft\|review\|realign\|package`; pipelines TOML en `bench/pipelines/` (cualquier clase que cumpla `karaoke_engine.steps`); `karaoke_bench.baseline` (Demucs, faster-whisper, alineador CTC); guía en `docs/banco.md` | ver notas C2 → C3, C4, C5/C7 |
 | C3 | Audio: separación y sonido | en revisión (PR #3) | `v3/c3-audio` | separador elegido con el banco (Mel-Band RoFormer de Kim en trozos de 8 s, `decisiones/004`), audio del paquete a −14 LUFS en m4a, motor de audio web con voz guía, tono, reloj con latencia y calibración, y página `/proba-audio`; falta que el usuario lo pruebe en aparatos reales y escuche la separación | `karaoke_engine.separation.RoformerSeparator`; `karaoke_engine.audio` (`decode`, `measure`, `plan_gain`, `package_audio`, `convert_package`); CLI `karaoke audio`; `#lib/audio/engine.js` (`AudioEngine`, cumple `PlaybackClock`), `clock.js` (`SongClock`), `calibration.js`; guía en `docs/audio.md` | ver notas C3 → C4, C5/C7, C8 |
 | C4 | Transcripción y sincronización | en revisión (PR #4) | `v3/c4-sincronia` | `karaoke make` de punta a punta (con letra, `--lrclib` o sin letra), alineador nuevo, sílabas, coros (contrato 1.1.0) y cantantes; con letra: jamendo 98,8 % a ≤ 0,3 s, media 0,093 s, inglés 97,6 %, gallego 98,6 %; sin letra: WER jamendo 23,2 %, gallego 26,5 % (meta 25 %); 0 cambios de idioma; `make` de 4 min: ~91 s con letra, 105–155 s sin letra (`decisiones/005` y `006`) | `karaoke make`; `karaoke_engine.make.make_package`; `karaoke_engine.align` (`LyricsAligner`, `parse_lyrics`, `syllables`…); `karaoke_engine.transcribe` (`WhisperTranscriber`, `LineSegmenter`); `karaoke_engine.lyrics_lookup`; `steps.TextAligner`; contrato 1.1.0 (`Line.role`); guía `docs/sincronia.md` | ver notas C4 → C2, C3, C5/C7, C8 |
-| C5 | Subtítulos animados | sin empezar | — | — | — | — |
+| C5 | Subtítulos animados | en revisión (PR #5); el usuario lo vio el 30/10 y se queda con `clasico` y `moderno` (`contraste`, como opción) | `v3/c5-subtitulos` | maquetación única en Python y TS con casos compartidos, modos páginas y desplazamiento, cuenta atrás, barra de pausa, coros y colores por cantante; componente web a 60 fps; generador ASS que coincide con la web a 1–3 px; 3 temas con fuentes OFL; tema 1.1.0 (`decisiones/007`) | `karaoke_engine.subtitles` (`build_layout`, `build_ass`, `load_theme`, `fonts_dir`, `render_preview`); CLI `karaoke subtitles\|preview`; `#lib/lyrics` (`Lyrics`, `THEMES`, `normalizeDoc`, `buildLayout`); página `/proba-letra`; guía `docs/subtitulos.md` | ver notas C5 → C6, C7, C4 |
 | C6 | Vídeo | sin empezar | — | — | — | — |
 | C7 | Frontend | sin empezar | — | — | — | — |
 | C8 | Backend, servidor y despliegue | sin empezar | — | — | — | — |
@@ -70,3 +70,12 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   convierte HiTZ large-v3: unos 6 GB y un pico de 6,7 GB de RAM en un proceso aparte. Mejor hacerlo
   en la instalación, con `WhisperTranscriber().prepare_for("gl")`. `--lrclib` es la única llamada
   a la red.
+- C5 → C6: el MP4 quema el ASS de `build_ass(doc, theme, ancho, alto)` con
+  `subtitles=letra.ass:fontsdir=<fonts_dir()>` (sin `fontsdir`, libass no encuentra las fuentes de los
+  temas). Vale para 16:9 y 9:16; `karaoke preview` es un ejemplo mínimo con fondo liso.
+- C5 → C7: `<Lyrics doc={normalizeDoc(doc)} theme={THEMES.clasico} clock={engine} />` de
+  `#lib/lyrics`; ocupa su contenedor y se adapta a su tamaño. `/proba-letra` es de prueba. Las
+  pruebas de navegador (`pnpm test:e2e`) usan el puerto 5181 y necesitan `libnss3`/`libnspr4`
+  (`docs/subtitulos.md`).
+- C5 → C4: el barrido pinta los tiempos tal cual (sin retoques); lo que se vea adelantado o atrasado se
+  arregla en el motor o en el editor. Una cuenta atrás a tempo necesitaría los pulsos en el documento.
