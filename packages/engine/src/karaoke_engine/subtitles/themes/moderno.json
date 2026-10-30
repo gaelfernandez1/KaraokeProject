@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1.0",
+  "id": "moderno",
+  "name": "Moderno",
+  "font": { "family": "Inter ExtraBold", "weight": 800, "file": "Inter-ExtraBold.ttf" },
+  "colors": {
+    "sung": "#FFFFFF",
+    "unsung": "#FFFFFF70",
+    "outline": "#00000000",
+    "shadow": "#00000080",
+    "box": null,
+    "singers": ["#FFFFFF", "#8FD8FF", "#FFB0D8", "#B5F2BE"]
+  },
+  "layout": {
+    "visible_lines": 4,
+    "position": "center",
+    "font_size": 0.065,
+    "line_spacing": 1.2,
+    "mode": "scroll",
+    "margin": 0.06,
+    "min_row_chars": 20,
+    "max_rows": 2,
+    "outline_width": 0.0,
+    "shadow_offset": 0.0,
+    "shadow_blur": 0.12
+  },
+  "animation": {
+    "fill": "wipe",
+    "countdown_min_gap": 5.0,
+    "lead_in": 3.0,
+    "hold": 0.3,
+    "transition": 0.4,
+    "anticipation": 0.05,
+    "countdown_dots": 3,
+    "countdown_step": 1.0,
+    "break_bar_min": 8.0
+  },
+  "backing": { "scale": 0.72, "brackets": true, "opacity": 0.8 }
+}
