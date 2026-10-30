@@ -59,6 +59,8 @@ function servePackages(): Plugin {
 }
 
 export default defineConfig({
+	// The lyrics themes and fonts live in the Python package, outside web/.
+	server: { fs: { allow: [ROOT] } },
 	plugins: [
 		servePackages(),
 		sveltekit({
