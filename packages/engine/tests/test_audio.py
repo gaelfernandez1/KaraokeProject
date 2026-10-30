@@ -1,0 +1,169 @@
+import shutil
+import subprocess
+from pathlib import Path
+
+import pytest
+
+from karaoke_engine.audio import (
+    Gain,
+    Loudness,
+    decode,
+    measure,
+    package_audio,
+    plan_gain,
+    probe,
+)
+from karaoke_engine.steps import Stems
+
+pytestmark = pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+
+
+def _lavfi(dest: Path, source: str, *extra: str) -> Path:
+    subprocess.run(
+        ["ffmpeg", "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i", source, *extra, str(dest)],
+        check=True,
+    )
+    return dest
+
+
+def _noise(dest: Path, amplitude: float, seconds: float = 6.0, seed: int = 1) -> Path:
+    # Pink noise is closer to music than a sine for a loudness meter.
+    return _lavfi(
+        dest,
+        f"anoisesrc=color=pink:amplitude={amplitude}:duration={seconds}:seed={seed}",
+        "-ac", "2", "-ar", "44100",
+    )  # fmt: skip
+
+
+def test_plan_gain_reaches_the_target() -> None:
+    assert plan_gain(Loudness(-20.0, -7.5), [-8.0, -10.0]) == Gain(db=6.0, lufs=-14.0)
+
+
+def test_plan_gain_stops_at_the_peak_ceiling() -> None:
+    # The loudest stem peaks at -3 dBTP, so only 2 dB fit under the -1 dBTP ceiling.
+    assert plan_gain(Loudness(-20.0, -4.0), [-3.0, -9.0]) == Gain(db=2.0, lufs=-18.0)
+
+
+def test_plan_gain_keeps_the_mix_under_the_ceiling_too() -> None:
+    # With the guide vocals at full volume the player sums both stems, which gives back the mix:
+    # its -2 dBTP peak leaves only 1 dB of room.
+    assert plan_gain(Loudness(-20.0, -2.0), [-3.0, -9.0]) == Gain(db=1.0, lufs=-19.0)
+
+
+def test_plan_gain_leaves_silence_alone() -> None:
+    assert plan_gain(Loudness(None, None), [None, None]) == Gain(db=0.0, lufs=None)
+
+
+def test_measure_reports_loudness_and_peak(tmp_path: Path) -> None:
+    quiet = measure(_noise(tmp_path / "quiet.wav", 0.05))
+    loud = measure(_noise(tmp_path / "loud.wav", 0.2))
+
+    assert quiet.integrated is not None
+    assert loud.integrated is not None
+    # Four times the amplitude is 12 dB louder.
+    assert loud.integrated - quiet.integrated == pytest.approx(12.0, abs=0.5)
+    assert quiet.true_peak is not None
+    assert quiet.true_peak < 0
+
+
+def test_measure_of_silence_is_none(tmp_path: Path) -> None:
+    silence = _lavfi(tmp_path / "silence.wav", "anullsrc=r=44100:cl=stereo", "-t", "3")
+
+    assert measure(silence) == Loudness(None, None)
+
+
+def test_decode_takes_the_audio_of_a_video(tmp_path: Path) -> None:
+    video = tmp_path / "clip.mp4"
+    subprocess.run(
+        ["ffmpeg", "-nostdin", "-v", "error", "-y", "-f", "lavfi", "-i",
+         "testsrc=size=160x120:rate=10:duration=4", "-f", "lavfi", "-i",
+         "sine=frequency=440:sample_rate=48000:duration=4", "-shortest", "-c:v", "mpeg4",
+         "-c:a", "aac", str(video)],
+        check=True,
+    )  # fmt: skip
+
+    wav = decode(video, tmp_path / "audio.wav")
+
+    info = probe(wav)
+    assert (info.sample_rate, info.channels) == (44100, 2)
+    assert info.duration == pytest.approx(4.0, abs=0.1)
+
+
+def test_package_audio_writes_normalized_m4a(tmp_path: Path) -> None:
+    vocals = _noise(tmp_path / "vocals.wav", 0.02, seed=1)
+    instrumental = _noise(tmp_path / "instrumental.wav", 0.03, seed=2)
+    mix = tmp_path / "mix.wav"
+    subprocess.run(
+        ["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(vocals), "-i", str(instrumental),
+         "-filter_complex", "amix=inputs=2:normalize=0", str(mix)],
+        check=True,
+    )  # fmt: skip
+
+    refs = package_audio(mix, Stems(vocals=vocals, instrumental=instrumental), tmp_path / "pkg")
+
+    assert (refs.instrumental, refs.vocals) == ("instrumental.m4a", "vocals.m4a")
+    assert refs.loudness_lufs == pytest.approx(-14.0, abs=0.1)
+    out = {name: tmp_path / "pkg" / name for name in ("instrumental.m4a", "vocals.m4a")}
+    for path in out.values():
+        info = probe(path)
+        assert (info.codec, info.sample_rate, info.channels) == ("aac", 44100, 2)
+        assert info.duration == pytest.approx(6.0, abs=0.05)
+    # Both stems go through the same encoder settings, so they decode to the same length.
+    lengths = {probe(decode(p, tmp_path / f"{p.stem}.wav")).frames for p in out.values()}
+    assert len(lengths) == 1
+    # Played together at full volume, the stems sound like the mix at the target loudness.
+    together = tmp_path / "together.wav"
+    subprocess.run(
+        ["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(out["vocals.m4a"]), "-i",
+         str(out["instrumental.m4a"]), "-filter_complex", "amix=inputs=2:normalize=0",
+         str(together)],
+        check=True,
+    )  # fmt: skip
+    measured = measure(together).integrated
+    assert measured == pytest.approx(-14.0, abs=0.7)
+
+
+def test_convert_package_levels_the_stems_into_m4a(bare_package: Path) -> None:
+    from karaoke_contracts import load_doc, validate_package
+    from karaoke_engine.audio import convert_package
+    from karaoke_engine.demo import synthesize_package_audio
+
+    synthesize_package_audio(bare_package)
+
+    refs = convert_package(bare_package)
+
+    doc = load_doc(bare_package / "karaoke.json")
+    assert doc.audio == refs
+    assert (doc.audio.instrumental, doc.audio.vocals) == ("instrumental.m4a", "vocals.m4a")
+    assert doc.audio.loudness_lufs is not None
+    assert validate_package(bare_package) == []
+
+
+def test_karaoke_audio_command(bare_package: Path) -> None:
+    from karaoke_engine.cli import main
+    from karaoke_engine.demo import synthesize_package_audio
+
+    synthesize_package_audio(bare_package)
+
+    assert main(["audio", str(bare_package)]) == 0
+    assert (bare_package / "vocals.m4a").is_file()
+
+
+def test_converting_a_package_twice_keeps_the_whole_song(
+    bare_package: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from karaoke_engine.audio import convert_package
+    from karaoke_engine.demo import synthesize_package_audio
+
+    synthesize_package_audio(bare_package)
+    # A relative path, as typed on the command line: the stems come back resolved, the output
+    # does not, so ffmpeg cannot tell it would be overwriting the file it is reading.
+    monkeypatch.chdir(bare_package.parent)
+    package = Path(bare_package.name)
+    convert_package(package)
+    first = probe(package / "instrumental.m4a").duration
+
+    convert_package(package)
+
+    assert probe(package / "instrumental.m4a").duration == pytest.approx(first, abs=0.05)
+    assert probe(package / "vocals.m4a").duration == pytest.approx(first, abs=0.05)

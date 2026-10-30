@@ -6,7 +6,14 @@ requires-python = ">=3.12,<3.13"
 dependencies = ["karaoke-contracts", "pydantic>=2.12"]
 
 [project.optional-dependencies]
-ml = ["torch>=2.8"]
+ml = [
+    "torch>=2.8",
+    "audio-separator[cpu]==0.47.1",
+    # Declared so they resolve like torch: torchvision from the CUDA index, and audioread,
+    # which audio-separator imports without declaring it.
+    "torchvision",
+    "audioread>=3.1",
+]
 
 [project.scripts]
 karaoke = "karaoke_engine.cli:main"

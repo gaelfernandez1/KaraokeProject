@@ -1,0 +1,18 @@
+# Separation candidate: base-turbo with the separator swapped, so a compare against base-turbo
+# shows only the effect of the separation.
+name = "sep-melkim"
+description = "Mel-Band RoFormer vocals model (Kimberley Jensen) + Whisper large-v3-turbo + default CTC aligner"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "vocals_mel_band_roformer.ckpt" }
+
+[steps.transcriber]
+target = "karaoke_bench.baseline.whisper:FasterWhisperTranscriber"
+params = { model = "large-v3-turbo" }
+
+[steps.segmenter]
+target = "karaoke_bench.baseline.segment:SegmentPerLine"
+
+[steps.aligner]
+target = "karaoke_bench.baseline.ctc:CtcAligner"

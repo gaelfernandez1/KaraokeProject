@@ -1,0 +1,950 @@
+{
+  "bench_version": "0.1.0",
+  "normalization_version": 1,
+  "created": "2026-10-29T11:05:46+01:00",
+  "git_commit": "03edc9a",
+  "pipeline": {
+    "name": "sep-karaoke-aufr33",
+    "description": "Mel-Band RoFormer karaoke model (aufr33 and viperx): lead vocals, backing vocals stay in the instrumental + Whisper large-v3-turbo + default CTC aligner",
+    "steps": {
+      "separator": {
+        "target": "karaoke_engine.separation:RoformerSeparator",
+        "params": {
+          "model": "mel_band_roformer_karaoke_aufr33_viperx_sdr_10.1956.ckpt"
+        },
+        "version": "2"
+      },
+      "transcriber": {
+        "target": "karaoke_bench.baseline.whisper:FasterWhisperTranscriber",
+        "params": {
+          "model": "large-v3-turbo"
+        },
+        "version": "1"
+      },
+      "segmenter": {
+        "target": "karaoke_bench.baseline.segment:SegmentPerLine",
+        "params": {},
+        "version": "1"
+      },
+      "aligner": {
+        "target": "karaoke_bench.baseline.ctc:CtcAligner",
+        "params": {},
+        "version": "1"
+      }
+    }
+  },
+  "set_name": "quick",
+  "mode": "lyrics",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "torch": "2.14.1+cu130",
+    "transformers": "5.21.0",
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.8.4",
+    "demucs": "4.0.1",
+    "numpy": "2.5.4",
+    "jiwer": "4.0.0",
+    "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "driver": "617.42",
+    "gpu_memory_mb": "4096"
+  },
+  "reference_kind": {
+    "de": "manual",
+    "en": "manual",
+    "es": "manual",
+    "fr": "manual"
+  },
+  "stages": {
+    "separator": {
+      "load_seconds": 7.197984012000234,
+      "vram_peak_mb": 2866.50390625,
+      "ram_peak_mb": 2308.62890625
+    },
+    "aligner": {
+      "load_seconds": null,
+      "vram_peak_mb": 1558.50390625,
+      "ram_peak_mb": 4161.81640625
+    }
+  },
+  "songs": [
+    {
+      "song_id": "Kinematic_-_Peyote",
+      "set_name": "jamendo",
+      "language": "en",
+      "duration": 183.373333,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 38.28440607599987,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 9.00214731900087,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 138,
+        "coverage": 0.9387755102040817,
+        "start_median": 0.05062431516726562,
+        "start_mean": 0.7004255383157354,
+        "start_within": 0.9420289855072463,
+        "end_median": 0.05688576139919377,
+        "end_mean": 0.8698872010295788,
+        "start_bias": 0.6751846097043313
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.06929747871643244,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Wordsmith_-_The_Statement",
+      "set_name": "jamendo",
+      "language": "en",
+      "duration": 171.2,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 34.824105912999585,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 2.551943644999483,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 527,
+        "coverage": 0.9070567986230637,
+        "start_median": 0.05522974361795718,
+        "start_mean": 0.7199419125288631,
+        "start_within": 0.7703984819734345,
+        "end_median": 0.04461918934285336,
+        "end_mean": 0.7262469213484158,
+        "start_bias": -0.47945798502397435
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.04347439794247521,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "The_Rinn_-_Voices__2017_Version_",
+      "set_name": "jamendo",
+      "language": "en",
+      "duration": 231.224308,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 47.22200239099948,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 1.7057358540005225,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 198,
+        "coverage": 0.9753694581280788,
+        "start_median": 0.05067515605279738,
+        "start_mean": 0.32307847310690296,
+        "start_within": 0.8888888888888888,
+        "end_median": 0.0940212263194411,
+        "end_mean": 0.28433798229922214,
+        "start_bias": -0.014258820547793311
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.06235463732363655,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Ridgway_-_Fire_Inside",
+      "set_name": "jamendo",
+      "language": "en",
+      "duration": 283.930204,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 58.00743895699998,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 1.986315412001204,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 234,
+        "coverage": 0.7697368421052632,
+        "start_median": 0.043702161598844214,
+        "start_mean": 0.3847165810259591,
+        "start_within": 0.9273504273504274,
+        "end_median": 0.05279675660660743,
+        "end_mean": 0.45354867251932823,
+        "start_bias": -0.2843035174553391
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.05817472862479178,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Cortez_-_Feel__Stripped_",
+      "set_name": "jamendo",
+      "language": "en",
+      "duration": 240.561633,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 49.520758566999575,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 1.7904988049995154,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 351,
+        "coverage": 0.9887323943661972,
+        "start_median": 0.05478949184009707,
+        "start_mean": 0.08114748314757508,
+        "start_within": 0.9829059829059829,
+        "end_median": 0.08430383928134688,
+        "end_mean": 0.12096091952229314,
+        "start_bias": 0.06974189265583082
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.04407527558235813,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "10._Disparan_-_criatura",
+      "set_name": "jamendo",
+      "language": "es",
+      "duration": 160.0,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 32.30873348200112,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 4.394680117000462,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 194,
+        "coverage": 1.0,
+        "start_median": 0.02464515036290038,
+        "start_mean": 0.03484338669671013,
+        "start_within": 0.9948453608247423,
+        "end_median": 0.07856336719191148,
+        "end_mean": 0.09586770181418368,
+        "start_bias": 0.008291127515951896
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.020556667500628123,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Baila_-_Alfonso_Lugo",
+      "set_name": "jamendo",
+      "language": "es",
+      "duration": 210.481451,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 42.99084435700024,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.6238695610009017,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 277,
+        "coverage": 0.9822695035460993,
+        "start_median": 0.04703757620433713,
+        "start_mean": 5.238473287766707,
+        "start_within": 0.5812274368231047,
+        "end_median": 0.11855970294399398,
+        "end_mean": 5.3277967383458185,
+        "start_bias": 2.04613376890572
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.13886750023770844,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Esencia_-_NandoMalo_",
+      "set_name": "jamendo",
+      "language": "es",
+      "duration": 261.6,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 53.821480836000774,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 4.559141641000679,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 328,
+        "coverage": 0.9820359281437125,
+        "start_median": 0.037114097662609424,
+        "start_mean": 0.4614482537165383,
+        "start_within": 0.8323170731707317,
+        "end_median": 0.10129830951581908,
+        "end_mean": 0.6008117951933375,
+        "start_bias": 0.34454505181507
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.052621069543278054,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Te_Recuerdo_-_Wilson_Way",
+      "set_name": "jamendo",
+      "language": "es",
+      "duration": 193.68,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 39.54259575800097,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.648622748998605,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 450,
+        "coverage": 0.982532751091703,
+        "start_median": 0.029681150465485473,
+        "start_mean": 0.14312569240472223,
+        "start_within": 0.9422222222222222,
+        "end_median": 0.08121037886282068,
+        "end_mean": 0.1944477367622909,
+        "start_bias": 0.0560432553876204
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.028436498914956587,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Háblame_-_(Talk_to_me)_-_Brunela_Crochenci",
+      "set_name": "jamendo",
+      "language": "es",
+      "duration": 213.508753,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 43.653217355999004,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 2.5973083400003816,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 105,
+        "coverage": 0.9905660377358491,
+        "start_median": 0.02732690229922241,
+        "start_mean": 0.045597958245243674,
+        "start_within": 1.0,
+        "end_median": 0.13216153781627327,
+        "end_mean": 0.22305283984886687,
+        "start_bias": 0.010725754859769579
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.023286991469809948,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "1_Freak_-_Automatisch_Gekommen",
+      "set_name": "jamendo",
+      "language": "de",
+      "duration": 188.4,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 38.83609428000091,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 5.40751291000015,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 359,
+        "coverage": 0.9782016348773842,
+        "start_median": 1.1710692963453653,
+        "start_mean": 1.961364042413483,
+        "start_within": 0.3342618384401114,
+        "end_median": 1.1197369968048463,
+        "end_mean": 1.8979580238309914,
+        "start_bias": 1.0955963371708135
+      },
+      "scored_share": 1.0,
+      "line_start_median": 1.1215414851800674,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Der_Musiker_-_d-music",
+      "set_name": "jamendo",
+      "language": "de",
+      "duration": 270.829705,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 55.58821448500021,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 5.342392698999902,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 347,
+        "coverage": 0.980225988700565,
+        "start_median": 0.023470299417169826,
+        "start_mean": 0.239307393670042,
+        "start_within": 0.9077809798270894,
+        "end_median": 0.06058773007009677,
+        "end_mean": 0.19761145370262007,
+        "start_bias": 0.16638452524025682
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.025239657226769907,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Cafe_Jenseitz_Bebelstraße_-_kangaroo.musique",
+      "set_name": "jamendo",
+      "language": "de",
+      "duration": 247.83678,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 50.39414772300006,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.261540288998731,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 87,
+        "coverage": 0.9456521739130435,
+        "start_median": 0.04617406193457896,
+        "start_mean": 0.06440662263447022,
+        "start_within": 0.9770114942528736,
+        "end_median": 0.10324179567608383,
+        "end_mean": 0.122809792350071,
+        "start_bias": 0.04747652008955042
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.06381071832350926,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Keine_Lust_-_Jonny_M",
+      "set_name": "jamendo",
+      "language": "de",
+      "duration": 228.551088,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 47.05163549900135,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 4.763256238000395,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 506,
+        "coverage": 0.9583333333333334,
+        "start_median": 0.015588553353758527,
+        "start_mean": 0.019372033792299122,
+        "start_within": 1.0,
+        "end_median": 0.058573312619955686,
+        "end_mean": 0.06532572364548117,
+        "start_bias": 0.0018082332943869166
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.017988463222408768,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Sehnsucht-Unplugged_-_REH-TORTE",
+      "set_name": "jamendo",
+      "language": "de",
+      "duration": 233.44,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 47.593697925000015,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.1786098209995544,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 145,
+        "coverage": 0.9602649006622517,
+        "start_median": 1.392435542465023,
+        "start_mean": 9.711724524075906,
+        "start_within": 0.3724137931034483,
+        "end_median": 1.8959172480109885,
+        "end_mean": 9.541447391637014,
+        "start_bias": -9.546680192954025
+      },
+      "scored_share": 1.0,
+      "line_start_median": 1.2972565157750395,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Capotes_à_un_Franc_-_elmanu",
+      "set_name": "jamendo",
+      "language": "fr",
+      "duration": 187.962585,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 37.8077020769997,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 4.735990397999558,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 239,
+        "coverage": 0.9755102040816327,
+        "start_median": 0.024730408388251135,
+        "start_mean": 0.03746989909221912,
+        "start_within": 1.0,
+        "end_median": 0.0849577532644048,
+        "end_mean": 0.1268576503113308,
+        "start_bias": 0.004238430767591614
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.024316566393357775,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Confession_-_Quesabe",
+      "set_name": "jamendo",
+      "language": "fr",
+      "duration": 147.795011,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 29.708813987999747,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 2.6615696019998722,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 308,
+        "coverage": 0.9166666666666666,
+        "start_median": 0.029169455704810332,
+        "start_mean": 0.13602110663232422,
+        "start_within": 0.961038961038961,
+        "end_median": 0.055966244154376454,
+        "end_mean": 0.1983034786677022,
+        "start_bias": -0.08293249428800545
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.04376371022344472,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Mère_nature_-_Law'",
+      "set_name": "jamendo",
+      "language": "fr",
+      "duration": 225.272721,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 46.28478233600072,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.3650089660004596,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 245,
+        "coverage": 0.9645669291338582,
+        "start_median": 0.03704191083794939,
+        "start_mean": 0.04357689440971719,
+        "start_within": 1.0,
+        "end_median": 0.11096637522175001,
+        "end_mean": 0.18261222355463427,
+        "start_bias": -0.027554943754432567
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.04444006529849531,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Pas_que_tes_pas_-_AZUL",
+      "set_name": "jamendo",
+      "language": "fr",
+      "duration": 202.413333,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 41.14556799699858,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 3.237720924998939,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 236,
+        "coverage": 0.8805970149253731,
+        "start_median": 0.050894237098182415,
+        "start_mean": 1.018367332592376,
+        "start_within": 0.788135593220339,
+        "end_median": 0.10751511749131026,
+        "end_mean": 1.1550656370610082,
+        "start_bias": -0.4798566552981923
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.045116274471041606,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    },
+    {
+      "song_id": "Le_musée_d'air_contemporain_-_KPTN",
+      "set_name": "jamendo",
+      "language": "fr",
+      "duration": 184.203129,
+      "mode": "lyrics",
+      "steps": {
+        "separator": {
+          "seconds": 37.825693593000324,
+          "cached": false,
+          "error": null
+        },
+        "aligner": {
+          "seconds": 2.768059579999317,
+          "cached": false,
+          "error": null
+        }
+      },
+      "wer": null,
+      "cer": null,
+      "ref_words": null,
+      "ref_chars": null,
+      "timing": {
+        "words": 241,
+        "coverage": 0.94140625,
+        "start_median": 0.021680770693819795,
+        "start_mean": 0.02941575552067116,
+        "start_within": 1.0,
+        "end_median": 0.07976799947888935,
+        "end_mean": 0.10000883965958263,
+        "start_bias": -0.0024248976863771887
+      },
+      "scored_share": 1.0,
+      "line_start_median": 0.019580028251660053,
+      "language_reported": null,
+      "language_switch": null,
+      "error": null
+    }
+  ],
+  "summary": {
+    "all": {
+      "songs": 20,
+      "failed": 0,
+      "wer": null,
+      "cer": null,
+      "timing": {
+        "words": 5515,
+        "coverage": 0.9484092863284609,
+        "start_median": 0.03586340785983566,
+        "start_mean": 0.8806228939393065,
+        "start_within": 0.8553037171350861,
+        "end_median": 0.08099575762756217,
+        "end_mean": 0.9283899897261986,
+        "start_bias": -0.10333748199002628
+      },
+      "line_start_median": 0.03471215128303129,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.2042758964497055,
+        "aligner": 0.01660632034306362
+      },
+      "est_seconds_4min": 60.20971604226482
+    },
+    "de": {
+      "songs": 5,
+      "failed": 0,
+      "wer": null,
+      "cer": null,
+      "timing": {
+        "words": 1444,
+        "coverage": 0.967828418230563,
+        "start_median": 0.03225663987216265,
+        "start_mean": 1.531007644105993,
+        "start_within": 0.7479224376731302,
+        "end_median": 0.08186606999211676,
+        "end_mean": 1.507747399499011,
+        "start_bias": -0.6427761006792879
+      },
+      "line_start_median": 0.030721153846130278,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.20525154168373153,
+        "aligner": 0.019726021925844148
+      },
+      "est_seconds_4min": 61.19259927829839
+    },
+    "en": {
+      "songs": 5,
+      "failed": 0,
+      "wer": null,
+      "cer": null,
+      "timing": {
+        "words": 1448,
+        "coverage": 0.9106918238993711,
+        "start_median": 0.0523717966239623,
+        "start_mean": 0.4547956466922116,
+        "start_within": 0.8798342541436464,
+        "end_median": 0.06425497378960188,
+        "end_mean": 0.488717647727756,
+        "start_bias": -0.14113932817627942
+      },
+      "line_start_median": 0.05179408277871289,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.20430175493763242,
+        "aligner": 0.0074429940579906
+      },
+      "est_seconds_4min": 58.01672377094975
+    },
+    "es": {
+      "songs": 5,
+      "failed": 0,
+      "wer": null,
+      "cer": null,
+      "timing": {
+        "words": 1354,
+        "coverage": 0.9854439592430859,
+        "start_median": 0.03127880312329623,
+        "start_mean": 1.2395613679080058,
+        "start_within": 0.8537666174298375,
+        "end_median": 0.0936389738735306,
+        "end_mean": 1.3311568162661152,
+        "start_bias": 0.5227060405502415
+      },
+      "line_start_median": 0.03095478540279828,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.2042500379617786,
+        "aligner": 0.01742791147171513
+      },
+      "est_seconds_4min": 60.40069187603873
+    },
+    "fr": {
+      "songs": 5,
+      "failed": 0,
+      "wer": null,
+      "cer": null,
+      "timing": {
+        "words": 1269,
+        "coverage": 0.9337748344370861,
+        "start_median": 0.030957716083250375,
+        "start_mean": 0.24345944320603582,
+        "start_within": 0.9511426319936959,
+        "end_median": 0.08444238961905626,
+        "end_mean": 0.34108279379771717,
+        "start_bias": -0.11435126516932825
+      },
+      "line_start_median": 0.03350304671633353,
+      "language_switches": 0,
+      "rtf_median": {
+        "separator": 0.20327498879235678,
+        "aligner": 0.015995591184692064
+      },
+      "est_seconds_4min": 59.82292320649196
+    }
+  },
+  "notes": []
+}

@@ -7,7 +7,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 |---|---|---|---|---|---|---|
 | C1 | Arquitectura, repo y cimientos | hecho | `v3/c1-cimientos` (PR #1) | workspace uv, contratos v0, web SvelteKit, CI, entorno GPU comprobado | `karaoke_contracts` (`KaraokeDoc`, `Theme`, `validate_doc`, `validate_package`, `load_doc`, `dump_doc`); `schemas/*.schema.json`; `#lib/contracts` (tipos TS + `PlaybackClock`); `karaoke_engine.steps` (`Separator`, `Transcriber`, `Segmenter`, `Aligner`); CLI `karaoke validate|demo`; `fixtures/packages/demo-sintetico`; `fixtures/themes/basico.json`; `make ci|contracts|check-env` | C2: crear `packages/bench` y su comando; C5/C7: pueden empezar con el demo sintético |
 | C2 | Banco de pruebas y métricas | en curso | `v3/c2-banco` | banco completo: JamendoLyrics (79 y rápido 20) y 5 gallegas con licencia libre, métricas, runner con caché, informes, comparación, línea base medida y metas fijadas (`decisiones/003`), página de revisión de oído y 3 paquetes reales; falta que el usuario valide de oído las 5 referencias gallegas | `karaoke-bench fetch\|run\|compare\|draft\|review\|realign\|package`; pipelines TOML en `bench/pipelines/` (cualquier clase que cumpla `karaoke_engine.steps`); `karaoke_bench.baseline` (Demucs, faster-whisper, alineador CTC); guía en `docs/banco.md` | ver notas C2 → C3, C4, C5/C7 |
-| C3 | Audio: separación y sonido | sin empezar | — | — | — | — |
+| C3 | Audio: separación y sonido | en curso | `v3/c3-audio` | separador elegido con el banco (Mel-Band RoFormer de Kim en trozos de 8 s, `decisiones/004`), audio del paquete a −14 LUFS en m4a, motor de audio web con voz guía, tono, reloj con latencia y calibración, y página `/proba-audio`; falta que el usuario lo pruebe en aparatos reales y escuche la separación | `karaoke_engine.separation.RoformerSeparator`; `karaoke_engine.audio` (`decode`, `measure`, `plan_gain`, `package_audio`, `convert_package`); CLI `karaoke audio`; `#lib/audio/engine.js` (`AudioEngine`, cumple `PlaybackClock`), `clock.js` (`SongClock`), `calibration.js`; guía en `docs/audio.md` | ver notas C3 → C4, C5/C7, C8 |
 | C4 | Transcripción y sincronización | sin empezar | — | — | — | — |
 | C5 | Subtítulos animados | sin empezar | — | — | — | — |
 | C6 | Vídeo | sin empezar | — | — | — | — |
@@ -28,11 +28,6 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   librerías del sistema (con sudo).
 - C1 → C7: `web/src/app.html` aún dice `lang="en"`; la interfaz va en gallego por defecto (y por
   idioma cuando haya i18n).
-- C2 → C3: la separación se mide con `karaoke-bench run --pipeline <nuevo>.toml --set quick --mode
-  both` y `compare` contra `base-turbo` (Demucs htdemucs). El alineador provisional es
-  `karaoke_bench.baseline.ctc:CtcAligner` (los modelos por defecto de WhisperX, sin WhisperX, que
-  fija torch 2.8): C4 debe revalidar el separador elegido con su alineador. Demucs con la canción
-  entera en la GPU llegó a ir 20 veces más lento en 4 GB: mezcla en RAM y trozos a la GPU.
 - C2 → C4: faster-whisper 1.2.1 (CTranslate2 4.8) es CUDA 12: precarga `libcublas.so.12` y recibe
   audio decodificado (ver `karaoke_bench/baseline/whisper.py`). Whisper `small` adivinando el idioma
   confunde el gallego (5 de 5) con noruego, coreano, latín o castellano; `large-v3-turbo` con el
@@ -46,3 +41,15 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   `nandomalo-esencia`, `law-mere-nature`): se versionan `karaoke.json` y `LICENSE`; el audio se
   crea en local con el comando que trae el final de cada `LICENSE` (antes, una vez,
   `uv run karaoke-bench fetch --set jamendo`).
+- C3 → C4: compara contra `bench/pipelines/sep-melkim-8s.toml` (separador elegido) además de
+  `base-turbo`, y revalida la elección con tu alineador. Con Kim aún no se cumplen las metas de
+  sincronía (97,5 % frente al 98 % en jamendo; inglés 94,4 % frente al 96 %). En gallego sin letra
+  Kim salió 4,7 puntos peor (dentro del ruido, 2 canciones): repítelo cuando estén validadas.
+  Kim usa 2,9 GB de VRAM: suelta el separador antes de cargar Whisper o el alineador.
+- C3 → C5/C7: el reproductor usa `AudioEngine` (`#lib/audio/engine.js`); la letra sigue
+  `engine.now()`, que ya descuenta la latencia de salida, la del cambio de tono y la calibración.
+  Faltan en la interfaz los controles de voz guía, tono y calibración (`docs/audio.md`).
+  `/proba-audio` y el middleware de `/paquetes/` en `web/vite.config.ts` son de prueba: C7 los
+  sustituye o los borra. El cambio de tono necesita HTTPS o `localhost` (AudioWorklet).
+- C3 → C8: separar una canción de 4 min cuesta unos 50 s en la RTX 3050 (Demucs, 14 s); el
+  separador se descarga una vez a `~/.cache/karaoke/models/audio-separator` (0,9 GB).
