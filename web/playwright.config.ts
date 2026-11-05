@@ -4,6 +4,8 @@ import { defineConfig } from '@playwright/test';
 // they need the Playwright Chromium (`pnpm exec playwright install chromium --only-shell`).
 // The lyrics specs set their own sizes; the app specs run on a phone, a laptop and a TV.
 const APP = /app\/.*\.spec\.ts/;
+// e2e/server runs against the real server: `pnpm test:e2e:server` (playwright.server.config.ts).
+const SERVER = /server\/.*\.spec\.ts/;
 
 export default defineConfig({
 	testDir: 'e2e',
@@ -14,7 +16,7 @@ export default defineConfig({
 	// The lyrics snapshots predate the projects: keep their names.
 	snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}-{platform}{ext}',
 	projects: [
-		{ name: 'lyrics', testIgnore: APP },
+		{ name: 'lyrics', testIgnore: [APP, SERVER] },
 		{
 			name: 'phone',
 			testMatch: APP,
