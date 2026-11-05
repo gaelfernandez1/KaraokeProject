@@ -16,7 +16,9 @@
 		"test": "npm run test:unit -- --run",
 		"gen:contracts": "json2ts -i ../schemas/karaoke.schema.json -o src/lib/contracts/generated/karaoke.ts --additionalProperties=false --unknownAny --ignoreMinAndMaxItems --style.useTabs --style.singleQuote --bannerComment '/* Generated from schemas/ by `pnpm gen:contracts`. Do not edit by hand. */' && json2ts -i ../schemas/theme.schema.json -o src/lib/contracts/generated/theme.ts --additionalProperties=false --unknownAny --ignoreMinAndMaxItems --style.useTabs --style.singleQuote --bannerComment '/* Generated from schemas/ by `pnpm gen:contracts`. Do not edit by hand. */'",
 		"test:e2e": "playwright test",
-		"perf": "node scripts/perf-budget.mjs"
+		"test:e2e:server": "playwright test -c playwright.server.config.ts",
+		"perf": "node scripts/perf-budget.mjs",
+		"gen:api": "openapi-typescript ../schemas/openapi.json -o src/lib/api/generated/openapi.ts"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "4.14.0",
@@ -31,6 +33,7 @@
 		"eslint-plugin-svelte": "^3.19.0",
 		"globals": "^17.6.0",
 		"json-schema-to-typescript": "16.0.0",
+		"openapi-typescript": "7.13.0",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"svelte": "^5.57.1",
