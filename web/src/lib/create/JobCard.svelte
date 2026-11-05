@@ -5,6 +5,7 @@
 	 */
 	import { resolve } from '$app/paths';
 	import { mediaUrl, type Job } from '#lib/api';
+	import { jobError } from '#lib/devices/explain.js';
 	import { i18n } from '#lib/i18n';
 	import Button from '#lib/ui/Button.svelte';
 	import SungText from '#lib/ui/SungText.svelte';
@@ -47,7 +48,7 @@
 		{#if running}<span class="elapsed num">{formatDuration(elapsed)}</span>{/if}
 	</p>
 	{#if job.stage === 'error'}
-		<p class="error">{job.error ?? t.failed}</p>
+		<p class="error">{jobError(job, t.failed, i18n.t)}</p>
 	{/if}
 	<div class="actions">
 		{#if running}

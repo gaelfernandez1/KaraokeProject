@@ -3,6 +3,8 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { ApiError, listSongs, type SongSummary } from '#lib/api';
+	import { needsPairing } from '#lib/devices/explain.js';
+	import PairingNotice from '#lib/devices/PairingNotice.svelte';
 	import { i18n } from '#lib/i18n';
 	import { languageName } from '#lib/create/languages.js';
 	import { filterSongs, languagesOf } from '#lib/library/filter.js';
@@ -16,6 +18,7 @@
 
 	let songs = $state.raw<SongSummary[] | null>(null);
 	let failed = $state<string | null>(null);
+	let unpaired = $state(false);
 	let query = $state('');
 	let language = $state('all');
 	let savedOnly = $state(false);
@@ -38,9 +41,12 @@
 
 	async function load() {
 		failed = null;
+		unpaired = false;
 		try {
 			songs = await listSongs();
 		} catch (error) {
+			// Away from home, an unpaired device sees nothing until it is paired.
+			unpaired = needsPairing(error);
 			failed =
 				error instanceof ApiError && error.status === 0 ? i18n.t.errors.network : t.loadError;
 		}
@@ -130,7 +136,11 @@
 
 	{#if !online}<p class="offline" role="status">{t.offline}</p>{/if}
 
-	{#if failed}
+	{#if unpaired}
+		<section class="notice">
+			<PairingNotice text={i18n.t.errors.server.not_paired} />
+		</section>
+	{:else if failed}
 		<section class="notice" role="alert">
 			<p>{failed}</p>
 			<Button onclick={load} icon="loop">{i18n.t.common.retry}</Button>

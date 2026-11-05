@@ -20,6 +20,36 @@ export interface PitchNode extends AudioNode {
 	latency(): Promise<number>;
 }
 
+/**
+ * How long the browser gets to start the sound. Bluetooth headphones can take a second or two
+ * to wake; past this, something is wrong (no output device, a stuck audio service).
+ */
+export const RESUME_TIMEOUT_MS = 4000;
+
+/** The browser did not start the sound, so the song cannot move on. */
+export class AudioStalledError extends Error {
+	constructor() {
+		super('The browser did not start the sound');
+		this.name = 'AudioStalledError';
+	}
+}
+
+/** Resumes the context, or fails with AudioStalledError if the browser does not let it run. */
+export async function resumeWithin(
+	context: AudioContext,
+	timeoutMs = RESUME_TIMEOUT_MS
+): Promise<void> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const late = new Promise<never>((_, reject) => {
+		timer = setTimeout(() => reject(new AudioStalledError()), timeoutMs);
+	});
+	try {
+		await Promise.race([context.resume(), late]);
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
 export interface StemUrls {
 	instrumental: string;
 	vocals?: string | null;
@@ -136,7 +166,7 @@ export class AudioEngine implements PlaybackClock {
 		if (!this.#instrumental || this.playing) return;
 		const request = ++this.#playRequest;
 		// Browsers start the context suspended until the user interacts with the page.
-		if (this.#context.state !== 'running') await this.#context.resume();
+		if (this.#context.state !== 'running') await resumeWithin(this.#context);
 		// A pause, a load or another play may have come while the context woke up.
 		if (request !== this.#playRequest || !this.#instrumental || this.playing) return;
 		this.#start(this.#clock.ended() ? 0 : this.#clock.position());
