@@ -53,9 +53,10 @@
 	});
 
 	$effect(() => {
-		fetch('/paquetes/index.json')
+		fetch('/api/songs')
 			.then((response) => response.json())
-			.then((ids: string[]) => {
+			.then((songs: { id: string }[]) => {
+				const ids = songs.map((s) => s.id).sort();
 				packages = ids;
 				if (!ids.includes(chosen)) chosen = ids[0] ?? '';
 			})
@@ -68,7 +69,7 @@
 		if (!id) return;
 		engine?.pause();
 		doc = null;
-		fetch(`/paquetes/${id}/karaoke.json`)
+		fetch(`/media/${id}/karaoke.json`)
 			.then((response) => {
 				if (!response.ok) throw new Error(`HTTP ${response.status}`);
 				return response.json();
@@ -101,7 +102,7 @@
 		return () => cancelAnimationFrame(raf);
 	});
 
-	const media = (file: string | null | undefined) => (file ? `/paquetes/${chosen}/${file}` : null);
+	const media = (file: string | null | undefined) => (file ? `/media/${chosen}/${file}` : null);
 
 	async function toggle() {
 		if (!doc) return;
@@ -113,7 +114,7 @@
 			context = new AudioContext();
 			engine = new AudioEngine(context);
 		}
-		const base = `/paquetes/${chosen}/`;
+		const base = `/media/${chosen}/`;
 		if (engine.duration === 0 || loadedFor !== chosen) {
 			message = 'Cargando o audio…';
 			try {

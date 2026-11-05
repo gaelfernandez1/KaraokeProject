@@ -11,7 +11,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | C4 | Transcripción y sincronización | hecho (PR #4, en `main` el 30/10); el usuario escuchó dos canciones suyas y suenan bien | `v3/c4-sincronia` | `karaoke make` de punta a punta (con letra, `--lrclib` o sin letra), alineador nuevo, sílabas, coros (contrato 1.1.0) y cantantes; con letra: jamendo 98,8 % a ≤ 0,3 s, media 0,093 s, inglés 97,6 %, gallego 98,6 %; sin letra: WER jamendo 23,2 %, gallego 26,5 % (meta 25 %); 0 cambios de idioma; `make` de 4 min: ~91 s con letra, 105–155 s sin letra (`decisiones/005` y `006`) | `karaoke make`; `karaoke_engine.make.make_package`; `karaoke_engine.align` (`LyricsAligner`, `parse_lyrics`, `syllables`…); `karaoke_engine.transcribe` (`WhisperTranscriber`, `LineSegmenter`); `karaoke_engine.lyrics_lookup`; `steps.TextAligner`; contrato 1.1.0 (`Line.role`); guía `docs/sincronia.md` | ver notas C4 → C2, C3, C5/C7, C8 |
 | C5 | Subtítulos animados | hecho (PR #5, en `main` el 30/10); el usuario se queda con `clasico` y `moderno` (`contraste`, como opción); falta probarlo en su tele | `v3/c5-subtitulos` | maquetación única en Python y TS con casos compartidos, modos páginas y desplazamiento, cuenta atrás, barra de pausa, coros y colores por cantante; componente web a 60 fps; generador ASS que coincide con la web a 1–3 px; 3 temas con fuentes OFL; tema 1.1.0 (`decisiones/007`) | `karaoke_engine.subtitles` (`build_layout`, `build_ass`, `load_theme`, `fonts_dir`, `render_preview`); CLI `karaoke subtitles\|preview`; `#lib/lyrics` (`Lyrics`, `THEMES`, `normalizeDoc`, `buildLayout`); página `/proba-letra`; guía `docs/subtitulos.md` | ver notas C5 → C6, C7, C4 |
 | C6 | Vídeo | hecho (PR #6, en `main` el 30/10); falta que el usuario elija el fondo por defecto | `v3/c6-video` | `make` guarda vídeo y portada; `karaoke render` 16:9 y 9:16 con fondo de vídeo, portada o degradado, oscurecido según su brillo, franja bajo la letra, título, créditos y miniatura, en 27–45 s para 4 min con NVENC (`decisiones/008`); vídeo de fondo sincronizado en la web | `karaoke_engine.video` (`render`, `add_background`, `extract_background`, `extract_cover`, `choose_background`); CLI `karaoke render\|background`; `#lib/video/background.js` (`BackgroundSync`); guía `docs/video.md` | ver notas C6 → C7, C8, C4 |
-| C7 | Frontend | sin empezar | — | — | — | — |
+| C7 | Frontend | hecho a falta del OK del usuario y de probarlo en su móvil, portátil y tele | `v3/c7-frontend` | app completa contra un servidor simulado: biblioteca de carteles, reproductor (voz guía, tono, retardo, descargas, vídeo), crear con progreso en vivo, fiesta con tele y móviles (turnos, mando, QR), editor de letra y tiempos, ajustes con calibración, PWA sin conexión, gl/es/en; revisada con capturas en cuatro rondas de un revisor independiente y una revisión de código (`decisiones/010`) | rutas `/`, `/crear`, `/cantar/<id>`, `/editar/<id>`, `/festa`, `/festa/<código>`, `/axustes`; `#lib/api` (cliente), `#lib/party` (turnos `upcoming`, conexión SSE), `#lib/player` (`PlayerSession`, `Stage`), `#lib/editor/ops`; servidor simulado `web/dev/mock/` (API esperada en `decisiones/010`); guía `docs/web.md` | ver notas C7 → C8, C10, C3/C5/C6 |
 | C8 | Backend, servidor y despliegue | sin empezar | — | — | — | — |
 | C9 | Calidad de código | sin empezar | — | — | — | — |
 | C10 | Proyecto profesional | sin empezar | — | — | — | — |
@@ -21,13 +21,22 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
 - C1 → todas: ya se puede trabajar en paralelo, como mucho dos áreas a la vez y cada una en su
-  rama. C1–C6 están en `main` (30/10): lo siguiente es C7 (frontend) y C8 (servidor).
+  rama. C1–C6 están en `main` (30/10); C7 (frontend) está en su rama; lo siguiente es C8 (servidor).
+- C7 → C8: la web espera la API de `decisiones/010` (la implementa hoy el simulador
+  `web/dev/mock/plugin.ts`, con sus tests): canciones con `hook` (`#lib/poster/hook.ts`), trabajos con
+  SSE, fiesta con SSE de estado completo con `version`, credenciales `Bearer` (`?token=` en SSE),
+  `/api/server` con la IP que alcanzan los móviles (en WSL, la de Windows). **HTTPS en casa**: sin
+  él, los móviles por la IP no tienen modo sin conexión, cambio de tono, pantalla encendida ni
+  portapapeles. Servir `/media` con Range y la app estática con `index.html` de respaldo.
+- C7 → C10: nombre provisional «Foliada» (constante en `web/src/lib/ui/Wordmark.svelte`, el título
+  de `app.html` y el manifiesto); icono: la «F» medio cantada (`web/static/icons/`).
+- C7 → C3/C5/C6: se usan `AudioEngine`, `<Lyrics>` y `BackgroundSync` sin cambios; `/proba-audio`
+  se retiró (la sustituyen el reproductor y Axustes) y `/proba-letra` queda solo en desarrollo. Las
+  portadas se pintan a dos tintas en el reproductor; el vídeo de fondo, como en el MP4.
 - C1 → C3/C4: torch está en el extra `ml` desde el índice cu130 (torch 2.14.1). whisperx 3.8.6
   exige torch 2.8; si lo usáis, cambiad versión e índice en una decisión.
 - C1 → C5/C7: Playwright necesitará navegadores (`pnpm exec playwright install chromium`) y quizá
   librerías del sistema (con sudo).
-- C1 → C7: `web/src/app.html` aún dice `lang="en"`; la interfaz va en gallego por defecto (y por
-  idioma cuando haya i18n).
 - C2 → C4: faster-whisper 1.2.1 (CTranslate2 4.8) es CUDA 12: precarga `libcublas.so.12` y recibe
   audio decodificado (ver `karaoke_bench/baseline/whisper.py`). Whisper `small` adivinando el idioma
   confunde el gallego (5 de 5) con noruego, coreano, latín o castellano; `large-v3-turbo` con el
@@ -48,9 +57,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   Kim usa 2,9 GB de VRAM: suelta el separador antes de cargar Whisper o el alineador.
 - C3 → C5/C7: el reproductor usa `AudioEngine` (`#lib/audio/engine.js`); la letra sigue
   `engine.now()`, que ya descuenta la latencia de salida, la del cambio de tono y la calibración.
-  Faltan en la interfaz los controles de voz guía, tono y calibración (`docs/audio.md`).
-  `/proba-audio` y el middleware de `/paquetes/` en `web/vite.config.ts` son de prueba: C7 los
-  sustituye o los borra. El cambio de tono necesita HTTPS o `localhost` (AudioWorklet).
+  El cambio de tono necesita HTTPS o `localhost` (AudioWorklet).
 - C3 → C8: separar una canción de 4 min cuesta unos 50 s en la RTX 3050 (Demucs, 14 s); el
   separador se descarga una vez a `~/.cache/karaoke/models/audio-separator` (0,9 GB).
 - C4 → C2: el banco gana `TextAligner` (letra tal cual y número de líneas libre), el conjunto
