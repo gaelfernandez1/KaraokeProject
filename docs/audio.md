@@ -72,10 +72,11 @@ const t = engine.now(); // lo que se oye ahora: la letra sigue esto
 
 Los tests (`pnpm --dir web test`) usan un `AudioContext` falso.
 
-Lo que solo se ve en un aparato real se prueba en `/proba-audio`: retardo por HDMI o Bluetooth, el
-cambio de tono en el móvil, la memoria. Esa página solo funciona con `pnpm --dir web dev`, que
-sirve en `/paquetes/` los paquetes de `fixtures/packages/` y `bench/data/paquetes/`. Para abrirla
-desde el móvil, en la misma red:
+Lo que solo se ve en un aparato real se prueba en la propia app: el reproductor (`/cantar/<id>`,
+panel «Son») para la voz guía y el tono, y `/axustes` para calibrar el retardo por HDMI o
+Bluetooth. Con `pnpm --dir web dev`, el servidor de desarrollo sirve en `/media/` los paquetes de
+`fixtures/packages/` y `bench/data/paquetes/` (ver `docs/web.md`). Para abrirla desde el móvil, en
+la misma red:
 
 ```bash
 pnpm --dir web dev --host
@@ -90,4 +91,4 @@ Ten en cuenta dos cosas al probar desde el móvil:
 - **Cambio de tono**: usa un `AudioWorklet`, y los navegadores solo lo dan en HTTPS o en
   `localhost`. Por `http://<ip>:5173` el resto funciona, pero el tono no. En Android sí se puede
   probar: conecta el móvil por USB y reenvía el puerto 5173 desde `chrome://inspect` (Port
-  forwarding). El móvil abre entonces `http://localhost:5173/proba-audio`.
+  forwarding). El móvil abre entonces `http://localhost:5173/axustes` o una canción.

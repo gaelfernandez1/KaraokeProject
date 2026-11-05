@@ -132,7 +132,7 @@ test('the break bar shows its progress when opened in the middle of a break', as
 });
 
 test('a backing line is faint as a whole, not layer by layer', async ({ page }) => {
-	await page.route('**/paquetes/demo-sintetico/karaoke.json', async (route) => {
+	await page.route('**/media/demo-sintetico/karaoke.json', async (route) => {
 		const doc = await (await route.fetch()).json();
 		doc.lines.splice(1, 0, {
 			id: 'b1',
