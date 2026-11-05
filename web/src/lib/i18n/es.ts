@@ -29,7 +29,29 @@ export const es = {
 			'No hay conexión con el servidor. Comprueba que el portátil está encendido y en la misma red.',
 		generic: 'Algo ha fallado. Inténtalo de nuevo.',
 		audioLoad: 'No se pudo cargar el sonido de esta canción.',
-		insecure: 'Esto necesita abrir la web con https en este dispositivo.'
+		audioStalled:
+			'El navegador no está sacando sonido. Comprueba que hay altavoces o auriculares activos y que esta pestaña no está silenciada; si sigue igual, cierra el navegador del todo y ábrelo de nuevo.',
+		insecure: 'Esto necesita abrir la web con https en este dispositivo.',
+		server: {
+			too_big: 'El archivo es demasiado grande (hasta 2 GB).',
+			too_long: 'La canción es demasiado larga (hasta 20 minutos).',
+			no_audio: 'Ese archivo no tiene sonido que se pueda leer.',
+			unreadable: 'No se pudo leer el sonido de ese archivo.',
+			bad_url: 'En ese enlace no hay una canción que se pueda descargar.',
+			download_failed: 'No se pudo descargar el enlace. Inténtalo más tarde.',
+			disk_full: 'El portátil se ha quedado sin espacio en disco.',
+			bad_lyrics: 'La letra no tiene ninguna línea para cantar.',
+			bad_language: 'Elige el idioma de la canción.',
+			bad_form: 'Falta la canción: un archivo o un enlace.',
+			bad_theme: 'Ese estilo de letra no existe.',
+			gpu_memory: 'La tarjeta gráfica se ha quedado sin memoria.',
+			out_of_memory: 'El portátil se ha quedado sin memoria.',
+			engine_failed: 'Algo ha fallado al hacer el karaoke.',
+			interrupted: 'El servidor se paró mientras se hacía.',
+			song_missing: 'La canción ya no está en la biblioteca.',
+			not_owner: 'Esto solo se puede hacer desde el portátil o un dispositivo vinculado.',
+			not_paired: 'Este dispositivo no está vinculado con el portátil.'
+		}
 	},
 	library: {
 		removeOffline: 'Quitar de este dispositivo',
@@ -141,6 +163,34 @@ export const es = {
 		more: 'Más opciones',
 		controls: 'Controles del reproductor'
 	},
+	device: {
+		title: 'Este dispositivo',
+		local: 'Este es el portátil que hace los karaokes: puede hacer de todo.',
+		owner: 'Este dispositivo está vinculado: puede crear, corregir y borrar canciones.',
+		home: 'Este dispositivo puede ver y cantar las canciones. Para crear o corregir, vincúlalo con el portátil.',
+		remote: 'Para usar el karaoke fuera de casa, vincula este dispositivo con el portátil.',
+		pairOther: 'Vincular otro dispositivo',
+		pairIntro: 'En el otro dispositivo, escanea el código o escribe las letras en Ajustes.',
+		pairIntroTyped: 'En el otro dispositivo, abre el karaoke y escribe estas letras en Ajustes.',
+		qrLabel: 'Código QR para vincular un dispositivo',
+		expires: (time: string) => `Vale hasta las ${time}, una sola vez.`,
+		atHome: 'En casa',
+		away: 'Fuera de casa',
+		code: 'Código de vinculación',
+		codeHint: 'Sale en el portátil, en Ajustes, al pulsar «Vincular otro dispositivo».',
+		pair: 'Vincular',
+		pairing: 'Vinculando…',
+		paired: 'Vinculado. Ya puedes crear y corregir canciones desde aquí.',
+		badCode: 'Ese código no vale o ya ha caducado.',
+		locked: 'Demasiados intentos seguidos. Espera unos minutos.',
+		devices: 'Dispositivos vinculados',
+		noDevices: 'Todavía no hay ninguno.',
+		unpair: 'Desvincular',
+		thisOne: 'este',
+		lastSeen: (when: string) => `Usado por última vez el ${when}`,
+		goPair: 'Vincular este dispositivo',
+		toLibrary: 'Ir a las canciones'
+	},
 	settings: {
 		title: 'Ajustes',
 		language: 'Idioma de la aplicación',
@@ -195,6 +245,8 @@ export const es = {
 		code: 'Código de la fiesta',
 		scan: 'Escanea con el móvil para pedir canciones',
 		orOpen: (url: string) => `o abre ${url}`,
+		unreachable:
+			'Los móviles todavía no pueden entrar: este portátil no está abierto a la wifi de casa (karaoke-server doctor).',
 		queueEmpty: 'La cola está vacía. Pide la primera canción desde el móvil.',
 		nowSinging: (name: string) => `Ahora canta ${name}`,
 		next: 'Después',
@@ -259,6 +311,11 @@ export const es = {
 		doubtful: 'Puede estar mal sincronizada',
 		leave: 'Hay cambios sin guardar. ¿Salir igualmente?',
 		saveError: 'No se pudo guardar. Los cambios siguen aquí: inténtalo de nuevo.',
+		deleteSong: 'Borrar esta canción',
+		deleteConfirm: (days: string) =>
+			`Desaparece de la biblioteca en todos los dispositivos. El portátil la guarda ${days} días en la papelera.`,
+		deleteYes: 'Sí, bórrala',
+		deleteError: 'No se pudo borrar. Inténtalo de nuevo.',
 		emptyWord: 'Una palabra no puede quedar vacía.',
 		help: 'Atajos'
 	}

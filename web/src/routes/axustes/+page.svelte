@@ -1,10 +1,11 @@
 <script lang="ts">
-	// This device's settings: interface language, lyrics style, guide vocals and sound delay.
+	// This device's settings: interface language, lyrics style, guide vocals, sound delay, pairing.
 	import { i18n, LOCALE_NAMES, LOCALES, setLocale } from '#lib/i18n';
 	import { Lyrics, THEMES } from '#lib/lyrics';
 	import Calibration from '#lib/settings/Calibration.svelte';
 	import { SAMPLE_DOC, SAMPLE_TIME } from '#lib/settings/sample.js';
 	import { settings, updateSettings } from '#lib/settings/settings.svelte.js';
+	import DevicePanel from '#lib/devices/DevicePanel.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import Slider from '#lib/ui/Slider.svelte';
 	import { saved } from '#lib/offline/saved.svelte.js';
@@ -118,6 +119,8 @@
 			</ul>
 		{/if}
 	</section>
+
+	<DevicePanel />
 </main>
 
 <style>

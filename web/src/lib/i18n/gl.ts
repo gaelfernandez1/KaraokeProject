@@ -28,7 +28,29 @@ export const gl = {
 		network: 'Non hai conexión co servidor. Comproba que o portátil está acendido e na mesma rede.',
 		generic: 'Algo fallou. Tenta de novo.',
 		audioLoad: 'Non se puido cargar o son desta canción.',
-		insecure: 'Isto precisa abrir a web con https neste aparello.'
+		audioStalled:
+			'O navegador non está a sacar son. Comproba que hai altofalantes ou auriculares activos e que esta lapela non está silenciada; se segue igual, pecha o navegador por completo e ábreo de novo.',
+		insecure: 'Isto precisa abrir a web con https neste aparello.',
+		server: {
+			too_big: 'O ficheiro é demasiado grande (ata 2 GB).',
+			too_long: 'A canción é demasiado longa (ata 20 minutos).',
+			no_audio: 'Ese ficheiro non ten son que se poida ler.',
+			unreadable: 'Non se puido ler o son dese ficheiro.',
+			bad_url: 'Nesa ligazón non hai unha canción que se poida descargar.',
+			download_failed: 'Non se puido descargar a ligazón. Tenta de novo máis tarde.',
+			disk_full: 'O portátil quedou sen sitio no disco.',
+			bad_lyrics: 'A letra non ten ningunha liña para cantar.',
+			bad_language: 'Escolle o idioma da canción.',
+			bad_form: 'Falta a canción: un ficheiro ou unha ligazón.',
+			bad_theme: 'Ese estilo de letra non existe.',
+			gpu_memory: 'A tarxeta gráfica quedou sen memoria.',
+			out_of_memory: 'O portátil quedou sen memoria.',
+			engine_failed: 'Algo fallou ao facer o karaoke.',
+			interrupted: 'O servidor parou mentres se facía.',
+			song_missing: 'A canción xa non está na biblioteca.',
+			not_owner: 'Isto só se pode facer dende o portátil ou un aparello vinculado.',
+			not_paired: 'Este aparello non está vinculado co portátil.'
+		}
 	},
 	library: {
 		removeOffline: 'Quitar deste aparello',
@@ -139,6 +161,34 @@ export const gl = {
 		more: 'Máis opcións',
 		controls: 'Controis do reprodutor'
 	},
+	device: {
+		title: 'Este aparello',
+		local: 'Este é o portátil que fai os karaokes: pode facer de todo.',
+		owner: 'Este aparello está vinculado: pode crear, corrixir e borrar cancións.',
+		home: 'Este aparello pode ver e cantar as cancións. Para crear ou corrixir, vincúlao co portátil.',
+		remote: 'Para usar o karaoke fóra da casa, vincula este aparello co portátil.',
+		pairOther: 'Vincular outro aparello',
+		pairIntro: 'No outro aparello, escanea o código ou escribe as letras en Axustes.',
+		pairIntroTyped: 'No outro aparello, abre o karaoke e escribe estas letras en Axustes.',
+		qrLabel: 'Código QR para vincular un aparello',
+		expires: (time: string) => `Vale ata as ${time}, unha soa vez.`,
+		atHome: 'Na casa',
+		away: 'Fóra da casa',
+		code: 'Código de vinculación',
+		codeHint: 'Sae no portátil, en Axustes, ao premer «Vincular outro aparello».',
+		pair: 'Vincular',
+		pairing: 'Vinculando…',
+		paired: 'Vinculado. Xa podes crear e corrixir cancións dende aquí.',
+		badCode: 'Ese código non vale ou xa caducou.',
+		locked: 'Demasiados intentos seguidos. Agarda uns minutos.',
+		devices: 'Aparellos vinculados',
+		noDevices: 'Aínda non hai ningún.',
+		unpair: 'Desvincular',
+		thisOne: 'este',
+		lastSeen: (when: string) => `Usado por última vez o ${when}`,
+		goPair: 'Vincular este aparello',
+		toLibrary: 'Ir ás cancións'
+	},
 	settings: {
 		title: 'Axustes',
 		language: 'Idioma da aplicación',
@@ -193,6 +243,8 @@ export const gl = {
 		code: 'Código da festa',
 		scan: 'Escanea co móbil para pedir cancións',
 		orOpen: (url: string) => `ou abre ${url}`,
+		unreachable:
+			'Os móbiles aínda non poden entrar: este portátil non está aberto á wifi da casa (karaoke-server doctor).',
 		queueEmpty: 'A cola está baleira. Pide a primeira canción dende o móbil.',
 		nowSinging: (name: string) => `Agora canta ${name}`,
 		next: 'Despois',
@@ -257,6 +309,11 @@ export const gl = {
 		doubtful: 'Pode estar mal sincronizada',
 		leave: 'Hai cambios sen gardar. Saír igualmente?',
 		saveError: 'Non se puido gardar. Os cambios seguen aquí: tenta de novo.',
+		deleteSong: 'Borrar esta canción',
+		deleteConfirm: (days: string) =>
+			`Vaise da biblioteca en todos os aparellos. O portátil gárdaa ${days} días na papeleira.`,
+		deleteYes: 'Si, borrala',
+		deleteError: 'Non se puido borrar. Tenta de novo.',
 		emptyWord: 'Unha palabra non pode quedar baleira.',
 		help: 'Atallos'
 	}

@@ -1,0 +1,2464 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Karaoke server",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/songs": {
+      "get": {
+        "tags": [
+          "songs"
+        ],
+        "summary": "List Songs",
+        "operationId": "list_songs_api_songs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SongSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List Songs Api Songs Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{song_id}/doc": {
+      "put": {
+        "tags": [
+          "songs"
+        ],
+        "summary": "Save Doc",
+        "description": "Stores corrected lyrics: validated, marked as edited, the original kept beside them.",
+        "operationId": "save_doc_api_songs__song_id__doc_put",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KaraokeDoc"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KaraokeDoc"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{song_id}": {
+      "delete": {
+        "tags": [
+          "songs"
+        ],
+        "summary": "Delete Song",
+        "operationId": "delete_song_api_songs__song_id__delete",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/media/{song_id}/{rel}": {
+      "get": {
+        "tags": [
+          "media"
+        ],
+        "summary": "Media",
+        "operationId": "media_media__song_id___rel__get",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          },
+          {
+            "name": "rel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Rel"
+            }
+          },
+          {
+            "name": "download",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Download"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Me",
+        "operationId": "me_api_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/pairing": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Start Pairing",
+        "operationId": "start_pairing_api_devices_pairing_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PairingOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/pair": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Pair",
+        "operationId": "pair_api_devices_pair_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PairRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices": {
+      "get": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "List Devices",
+        "operationId": "list_devices_api_devices_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Device"
+                  },
+                  "type": "array",
+                  "title": "Response List Devices Api Devices Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/{device_id}": {
+      "delete": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "Revoke",
+        "operationId": "revoke_api_devices__device_id__delete",
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Device Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/server": {
+      "get": {
+        "tags": [
+          "server"
+        ],
+        "summary": "Server Info",
+        "operationId": "server_info_api_server_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "server"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties": {
+      "post": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Create Party",
+        "operationId": "create_party_api_parties_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartyCreated"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}": {
+      "get": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Get Party",
+        "operationId": "get_party_api_parties__code__get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartyState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/events": {
+      "get": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Party Events",
+        "description": "The full state at once and after every change; commands go to the TV only.",
+        "operationId": "party_events_api_parties__code__events_get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/event-stream": {
+                "itemSchema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "retry": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/guests": {
+      "post": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Join",
+        "operationId": "join_api_parties__code__guests_post",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Joined"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/queue": {
+      "post": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Enqueue",
+        "operationId": "enqueue_api_parties__code__queue_post",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueueRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueItem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/queue/{item_id}": {
+      "delete": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Remove",
+        "operationId": "remove_api_parties__code__queue__item_id__delete",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/promote/{item_id}": {
+      "post": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Promote",
+        "operationId": "promote_api_parties__code__promote__item_id__post",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/advance": {
+      "put": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Advance",
+        "operationId": "advance_api_parties__code__advance_put",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdvanceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/commands": {
+      "post": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Command",
+        "operationId": "command_api_parties__code__commands_post",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/SimpleCommand"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ValueCommand"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "play": "#/components/schemas/SimpleCommand",
+                    "pause": "#/components/schemas/SimpleCommand",
+                    "skip": "#/components/schemas/SimpleCommand",
+                    "vocals": "#/components/schemas/ValueCommand",
+                    "pitch": "#/components/schemas/ValueCommand"
+                  }
+                },
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/playback": {
+      "put": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Playback",
+        "operationId": "playback_api_parties__code__playback_put",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Playback"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parties/{code}/settings": {
+      "put": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "Settings",
+        "operationId": "settings_api_parties__code__settings_put",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartySettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "List Jobs",
+        "operationId": "list_jobs_api_jobs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Job"
+                  },
+                  "type": "array",
+                  "title": "Response List Jobs Api Jobs Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Create Job",
+        "description": "A song file (multipart `file`) or a link (`url`), with its language and lyrics if any.",
+        "operationId": "create_job_api_jobs_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Get Job",
+        "operationId": "get_job_api_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Cancel Job",
+        "operationId": "cancel_job_api_jobs__job_id__delete",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}/retry": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Retry Job",
+        "operationId": "retry_job_api_jobs__job_id__retry_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}/log": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Job Log",
+        "operationId": "job_log_api_jobs__job_id__log_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}/events": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Job Events",
+        "description": "The job now and after every change.",
+        "operationId": "job_events_api_jobs__job_id__events_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/event-stream": {
+                "itemSchema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "string"
+                    },
+                    "event": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "retry": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{song_id}/exports": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Export Video",
+        "operationId": "export_video_api_songs__song_id__exports_post",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AdvanceRequest": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "playing",
+              "done",
+              "skipped"
+            ],
+            "title": "State"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "state"
+        ],
+        "title": "AdvanceRequest"
+      },
+      "AudioRefs": {
+        "properties": {
+          "instrumental": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Instrumental"
+          },
+          "vocals": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vocals"
+          },
+          "loudness_lufs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loudness Lufs"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "instrumental"
+        ],
+        "title": "AudioRefs"
+      },
+      "Device": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "last_seen": {
+            "type": "string",
+            "title": "Last Seen"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "last_seen"
+        ],
+        "title": "Device",
+        "description": "A device paired with the server: it may create, correct and delete songs."
+      },
+      "ExportRequest": {
+        "properties": {
+          "aspect": {
+            "type": "string",
+            "enum": [
+              "16:9",
+              "9:16"
+            ],
+            "title": "Aspect",
+            "default": "16:9"
+          },
+          "theme": {
+            "type": "string",
+            "title": "Theme",
+            "default": "clasico"
+          }
+        },
+        "type": "object",
+        "title": "ExportRequest"
+      },
+      "Guest": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "joined_at": {
+            "type": "integer",
+            "title": "Joined At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "color",
+          "joined_at"
+        ],
+        "title": "Guest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "version"
+        ],
+        "title": "Health"
+      },
+      "Job": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "make",
+              "export"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "download",
+              "separate",
+              "transcribe",
+              "align",
+              "audio",
+              "video",
+              "done",
+              "error",
+              "cancelled"
+            ],
+            "title": "Stage"
+          },
+          "progress": {
+            "type": "number",
+            "title": "Progress"
+          },
+          "song_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Song Id"
+          },
+          "file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "too_big",
+                  "too_long",
+                  "no_audio",
+                  "unreadable",
+                  "bad_url",
+                  "download_failed",
+                  "disk_full",
+                  "bad_lyrics",
+                  "gpu_memory",
+                  "out_of_memory",
+                  "engine_failed",
+                  "interrupted",
+                  "song_missing"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "with_lyrics": {
+            "type": "boolean",
+            "title": "With Lyrics"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "overall": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overall"
+          },
+          "eta": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta"
+          },
+          "can_retry": {
+            "type": "boolean",
+            "title": "Can Retry"
+          },
+          "attempt": {
+            "type": "integer",
+            "title": "Attempt"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "stage",
+          "progress",
+          "song_id",
+          "file",
+          "error",
+          "error_code",
+          "with_lyrics",
+          "created_at",
+          "overall",
+          "eta",
+          "can_retry",
+          "attempt"
+        ],
+        "title": "Job"
+      },
+      "JoinRequest": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "JoinRequest"
+      },
+      "Joined": {
+        "properties": {
+          "guest": {
+            "$ref": "#/components/schemas/Guest"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guest",
+          "token"
+        ],
+        "title": "Joined"
+      },
+      "KaraokeDoc": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "pattern": "^1\\.\\d+\\.\\d+$",
+            "title": "Schema Version",
+            "default": "1.1.0"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "artist": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artist"
+          },
+          "language": {
+            "type": "string",
+            "pattern": "^[a-z]{2,3}$",
+            "title": "Language"
+          },
+          "duration": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Duration"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioRefs"
+          },
+          "video": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VideoRefs"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "singers": {
+            "items": {
+              "$ref": "#/components/schemas/Singer"
+            },
+            "type": "array",
+            "title": "Singers"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "edited": {
+            "type": "boolean",
+            "title": "Edited",
+            "default": false
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "language",
+          "duration",
+          "audio",
+          "lines",
+          "provenance"
+        ],
+        "title": "KaraokeDoc"
+      },
+      "LanguageFallback": {
+        "properties": {
+          "step": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Step"
+          },
+          "requested": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Requested"
+          },
+          "used": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Used"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "step",
+          "requested",
+          "used",
+          "reason"
+        ],
+        "title": "LanguageFallback",
+        "description": "Records that a step could not use a resource for the requested language."
+      },
+      "Line": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Start",
+            "description": "Seconds from the start of the song audio."
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "End",
+            "description": "Seconds from the start of the song audio."
+          },
+          "singer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Singer"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "lead",
+              "backing"
+            ],
+            "title": "Role",
+            "description": "backing: backing vocals (written in parentheses); they may overlap the lead.",
+            "default": "lead"
+          },
+          "words": {
+            "items": {
+              "$ref": "#/components/schemas/Word"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Words"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "id",
+          "start",
+          "end",
+          "words"
+        ],
+        "title": "Line"
+      },
+      "Me": {
+        "properties": {
+          "owner": {
+            "type": "boolean",
+            "title": "Owner"
+          },
+          "zone": {
+            "type": "string",
+            "enum": [
+              "local",
+              "home",
+              "remote"
+            ],
+            "title": "Zone"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Device"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "owner",
+          "zone",
+          "device"
+        ],
+        "title": "Me"
+      },
+      "PairRequest": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "PairRequest"
+      },
+      "PairingOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "expires_at": {
+            "type": "string",
+            "title": "Expires At"
+          },
+          "urls": {
+            "$ref": "#/components/schemas/PairingUrls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "expires_at",
+          "urls"
+        ],
+        "title": "PairingOut"
+      },
+      "PairingUrls": {
+        "properties": {
+          "home": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home"
+          },
+          "remote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remote"
+          }
+        },
+        "type": "object",
+        "required": [
+          "home",
+          "remote"
+        ],
+        "title": "PairingUrls"
+      },
+      "Part": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Text"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Start",
+            "description": "Seconds from the start of the song audio."
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "End",
+            "description": "Seconds from the start of the song audio."
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "text",
+          "start",
+          "end"
+        ],
+        "title": "Part",
+        "description": "A sub-unit of a word (a syllable or a group of letters) with its own timing."
+      },
+      "PartyCreated": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "host_token": {
+            "type": "string",
+            "title": "Host Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "host_token"
+        ],
+        "title": "PartyCreated"
+      },
+      "PartySettings": {
+        "properties": {
+          "guests_control": {
+            "type": "boolean",
+            "title": "Guests Control"
+          }
+        },
+        "type": "object",
+        "required": [
+          "guests_control"
+        ],
+        "title": "PartySettings"
+      },
+      "PartyState": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "guests": {
+            "items": {
+              "$ref": "#/components/schemas/Guest"
+            },
+            "type": "array",
+            "title": "Guests"
+          },
+          "queue": {
+            "items": {
+              "$ref": "#/components/schemas/QueueItem"
+            },
+            "type": "array",
+            "title": "Queue"
+          },
+          "playback": {
+            "$ref": "#/components/schemas/Playback"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/PartySettings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "version",
+          "guests",
+          "queue",
+          "playback",
+          "settings"
+        ],
+        "title": "PartyState"
+      },
+      "Playback": {
+        "properties": {
+          "item_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Id"
+          },
+          "playing": {
+            "type": "boolean",
+            "title": "Playing"
+          },
+          "position": {
+            "type": "number",
+            "title": "Position"
+          },
+          "at": {
+            "type": "integer",
+            "title": "At"
+          },
+          "vocals": {
+            "type": "number",
+            "title": "Vocals"
+          },
+          "pitch": {
+            "type": "number",
+            "title": "Pitch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "playing",
+          "position",
+          "at",
+          "vocals",
+          "pitch"
+        ],
+        "title": "Playback",
+        "description": "What the TV is playing, published by the TV so phones can show it."
+      },
+      "Provenance": {
+        "properties": {
+          "lyrics_source": {
+            "type": "string",
+            "enum": [
+              "user",
+              "asr",
+              "lrclib"
+            ],
+            "title": "Lyrics Source"
+          },
+          "separation_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Separation Model"
+          },
+          "asr_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asr Model"
+          },
+          "align_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Align Model"
+          },
+          "engine_version": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Engine Version"
+          },
+          "language_fallbacks": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageFallback"
+            },
+            "type": "array",
+            "title": "Language Fallbacks"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "lyrics_source",
+          "engine_version"
+        ],
+        "title": "Provenance"
+      },
+      "QueueItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "guest_id": {
+            "type": "string",
+            "title": "Guest Id"
+          },
+          "song_id": {
+            "type": "string",
+            "title": "Song Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "artist": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artist"
+          },
+          "duration": {
+            "type": "number",
+            "title": "Duration"
+          },
+          "added_at": {
+            "type": "integer",
+            "title": "Added At"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "playing",
+              "done",
+              "skipped"
+            ],
+            "title": "State"
+          },
+          "promoted": {
+            "type": "boolean",
+            "title": "Promoted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "guest_id",
+          "song_id",
+          "title",
+          "artist",
+          "duration",
+          "added_at",
+          "state",
+          "promoted"
+        ],
+        "title": "QueueItem"
+      },
+      "QueueRequest": {
+        "properties": {
+          "song_id": {
+            "type": "string",
+            "title": "Song Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "song_id"
+        ],
+        "title": "QueueRequest"
+      },
+      "ServerInfo": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "home_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Url"
+          },
+          "remote_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remote Url"
+          },
+          "home_reachable": {
+            "type": "boolean",
+            "title": "Home Reachable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "home_url",
+          "remote_url",
+          "home_reachable"
+        ],
+        "title": "ServerInfo",
+        "description": "Addresses of the server; `url` is the one for the party QR (the home network's)."
+      },
+      "SimpleCommand": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "play",
+              "pause",
+              "skip"
+            ],
+            "title": "Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "title": "SimpleCommand"
+      },
+      "Singer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "Singer"
+      },
+      "SongSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "artist": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Artist"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "duration": {
+            "type": "number",
+            "title": "Duration"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "has_video": {
+            "type": "boolean",
+            "title": "Has Video"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "edited": {
+            "type": "boolean",
+            "title": "Edited"
+          },
+          "lyrics_source": {
+            "type": "string",
+            "enum": [
+              "user",
+              "asr",
+              "lrclib"
+            ],
+            "title": "Lyrics Source"
+          },
+          "hook": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hook"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "artist",
+          "language",
+          "duration",
+          "cover",
+          "has_video",
+          "created_at",
+          "edited",
+          "lyrics_source",
+          "hook"
+        ],
+        "title": "SongSummary",
+        "description": "A song in the library, without its lyrics."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "ValueCommand": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "vocals",
+              "pitch"
+            ],
+            "title": "Type"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "value"
+        ],
+        "title": "ValueCommand"
+      },
+      "VideoRefs": {
+        "properties": {
+          "background": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Background"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "VideoRefs"
+      },
+      "Word": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Text",
+            "description": "Text as displayed, with its original spelling."
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Start",
+            "description": "Seconds from the start of the song audio."
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "End",
+            "description": "Seconds from the start of the song audio."
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/Part"
+            },
+            "type": "array",
+            "title": "Parts",
+            "description": "Optional sub-units; when present their texts concatenate to the word text."
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "text",
+          "start",
+          "end"
+        ],
+        "title": "Word"
+      }
+    }
+  }
+}

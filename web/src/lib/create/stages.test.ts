@@ -12,7 +12,12 @@ const job = (stage: JobStage, progress = 0, withLyrics = false): Job => ({
 	file: null,
 	error: null,
 	with_lyrics: withLyrics,
-	created_at: '2026-10-30T10:00:00Z'
+	created_at: '2026-10-30T10:00:00Z',
+	error_code: null,
+	overall: null,
+	eta: null,
+	can_retry: false,
+	attempt: 1
 });
 
 describe('overallProgress', () => {
@@ -54,5 +59,12 @@ describe('overallProgress of a video export', () => {
 		});
 		expect(overallProgress(exporting(0))).toBeCloseTo(0.1);
 		expect(overallProgress(exporting(0.5))).toBeCloseTo(0.55);
+	});
+});
+
+describe('overallProgress with the server estimate', () => {
+	it("trusts the server's own estimate when it sends one", () => {
+		expect(overallProgress({ ...job('align', 0.5), overall: 0.42 })).toBe(0.42);
+		expect(overallProgress({ ...job('error'), overall: null })).toBeNull();
 	});
 });

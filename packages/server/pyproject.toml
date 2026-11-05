@@ -1,0 +1,24 @@
+[project]
+name = "karaoke-server"
+version = "0.1.0"
+description = "Karaoke server: library, job queue for one GPU, party rooms and the web app"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "karaoke-contracts",
+    "karaoke-engine",
+    "pydantic>=2.12",
+    "fastapi>=0.162,<0.163",
+    "uvicorn>=0.54",
+    "python-multipart>=0.0.32",
+]
+
+[project.scripts]
+karaoke-server = "karaoke_server.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+karaoke-contracts = { workspace = true }
+karaoke-engine = { workspace = true }

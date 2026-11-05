@@ -28,7 +28,29 @@ export const en = {
 		network: 'Cannot reach the server. Check that the laptop is on and on the same network.',
 		generic: 'Something went wrong. Try again.',
 		audioLoad: 'Could not load the sound of this song.',
-		insecure: 'This needs the site opened over https on this device.'
+		audioStalled:
+			'The browser is not playing any sound. Check that speakers or headphones are on and that this tab is not muted; if nothing changes, quit the browser completely and open it again.',
+		insecure: 'This needs the site opened over https on this device.',
+		server: {
+			too_big: 'The file is too big (up to 2 GB).',
+			too_long: 'The song is too long (up to 20 minutes).',
+			no_audio: 'That file has no sound we can read.',
+			unreadable: 'The sound of that file could not be read.',
+			bad_url: 'There is no song we can download at that link.',
+			download_failed: 'The link could not be downloaded. Try again later.',
+			disk_full: 'The laptop is out of disk space.',
+			bad_lyrics: 'The lyrics have no lines to sing.',
+			bad_language: 'Choose the language of the song.',
+			bad_form: 'The song is missing: a file or a link.',
+			bad_theme: 'That lyrics style does not exist.',
+			gpu_memory: 'The graphics card ran out of memory.',
+			out_of_memory: 'The laptop ran out of memory.',
+			engine_failed: 'Something went wrong making the karaoke.',
+			interrupted: 'The server stopped while it was being made.',
+			song_missing: 'The song is no longer in the library.',
+			not_owner: 'Only the laptop or a paired device can do this.',
+			not_paired: 'This device is not paired with the laptop.'
+		}
 	},
 	library: {
 		removeOffline: 'Remove from this device',
@@ -139,6 +161,34 @@ export const en = {
 		more: 'More options',
 		controls: 'Player controls'
 	},
+	device: {
+		title: 'This device',
+		local: 'This is the laptop that makes the karaokes: it can do everything.',
+		owner: 'This device is paired: it can create, correct and delete songs.',
+		home: 'This device can browse and sing the songs. To create or correct them, pair it with the laptop.',
+		remote: 'To use the karaoke away from home, pair this device with the laptop.',
+		pairOther: 'Pair another device',
+		pairIntro: 'On the other device, scan the code or type the letters in Settings.',
+		pairIntroTyped: 'On the other device, open the karaoke and type these letters in Settings.',
+		qrLabel: 'QR code to pair a device',
+		expires: (time: string) => `Valid until ${time}, once.`,
+		atHome: 'At home',
+		away: 'Away from home',
+		code: 'Pairing code',
+		codeHint: 'It shows on the laptop, in Settings, under «Pair another device».',
+		pair: 'Pair',
+		pairing: 'Pairing…',
+		paired: 'Paired. You can now create and correct songs from here.',
+		badCode: 'That code is wrong or has expired.',
+		locked: 'Too many tries in a row. Wait a few minutes.',
+		devices: 'Paired devices',
+		noDevices: 'None yet.',
+		unpair: 'Unpair',
+		thisOne: 'this one',
+		lastSeen: (when: string) => `Last used ${when}`,
+		goPair: 'Pair this device',
+		toLibrary: 'Go to the songs'
+	},
 	settings: {
 		title: 'Settings',
 		language: 'App language',
@@ -193,6 +243,8 @@ export const en = {
 		code: 'Party code',
 		scan: 'Scan with your phone to request songs',
 		orOpen: (url: string) => `or open ${url}`,
+		unreachable:
+			'Phones cannot get in yet: this laptop is not open to the home Wi-Fi (karaoke-server doctor).',
 		queueEmpty: 'The queue is empty. Request the first song from a phone.',
 		nowSinging: (name: string) => `Now singing: ${name}`,
 		next: 'Next',
@@ -257,6 +309,11 @@ export const en = {
 		doubtful: 'May be out of sync',
 		leave: 'There are unsaved changes. Leave anyway?',
 		saveError: 'Could not save. Your changes are still here: try again.',
+		deleteSong: 'Delete this song',
+		deleteConfirm: (days: string) =>
+			`It leaves the library on every device. The laptop keeps it in the bin for ${days} days.`,
+		deleteYes: 'Yes, delete it',
+		deleteError: 'Could not delete it. Try again.',
 		emptyWord: 'A word cannot be empty.',
 		help: 'Shortcuts'
 	}

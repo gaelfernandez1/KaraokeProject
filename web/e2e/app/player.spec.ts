@@ -37,3 +37,30 @@ test('a song that does not exist says so and leads back', async ({ page }) => {
 	await page.getByRole('link', { name: 'Ir ás cancións' }).click();
 	await expect(page).toHaveURL(/\/$/);
 });
+
+// What a browser whose sound output is stuck does: the audio either never starts or starts with
+// a clock that does not move. The song must not sit frozen at 0:00 without a word.
+const STUCK = {
+	'never starts': () => {
+		// As in Chrome before a tap: suspended, and here resume() never gets anywhere.
+		Object.defineProperty(BaseAudioContext.prototype, 'state', { get: () => 'suspended' });
+		AudioContext.prototype.resume = () => new Promise(() => {});
+	},
+	'clock stands still': () => {
+		Object.defineProperty(BaseAudioContext.prototype, 'currentTime', { get: () => 0 });
+	}
+};
+
+for (const [name, stick] of Object.entries(STUCK)) {
+	test(`a browser that plays no sound says so (${name})`, async ({ page }, testInfo) => {
+		test.skip(testInfo.project.name !== 'laptop', 'the same on every screen');
+		await page.addInitScript(stick);
+		await page.goto('/cantar/demo-sintetico');
+		const sing = page.getByRole('button', { name: 'Cantar' });
+		await expect(sing).toBeEnabled({ timeout: 15_000 });
+		await sing.click();
+		await expect(page.getByRole('alert')).toContainText('O navegador non está a sacar son', {
+			timeout: 10_000
+		});
+	});
+}

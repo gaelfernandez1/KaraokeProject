@@ -1,6 +1,7 @@
 import {
 	cancelJob,
 	createExport,
+	retryJob,
 	uploadJob,
 	jobEventsUrl,
 	listJobs,
@@ -70,8 +71,16 @@ class Jobs {
 		return job;
 	}
 
-	/** Starts a failed or cancelled job again with what it was first asked; null if unknown. */
+	/**
+	 * Starts a failed or cancelled job again: on the server, which kept the song (no new upload),
+	 * or else by sending again what it was first asked; null if neither is possible.
+	 */
 	async retry(job: Job): Promise<Job | null> {
+		if (job.can_retry) {
+			const again = await retryJob(job.id);
+			this.#add(again);
+			return again;
+		}
 		const input = this.#inputs.get(job.id);
 		if (!input) return null;
 		this.dismiss(job.id);
@@ -79,7 +88,7 @@ class Jobs {
 	}
 
 	canRetry(job: Job): boolean {
-		return this.#inputs.has(job.id);
+		return job.can_retry || this.#inputs.has(job.id);
 	}
 
 	async cancel(id: string): Promise<void> {
