@@ -1,0 +1,67 @@
+/*
+ * Design tokens. The app is dark only: it is used at night and on a TV. The palette comes from a
+ * village festival at night: a blue night sky (not black), the sodium-lamp amber that is also the
+ * "sung" colour of the lyrics, poster-paper white, and the singers' colours, which stand for
+ * people in party mode.
+ */
+:root {
+	color-scheme: dark;
+
+	--noite: #16122e;
+	--noite-alta: #221c45;
+	--noite-funda: #0f0c22;
+	--linha: #3a3266;
+	--papel: #f3effa;
+	--papel-suave: #b9b2d3;
+	--farol: #ffc531;
+	--fucsia: #ff5fae;
+	/* A red apart from the tomato paper and the orange of a guest. */
+	--erro: #ff4d6a;
+
+	/* Not the lyric amber: amber means sung, selected and the main action, never a person. */
+	--cantante-1: #ff8a3d;
+	--cantante-2: #4fd1ff;
+	--cantante-3: #ff6fb5;
+	--cantante-4: #7ce38b;
+
+	--font-display: 'Big Shoulders', 'Arial Narrow', sans-serif;
+	--font-text: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+
+	/* Fluid type from a 360 px phone to a 1920 px TV: 16 px → 20 px base, ratio 1.25; the
+	   display steps jump by 3× and more for poster titles and the room code. */
+	--t--1: clamp(0.8125rem, 0.7692rem + 0.1923vw, 1rem);
+	--t-0: clamp(1rem, 0.9423rem + 0.2564vw, 1.25rem);
+	--t-1: clamp(1.25rem, 1.1779rem + 0.3205vw, 1.5625rem);
+	--t-2: clamp(1.5625rem, 1.4724rem + 0.4005vw, 1.953rem);
+	--t-3: clamp(1.953rem, 1.8404rem + 0.5005vw, 2.441rem);
+	--t-4: clamp(2.75rem, 2.4615rem + 1.2821vw, 4rem);
+	--t-5: clamp(3.75rem, 3.2308rem + 2.3077vw, 6rem);
+	--t-6: clamp(5.5rem, 4.5769rem + 4.1026vw, 9.5rem);
+	--t-7: clamp(8rem, 6.3846rem + 7.1795vw, 15rem);
+
+	--s-1: 0.25rem;
+	--s-2: 0.5rem;
+	--s-3: 0.75rem;
+	--s-4: 1rem;
+	--s-5: 1.5rem;
+	--s-6: 2rem;
+	--s-7: 3rem;
+	--s-8: 4rem;
+	--s-9: 6rem;
+	--s-10: 8rem;
+
+	--page-x: clamp(1rem, 4vw, 4rem);
+	--page-max: 100rem;
+	/* TV title-safe area: 5 % of each side. */
+	--safe-x: 5vw;
+	--safe-y: 5vh;
+
+	/* Shape rule: paper things (posters, cards, rows) are square; controls 10 px; pills only for
+	   filter chips and a person's name. */
+	--radius-control: 10px;
+	--target: 3rem;
+
+	--ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+	--dur-1: 120ms;
+	--dur-2: 240ms;
+}
