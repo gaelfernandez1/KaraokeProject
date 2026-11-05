@@ -12,8 +12,11 @@ pnpm --dir web dev            # http://localhost:5173, con el servidor simulado
 pnpm --dir web dev --host     # también para los móviles de la red de casa
 ```
 
-Mientras no exista el servidor de verdad, `pnpm dev` trae uno simulado (`web/dev/mock/`) con las
-mismas rutas `/api` y `/media` que usará la app:
+En uso normal, la web compilada la sirve el servidor (`make serve`, ver `docs/servidor.md`). Para
+desarrollar, `pnpm dev` trae un servidor simulado (`web/dev/mock/`) con las mismas rutas `/api` y
+`/media`; con `KARAOKE_SERVER=http://127.0.0.1:8765 pnpm --dir web dev` habla en cambio con el
+servidor de verdad (desde el propio portátil: a través del proxy, un móvil cuenta como de fuera). El
+simulado:
 
 - **Biblioteca**: las carpetas de paquetes de `fixtures/packages/` y `bench/data/paquetes/` (o las
   de `KARAOKE_PACKAGES`, separadas por `:`). Las correcciones del editor se guardan en memoria:
@@ -111,6 +114,7 @@ inglés. Se cambia en Axustes sin recargar, así que una canción no se corta.
 ```bash
 pnpm --dir web test       # lógica: turnos, editor, cliente, i18n, servidor simulado…
 pnpm --dir web test:e2e   # navegador: móvil, portátil y tele, con axe (accesibilidad)
+pnpm --dir web test:e2e:server   # navegador contra el servidor real con el motor falso
 pnpm --dir web build && pnpm --dir web perf   # presupuesto de JavaScript por pantalla
 node web/dev/shots.mjs /cantar/demo-sintetico --sizes phone,laptop,tv   # capturas
 ```
@@ -122,8 +126,10 @@ apuntando a `libnss3` (ver `docs/subtitulos.md`).
 
 - **HTTPS en casa**: por `http://<ip-del-portátil>` los móviles no tienen modo sin conexión,
   cambio de tono (AudioWorklet), pantalla siempre encendida ni portapapeles. En la tele
-  (`localhost`) funciona todo. Lo resuelve el servidor (área C8).
+  (`localhost`) funciona todo. Por Tailscale (HTTPS, `docs/servidor.md`) también; un certificado
+  para la IP de casa queda pendiente.
 - **iPhone**: solo pone en pantalla completa los `<video>`; instalada en la pantalla de inicio sí
   ocupa toda la pantalla.
 - **WSL**: el servidor de desarrollo anuncia la IP interna de WSL en el QR; con
-  `networkingMode=mirrored` (ver `docs/audio.md`) los móviles llegan al portátil.
+  `networkingMode=mirrored` y la regla del cortafuegos (ver `docs/servidor.md`) los móviles llegan
+  al portátil.
