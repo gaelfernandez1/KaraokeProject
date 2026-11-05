@@ -10,6 +10,7 @@ bun.lockb
 
 # Generated from schemas/
 /src/lib/contracts/generated/
+/src/lib/api/generated/
 
 # Playwright output and reference screenshots
 /test-results/

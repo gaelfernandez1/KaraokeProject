@@ -24,3 +24,15 @@ test('the latency can be nudged and is kept for this device', async ({ page }) =
 	await page.getByRole('button', { name: 'A letra 10 ms antes' }).click();
 	await expect(page.locator('#retardo output')).toHaveText('0 ms');
 });
+
+test('the calibration says so when the browser plays no sound', async ({ page }, testInfo) => {
+	test.skip(testInfo.project.name !== 'laptop', 'the same on every screen');
+	await page.addInitScript(() => {
+		AudioContext.prototype.resume = () => new Promise(() => {});
+	});
+	await page.goto('/axustes');
+	await page.getByRole('button', { name: 'Comezar' }).click();
+	await expect(page.getByRole('alert')).toContainText('O navegador non está a sacar son', {
+		timeout: 10_000
+	});
+});

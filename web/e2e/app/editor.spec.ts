@@ -37,3 +37,27 @@ test('a word is corrected and nudged, saved, and the player shows it', async ({
 	await page.goto('/cantar/demo-sintetico?t=8&controis');
 	await expect(page.locator('[data-testid="stage"]')).toContainText(text);
 });
+
+test('a song can be deleted from the library, after saying yes', async ({ page }, testInfo) => {
+	test.skip(testInfo.project.name !== 'laptop', 'one is enough: it deletes a song');
+	const title = `Para borrar ${Date.now()}`;
+	await page.goto('/crear');
+	await page.getByLabel('Ligazón').fill('https://example.com/video');
+	await page.getByLabel(/^Título/).fill(title);
+	await page.getByRole('button', { name: 'Crear karaoke' }).last().click();
+	const card = page.locator('.job').filter({ hasText: title });
+	await card.getByRole('link', { name: 'Cantar agora' }).click({ timeout: 20_000 });
+	await page.getByRole('link', { name: 'Corrixir a letra' }).click();
+
+	const remove = page.getByRole('button', { name: 'Borrar esta canción' });
+	await remove.click();
+	await expect(page.getByText('Vaise da biblioteca')).toBeVisible();
+	await page.getByRole('button', { name: 'Cancelar' }).click();
+	await expect(page.getByText('Vaise da biblioteca')).toBeHidden();
+
+	await remove.click();
+	await page.getByRole('button', { name: 'Si, borrala' }).click();
+	await expect(page).toHaveURL(/\/$/);
+	await expect(page.locator('.wall .poster').first()).toBeVisible();
+	await expect(page.getByRole('link', { name: new RegExp(`^${title}`) })).toHaveCount(0);
+});

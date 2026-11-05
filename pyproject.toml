@@ -3,7 +3,7 @@ name = "karaoke-workspace"
 version = "0.0.0"
 description = "Workspace root for the v3 karaoke generator (Galician first)"
 requires-python = ">=3.12,<3.13"
-dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench"]
+dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench", "karaoke-server"]
 
 [project.optional-dependencies]
 # GPU stack for the engine. Kept out of the default sync so CI and the web
@@ -11,7 +11,7 @@ dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench"]
 ml = ["karaoke-engine[ml]", "karaoke-bench[ml]"]
 
 [dependency-groups]
-dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7"]
+dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7", "httpx>=0.28"]
 
 [tool.uv]
 package = false
@@ -23,6 +23,7 @@ members = ["packages/*"]
 karaoke-contracts = { workspace = true }
 karaoke-engine = { workspace = true }
 karaoke-bench = { workspace = true }
+karaoke-server = { workspace = true }
 torch = { index = "pytorch-cu130" }
 torchaudio = { index = "pytorch-cu130" }
 torchvision = { index = "pytorch-cu130" }
@@ -43,13 +44,13 @@ select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PT"]
 allowed-confusables = ["’", "‘", "´"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["karaoke_contracts", "karaoke_engine", "karaoke_bench"]
+known-first-party = ["karaoke_contracts", "karaoke_engine", "karaoke_bench", "karaoke_server"]
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
-files = ["packages/contracts/src", "packages/engine/src", "packages/bench/src"]
+files = ["packages/contracts/src", "packages/engine/src", "packages/bench/src", "packages/server/src"]
 
 # Libraries without type information used by the bench (the optional ones live in the ml extra).
 [[tool.mypy.overrides]]

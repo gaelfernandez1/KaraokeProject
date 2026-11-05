@@ -11,8 +11,8 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | C4 | Transcripción y sincronización | hecho (PR #4, en `main` el 30/10); el usuario escuchó dos canciones suyas y suenan bien | `v3/c4-sincronia` | `karaoke make` de punta a punta (con letra, `--lrclib` o sin letra), alineador nuevo, sílabas, coros (contrato 1.1.0) y cantantes; con letra: jamendo 98,8 % a ≤ 0,3 s, media 0,093 s, inglés 97,6 %, gallego 98,6 %; sin letra: WER jamendo 23,2 %, gallego 26,5 % (meta 25 %); 0 cambios de idioma; `make` de 4 min: ~91 s con letra, 105–155 s sin letra (`decisiones/005` y `006`) | `karaoke make`; `karaoke_engine.make.make_package`; `karaoke_engine.align` (`LyricsAligner`, `parse_lyrics`, `syllables`…); `karaoke_engine.transcribe` (`WhisperTranscriber`, `LineSegmenter`); `karaoke_engine.lyrics_lookup`; `steps.TextAligner`; contrato 1.1.0 (`Line.role`); guía `docs/sincronia.md` | ver notas C4 → C2, C3, C5/C7, C8 |
 | C5 | Subtítulos animados | hecho (PR #5, en `main` el 30/10); el usuario se queda con `clasico` y `moderno` (`contraste`, como opción); falta probarlo en su tele | `v3/c5-subtitulos` | maquetación única en Python y TS con casos compartidos, modos páginas y desplazamiento, cuenta atrás, barra de pausa, coros y colores por cantante; componente web a 60 fps; generador ASS que coincide con la web a 1–3 px; 3 temas con fuentes OFL; tema 1.1.0 (`decisiones/007`) | `karaoke_engine.subtitles` (`build_layout`, `build_ass`, `load_theme`, `fonts_dir`, `render_preview`); CLI `karaoke subtitles\|preview`; `#lib/lyrics` (`Lyrics`, `THEMES`, `normalizeDoc`, `buildLayout`); página `/proba-letra`; guía `docs/subtitulos.md` | ver notas C5 → C6, C7, C4 |
 | C6 | Vídeo | hecho (PR #6, en `main` el 30/10); falta que el usuario elija el fondo por defecto | `v3/c6-video` | `make` guarda vídeo y portada; `karaoke render` 16:9 y 9:16 con fondo de vídeo, portada o degradado, oscurecido según su brillo, franja bajo la letra, título, créditos y miniatura, en 27–45 s para 4 min con NVENC (`decisiones/008`); vídeo de fondo sincronizado en la web | `karaoke_engine.video` (`render`, `add_background`, `extract_background`, `extract_cover`, `choose_background`); CLI `karaoke render\|background`; `#lib/video/background.js` (`BackgroundSync`); guía `docs/video.md` | ver notas C6 → C7, C8, C4 |
-| C7 | Frontend | hecho a falta del OK del usuario y de probarlo en su móvil, portátil y tele | `v3/c7-frontend` | app completa contra un servidor simulado: biblioteca de carteles, reproductor (voz guía, tono, retardo, descargas, vídeo), crear con progreso en vivo, fiesta con tele y móviles (turnos, mando, QR), editor de letra y tiempos, ajustes con calibración, PWA sin conexión, gl/es/en; revisada con capturas en cuatro rondas de un revisor independiente y una revisión de código (`decisiones/010`) | rutas `/`, `/crear`, `/cantar/<id>`, `/editar/<id>`, `/festa`, `/festa/<código>`, `/axustes`; `#lib/api` (cliente), `#lib/party` (turnos `upcoming`, conexión SSE), `#lib/player` (`PlayerSession`, `Stage`), `#lib/editor/ops`; servidor simulado `web/dev/mock/` (API esperada en `decisiones/010`); guía `docs/web.md` | ver notas C7 → C8, C10, C3/C5/C6 |
-| C8 | Backend, servidor y despliegue | sin empezar | — | — | — | — |
+| C7 | Frontend | hecho a falta del OK del usuario y de probarlo en su móvil, portátil y tele | `v3/c7-frontend` | app completa contra un servidor simulado: biblioteca de carteles, reproductor (voz guía, tono, retardo, descargas, vídeo), crear con progreso en vivo, fiesta con tele y móviles (turnos, mando, QR), editor de letra y tiempos, ajustes con calibración, PWA sin conexión, gl/es/en; revisada con capturas en cuatro rondas de un revisor independiente y una revisión de código (`decisiones/010`) | rutas `/`, `/crear`, `/cantar/<id>`, `/editar/<id>`, `/festa`, `/festa/<código>`, `/axustes`; `#lib/api` (cliente), `#lib/party` (turnos `upcoming`, conexión SSE), `#lib/player` (`PlayerSession`, `Stage`), `#lib/editor/ops`; servidor simulado `web/dev/mock/` (API esperada en `decisiones/010`); guía `docs/web.md` | ver notas C7 → C10, C3/C5/C6 |
+| C8 | Backend, servidor y despliegue | hecho a falta del OK del usuario y de sus pasos en Windows (red `mirrored`, cortafuegos, Tailscale Serve, arranque) | `v3/c8-servidor` (encima de C7) | `karaoke-server`: FastAPI en un proceso con dos sockets (casa 8765, túneles 8766), zonas de red y aparatos vinculados, cola de un trabajo de GPU a la vez con un proceso hijo por trabajo en un *scope* de systemd, subidas en streaming, enlaces con yt-dlp al día, progreso y tiempo restante con SSE, cancelar y reintentar, fiesta persistente, `doctor`, copias, arranque con Windows; OpenAPI y tipos TS generados; probado de punta a punta en la RTX 3050: 4:47 con letra en 106 s, 5:13 por enlace sin letra en 166 s, MP4 en 30 s, cancelar libera la GPU en 0,3 s (`decisiones/011`) | `karaoke-server serve|pair|devices|import|backup|prepare|openapi|doctor|autostart`; `make serve`; API en `schemas/openapi.json` (tipos en `web/src/lib/api/generated/`); `#lib/devices` (`owner`, `DevicePanel`); ruta `/vincular`; `pnpm --dir web test:e2e:server`; guía `docs/servidor.md` | ver notas C8 → C7, C3, C9, C10 |
 | C9 | Calidad de código | sin empezar | — | — | — | — |
 | C10 | Proyecto profesional | sin empezar | — | — | — | — |
 
@@ -21,13 +21,24 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
 - C1 → todas: ya se puede trabajar en paralelo, como mucho dos áreas a la vez y cada una en su
-  rama. C1–C6 están en `main` (30/10); C7 (frontend) está en su rama; lo siguiente es C8 (servidor).
-- C7 → C8: la web espera la API de `decisiones/010` (la implementa hoy el simulador
-  `web/dev/mock/plugin.ts`, con sus tests): canciones con `hook` (`#lib/poster/hook.ts`), trabajos con
-  SSE, fiesta con SSE de estado completo con `version`, credenciales `Bearer` (`?token=` en SSE),
-  `/api/server` con la IP que alcanzan los móviles (en WSL, la de Windows). **HTTPS en casa**: sin
-  él, los móviles por la IP no tienen modo sin conexión, cambio de tono, pantalla encendida ni
-  portapapeles. Servir `/media` con Range y la app estática con `index.html` de respaldo.
+  rama. C1–C6 están en `main` (30/10); C7 (frontend) y C8 (servidor, apilado sobre C7) están en sus
+  ramas a la espera del OK del usuario; lo siguiente es C9 (calidad de código).
+- C8 → C7: la API real es la de `decisiones/010` con añadidos (`decisiones/011`): `Job.error_code`,
+  `overall`, `eta`, `can_retry`; errores `{detail, code}`; `/api/me`, vincular aparatos y
+  `home_reachable`. Los tipos de `#lib/api` y `#lib/party` salen de `schemas/openapi.json` (`make
+  contracts`). C8 tocó ficheros de C7 (lista en `decisiones/011`): si C7 cambia antes de fusionarse,
+  hay que rehacer C8 encima. `pnpm --dir web test:e2e:server` prueba la web contra el servidor real.
+  `e2e/app/player.spec.ts` («a song plays, pauses and jumps») falló una vez de 2 con toda la batería
+  en paralelo; repetida sola, 36 de 36 bien. `e2e/app/editor.spec.ts` («a word is corrected…») es
+  intermitente con toda la batería: las versiones de móvil y portátil guardan a la vez la misma
+  canción del simulador y gana la última.
+- C8 → C3: el paso `encode` de `make_package` (`package_audio`) tarda 30–34 s en una canción de 5
+  min, casi un tercio del total con letra: tres `loudnorm` y dos codificaciones AAC en serie. En
+  paralelo serían unos 14 s (medido a mano, `bench/results/2026-11-05-c8-servidor/`).
+- C8 → C9: `packages/server` entra en ruff, mypy estricto y pytest (241 tests, ~20 s, sin GPU ni
+  red); usa ffmpeg en algunos tests (se saltan sin él) y systemd en uno (también se salta).
+- C8 → C10: el `README.md` sigue describiendo el sistema viejo (Docker, Celery); arrancar ahora es
+  `make serve` y la guía para personas es `docs/servidor.md`.
 - C7 → C10: nombre provisional «Foliada» (constante en `web/src/lib/ui/Wordmark.svelte`, el título
   de `app.html` y el manifiesto); icono: la «F» medio cantada (`web/static/icons/`).
 - C7 → C3/C5/C6: se usan `AudioEngine`, `<Lyrics>` y `BackgroundSync` sin cambios; `/proba-audio`
@@ -58,8 +69,6 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 - C3 → C5/C7: el reproductor usa `AudioEngine` (`#lib/audio/engine.js`); la letra sigue
   `engine.now()`, que ya descuenta la latencia de salida, la del cambio de tono y la calibración.
   El cambio de tono necesita HTTPS o `localhost` (AudioWorklet).
-- C3 → C8: separar una canción de 4 min cuesta unos 50 s en la RTX 3050 (Demucs, 14 s); el
-  separador se descarga una vez a `~/.cache/karaoke/models/audio-separator` (0,9 GB).
 - C4 → C2: el banco gana `TextAligner` (letra tal cual y número de líneas libre), el conjunto
   `stress`, `import-srt` (referencias aproximadas y columna ≤ 0,5 s), `triangulate`,
   `package --align`, avisos sin referencia, alineador por idioma agrupado, y los informes de
@@ -71,12 +80,6 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
   coros pueden solaparse con la línea principal (un `role` ausente en paquetes 1.0.0 es `"lead"`).
   Las palabras de dos o más sílabas traen `parts` con tiempo real (gl, es, pt), y `confidence` por
   palabra sirve al editor. `karaoke make` ya hace paquetes de canciones reales para probar.
-- C4 → C8: `make_package(source, out_dir, language, lyrics | None, ...)` es lo que debe llamar el
-  worker. Una canción de 4 min tarda 60–90 s con 3,8 GB de RAM de pico. Los modelos van a la caché
-  de Hugging Face y a `~/.cache/karaoke/models/ct2`. El primer uso sin letra en gallego descarga y
-  convierte HiTZ large-v3: unos 6 GB y un pico de 6,7 GB de RAM en un proceso aparte. Mejor hacerlo
-  en la instalación, con `WhisperTranscriber().prepare_for("gl")`. `--lrclib` es la única llamada
-  a la red.
 - C5 → C6: el MP4 quema el ASS de `build_ass(doc, theme, ancho, alto)` con
   `subtitles=letra.ass:fontsdir=<fonts_dir()>` (sin `fontsdir`, libass no encuentra las fuentes de los
   temas). Vale para 16:9 y 9:16; `karaoke preview` es un ejemplo mínimo con fondo liso.
@@ -89,8 +92,6 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 - C6 → C7: el reproductor pone detrás de la letra el `<video muted playsinline>` del paquete
   (`video.background`) con `BackgroundSync` y, si no hay vídeo, la portada; `/proba-letra` lo enseña
   (portada desenfocada detrás, oscurecido y franja bajo la letra).
-- C6 → C8: hay que servir los `.mp4` con peticiones Range (206), o el navegador no puede saltar en el
-  vídeo; la exportación es `karaoke_engine.video.render.render(paquete, salida, tema, aspect=...)`.
 - C6 → C4: `make_package` guarda `background.mp4` y `cover.jpg` si la canción trae vídeo o carátula
   (unos 7 s más para 3 min de vídeo).
 - C6 → C4: `make` en gallego junta ahora los pronombres enclíticos escritos aparte a su verbo

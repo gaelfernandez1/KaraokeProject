@@ -1,5 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { AudioEngine, MAX_SEMITONES, START_DELAY, type PitchNode } from './engine';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	AudioEngine,
+	AudioStalledError,
+	MAX_SEMITONES,
+	RESUME_TIMEOUT_MS,
+	START_DELAY,
+	type PitchNode
+} from './engine';
 
 // A tiny stand-in for the Web Audio API: just what the engine touches, and records of it.
 class FakeParam {
@@ -98,6 +105,22 @@ beforeEach(async () => {
 });
 
 const playing = () => context.sources.filter((s) => s.started && !s.stopped);
+
+describe('a browser that will not start the sound', () => {
+	it('gives up waiting for the audio to start instead of hanging', async () => {
+		vi.useFakeTimers();
+		try {
+			context.resume = () => new Promise(() => {});
+			const started = engine.play();
+			const settled = expect(started).rejects.toThrow(AudioStalledError);
+			await vi.advanceTimersByTimeAsync(RESUME_TIMEOUT_MS + 100);
+			await settled;
+			expect(engine.playing).toBe(false);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+});
 
 describe('AudioEngine', () => {
 	it('loads both stems and keeps the guide vocals in mono', () => {
