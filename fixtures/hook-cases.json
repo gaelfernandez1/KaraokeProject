@@ -1,0 +1,117 @@
+{
+  "note": "Shared by karaoke_server.hook and web/src/lib/poster/hook.ts: both must give these hooks.",
+  "cases": [
+    {
+      "name": "the lead line sung most often, ignoring case and punctuation",
+      "lines": [
+        [
+          "Primeira liña do verso"
+        ],
+        [
+          "Quero bailar contigo,"
+        ],
+        [
+          "Outra cousa"
+        ],
+        [
+          "quero bailar contigo"
+        ]
+      ],
+      "expected": "Quero bailar contigo"
+    },
+    {
+      "name": "without repeats, the first line of three words or more",
+      "lines": [
+        [
+          "Ai"
+        ],
+        [
+          "Ola mar de Vigo"
+        ]
+      ],
+      "expected": "Ola mar de Vigo"
+    },
+    {
+      "name": "backing vocals do not count",
+      "lines": [
+        [
+          "eh eh eh",
+          "backing"
+        ],
+        [
+          "eh eh eh",
+          "backing"
+        ],
+        [
+          "Canta comigo agora"
+        ]
+      ],
+      "expected": "Canta comigo agora"
+    },
+    {
+      "name": "no lines, no hook",
+      "lines": [],
+      "expected": null
+    },
+    {
+      "name": "a repeated one-word line is not a hook",
+      "lines": [
+        [
+          "Ei"
+        ],
+        [
+          "Ei"
+        ],
+        [
+          "Non"
+        ]
+      ],
+      "expected": "Ei"
+    },
+    {
+      "name": "trailing dashes and commas go",
+      "lines": [
+        [
+          "Mar de Vigo, —"
+        ],
+        [
+          "Mar de Vigo"
+        ]
+      ],
+      "expected": "Mar de Vigo"
+    },
+    {
+      "name": "accents are letters: Galician words are kept whole",
+      "lines": [
+        [
+          "Ninguén coma ti"
+        ],
+        [
+          "ninguén coma ti!"
+        ],
+        [
+          "Xa vés"
+        ]
+      ],
+      "expected": "Ninguén coma ti"
+    }
+  ],
+  "packages": [
+    {
+      "package": "cortez-feel-stripped",
+      "expected": "What is it that you want from me, want from me?"
+    },
+    {
+      "package": "demo-sintetico",
+      "expected": "Ola, mar de Vigo"
+    },
+    {
+      "package": "law-mere-nature",
+      "expected": "Je suis là, je suis la mère nature"
+    },
+    {
+      "package": "nandomalo-esencia",
+      "expected": "¿Qué cantaba mi abuelo?"
+    }
+  ]
+}

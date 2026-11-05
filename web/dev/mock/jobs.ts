@@ -14,6 +14,7 @@ export interface JobRequest {
 interface Running {
 	job: Job;
 	started: number;
+	weights: [JobStage, number][];
 	stages: { stage: JobStage; until: number }[];
 	finish: (job: Job) => void;
 }
@@ -79,14 +80,18 @@ export class Jobs {
 		return job;
 	}
 
-	#add(kind: Job['kind'], title: string, withLyrics: boolean, weights: [JobStage, number][]): Job {
+	#schedule(weights: [JobStage, number][], started: number) {
 		const total = weights.reduce((sum, [, w]) => sum + w, 0);
-		const started = this.#now();
 		let until = started;
-		const stages = weights.map(([stage, weight]) => {
+		return weights.map(([stage, weight]) => {
 			until += (weight / total) * this.#seconds * 1000;
 			return { stage, until };
 		});
+	}
+
+	#add(kind: Job['kind'], title: string, withLyrics: boolean, weights: [JobStage, number][]): Job {
+		const started = this.#now();
+		const stages = this.#schedule(weights, started);
 		const job: Job = {
 			id: `job-${++this.#count}`,
 			kind,
@@ -96,10 +101,15 @@ export class Jobs {
 			song_id: null,
 			file: null,
 			error: null,
+			error_code: null,
 			with_lyrics: withLyrics,
-			created_at: new Date(started).toISOString()
+			created_at: new Date(started).toISOString(),
+			overall: null,
+			eta: null,
+			can_retry: false,
+			attempt: 1
 		};
-		this.#jobs.set(job.id, { job, started, stages, finish: () => {} });
+		this.#jobs.set(job.id, { job, started, weights, stages, finish: () => {} });
 		return job;
 	}
 
@@ -115,8 +125,27 @@ export class Jobs {
 		const running = this.#jobs.get(id);
 		if (!running || ['done', 'error', 'cancelled'].includes(running.job.stage)) return false;
 		running.job.stage = 'cancelled';
+		running.job.can_retry = true;
 		this.#emit(running.job);
 		return true;
+	}
+
+	/** Runs a cancelled (or failed) job again, from the start, as the real server does. */
+	retry(id: string): Job | undefined {
+		const running = this.#jobs.get(id);
+		if (!running || !running.job.can_retry) return undefined;
+		running.started = this.#now();
+		running.stages = this.#schedule(running.weights, running.started);
+		Object.assign(running.job, {
+			stage: running.stages[0].stage,
+			progress: 0,
+			error: null,
+			error_code: null,
+			can_retry: false,
+			attempt: running.job.attempt + 1
+		});
+		this.#emit(running.job);
+		return running.job;
 	}
 
 	/** Moves every job on to where it should be now. */

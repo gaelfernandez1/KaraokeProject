@@ -22,10 +22,18 @@ export interface EngineLike {
 
 export type PlayerState = 'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'ended' | 'error';
 
+/**
+ * How long the audio clock may stay still after pressing play before the session says the
+ * browser is not playing sound (instead of a song frozen at 0:00 with no explanation).
+ */
+export const STALL_MS = 4000;
+
 export interface SessionOptions {
 	createEngine?: () => EngineLike;
 	/** Whether the page is in a secure context (AudioWorklet, hence the key change, needs it). */
 	secure?: boolean;
+	/** Wall clock in milliseconds (performance.now); tests move it by hand. */
+	wallNow?: () => number;
 }
 
 /**
@@ -35,7 +43,7 @@ export interface SessionOptions {
 export class PlayerSession {
 	state = $state<PlayerState>('idle');
 	/** Message key in `errors` when the state is 'error'. */
-	error = $state<'audioLoad' | null>(null);
+	error = $state<'audioLoad' | 'audioStalled' | null>(null);
 	/** What the listener hears now, in seconds. */
 	time = $state(0);
 	duration = $state(0);
@@ -54,8 +62,12 @@ export class PlayerSession {
 	/** Whether it has played since loading: a stop is then a pause, not the start screen. */
 	#started = false;
 	#context: AudioContext | null = null;
+	readonly #wallNow: () => number;
+	/** Right after play: where the song was and when, until the audio clock is seen moving. */
+	#stallWatch: { position: number; since: number } | null = null;
 
 	constructor(options: SessionOptions = {}) {
+		this.#wallNow = options.wallNow ?? (() => performance.now());
 		this.#createEngine =
 			options.createEngine ??
 			(() => {
@@ -116,13 +128,28 @@ export class PlayerSession {
 		if (!this.#engine || this.state === 'loading' || this.state === 'error') return;
 		this.#ended = false;
 		this.#started = true;
-		await this.#engine.play();
+		try {
+			await this.#engine.play();
+		} catch {
+			this.#stalled();
+			return;
+		}
+		this.#stallWatch = { position: this.#engine.position(), since: this.#wallNow() };
 		this.tick();
 	}
 
 	pause(): void {
+		this.#stallWatch = null;
 		this.#engine?.pause();
 		this.tick();
+	}
+
+	/** The browser is not playing the sound: stop, and say so. */
+	#stalled(): void {
+		this.#stallWatch = null;
+		this.#engine?.pause();
+		this.state = 'error';
+		this.error = 'audioStalled';
 	}
 
 	async toggle(): Promise<void> {
@@ -184,6 +211,11 @@ export class PlayerSession {
 		this.time = engine.now();
 		this.#sync?.tick();
 		if (this.state === 'loading' || this.state === 'error' || this.state === 'idle') return;
+		const watch = this.#stallWatch;
+		if (watch && engine.playing) {
+			if (engine.position() !== watch.position) this.#stallWatch = null;
+			else if (this.#wallNow() - watch.since > STALL_MS) return this.#stalled();
+		}
 		if (engine.playing) this.state = 'playing';
 		else if (this.#ended) this.state = 'ended';
 		else this.state = this.#started ? 'paused' : 'ready';

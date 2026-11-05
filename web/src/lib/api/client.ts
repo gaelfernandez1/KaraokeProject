@@ -1,15 +1,29 @@
 import type { KaraokeDoc } from '#lib/contracts';
 import { normalizeDoc } from '#lib/lyrics/layout.js';
-import type { CreateJobInput, ExportInput, Job, ServerInfo, SongSummary } from './types';
+import type {
+	CreateJobInput,
+	Device,
+	ExportInput,
+	Job,
+	Me,
+	Pairing,
+	ServerInfo,
+	SongSummary
+} from './types';
 
-/** An answer from the server that is not a success; `status` 0 means it could not be reached. */
+/**
+ * An answer from the server that is not a success; `status` 0 means it could not be reached.
+ * `code` says why in a stable word (`not_owner`, `too_long`…) the app can explain in its language.
+ */
 export class ApiError extends Error {
 	readonly status: number;
+	readonly code: string | null;
 
-	constructor(status: number, message: string) {
+	constructor(status: number, message: string, code: string | null = null) {
 		super(message);
 		this.name = 'ApiError';
 		this.status = status;
+		this.code = code;
 	}
 }
 
@@ -28,13 +42,15 @@ async function request<T>(
 	}
 	if (!response.ok) {
 		let detail = response.statusText;
+		let code: string | null = null;
 		try {
 			const body = await response.json();
 			if (typeof body?.detail === 'string') detail = body.detail;
+			if (typeof body?.code === 'string') code = body.code;
 		} catch {
 			// Not JSON: the status text says enough.
 		}
-		throw new ApiError(response.status, detail);
+		throw new ApiError(response.status, detail, code);
 	}
 	if (response.status === 204) return undefined as T;
 	return (await response.json()) as T;
@@ -107,13 +123,10 @@ export function uploadJob(
 		};
 		xhr.onload = () => {
 			if (xhr.status >= 200 && xhr.status < 300) done(xhr.response as Job);
-			else
-				fail(
-					new ApiError(
-						xhr.status,
-						(xhr.response as { detail?: string } | null)?.detail ?? xhr.statusText
-					)
-				);
+			else {
+				const body = xhr.response as { detail?: string; code?: string } | null;
+				fail(new ApiError(xhr.status, body?.detail ?? xhr.statusText, body?.code ?? null));
+			}
 		};
 		xhr.onerror = () => fail(new ApiError(0, 'network'));
 		xhr.send(jobForm(input));
@@ -128,6 +141,11 @@ export function cancelJob(id: string, fetchImpl?: Fetch): Promise<void> {
 	return request(`/api/jobs/${encodeURIComponent(id)}`, { method: 'DELETE' }, fetchImpl);
 }
 
+/** Runs a failed or cancelled job again with what the server kept of it (no new upload). */
+export function retryJob(id: string, fetchImpl?: Fetch): Promise<Job> {
+	return request(`/api/jobs/${encodeURIComponent(id)}/retry`, { method: 'POST' }, fetchImpl);
+}
+
 export function jobEventsUrl(id: string): string {
 	return `/api/jobs/${encodeURIComponent(id)}/events`;
 }
@@ -138,6 +156,29 @@ export function createExport(id: string, input: ExportInput, fetchImpl?: Fetch):
 
 export function serverInfo(fetchImpl?: Fetch): Promise<ServerInfo> {
 	return request('/api/server', {}, fetchImpl);
+}
+
+// Pairing: a device becomes the owner's with a short code shown on one that already is.
+
+export function getMe(fetchImpl?: Fetch): Promise<Me> {
+	return request('/api/me', {}, fetchImpl);
+}
+
+export function startPairing(fetchImpl?: Fetch): Promise<Pairing> {
+	return request('/api/devices/pairing', { method: 'POST' }, fetchImpl);
+}
+
+/** The server answers with a cookie that makes this browser the owner's. */
+export function pairDevice(code: string, fetchImpl?: Fetch): Promise<Device> {
+	return request('/api/devices/pair', json('POST', { code }), fetchImpl);
+}
+
+export function listDevices(fetchImpl?: Fetch): Promise<Device[]> {
+	return request('/api/devices', {}, fetchImpl);
+}
+
+export function revokeDevice(id: string, fetchImpl?: Fetch): Promise<void> {
+	return request(`/api/devices/${encodeURIComponent(id)}`, { method: 'DELETE' }, fetchImpl);
 }
 
 export { request as apiRequest, json as jsonBody };

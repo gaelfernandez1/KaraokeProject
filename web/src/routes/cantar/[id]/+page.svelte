@@ -9,6 +9,7 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { ApiError, getDoc, mediaUrl } from '#lib/api';
+	import { explain } from '#lib/devices/explain.js';
 	import { jobs } from '#lib/create/jobs.svelte.js';
 	import type { KaraokeDoc, PlaybackClock } from '#lib/contracts';
 	import { i18n } from '#lib/i18n';
@@ -195,8 +196,8 @@
 		try {
 			await jobs.startExport(id, { aspect, theme: settings.theme });
 			notice = t.videoStarted;
-		} catch {
-			notice = i18n.t.errors.generic;
+		} catch (error) {
+			notice = explain(error, i18n.t.errors.generic, i18n.t);
 		}
 		setTimeout(() => (notice = null), 5000);
 	}
@@ -269,8 +270,13 @@
 		{#if frozenAt === null && session.state !== 'playing' && session.state !== 'paused'}
 			<div class="center">
 				{#if session.state === 'error'}
-					<p class="message" role="alert">{i18n.t.errors.audioLoad}</p>
-					<Button variant="primary" size="l" icon="loop" onclick={() => session.retry()}
+					<p class="message" role="alert">{i18n.t.errors[session.error ?? 'audioLoad']}</p>
+					<!-- A stuck audio output needs a new audio context: the page starts over. -->
+					<Button
+						variant="primary"
+						size="l"
+						icon="loop"
+						onclick={() => (session.error === 'audioStalled' ? location.reload() : session.retry())}
 						>{i18n.t.common.retry}</Button
 					>
 				{:else if session.state === 'ended'}

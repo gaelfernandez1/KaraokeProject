@@ -88,6 +88,16 @@ function lanAddress(): string {
 	return 'localhost';
 }
 
+/**
+ * The stand-in has no pairing of its own: every browser is the owner, except one carrying the
+ * `karaoke_mock_visitor` cookie (tests set it), until it pairs with the code below.
+ */
+const MOCK_PAIRING_CODE = 'BCDFGHJK';
+const visitor = (req: Req): boolean =>
+	/(?:^|;\s*)karaoke_mock_visitor=1/.test(req.headers.cookie ?? '');
+const notOwner = (res: Res) =>
+	send(res, 403, { detail: 'Only a paired device can do this', code: 'not_owner' });
+
 const bearer = (req: Req, url: URL): string =>
 	(req.headers.authorization ?? '').replace(/^Bearer /, '') || url.searchParams.get('token') || '';
 
@@ -135,6 +145,42 @@ export function mockApi(options: MockOptions = {}): Plugin {
 				const parts = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
 				const method = req.method ?? 'GET';
 				try {
+					const writes = method !== 'GET' && ['songs', 'jobs'].includes(parts[0]);
+					if (writes && visitor(req)) return notOwner(res);
+					if (parts[0] === 'me' && method === 'GET') {
+						return send(res, 200, {
+							owner: !visitor(req),
+							zone: visitor(req) ? 'home' : 'local',
+							device: null
+						});
+					}
+					// /api/devices…
+					if (parts[0] === 'devices') {
+						if (parts[1] === 'pairing' && method === 'POST') {
+							if (visitor(req)) return notOwner(res);
+							const address = server.httpServer?.address();
+							const port = typeof address === 'object' && address ? address.port : 5173;
+							return send(res, 200, {
+								code: MOCK_PAIRING_CODE,
+								expires_at: new Date(Date.now() + 600_000).toISOString(),
+								urls: {
+									home: `http://${lanAddress()}:${port}/vincular?code=${MOCK_PAIRING_CODE}`,
+									remote: null
+								}
+							});
+						}
+						if (parts[1] === 'pair' && method === 'POST') {
+							const { code } = await readJson<{ code: string }>(req);
+							if ((code ?? '').replace(/[\s-]/g, '').toUpperCase() !== MOCK_PAIRING_CODE) {
+								return send(res, 422, { detail: 'That code is wrong', code: 'bad_code' });
+							}
+							res.setHeader('Set-Cookie', 'karaoke_mock_visitor=; Max-Age=0; Path=/');
+							const now = new Date().toISOString();
+							return send(res, 200, { id: 'd1', name: 'Device', created_at: now, last_seen: now });
+						}
+						if (parts.length === 1 && method === 'GET') return send(res, 200, []);
+						if (parts.length === 2 && method === 'DELETE') return send(res, 204);
+					}
 					// /api/songs…
 					if (parts[0] === 'songs') {
 						if (parts.length === 1 && method === 'GET') return send(res, 200, library.list());
@@ -181,6 +227,12 @@ export function mockApi(options: MockOptions = {}): Plugin {
 						const job = jobs.get(parts[1]);
 						if (!job) return notFound(res);
 						if (parts.length === 2 && method === 'GET') return send(res, 200, job);
+						if (parts[2] === 'retry' && method === 'POST') {
+							const again = jobs.retry(job.id);
+							return again
+								? send(res, 200, again)
+								: send(res, 409, { detail: 'Cannot retry', code: 'not_retryable' });
+						}
 						if (parts.length === 2 && method === 'DELETE') {
 							jobs.cancel(job.id);
 							return send(res, 204);
@@ -242,7 +294,8 @@ export function mockApi(options: MockOptions = {}): Plugin {
 					if (parts[0] === 'server' && method === 'GET') {
 						const address = server.httpServer?.address();
 						const port = typeof address === 'object' && address ? address.port : 5173;
-						return send(res, 200, { url: `http://${lanAddress()}:${port}` });
+						const url = `http://${lanAddress()}:${port}`;
+						return send(res, 200, { url, home_url: url, remote_url: null, home_reachable: true });
 					}
 				} catch (error) {
 					return send(res, 400, { detail: String(error) });

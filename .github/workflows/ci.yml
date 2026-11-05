@@ -71,10 +71,10 @@ jobs:
       - name: Fail if generated files are stale or missing
         # git status also catches newly generated files that were never committed.
         run: |
-          changes=$(git status --porcelain -- schemas web/src/lib/contracts/generated)
+          changes=$(git status --porcelain -- schemas web/src/lib/contracts/generated web/src/lib/api/generated)
           if [ -n "$changes" ]; then
             echo "$changes"
-            git diff -- schemas web/src/lib/contracts/generated
+            git diff -- schemas web/src/lib/contracts/generated web/src/lib/api/generated
             echo "::error::Generated contracts are out of date; run 'make contracts' and commit."
             exit 1
           fi

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PlayerSession, type EngineLike } from './session.svelte';
+import { PlayerSession, STALL_MS, type EngineLike } from './session.svelte';
 
 class FakeEngine implements EngineLike {
 	duration = 0;
@@ -54,6 +54,17 @@ const URLS = { instrumental: 'i.m4a', vocals: 'v.m4a' };
 
 function session(engine = new FakeEngine(), secure = true) {
 	return { engine, player: new PlayerSession({ createEngine: () => engine, secure }) };
+}
+
+/** A session whose wall clock the test moves by hand. */
+function timed(engine = new FakeEngine()) {
+	const wall = { ms: 0 };
+	const player = new PlayerSession({
+		createEngine: () => engine,
+		secure: true,
+		wallNow: () => wall.ms
+	});
+	return { engine, player, wall };
 }
 
 describe('PlayerSession', () => {
@@ -131,5 +142,41 @@ describe('PlayerSession', () => {
 		player.setVocals(-1);
 		expect(player.vocals).toBe(0);
 		expect(engine.vocals).toBe(0);
+	});
+	it('says the browser is not playing sound when the audio clock does not move', async () => {
+		const { engine, player, wall } = timed();
+		await player.load(URLS, { vocals: 0.15, latencyMs: 0 });
+		await player.play();
+		wall.ms = STALL_MS - 100;
+		player.tick();
+		expect(player.state).toBe('playing');
+		wall.ms = STALL_MS + 100;
+		player.tick();
+		expect(player.state).toBe('error');
+		expect(player.error).toBe('audioStalled');
+		expect(engine.playing).toBe(false);
+	});
+
+	it('keeps playing once the audio clock moves', async () => {
+		const { engine, player, wall } = timed();
+		await player.load(URLS, { vocals: 0.15, latencyMs: 0 });
+		await player.play();
+		engine.time = 0.4;
+		wall.ms = 400;
+		player.tick();
+		wall.ms = STALL_MS * 3;
+		player.tick();
+		expect(player.state).toBe('playing');
+	});
+
+	it('says so when the engine cannot start the sound at all', async () => {
+		const { engine, player } = timed();
+		engine.play = async () => {
+			throw new Error('the audio did not start');
+		};
+		await player.load(URLS, { vocals: 0.15, latencyMs: 0 });
+		await player.play();
+		expect(player.state).toBe('error');
+		expect(player.error).toBe('audioStalled');
 	});
 });

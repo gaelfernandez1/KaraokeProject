@@ -5,15 +5,18 @@
 	 * edges, or tap the rhythm with the space bar to retime the whole line.
 	 */
 	import { splitTitle } from '#lib/poster/fit.js';
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { ApiError, getDoc, mediaUrl, saveDoc } from '#lib/api';
+	import { ApiError, deleteSong, getDoc, mediaUrl, saveDoc } from '#lib/api';
+	import { explain, needsPairing } from '#lib/devices/explain.js';
+	import PairingNotice from '#lib/devices/PairingNotice.svelte';
 	import type { KaraokeDoc } from '#lib/contracts';
 	import { History } from '#lib/editor/history.svelte.js';
 	import { checkDoc, moveWordEdge, retimeLine, setWordText, shiftLine } from '#lib/editor/ops.js';
 	import Waveform from '#lib/editor/Waveform.svelte';
 	import { i18n } from '#lib/i18n';
+	import { saved as offline } from '#lib/offline/saved.svelte.js';
 	import { PlayerSession } from '#lib/player/session.svelte.js';
 	import { settings } from '#lib/settings/settings.svelte.js';
 	import Button from '#lib/ui/Button.svelte';
@@ -30,6 +33,14 @@
 	let failure = $state<string | null>(null);
 	let notice = $state<string | null>(null);
 	let saving = $state(false);
+	/** Deleting the song: asked once, then done; a failure says why (and how to pair if needed). */
+	let confirmDelete = $state(false);
+	let deleting = $state(false);
+	let deleteFailure = $state<string | null>(null);
+	let deleteUnpaired = $state(false);
+	let deleted = false;
+	/** How long the server keeps a deleted song (karaoke_server.library.Library.purge_trash). */
+	const TRASH_DAYS = '30';
 	let lineIndex = $state(0);
 	let wordIndex = $state(0);
 	let mode = $state<'idle' | 'line' | 'loop' | 'tap'>('idle');
@@ -98,7 +109,7 @@
 	});
 
 	beforeNavigate(({ cancel }) => {
-		if (dirty && !confirm(t.leave)) cancel();
+		if (!deleted && dirty && !confirm(t.leave)) cancel();
 	});
 
 	/** Stops (or loops) at the end of the line being listened to. */
@@ -208,10 +219,29 @@
 			history?.reset(stored);
 			saved = stored;
 			notice = t.saved;
-		} catch {
-			notice = t.saveError;
+		} catch (error) {
+			notice = explain(error, t.saveError, i18n.t);
 		} finally {
 			saving = false;
+		}
+	}
+
+	async function remove() {
+		if (deleting) return;
+		deleting = true;
+		deleteFailure = null;
+		deleteUnpaired = false;
+		try {
+			await deleteSong(id);
+			deleted = true;
+			// A copy kept on this device for singing offline goes too.
+			if (offline.has(id)) await offline.remove(id).catch(() => {});
+			await goto(resolve('/'));
+		} catch (error) {
+			deleteUnpaired = needsPairing(error);
+			deleteFailure = explain(error, t.deleteError, i18n.t);
+		} finally {
+			deleting = false;
 		}
 	}
 
@@ -478,6 +508,29 @@
 							{/each}
 						</dl>
 					</details>
+
+					<div class="delete">
+						{#if confirmDelete}
+							<!-- The figure in the poster face, as everywhere (the text face slashes its zero). -->
+							{@const [before, after] = t.deleteConfirm('\u0001').split('\u0001')}
+							<p>{before}<span class="num">{TRASH_DAYS}</span>{after}</p>
+							<div class="row">
+								<Button variant="danger" icon="trash" disabled={deleting} onclick={remove}
+									>{t.deleteYes}</Button
+								>
+								<Button onclick={() => (confirmDelete = false)}>{i18n.t.common.cancel}</Button>
+							</div>
+						{:else}
+							<Button variant="ghost" icon="trash" onclick={() => (confirmDelete = true)}
+								>{t.deleteSong}</Button
+							>
+						{/if}
+						{#if deleteFailure && deleteUnpaired}
+							<PairingNotice text={deleteFailure} />
+						{:else if deleteFailure}
+							<p class="failed" role="alert">{deleteFailure}</p>
+						{/if}
+					</div>
 				</section>
 			{:else}
 				<p class="message">{t.chooseLine}</p>
@@ -539,6 +592,32 @@
 		font-size: var(--t--1);
 		color: var(--farol);
 		font-weight: 700;
+	}
+
+	/* Last in the song's page, apart from the editing, as in a contact card. */
+	.delete {
+		display: grid;
+		justify-items: start;
+		gap: var(--s-3);
+		margin-top: var(--s-6);
+		padding-top: var(--s-4);
+		border-top: 1px solid var(--linha);
+	}
+
+	.delete p {
+		max-width: 38rem;
+		color: var(--papel-suave);
+	}
+
+	.delete .row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--s-3);
+	}
+
+	.delete .failed {
+		font-weight: 700;
+		color: var(--erro);
 	}
 
 	.notice {

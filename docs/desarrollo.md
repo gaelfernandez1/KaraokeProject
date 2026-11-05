@@ -48,6 +48,9 @@ Referencia: el portátil del proyecto (Windows 11 + WSL2 con Ubuntu 26.04, RTX 3
 | Formatear Python | `make format` |
 | Tests de Python | `make test` (o `uv run pytest packages/engine -q`) |
 | Web en modo desarrollo | `pnpm --dir web dev` |
+| El servidor con la web compilada (para el móvil y la tele) | `make serve` (guía: [`docs/servidor.md`](servidor.md)) |
+| Qué le falta al servidor (red, GPU, modelos…) | `uv run karaoke-server doctor` |
+| Servidor sin GPU, con karaokes de mentira | `uv run karaoke-server serve --fake-engine` |
 | Regenerar JSON Schema y tipos TS tras tocar un contrato | `make contracts` |
 | Validar un paquete de karaoke | `uv run karaoke validate <carpeta>` |
 | Audio sintético para el paquete de ejemplo | `uv run karaoke demo fixtures/packages/demo-sintetico` |

@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { ApiError, createJob, getDoc, listSongs, mediaUrl } from './client';
+import {
+	ApiError,
+	createJob,
+	getDoc,
+	getMe,
+	listDevices,
+	listSongs,
+	mediaUrl,
+	pairDevice,
+	revokeDevice,
+	retryJob,
+	startPairing
+} from './client';
 
 interface Call {
 	url: string;
@@ -86,5 +98,51 @@ describe('api client', () => {
 		const loaded = await getDoc('s', impl);
 		expect(calls[0].url).toBe('/media/s/karaoke.json');
 		expect(loaded.lines[0].role).toBe('lead');
+	});
+});
+
+describe('api client, server additions', () => {
+	it('keeps the error code the server sends', async () => {
+		const { impl } = fakeFetch(
+			{ detail: 'Only a paired device can do this', code: 'not_owner' },
+			403
+		);
+		const error = (await listSongs(impl).catch((e: unknown) => e)) as ApiError;
+		expect(error.status).toBe(403);
+		expect(error.code).toBe('not_owner');
+	});
+
+	it('has no code when the server sends none', async () => {
+		const { impl } = fakeFetch({ detail: 'nope' }, 404);
+		const error = (await listSongs(impl).catch((e: unknown) => e)) as ApiError;
+		expect(error.code).toBeNull();
+	});
+
+	it('retries a job on the server', async () => {
+		const { calls, impl } = fakeFetch({ id: 'j1', stage: 'queued' });
+		await retryJob('j 1', impl);
+		expect(calls[0].url).toBe('/api/jobs/j%201/retry');
+		expect(calls[0].init?.method).toBe('POST');
+	});
+
+	it('pairs a device with a code', async () => {
+		const { calls, impl } = fakeFetch({ id: 'd1', name: 'iPhone · Safari' });
+		await pairDevice('BCDF GHJK', impl);
+		expect(calls[0].url).toBe('/api/devices/pair');
+		expect(JSON.parse(String(calls[0].init?.body))).toEqual({ code: 'BCDF GHJK' });
+	});
+
+	it('asks who it is, starts a pairing and manages devices', async () => {
+		const { calls, impl } = fakeFetch({});
+		await getMe(impl);
+		await startPairing(impl);
+		await listDevices(impl);
+		await revokeDevice('d1', impl);
+		expect(calls.map((c) => `${c.init?.method ?? 'GET'} ${c.url}`)).toEqual([
+			'GET /api/me',
+			'POST /api/devices/pairing',
+			'GET /api/devices',
+			'DELETE /api/devices/d1'
+		]);
 	});
 });
