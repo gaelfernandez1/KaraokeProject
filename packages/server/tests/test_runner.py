@@ -83,6 +83,7 @@ def test_runner_reports_bad_lyrics(tmp_path: Path) -> None:
     assert events[-1]["transient"] is False
 
 
+@pytest.mark.usefixtures("ffmpeg")
 def test_runner_reports_unreadable_audio(tmp_path: Path) -> None:
     song = tmp_path / "not-audio.mp3"
     song.write_text("hello")
