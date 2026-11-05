@@ -16,13 +16,13 @@ test.beforeAll(() => {
 });
 
 test.beforeEach(async ({ page }) => {
-	await page.route('**/paquetes/demo-sintetico/karaoke.json', async (route) => {
+	await page.route('**/media/demo-sintetico/karaoke.json', async (route) => {
 		const doc = await (await route.fetch()).json();
 		doc.video = { background: 'background.mp4' };
 		await route.fulfill({ json: doc });
 	});
 	// With byte ranges, like the real server: without them a browser cannot seek in a video.
-	await page.route('**/paquetes/demo-sintetico/background.mp4', (route) => {
+	await page.route('**/media/demo-sintetico/background.mp4', (route) => {
 		const body = readFileSync(clip);
 		const range = /bytes=(\d+)-(\d*)/.exec(route.request().headers()['range'] ?? '');
 		const start = range ? Number(range[1]) : 0;
