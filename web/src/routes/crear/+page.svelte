@@ -6,6 +6,8 @@
 	 */
 	import { tick } from 'svelte';
 	import { ApiError, type SongSummary } from '#lib/api';
+	import { explain, needsPairing } from '#lib/devices/explain.js';
+	import PairingNotice from '#lib/devices/PairingNotice.svelte';
 	import JobCard from '#lib/create/JobCard.svelte';
 	import { jobs } from '#lib/create/jobs.svelte.js';
 	import { LANGUAGES } from '#lib/create/languages.js';
@@ -25,6 +27,7 @@
 	let artist = $state('');
 	let error = $state<CreateError | null>(null);
 	let failure = $state<string | null>(null);
+	let unpaired = $state(false);
 	let sending = $state(false);
 	let dragging = $state(false);
 	let fileInput = $state<HTMLInputElement | null>(null);
@@ -84,6 +87,7 @@
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
 		failure = null;
+		unpaired = false;
 		const result = validateCreate({ file, url, language, lyrics, lrclib, title, artist });
 		if (!result.ok) {
 			error = result.error;
@@ -106,12 +110,12 @@
 			if (fileInput) fileInput.value = '';
 			top?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 		} catch (caught) {
-			failure =
-				caught instanceof ApiError && caught.status === 0
-					? i18n.t.errors.network
-					: caught instanceof ApiError
-						? `${t.failed} ${caught.message}`
-						: t.failed;
+			unpaired = needsPairing(caught);
+			failure = explain(
+				caught,
+				caught instanceof ApiError ? `${t.failed} ${caught.message}` : t.failed,
+				i18n.t
+			);
 		} finally {
 			sending = false;
 		}
@@ -248,7 +252,8 @@
 			</div>
 
 			{#if error}<p class="error">{t[error]}</p>{/if}
-			{#if failure}<p class="error" role="alert">{failure}</p>{/if}
+			{#if unpaired}<PairingNotice text={failure ?? ''} />
+			{:else if failure}<p class="error" role="alert">{failure}</p>{/if}
 			<Button variant="primary" size="l" icon="create" type="submit" disabled={sending}>
 				{sending ? `${t.sending} ${Math.round((jobs.uploading ?? 0) * 100)} %` : t.submit}
 			</Button>

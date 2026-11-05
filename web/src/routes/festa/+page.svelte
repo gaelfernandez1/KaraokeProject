@@ -43,6 +43,8 @@
 	let host = $state.raw<HostParty | null>(null);
 	let resumable = $state<PartyCreated | null>(null);
 	let baseUrl = $state(location.origin);
+	/** Whether phones can open that address (not while WSL keeps the laptop off the Wi-Fi). */
+	let reachable = $state(true);
 	let failure = $state<string | null>(null);
 	let fullscreen = $state(false);
 	let idle = $state(false);
@@ -79,7 +81,10 @@
 	);
 
 	serverInfo()
-		.then((info) => (baseUrl = info.url))
+		.then((info) => {
+			baseUrl = info.url;
+			reachable = info.home_reachable !== false;
+		})
 		.catch(() => {});
 
 	// A party this TV was running (the page was reloaded) can be picked up again.
@@ -407,10 +412,15 @@
 					{/if}
 				</section>
 				<aside class="join-card">
-					<div class="qr"><Qr text={joinUrl} label={t.scan} /></div>
+					<div class="qr" class:short={!reachable}><Qr text={joinUrl} label={t.scan} /></div>
 					<p class="scan">{t.scan}</p>
 					<p class="code num" aria-label={t.code}>{host.code}</p>
-					<p class="url num">{t.orOpen(joinUrl.replace(/^https?:\/\//, ''))}</p>
+					{#if reachable}
+						<p class="url num">{t.orOpen(joinUrl.replace(/^https?:\/\//, ''))}</p>
+					{:else}
+						<!-- The address would not open on a phone: say why instead. -->
+						<p class="unreachable" role="status">{t.unreachable}</p>
+					{/if}
 					{#if party}<p class="guests num">{t.guests(party.guests.length)}</p>{/if}
 				</aside>
 				{#if party && !host.connection.connected}
@@ -644,6 +654,11 @@
 		width: min(100%, 40vh);
 	}
 
+	/* Room for the warning that replaces the address, without pushing the lobby down. */
+	.qr.short {
+		width: min(100%, 34vh);
+	}
+
 	.scan {
 		font-size: 2rem;
 		font-weight: 700;
@@ -750,6 +765,13 @@
 		background: var(--who);
 		transform-origin: left;
 		transform: scaleX(var(--p));
+	}
+
+	.unreachable {
+		max-width: 28rem;
+		font-size: 1.25rem;
+		font-weight: 700;
+		color: var(--farol);
 	}
 
 	.reconnecting {

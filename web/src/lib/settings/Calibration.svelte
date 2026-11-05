@@ -10,6 +10,7 @@
 		estimateLatency,
 		manualOffset
 	} from '#lib/audio/calibration.js';
+	import { resumeWithin } from '#lib/audio/engine.js';
 	import { i18n } from '#lib/i18n';
 	import Button from '#lib/ui/Button.svelte';
 
@@ -21,12 +22,14 @@
 	let { onresult }: Props = $props();
 
 	const COUNT = 10;
-	let phase = $state<'idle' | 'running' | 'done' | 'failed'>('idle');
+	// 'silent': the browser is not playing sound at all, so there is nothing to tap along to.
+	let phase = $state<'idle' | 'running' | 'done' | 'failed' | 'silent'>('idle');
 	let tapCount = $state(0);
 	let resultMs = $state(0);
 	let ripples = $state<{ id: number; x: number; y: number }[]>([]);
 	let context: AudioContext | null = null;
 	let clicks: number[] = [];
+	let startedAt = 0;
 	let taps: number[] = [];
 	let ripple = 0;
 
@@ -47,7 +50,13 @@
 
 	async function start() {
 		context ??= new AudioContext();
-		await context.resume();
+		try {
+			await resumeWithin(context);
+		} catch {
+			phase = 'silent';
+			return;
+		}
+		startedAt = context.currentTime;
 		clicks = clickTimes(context.currentTime, COUNT, CLICK_INTERVAL, 1);
 		for (const at of clicks) click(context, at);
 		taps = [];
@@ -75,6 +84,11 @@
 
 	function finish() {
 		if (!context) return;
+		// Ten seconds went by and the audio clock did not: no click ever sounded.
+		if (context.currentTime === startedAt) {
+			phase = 'silent';
+			return;
+		}
 		const measured = estimateLatency(clicks, taps);
 		if (measured === null) {
 			phase = 'failed';
@@ -111,6 +125,9 @@
 		<p class="intro">{t.calibrateIntro}</p>
 		{#if phase === 'done'}<p class="result" role="status">{t.calibrateResult(resultMs)}</p>{/if}
 		{#if phase === 'failed'}<p class="failed" role="alert">{t.calibrateFailed}</p>{/if}
+		{#if phase === 'silent'}
+			<p class="failed" role="alert">{i18n.t.errors.audioStalled}</p>
+		{/if}
 		<Button variant={phase === 'idle' ? 'primary' : 'quiet'} icon="tap" onclick={start}>
 			{phase === 'idle' ? t.calibrateStart : i18n.t.common.retry}
 		</Button>
@@ -135,6 +152,7 @@
 	}
 
 	.failed {
+		max-width: 38rem;
 		font-weight: 700;
 		color: var(--erro);
 	}

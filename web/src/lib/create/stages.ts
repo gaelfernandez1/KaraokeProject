@@ -17,10 +17,15 @@ const EXPORT: [JobStage, number][] = [
 	['video', 0.9]
 ];
 
-/** How far the whole job has gone, 0–1; null once it has stopped without finishing. */
+/**
+ * How far the whole job has gone, 0–1; null once it has stopped without finishing. The server
+ * knows what each stage takes on its machine and sends `overall`; the weights below are for
+ * when it does not.
+ */
 export function overallProgress(job: Job): number | null {
 	if (job.stage === 'done') return 1;
 	if (job.stage === 'error' || job.stage === 'cancelled') return null;
+	if (job.overall !== null && job.overall !== undefined) return job.overall;
 	const weights = job.kind === 'export' ? EXPORT : MAKE;
 	const stages = weights.filter(([stage]) => !(stage === 'transcribe' && job.with_lyrics));
 	const total = stages.reduce((sum, [, w]) => sum + w, 0);
