@@ -146,6 +146,7 @@ async def test_media_info_of_a_picture_has_no_audio(tmp_path: Path) -> None:
     assert not (await media_info(picture)).has_audio
 
 
+@pytest.mark.usefixtures("ffmpeg")
 async def test_media_info_of_garbage(tmp_path: Path) -> None:
     junk = tmp_path / "junk.mp3"
     junk.write_text("hello")
