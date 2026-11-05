@@ -8,16 +8,18 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && tsc -p src/service-worker/tsconfig.json --noEmit",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
 		"gen:contracts": "json2ts -i ../schemas/karaoke.schema.json -o src/lib/contracts/generated/karaoke.ts --additionalProperties=false --unknownAny --ignoreMinAndMaxItems --style.useTabs --style.singleQuote --bannerComment '/* Generated from schemas/ by `pnpm gen:contracts`. Do not edit by hand. */' && json2ts -i ../schemas/theme.schema.json -o src/lib/contracts/generated/theme.ts --additionalProperties=false --unknownAny --ignoreMinAndMaxItems --style.useTabs --style.singleQuote --bannerComment '/* Generated from schemas/ by `pnpm gen:contracts`. Do not edit by hand. */'",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"perf": "node scripts/perf-budget.mjs"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "4.14.0",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.64.1",
 		"@sveltejs/adapter-static": "^4.0.0",
@@ -40,12 +42,15 @@
 	},
 	"imports": {
 		"#lib": "./src/lib/index.js",
+		"#lib/api": "./src/lib/api/index.js",
 		"#lib/contracts": "./src/lib/contracts/index.js",
+		"#lib/i18n": "./src/lib/i18n/index.svelte.js",
 		"#lib/lyrics": "./src/lib/lyrics/index.js",
 		"#lib/*": "./src/lib/*"
 	},
 	"packageManager": "pnpm@10.33.0",
 	"dependencies": {
+		"lean-qr": "2.7.4",
 		"signalsmith-stretch": "1.3.2"
 	}
 }
