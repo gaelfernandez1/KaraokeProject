@@ -1,0 +1,27 @@
+{
+	"id": "/",
+	"name": "Foliada",
+	"short_name": "Foliada",
+	"description": "Karaoke de calquera canción, coa letra sincronizada.",
+	"lang": "gl",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"display_override": ["fullscreen", "standalone"],
+	"orientation": "any",
+	"background_color": "#16122E",
+	"theme_color": "#16122E",
+	"categories": ["music", "entertainment"],
+	"launch_handler": { "client_mode": "focus-existing" },
+	"icons": [
+		{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+		{ "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+		{
+			"src": "/icons/icon-maskable-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+	]
+}
