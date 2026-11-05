@@ -107,8 +107,8 @@ llevan `role: "backing"` (contrato 1.1.0, `decisiones/006`).
 
 Acepta cualquier audio o vídeo que lea ffmpeg. Separa la voz, alinea la letra, deja el audio
 nivelado en m4a y escribe `karaoke.json` el último: si algo falla a medias, no queda un paquete
-que parezca bueno. Para escucharlo, copia la carpeta a `bench/data/paquetes/` y ábrela en
-`/proba-audio`.
+que parezca bueno. Para escucharlo, copia la carpeta a `bench/data/paquetes/` y ábrela desde la
+biblioteca de la web (`pnpm --dir web dev`, ver `docs/web.md`).
 
 ## Medir
 
