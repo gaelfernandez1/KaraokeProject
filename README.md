@@ -102,8 +102,10 @@ inglés).
 
 ## Comezar
 
-Precisas Linux ou Windows 11 con WSL 2 (Ubuntu), Node 22 ou superior e ffmpeg. Recoméndase unha GPU
-NVIDIA de 4 GB; sen ela tamén funciona, máis amodo.
+Precisas Linux ou Windows 11 con WSL 2 (Ubuntu), Node 22 ou superior e ffmpeg. Para crear karaokes
+fai falta unha **gráfica NVIDIA da serie RTX 20 ou posterior**, con 4 GB de memoria de vídeo ou
+máis; calquera NVIDIA máis nova ou con máis memoria funciona igual, só que máis rápido. Sen ela,
+o servidor, o reprodutor, a festa e o editor seguen funcionando con karaokes feitos noutra parte.
 
 ```bash
 git clone https://github.com/gaelfernandez1/KaraokeProject.git
@@ -140,6 +142,8 @@ documentos do plan e as decisións de deseño, en castelán.
 A versión 3.0 é unha reconstrución completa. O que aínda non fai:
 
 - Precisa Linux ou WSL 2; non hai versión nativa para Windows nin macOS.
+- Para crear karaokes fai falta unha gráfica NVIDIA (serie RTX 20 ou posterior): coas de AMD,
+  Intel ou Apple aínda non se poden crear.
 - Os cantantes só se distinguen cando a letra di quen canta; aínda non hai detección automática
   de voces.
 - Sen letra, a transcrición en galego aínda erra preto dunha palabra de cada catro: pegar a letra
