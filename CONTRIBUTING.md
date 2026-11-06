@@ -51,4 +51,3 @@ Para consultas sobre contribucións:
 Ao contribuír, aceptas que as túas contribucións se distribúan baixo a mesma [Licenza MIT](LICENSE) do proxecto.
 
 ---
-
