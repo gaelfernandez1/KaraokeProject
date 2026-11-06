@@ -1,0 +1,40 @@
+name: Release
+
+# Pushing a tag like v3.1.0 drafts its GitHub release with that version's CHANGELOG.md section.
+# The draft is reviewed (and extra files attached) by hand before publishing: releases are
+# immutable once published. How to cut one: docs/releasing.md.
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions: {}
+
+jobs:
+  draft:
+    name: Draft the release from CHANGELOG.md
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # creates the draft release
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # scripts/release.py only needs the standard library of the runner's Python (3.12).
+      - name: Check the tag, the version in every file and the changelog agree
+        run: |
+          python3 scripts/release.py check
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::The tag $TAG does not match the version $version in the repository."
+            exit 1
+          fi
+      - name: Take the notes from CHANGELOG.md
+        run: python3 scripts/release.py notes "${TAG#v}" > "$RUNNER_TEMP/notes.md"
+      - name: Draft the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --verify-tag \
+            --title "Proxecto Karaoke en Galego ${TAG#v}" --notes-file "$RUNNER_TEMP/notes.md"

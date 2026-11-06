@@ -12,7 +12,7 @@ server=../.venv/bin/karaoke-server
 rm -rf "$data"
 pnpm build >/dev/null
 # The fixtures' audio is not in git: the synthetic song's is made here; the real songs' comes from
-# `uv run karaoke-bench package` (docs/banco.md, «Paquetes de ejemplo con canciones reales»).
+# `uv run karaoke-bench package` (docs/benchmark.md, «Paquetes de ejemplo con canciones reales»).
 demo=../fixtures/packages/demo-sintetico
 [ -f "$demo/vocals.wav" ] || ../.venv/bin/karaoke demo "$demo" >/dev/null
 if ! "$server" --data "$data" import ../fixtures/packages/* >/dev/null; then

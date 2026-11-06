@@ -1,6 +1,6 @@
 <script lang="ts" module>
-	/** Provisional name; one place to change it. */
-	export const APP_NAME = 'Foliada';
+	/** The product name, in one place. */
+	export const APP_NAME = 'Proxecto Karaoke en Galego';
 	const SEEN_KEY = 'foliada.sung';
 </script>
 

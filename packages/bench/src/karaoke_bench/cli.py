@@ -6,6 +6,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from karaoke_bench import __version__
 from karaoke_bench.audio import AudioError, duration
 from karaoke_bench.compare import compare_runs
 from karaoke_bench.drafting import (
@@ -31,6 +32,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="karaoke-bench", description="Measure the karaoke engine on song sets."
     )
+    parser.add_argument("--version", action="version", version=f"karaoke-bench {__version__}")
     parser.add_argument(
         "--bench-dir", type=Path, default=Path("bench"), help="bench folder (default: bench)"
     )

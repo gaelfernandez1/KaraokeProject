@@ -1,0 +1,6012 @@
+{
+  "schema_version": "1.1.0",
+  "id": "cloplas-laverca",
+  "title": "laverca",
+  "artist": "Clo Plas",
+  "language": "gl",
+  "duration": 313.032018,
+  "audio": {
+    "instrumental": "instrumental.wav",
+    "vocals": "vocals.wav",
+    "loudness_lufs": -16.9
+  },
+  "video": null,
+  "cover": null,
+  "singers": [
+    {
+      "id": "s1",
+      "name": null,
+      "color": null
+    }
+  ],
+  "lines": [
+    {
+      "id": "l1",
+      "start": 3.983,
+      "end": 35.424,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "A",
+          "start": 3.983,
+          "end": 4.003,
+          "confidence": 0.636,
+          "parts": []
+        },
+        {
+          "text": "avoa",
+          "start": 31.882,
+          "end": 32.182,
+          "confidence": 0.147,
+          "parts": [
+            {
+              "text": "a",
+              "start": 31.882,
+              "end": 32.022
+            },
+            {
+              "text": "vo",
+              "start": 32.022,
+              "end": 32.162
+            },
+            {
+              "text": "a",
+              "start": 32.162,
+              "end": 32.182
+            }
+          ]
+        },
+        {
+          "text": "descoxe",
+          "start": 32.222,
+          "end": 32.602,
+          "confidence": 0.639,
+          "parts": [
+            {
+              "text": "des",
+              "start": 32.222,
+              "end": 32.402
+            },
+            {
+              "text": "co",
+              "start": 32.402,
+              "end": 32.542
+            },
+            {
+              "text": "xe",
+              "start": 32.542,
+              "end": 32.602
+            }
+          ]
+        },
+        {
+          "text": "unha",
+          "start": 32.662,
+          "end": 32.762,
+          "confidence": 0.662,
+          "parts": [
+            {
+              "text": "u",
+              "start": 32.662,
+              "end": 32.682
+            },
+            {
+              "text": "nha",
+              "start": 32.682,
+              "end": 32.762
+            }
+          ]
+        },
+        {
+          "text": "camisa",
+          "start": 32.822,
+          "end": 33.222,
+          "confidence": 0.95,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 32.822,
+              "end": 32.942
+            },
+            {
+              "text": "mi",
+              "start": 32.942,
+              "end": 33.122
+            },
+            {
+              "text": "sa",
+              "start": 33.122,
+              "end": 33.222
+            }
+          ]
+        },
+        {
+          "text": "para",
+          "start": 33.363,
+          "end": 33.543,
+          "confidence": 0.12,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 33.363,
+              "end": 33.423
+            },
+            {
+              "text": "ra",
+              "start": 33.423,
+              "end": 33.543
+            }
+          ]
+        },
+        {
+          "text": "o",
+          "start": 35.404,
+          "end": 35.424,
+          "confidence": 0.075,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "start": 35.524,
+      "end": 37.525,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Meu",
+          "start": 35.524,
+          "end": 35.704,
+          "confidence": 0.787,
+          "parts": []
+        },
+        {
+          "text": "grao",
+          "start": 35.784,
+          "end": 36.004,
+          "confidence": 0.846,
+          "parts": [
+            {
+              "text": "gra",
+              "start": 35.784,
+              "end": 35.984
+            },
+            {
+              "text": "o",
+              "start": 35.984,
+              "end": 36.004
+            }
+          ]
+        },
+        {
+          "text": "de",
+          "start": 36.084,
+          "end": 36.164,
+          "confidence": 0.948,
+          "parts": []
+        },
+        {
+          "text": "embarazada",
+          "start": 36.685,
+          "end": 37.265,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "em",
+              "start": 36.685,
+              "end": 36.785
+            },
+            {
+              "text": "ba",
+              "start": 36.785,
+              "end": 36.865
+            },
+            {
+              "text": "ra",
+              "start": 36.865,
+              "end": 37.025
+            },
+            {
+              "text": "za",
+              "start": 37.025,
+              "end": 37.205
+            },
+            {
+              "text": "da",
+              "start": 37.205,
+              "end": 37.265
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 37.425,
+          "end": 37.525,
+          "confidence": 0.089,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "start": 39.086,
+      "end": 41.248,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Aquí",
+          "start": 39.086,
+          "end": 39.167,
+          "confidence": 0.013,
+          "parts": [
+            {
+              "text": "A",
+              "start": 39.086,
+              "end": 39.106
+            },
+            {
+              "text": "quí",
+              "start": 39.106,
+              "end": 39.167
+            }
+          ]
+        },
+        {
+          "text": "non",
+          "start": 39.247,
+          "end": 39.327,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "vai",
+          "start": 39.407,
+          "end": 39.507,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "ser,",
+          "start": 39.607,
+          "end": 39.767,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 40.628,
+          "end": 40.748,
+          "confidence": 0.888,
+          "parts": []
+        },
+        {
+          "text": "este",
+          "start": 40.828,
+          "end": 40.968,
+          "confidence": 0.987,
+          "parts": [
+            {
+              "text": "es",
+              "start": 40.828,
+              "end": 40.908
+            },
+            {
+              "text": "te",
+              "start": 40.908,
+              "end": 40.968
+            }
+          ]
+        },
+        {
+          "text": "verán",
+          "start": 41.028,
+          "end": 41.248,
+          "confidence": 0.103,
+          "parts": [
+            {
+              "text": "ve",
+              "start": 41.028,
+              "end": 41.068
+            },
+            {
+              "text": "rán",
+              "start": 41.068,
+              "end": 41.248
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "start": 42.969,
+      "end": 44.53,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Inventou",
+          "start": 42.969,
+          "end": 43.349,
+          "confidence": 0.962,
+          "parts": [
+            {
+              "text": "In",
+              "start": 42.969,
+              "end": 43.069
+            },
+            {
+              "text": "ven",
+              "start": 43.069,
+              "end": 43.229
+            },
+            {
+              "text": "tou",
+              "start": 43.229,
+              "end": 43.349
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 43.429,
+          "end": 43.509,
+          "confidence": 0.96,
+          "parts": []
+        },
+        {
+          "text": "si,",
+          "start": 43.59,
+          "end": 43.67,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "e",
+          "start": 44.09,
+          "end": 44.11,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "agora?",
+          "start": 44.23,
+          "end": 44.53,
+          "confidence": 1.0,
+          "parts": [
+            {
+              "text": "a",
+              "start": 44.23,
+              "end": 44.29
+            },
+            {
+              "text": "go",
+              "start": 44.29,
+              "end": 44.45
+            },
+            {
+              "text": "ra?",
+              "start": 44.45,
+              "end": 44.53
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l5",
+      "start": 47.012,
+      "end": 48.913,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Intenta",
+          "start": 47.012,
+          "end": 47.512,
+          "confidence": 0.865,
+          "parts": [
+            {
+              "text": "In",
+              "start": 47.012,
+              "end": 47.172
+            },
+            {
+              "text": "ten",
+              "start": 47.172,
+              "end": 47.432
+            },
+            {
+              "text": "ta",
+              "start": 47.432,
+              "end": 47.512
+            }
+          ]
+        },
+        {
+          "text": "facela",
+          "start": 47.812,
+          "end": 48.133,
+          "confidence": 0.815,
+          "parts": [
+            {
+              "text": "fa",
+              "start": 47.812,
+              "end": 47.932
+            },
+            {
+              "text": "ce",
+              "start": 47.932,
+              "end": 48.033
+            },
+            {
+              "text": "la",
+              "start": 48.033,
+              "end": 48.133
+            }
+          ]
+        },
+        {
+          "text": "máis",
+          "start": 48.213,
+          "end": 48.393,
+          "confidence": 0.965,
+          "parts": []
+        },
+        {
+          "text": "pequena",
+          "start": 48.513,
+          "end": 48.913,
+          "confidence": 0.972,
+          "parts": [
+            {
+              "text": "pe",
+              "start": 48.513,
+              "end": 48.633
+            },
+            {
+              "text": "que",
+              "start": 48.633,
+              "end": 48.813
+            },
+            {
+              "text": "na",
+              "start": 48.813,
+              "end": 48.913
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l6",
+      "start": 50.654,
+      "end": 52.616,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "E",
+          "start": 50.654,
+          "end": 50.674,
+          "confidence": 0.966,
+          "parts": []
+        },
+        {
+          "text": "eu",
+          "start": 50.774,
+          "end": 50.874,
+          "confidence": 0.831,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 50.955,
+          "end": 51.035,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "podo",
+          "start": 51.135,
+          "end": 51.275,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "po",
+              "start": 51.135,
+              "end": 51.215
+            },
+            {
+              "text": "do",
+              "start": 51.215,
+              "end": 51.275
+            }
+          ]
+        },
+        {
+          "text": "quita-los",
+          "start": 51.355,
+          "end": 51.715,
+          "confidence": 0.46,
+          "parts": [
+            {
+              "text": "qui",
+              "start": 51.355,
+              "end": 51.455
+            },
+            {
+              "text": "ta-",
+              "start": 51.455,
+              "end": 51.615
+            },
+            {
+              "text": "los",
+              "start": 51.615,
+              "end": 51.715
+            }
+          ]
+        },
+        {
+          "text": "óxos",
+          "start": 51.835,
+          "end": 52.035,
+          "confidence": 0.025,
+          "parts": [
+            {
+              "text": "ó",
+              "start": 51.835,
+              "end": 51.895
+            },
+            {
+              "text": "xos",
+              "start": 51.895,
+              "end": 52.035
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 52.095,
+          "end": 52.155,
+          "confidence": 0.987,
+          "parts": []
+        },
+        {
+          "text": "agulla",
+          "start": 52.255,
+          "end": 52.616,
+          "confidence": 0.799,
+          "parts": [
+            {
+              "text": "a",
+              "start": 52.255,
+              "end": 52.335
+            },
+            {
+              "text": "gu",
+              "start": 52.335,
+              "end": 52.496
+            },
+            {
+              "text": "lla",
+              "start": 52.496,
+              "end": 52.616
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l7",
+      "start": 55.678,
+      "end": 56.258,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "É",
+          "start": 55.678,
+          "end": 55.698,
+          "confidence": 0.964,
+          "parts": []
+        },
+        {
+          "text": "domingo.",
+          "start": 55.798,
+          "end": 56.258,
+          "confidence": 0.956,
+          "parts": [
+            {
+              "text": "do",
+              "start": 55.798,
+              "end": 55.918
+            },
+            {
+              "text": "min",
+              "start": 55.918,
+              "end": 56.158
+            },
+            {
+              "text": "go.",
+              "start": 56.158,
+              "end": 56.258
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l8",
+      "start": 57.499,
+      "end": 58.78,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "E",
+          "start": 57.499,
+          "end": 57.519,
+          "confidence": 0.973,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 57.599,
+          "end": 57.679,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "hai",
+          "start": 57.739,
+          "end": 57.839,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "nada",
+          "start": 57.979,
+          "end": 58.199,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "na",
+              "start": 57.979,
+              "end": 58.139
+            },
+            {
+              "text": "da",
+              "start": 58.139,
+              "end": 58.199
+            }
+          ]
+        },
+        {
+          "text": "de",
+          "start": 58.299,
+          "end": 58.34,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "ruído.",
+          "start": 58.46,
+          "end": 58.78,
+          "confidence": 0.983,
+          "parts": [
+            {
+              "text": "ruí",
+              "start": 58.46,
+              "end": 58.68
+            },
+            {
+              "text": "do.",
+              "start": 58.68,
+              "end": 58.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "start": 62.302,
+      "end": 64.624,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "É",
+          "start": 62.302,
+          "end": 62.322,
+          "confidence": 0.919,
+          "parts": []
+        },
+        {
+          "text": "domingo",
+          "start": 62.402,
+          "end": 62.702,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "do",
+              "start": 62.402,
+              "end": 62.502
+            },
+            {
+              "text": "min",
+              "start": 62.502,
+              "end": 62.642
+            },
+            {
+              "text": "go",
+              "start": 62.642,
+              "end": 62.702
+            }
+          ]
+        },
+        {
+          "text": "ao",
+          "start": 62.742,
+          "end": 62.783,
+          "confidence": 0.339,
+          "parts": [
+            {
+              "text": "a",
+              "start": 62.742,
+              "end": 62.763
+            },
+            {
+              "text": "o",
+              "start": 62.763,
+              "end": 62.783
+            }
+          ]
+        },
+        {
+          "text": "mediodía",
+          "start": 62.823,
+          "end": 63.263,
+          "confidence": 0.885,
+          "parts": [
+            {
+              "text": "me",
+              "start": 62.823,
+              "end": 62.883
+            },
+            {
+              "text": "dio",
+              "start": 62.883,
+              "end": 63.063
+            },
+            {
+              "text": "dí",
+              "start": 63.063,
+              "end": 63.223
+            },
+            {
+              "text": "a",
+              "start": 63.223,
+              "end": 63.263
+            }
+          ]
+        },
+        {
+          "text": "e",
+          "start": 63.403,
+          "end": 63.443,
+          "confidence": 0.962,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 63.503,
+          "end": 63.603,
+          "confidence": 0.935,
+          "parts": []
+        },
+        {
+          "text": "hai",
+          "start": 63.663,
+          "end": 63.763,
+          "confidence": 0.993,
+          "parts": []
+        },
+        {
+          "text": "nada",
+          "start": 63.903,
+          "end": 64.123,
+          "confidence": 0.874,
+          "parts": [
+            {
+              "text": "na",
+              "start": 63.903,
+              "end": 64.043
+            },
+            {
+              "text": "da",
+              "start": 64.043,
+              "end": 64.123
+            }
+          ]
+        },
+        {
+          "text": "de",
+          "start": 64.203,
+          "end": 64.244,
+          "confidence": 0.985,
+          "parts": []
+        },
+        {
+          "text": "ruído",
+          "start": 64.364,
+          "end": 64.624,
+          "confidence": 0.968,
+          "parts": [
+            {
+              "text": "ruí",
+              "start": 64.364,
+              "end": 64.564
+            },
+            {
+              "text": "do",
+              "start": 64.564,
+              "end": 64.624
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l10",
+      "start": 65.905,
+      "end": 67.045,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Nin",
+          "start": 65.905,
+          "end": 66.125,
+          "confidence": 0.962,
+          "parts": []
+        },
+        {
+          "text": "coa",
+          "start": 66.245,
+          "end": 66.365,
+          "confidence": 0.886,
+          "parts": [
+            {
+              "text": "co",
+              "start": 66.245,
+              "end": 66.325
+            },
+            {
+              "text": "a",
+              "start": 66.325,
+              "end": 66.365
+            }
+          ]
+        },
+        {
+          "text": "ventá",
+          "start": 66.385,
+          "end": 66.585,
+          "confidence": 0.652,
+          "parts": [
+            {
+              "text": "ven",
+              "start": 66.385,
+              "end": 66.525
+            },
+            {
+              "text": "tá",
+              "start": 66.525,
+              "end": 66.585
+            }
+          ]
+        },
+        {
+          "text": "aberta.",
+          "start": 66.725,
+          "end": 67.045,
+          "confidence": 0.962,
+          "parts": [
+            {
+              "text": "a",
+              "start": 66.725,
+              "end": 66.765
+            },
+            {
+              "text": "ber",
+              "start": 66.765,
+              "end": 66.985
+            },
+            {
+              "text": "ta.",
+              "start": 66.985,
+              "end": 67.045
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l11",
+      "start": 70.047,
+      "end": 71.508,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Nin",
+          "start": 70.047,
+          "end": 70.188,
+          "confidence": 0.942,
+          "parts": []
+        },
+        {
+          "text": "eu,",
+          "start": 70.288,
+          "end": 70.388,
+          "confidence": 0.956,
+          "parts": []
+        },
+        {
+          "text": "fun",
+          "start": 70.828,
+          "end": 70.948,
+          "confidence": 0.891,
+          "parts": []
+        },
+        {
+          "text": "aos",
+          "start": 71.048,
+          "end": 71.148,
+          "confidence": 0.895,
+          "parts": [
+            {
+              "text": "a",
+              "start": 71.048,
+              "end": 71.088
+            },
+            {
+              "text": "os",
+              "start": 71.088,
+              "end": 71.148
+            }
+          ]
+        },
+        {
+          "text": "viños",
+          "start": 71.188,
+          "end": 71.508,
+          "confidence": 0.988,
+          "parts": [
+            {
+              "text": "vi",
+              "start": 71.188,
+              "end": 71.328
+            },
+            {
+              "text": "ños",
+              "start": 71.328,
+              "end": 71.508
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l12",
+      "start": 74.35,
+      "end": 75.871,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Podo",
+          "start": 74.35,
+          "end": 74.51,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "Po",
+              "start": 74.35,
+              "end": 74.45
+            },
+            {
+              "text": "do",
+              "start": 74.45,
+              "end": 74.51
+            }
+          ]
+        },
+        {
+          "text": "oír",
+          "start": 74.591,
+          "end": 74.731,
+          "confidence": 0.341,
+          "parts": [
+            {
+              "text": "o",
+              "start": 74.591,
+              "end": 74.671
+            },
+            {
+              "text": "ír",
+              "start": 74.671,
+              "end": 74.731
+            }
+          ]
+        },
+        {
+          "text": "as",
+          "start": 74.811,
+          "end": 74.851,
+          "confidence": 0.756,
+          "parts": []
+        },
+        {
+          "text": "súas",
+          "start": 74.891,
+          "end": 75.071,
+          "confidence": 0.953,
+          "parts": [
+            {
+              "text": "sú",
+              "start": 74.891,
+              "end": 74.991
+            },
+            {
+              "text": "as",
+              "start": 74.991,
+              "end": 75.071
+            }
+          ]
+        },
+        {
+          "text": "puntadas",
+          "start": 75.131,
+          "end": 75.671,
+          "confidence": 0.984,
+          "parts": [
+            {
+              "text": "pun",
+              "start": 75.131,
+              "end": 75.351
+            },
+            {
+              "text": "ta",
+              "start": 75.351,
+              "end": 75.531
+            },
+            {
+              "text": "das",
+              "start": 75.531,
+              "end": 75.671
+            }
+          ]
+        },
+        {
+          "text": "e...",
+          "start": 75.851,
+          "end": 75.871,
+          "confidence": 0.988,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l13",
+      "start": 77.533,
+      "end": 79.554,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "O",
+          "start": 77.533,
+          "end": 77.553,
+          "confidence": 0.988,
+          "parts": []
+        },
+        {
+          "text": "segundeiro",
+          "start": 77.633,
+          "end": 78.313,
+          "confidence": 0.947,
+          "parts": [
+            {
+              "text": "se",
+              "start": 77.633,
+              "end": 77.773
+            },
+            {
+              "text": "gun",
+              "start": 77.773,
+              "end": 77.993
+            },
+            {
+              "text": "dei",
+              "start": 77.993,
+              "end": 78.233
+            },
+            {
+              "text": "ro",
+              "start": 78.233,
+              "end": 78.313
+            }
+          ]
+        },
+        {
+          "text": "do",
+          "start": 78.573,
+          "end": 78.633,
+          "confidence": 0.951,
+          "parts": []
+        },
+        {
+          "text": "reloxo",
+          "start": 78.733,
+          "end": 79.054,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "re",
+              "start": 78.733,
+              "end": 78.833
+            },
+            {
+              "text": "lo",
+              "start": 78.833,
+              "end": 78.973
+            },
+            {
+              "text": "xo",
+              "start": 78.973,
+              "end": 79.054
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 79.134,
+          "end": 79.194,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "sala.",
+          "start": 79.274,
+          "end": 79.554,
+          "confidence": 0.91,
+          "parts": [
+            {
+              "text": "sa",
+              "start": 79.274,
+              "end": 79.474
+            },
+            {
+              "text": "la.",
+              "start": 79.474,
+              "end": 79.554
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l14",
+      "start": 81.375,
+      "end": 82.396,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Martela,",
+          "start": 81.375,
+          "end": 81.895,
+          "confidence": 0.995,
+          "parts": [
+            {
+              "text": "Mar",
+              "start": 81.375,
+              "end": 81.635
+            },
+            {
+              "text": "te",
+              "start": 81.635,
+              "end": 81.815
+            },
+            {
+              "text": "la,",
+              "start": 81.815,
+              "end": 81.895
+            }
+          ]
+        },
+        {
+          "text": "en",
+          "start": 82.016,
+          "end": 82.056,
+          "confidence": 0.398,
+          "parts": []
+        },
+        {
+          "text": "min.",
+          "start": 82.216,
+          "end": 82.396,
+          "confidence": 0.892,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l15",
+      "start": 85.338,
+      "end": 86.959,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Parece",
+          "start": 85.338,
+          "end": 85.538,
+          "confidence": 0.944,
+          "parts": [
+            {
+              "text": "Pa",
+              "start": 85.338,
+              "end": 85.418
+            },
+            {
+              "text": "re",
+              "start": 85.418,
+              "end": 85.478
+            },
+            {
+              "text": "ce",
+              "start": 85.478,
+              "end": 85.538
+            }
+          ]
+        },
+        {
+          "text": "unha",
+          "start": 85.638,
+          "end": 85.738,
+          "confidence": 0.211,
+          "parts": [
+            {
+              "text": "u",
+              "start": 85.638,
+              "end": 85.658
+            },
+            {
+              "text": "nha",
+              "start": 85.658,
+              "end": 85.738
+            }
+          ]
+        },
+        {
+          "text": "casa",
+          "start": 85.778,
+          "end": 85.998,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 85.778,
+              "end": 85.938
+            },
+            {
+              "text": "sa",
+              "start": 85.938,
+              "end": 85.998
+            }
+          ]
+        },
+        {
+          "text": "no",
+          "start": 86.118,
+          "end": 86.178,
+          "confidence": 0.934,
+          "parts": []
+        },
+        {
+          "text": "medio",
+          "start": 86.338,
+          "end": 86.499,
+          "confidence": 0.834,
+          "parts": [
+            {
+              "text": "me",
+              "start": 86.338,
+              "end": 86.419
+            },
+            {
+              "text": "dio",
+              "start": 86.419,
+              "end": 86.499
+            }
+          ]
+        },
+        {
+          "text": "dun",
+          "start": 86.559,
+          "end": 86.659,
+          "confidence": 0.83,
+          "parts": []
+        },
+        {
+          "text": "trado,",
+          "start": 86.719,
+          "end": 86.959,
+          "confidence": 0.269,
+          "parts": [
+            {
+              "text": "tra",
+              "start": 86.719,
+              "end": 86.899
+            },
+            {
+              "text": "do,",
+              "start": 86.899,
+              "end": 86.959
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l16",
+      "start": 87.059,
+      "end": 88.9,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "pero",
+          "start": 87.059,
+          "end": 87.239,
+          "confidence": 0.946,
+          "parts": [
+            {
+              "text": "pe",
+              "start": 87.059,
+              "end": 87.139
+            },
+            {
+              "text": "ro",
+              "start": 87.139,
+              "end": 87.239
+            }
+          ]
+        },
+        {
+          "text": "é",
+          "start": 88.14,
+          "end": 88.16,
+          "confidence": 0.795,
+          "parts": []
+        },
+        {
+          "text": "un",
+          "start": 88.26,
+          "end": 88.3,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "piso",
+          "start": 88.34,
+          "end": 88.5,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "pi",
+              "start": 88.34,
+              "end": 88.44
+            },
+            {
+              "text": "so",
+              "start": 88.44,
+              "end": 88.5
+            }
+          ]
+        },
+        {
+          "text": "na",
+          "start": 88.56,
+          "end": 88.62,
+          "confidence": 0.995,
+          "parts": []
+        },
+        {
+          "text": "billa.",
+          "start": 88.66,
+          "end": 88.9,
+          "confidence": 0.629,
+          "parts": [
+            {
+              "text": "bi",
+              "start": 88.66,
+              "end": 88.78
+            },
+            {
+              "text": "lla.",
+              "start": 88.78,
+              "end": 88.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l17",
+      "start": 92.983,
+      "end": 94.944,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Pode",
+          "start": 92.983,
+          "end": 93.163,
+          "confidence": 0.995,
+          "parts": [
+            {
+              "text": "Po",
+              "start": 92.983,
+              "end": 93.103
+            },
+            {
+              "text": "de",
+              "start": 93.103,
+              "end": 93.163
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 93.263,
+          "end": 93.323,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "cando",
+          "start": 93.503,
+          "end": 93.663,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "can",
+              "start": 93.503,
+              "end": 93.603
+            },
+            {
+              "text": "do",
+              "start": 93.603,
+              "end": 93.663
+            }
+          ]
+        },
+        {
+          "text": "dean",
+          "start": 93.743,
+          "end": 93.944,
+          "confidence": 0.985,
+          "parts": [
+            {
+              "text": "de",
+              "start": 93.743,
+              "end": 93.884
+            },
+            {
+              "text": "an",
+              "start": 93.884,
+              "end": 93.944
+            }
+          ]
+        },
+        {
+          "text": "as",
+          "start": 94.024,
+          "end": 94.104,
+          "confidence": 0.72,
+          "parts": []
+        },
+        {
+          "text": "dúas",
+          "start": 94.144,
+          "end": 94.504,
+          "confidence": 0.903,
+          "parts": [
+            {
+              "text": "dú",
+              "start": 94.144,
+              "end": 94.344
+            },
+            {
+              "text": "as",
+              "start": 94.344,
+              "end": 94.504
+            }
+          ]
+        },
+        {
+          "text": "ou",
+          "start": 94.784,
+          "end": 94.944,
+          "confidence": 0.157,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l18",
+      "start": 96.525,
+      "end": 98.547,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "O",
+          "start": 96.525,
+          "end": 96.545,
+          "confidence": 0.991,
+          "parts": []
+        },
+        {
+          "text": "reloxo",
+          "start": 96.645,
+          "end": 96.966,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "re",
+              "start": 96.645,
+              "end": 96.746
+            },
+            {
+              "text": "lo",
+              "start": 96.746,
+              "end": 96.886
+            },
+            {
+              "text": "xo",
+              "start": 96.886,
+              "end": 96.966
+            }
+          ]
+        },
+        {
+          "text": "é",
+          "start": 97.006,
+          "end": 97.026,
+          "confidence": 0.0,
+          "parts": []
+        },
+        {
+          "text": "moi",
+          "start": 97.066,
+          "end": 97.146,
+          "confidence": 0.003,
+          "parts": []
+        },
+        {
+          "text": "drague",
+          "start": 97.206,
+          "end": 97.526,
+          "confidence": 0.273,
+          "parts": [
+            {
+              "text": "dra",
+              "start": 97.206,
+              "end": 97.426
+            },
+            {
+              "text": "gue",
+              "start": 97.426,
+              "end": 97.526
+            }
+          ]
+        },
+        {
+          "text": "e",
+          "start": 97.906,
+          "end": 97.926,
+          "confidence": 0.966,
+          "parts": []
+        },
+        {
+          "text": "apareza",
+          "start": 98.086,
+          "end": 98.547,
+          "confidence": 0.962,
+          "parts": [
+            {
+              "text": "a",
+              "start": 98.086,
+              "end": 98.146
+            },
+            {
+              "text": "pa",
+              "start": 98.146,
+              "end": 98.227
+            },
+            {
+              "text": "re",
+              "start": 98.227,
+              "end": 98.407
+            },
+            {
+              "text": "za",
+              "start": 98.407,
+              "end": 98.547
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l19",
+      "start": 100.848,
+      "end": 101.629,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Non",
+          "start": 100.848,
+          "end": 100.948,
+          "confidence": 0.993,
+          "parts": []
+        },
+        {
+          "text": "os",
+          "start": 101.028,
+          "end": 101.088,
+          "confidence": 0.146,
+          "parts": []
+        },
+        {
+          "text": "alá",
+          "start": 101.128,
+          "end": 101.249,
+          "confidence": 0.525,
+          "parts": [
+            {
+              "text": "a",
+              "start": 101.128,
+              "end": 101.189
+            },
+            {
+              "text": "lá",
+              "start": 101.189,
+              "end": 101.249
+            }
+          ]
+        },
+        {
+          "text": "igual,",
+          "start": 101.349,
+          "end": 101.629,
+          "confidence": 0.983,
+          "parts": [
+            {
+              "text": "i",
+              "start": 101.349,
+              "end": 101.389
+            },
+            {
+              "text": "gual,",
+              "start": 101.389,
+              "end": 101.629
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l20",
+      "start": 101.909,
+      "end": 103.33,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "con",
+          "start": 101.909,
+          "end": 102.009,
+          "confidence": 0.96,
+          "parts": []
+        },
+        {
+          "text": "dos",
+          "start": 102.049,
+          "end": 102.189,
+          "confidence": 0.825,
+          "parts": []
+        },
+        {
+          "text": "vestidos",
+          "start": 102.229,
+          "end": 102.609,
+          "confidence": 0.986,
+          "parts": [
+            {
+              "text": "ves",
+              "start": 102.229,
+              "end": 102.389
+            },
+            {
+              "text": "ti",
+              "start": 102.389,
+              "end": 102.509
+            },
+            {
+              "text": "dos",
+              "start": 102.509,
+              "end": 102.609
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 102.69,
+          "end": 102.75,
+          "confidence": 0.995,
+          "parts": []
+        },
+        {
+          "text": "ela",
+          "start": 102.79,
+          "end": 102.89,
+          "confidence": 0.938,
+          "parts": [
+            {
+              "text": "e",
+              "start": 102.79,
+              "end": 102.83
+            },
+            {
+              "text": "la",
+              "start": 102.83,
+              "end": 102.89
+            }
+          ]
+        },
+        {
+          "text": "me",
+          "start": 102.95,
+          "end": 102.99,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "fixo",
+          "start": 103.07,
+          "end": 103.33,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "fi",
+              "start": 103.07,
+              "end": 103.23
+            },
+            {
+              "text": "xo",
+              "start": 103.23,
+              "end": 103.33
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l21",
+      "start": 104.791,
+      "end": 106.412,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "E",
+          "start": 104.791,
+          "end": 104.811,
+          "confidence": 0.964,
+          "parts": []
+        },
+        {
+          "text": "poñéndolle",
+          "start": 104.891,
+          "end": 105.271,
+          "confidence": 0.93,
+          "parts": [
+            {
+              "text": "po",
+              "start": 104.891,
+              "end": 104.971
+            },
+            {
+              "text": "ñén",
+              "start": 104.971,
+              "end": 105.111
+            },
+            {
+              "text": "do",
+              "start": 105.111,
+              "end": 105.171
+            },
+            {
+              "text": "lle",
+              "start": 105.171,
+              "end": 105.271
+            }
+          ]
+        },
+        {
+          "text": "unha",
+          "start": 105.311,
+          "end": 105.391,
+          "confidence": 0.973,
+          "parts": [
+            {
+              "text": "u",
+              "start": 105.311,
+              "end": 105.331
+            },
+            {
+              "text": "nha",
+              "start": 105.331,
+              "end": 105.391
+            }
+          ]
+        },
+        {
+          "text": "bisneda",
+          "start": 105.451,
+          "end": 105.772,
+          "confidence": 0.55,
+          "parts": [
+            {
+              "text": "bis",
+              "start": 105.451,
+              "end": 105.592
+            },
+            {
+              "text": "ne",
+              "start": 105.592,
+              "end": 105.712
+            },
+            {
+              "text": "da",
+              "start": 105.712,
+              "end": 105.772
+            }
+          ]
+        },
+        {
+          "text": "nos",
+          "start": 105.852,
+          "end": 105.952,
+          "confidence": 0.992,
+          "parts": []
+        },
+        {
+          "text": "brazos.",
+          "start": 106.012,
+          "end": 106.412,
+          "confidence": 0.957,
+          "parts": [
+            {
+              "text": "bra",
+              "start": 106.012,
+              "end": 106.232
+            },
+            {
+              "text": "zos.",
+              "start": 106.232,
+              "end": 106.412
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l22",
+      "start": 108.173,
+      "end": 110.055,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "E",
+          "start": 108.173,
+          "end": 108.193,
+          "confidence": 0.977,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 108.293,
+          "end": 108.373,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "vai",
+          "start": 108.453,
+          "end": 108.554,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "ser,",
+          "start": 108.654,
+          "end": 108.834,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 109.094,
+          "end": 109.174,
+          "confidence": 0.926,
+          "parts": []
+        },
+        {
+          "text": "vai",
+          "start": 109.254,
+          "end": 109.354,
+          "confidence": 0.931,
+          "parts": []
+        },
+        {
+          "text": "ser",
+          "start": 109.434,
+          "end": 109.554,
+          "confidence": 0.995,
+          "parts": []
+        },
+        {
+          "text": "problema.",
+          "start": 109.654,
+          "end": 110.055,
+          "confidence": 0.045,
+          "parts": [
+            {
+              "text": "pro",
+              "start": 109.654,
+              "end": 109.834
+            },
+            {
+              "text": "ble",
+              "start": 109.834,
+              "end": 109.974
+            },
+            {
+              "text": "ma.",
+              "start": 109.974,
+              "end": 110.055
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l23",
+      "start": 111.956,
+      "end": 112.856,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Pérdome",
+          "start": 111.956,
+          "end": 112.256,
+          "confidence": 0.773,
+          "parts": [
+            {
+              "text": "Pér",
+              "start": 111.956,
+              "end": 112.116
+            },
+            {
+              "text": "do",
+              "start": 112.116,
+              "end": 112.216
+            },
+            {
+              "text": "me",
+              "start": 112.216,
+              "end": 112.256
+            }
+          ]
+        },
+        {
+          "text": "aí",
+          "start": 112.296,
+          "end": 112.356,
+          "confidence": 0.541,
+          "parts": [
+            {
+              "text": "a",
+              "start": 112.296,
+              "end": 112.336
+            },
+            {
+              "text": "í",
+              "start": 112.336,
+              "end": 112.356
+            }
+          ]
+        },
+        {
+          "text": "un",
+          "start": 112.416,
+          "end": 112.456,
+          "confidence": 0.92,
+          "parts": []
+        },
+        {
+          "text": "pedazo",
+          "start": 112.496,
+          "end": 112.856,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "pe",
+              "start": 112.496,
+              "end": 112.596
+            },
+            {
+              "text": "da",
+              "start": 112.596,
+              "end": 112.776
+            },
+            {
+              "text": "zo",
+              "start": 112.776,
+              "end": 112.856
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l24",
+      "start": 116.399,
+      "end": 117.219,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Voume",
+          "start": 116.399,
+          "end": 116.619,
+          "confidence": 0.984,
+          "parts": [
+            {
+              "text": "Vou",
+              "start": 116.399,
+              "end": 116.559
+            },
+            {
+              "text": "me",
+              "start": 116.559,
+              "end": 116.619
+            }
+          ]
+        },
+        {
+          "text": "sentindo",
+          "start": 116.699,
+          "end": 117.219,
+          "confidence": 0.933,
+          "parts": [
+            {
+              "text": "sen",
+              "start": 116.699,
+              "end": 116.899
+            },
+            {
+              "text": "tin",
+              "start": 116.899,
+              "end": 117.139
+            },
+            {
+              "text": "do",
+              "start": 117.139,
+              "end": 117.219
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l25",
+      "start": 123.504,
+      "end": 124.785,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Home,",
+          "start": 123.504,
+          "end": 123.704,
+          "confidence": 0.143,
+          "parts": [
+            {
+              "text": "Ho",
+              "start": 123.504,
+              "end": 123.644
+            },
+            {
+              "text": "me,",
+              "start": 123.644,
+              "end": 123.704
+            }
+          ]
+        },
+        {
+          "text": "sentindo",
+          "start": 123.764,
+          "end": 124.104,
+          "confidence": 0.927,
+          "parts": [
+            {
+              "text": "sen",
+              "start": 123.764,
+              "end": 123.904
+            },
+            {
+              "text": "tin",
+              "start": 123.904,
+              "end": 124.044
+            },
+            {
+              "text": "do",
+              "start": 124.044,
+              "end": 124.104
+            }
+          ]
+        },
+        {
+          "text": "como",
+          "start": 124.164,
+          "end": 124.304,
+          "confidence": 0.907,
+          "parts": [
+            {
+              "text": "co",
+              "start": 124.164,
+              "end": 124.264
+            },
+            {
+              "text": "mo",
+              "start": 124.264,
+              "end": 124.304
+            }
+          ]
+        },
+        {
+          "text": "inchada",
+          "start": 124.404,
+          "end": 124.785,
+          "confidence": 0.976,
+          "parts": [
+            {
+              "text": "in",
+              "start": 124.404,
+              "end": 124.504
+            },
+            {
+              "text": "cha",
+              "start": 124.504,
+              "end": 124.724
+            },
+            {
+              "text": "da",
+              "start": 124.724,
+              "end": 124.785
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l26",
+      "start": 127.506,
+      "end": 129.568,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Obsesionada,",
+          "start": 127.506,
+          "end": 128.367,
+          "confidence": 0.871,
+          "parts": [
+            {
+              "text": "Ob",
+              "start": 127.506,
+              "end": 127.666
+            },
+            {
+              "text": "se",
+              "start": 127.666,
+              "end": 127.847
+            },
+            {
+              "text": "sio",
+              "start": 127.847,
+              "end": 128.047
+            },
+            {
+              "text": "na",
+              "start": 128.047,
+              "end": 128.287
+            },
+            {
+              "text": "da,",
+              "start": 128.287,
+              "end": 128.367
+            }
+          ]
+        },
+        {
+          "text": "con",
+          "start": 128.627,
+          "end": 128.727,
+          "confidence": 0.981,
+          "parts": []
+        },
+        {
+          "text": "que",
+          "start": 128.787,
+          "end": 128.867,
+          "confidence": 0.817,
+          "parts": []
+        },
+        {
+          "text": "me",
+          "start": 128.907,
+          "end": 128.967,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "pasa",
+          "start": 129.047,
+          "end": 129.248,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 129.047,
+              "end": 129.167
+            },
+            {
+              "text": "sa",
+              "start": 129.167,
+              "end": 129.248
+            }
+          ]
+        },
+        {
+          "text": "algo",
+          "start": 129.368,
+          "end": 129.568,
+          "confidence": 0.9,
+          "parts": [
+            {
+              "text": "al",
+              "start": 129.368,
+              "end": 129.488
+            },
+            {
+              "text": "go",
+              "start": 129.488,
+              "end": 129.568
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l27",
+      "start": 131.189,
+      "end": 132.81,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Algo",
+          "start": 131.189,
+          "end": 131.329,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "Al",
+              "start": 131.189,
+              "end": 131.269
+            },
+            {
+              "text": "go",
+              "start": 131.269,
+              "end": 131.329
+            }
+          ]
+        },
+        {
+          "text": "raro,",
+          "start": 131.449,
+          "end": 131.649,
+          "confidence": 0.992,
+          "parts": [
+            {
+              "text": "ra",
+              "start": 131.449,
+              "end": 131.589
+            },
+            {
+              "text": "ro,",
+              "start": 131.589,
+              "end": 131.649
+            }
+          ]
+        },
+        {
+          "text": "algo",
+          "start": 131.809,
+          "end": 131.969,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "al",
+              "start": 131.809,
+              "end": 131.909
+            },
+            {
+              "text": "go",
+              "start": 131.909,
+              "end": 131.969
+            }
+          ]
+        },
+        {
+          "text": "inesperado",
+          "start": 132.29,
+          "end": 132.81,
+          "confidence": 0.879,
+          "parts": [
+            {
+              "text": "i",
+              "start": 132.29,
+              "end": 132.35
+            },
+            {
+              "text": "nes",
+              "start": 132.35,
+              "end": 132.51
+            },
+            {
+              "text": "pe",
+              "start": 132.51,
+              "end": 132.59
+            },
+            {
+              "text": "ra",
+              "start": 132.59,
+              "end": 132.73
+            },
+            {
+              "text": "do",
+              "start": 132.73,
+              "end": 132.81
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l28",
+      "start": 134.971,
+      "end": 136.953,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Algo...",
+          "start": 134.971,
+          "end": 135.192,
+          "confidence": 0.704,
+          "parts": [
+            {
+              "text": "Al",
+              "start": 134.971,
+              "end": 135.132
+            },
+            {
+              "text": "go...",
+              "start": 135.132,
+              "end": 135.192
+            }
+          ]
+        },
+        {
+          "text": "como",
+          "start": 135.992,
+          "end": 136.112,
+          "confidence": 0.968,
+          "parts": [
+            {
+              "text": "co",
+              "start": 135.992,
+              "end": 136.072
+            },
+            {
+              "text": "mo",
+              "start": 136.072,
+              "end": 136.112
+            }
+          ]
+        },
+        {
+          "text": "de",
+          "start": 136.192,
+          "end": 136.232,
+          "confidence": 0.959,
+          "parts": []
+        },
+        {
+          "text": "ser",
+          "start": 136.272,
+          "end": 136.352,
+          "confidence": 0.968,
+          "parts": []
+        },
+        {
+          "text": "un",
+          "start": 136.412,
+          "end": 136.452,
+          "confidence": 0.868,
+          "parts": []
+        },
+        {
+          "text": "desastre.",
+          "start": 136.512,
+          "end": 136.953,
+          "confidence": 0.994,
+          "parts": [
+            {
+              "text": "de",
+              "start": 136.512,
+              "end": 136.593
+            },
+            {
+              "text": "sas",
+              "start": 136.593,
+              "end": 136.833
+            },
+            {
+              "text": "tre.",
+              "start": 136.833,
+              "end": 136.953
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l29",
+      "start": 137.013,
+      "end": 140.195,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Hai",
+          "start": 137.013,
+          "end": 137.073,
+          "confidence": 0.0,
+          "parts": []
+        },
+        {
+          "text": "algún",
+          "start": 139.695,
+          "end": 140.195,
+          "confidence": 0.02,
+          "parts": [
+            {
+              "text": "al",
+              "start": 139.695,
+              "end": 139.835
+            },
+            {
+              "text": "gún",
+              "start": 139.835,
+              "end": 140.195
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l30",
+      "start": 141.076,
+      "end": 141.476,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Unha",
+          "start": 141.076,
+          "end": 141.216,
+          "confidence": 0.978,
+          "parts": [
+            {
+              "text": "U",
+              "start": 141.076,
+              "end": 141.116
+            },
+            {
+              "text": "nha",
+              "start": 141.116,
+              "end": 141.216
+            }
+          ]
+        },
+        {
+          "text": "cousa.",
+          "start": 141.256,
+          "end": 141.476,
+          "confidence": 0.994,
+          "parts": [
+            {
+              "text": "cou",
+              "start": 141.256,
+              "end": 141.396
+            },
+            {
+              "text": "sa.",
+              "start": 141.396,
+              "end": 141.476
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l31",
+      "start": 143.397,
+      "end": 144.478,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Que",
+          "start": 143.397,
+          "end": 143.477,
+          "confidence": 0.992,
+          "parts": []
+        },
+        {
+          "text": "se",
+          "start": 143.537,
+          "end": 143.577,
+          "confidence": 0.989,
+          "parts": []
+        },
+        {
+          "text": "me",
+          "start": 143.617,
+          "end": 143.677,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "pon",
+          "start": 143.757,
+          "end": 143.857,
+          "confidence": 0.993,
+          "parts": []
+        },
+        {
+          "text": "aquí",
+          "start": 143.917,
+          "end": 144.018,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "a",
+              "start": 143.917,
+              "end": 143.957
+            },
+            {
+              "text": "quí",
+              "start": 143.957,
+              "end": 144.018
+            }
+          ]
+        },
+        {
+          "text": "no",
+          "start": 144.078,
+          "end": 144.138,
+          "confidence": 0.832,
+          "parts": []
+        },
+        {
+          "text": "peito",
+          "start": 144.198,
+          "end": 144.478,
+          "confidence": 1.0,
+          "parts": [
+            {
+              "text": "pei",
+              "start": 144.198,
+              "end": 144.418
+            },
+            {
+              "text": "to",
+              "start": 144.418,
+              "end": 144.478
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l32",
+      "start": 154.184,
+      "end": 155.705,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Puiden",
+          "start": 154.184,
+          "end": 154.445,
+          "confidence": 0.895,
+          "parts": [
+            {
+              "text": "Pui",
+              "start": 154.184,
+              "end": 154.305
+            },
+            {
+              "text": "den",
+              "start": 154.305,
+              "end": 154.445
+            }
+          ]
+        },
+        {
+          "text": "ser",
+          "start": 154.525,
+          "end": 154.665,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "unha",
+          "start": 154.745,
+          "end": 154.845,
+          "confidence": 0.988,
+          "parts": [
+            {
+              "text": "u",
+              "start": 154.745,
+              "end": 154.765
+            },
+            {
+              "text": "nha",
+              "start": 154.765,
+              "end": 154.845
+            }
+          ]
+        },
+        {
+          "text": "vaca",
+          "start": 154.885,
+          "end": 155.085,
+          "confidence": 0.973,
+          "parts": [
+            {
+              "text": "va",
+              "start": 154.885,
+              "end": 155.025
+            },
+            {
+              "text": "ca",
+              "start": 155.025,
+              "end": 155.085
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 155.125,
+          "end": 155.185,
+          "confidence": 0.965,
+          "parts": []
+        },
+        {
+          "text": "montaña",
+          "start": 155.245,
+          "end": 155.705,
+          "confidence": 0.957,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 155.245,
+              "end": 155.425
+            },
+            {
+              "text": "ta",
+              "start": 155.425,
+              "end": 155.605
+            },
+            {
+              "text": "ña",
+              "start": 155.605,
+              "end": 155.705
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l33",
+      "start": 158.067,
+      "end": 159.948,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Unha",
+          "start": 158.067,
+          "end": 158.187,
+          "confidence": 0.915,
+          "parts": [
+            {
+              "text": "U",
+              "start": 158.067,
+              "end": 158.107
+            },
+            {
+              "text": "nha",
+              "start": 158.107,
+              "end": 158.187
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 158.247,
+          "end": 158.307,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "nunca",
+          "start": 158.347,
+          "end": 158.547,
+          "confidence": 0.884,
+          "parts": [
+            {
+              "text": "nun",
+              "start": 158.347,
+              "end": 158.467
+            },
+            {
+              "text": "ca",
+              "start": 158.467,
+              "end": 158.547
+            }
+          ]
+        },
+        {
+          "text": "saíu",
+          "start": 158.587,
+          "end": 158.868,
+          "confidence": 0.318,
+          "parts": [
+            {
+              "text": "sa",
+              "start": 158.587,
+              "end": 158.727
+            },
+            {
+              "text": "íu",
+              "start": 158.727,
+              "end": 158.868
+            }
+          ]
+        },
+        {
+          "text": "dos",
+          "start": 158.928,
+          "end": 159.028,
+          "confidence": 0.968,
+          "parts": []
+        },
+        {
+          "text": "prados",
+          "start": 159.088,
+          "end": 159.328,
+          "confidence": 0.906,
+          "parts": [
+            {
+              "text": "pra",
+              "start": 159.088,
+              "end": 159.228
+            },
+            {
+              "text": "dos",
+              "start": 159.228,
+              "end": 159.328
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 159.388,
+          "end": 159.448,
+          "confidence": 0.711,
+          "parts": []
+        },
+        {
+          "text": "montaña.",
+          "start": 159.508,
+          "end": 159.948,
+          "confidence": 0.992,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 159.508,
+              "end": 159.668
+            },
+            {
+              "text": "ta",
+              "start": 159.668,
+              "end": 159.848
+            },
+            {
+              "text": "ña.",
+              "start": 159.848,
+              "end": 159.948
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l34",
+      "start": 162.03,
+      "end": 162.91,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Que",
+          "start": 162.03,
+          "end": 162.09,
+          "confidence": 0.938,
+          "parts": []
+        },
+        {
+          "text": "na",
+          "start": 162.15,
+          "end": 162.21,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "súa",
+          "start": 162.27,
+          "end": 162.37,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "sú",
+              "start": 162.27,
+              "end": 162.35
+            },
+            {
+              "text": "a",
+              "start": 162.35,
+              "end": 162.37
+            }
+          ]
+        },
+        {
+          "text": "vida",
+          "start": 162.41,
+          "end": 162.53,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "vi",
+              "start": 162.41,
+              "end": 162.49
+            },
+            {
+              "text": "da",
+              "start": 162.49,
+              "end": 162.53
+            }
+          ]
+        },
+        {
+          "text": "non",
+          "start": 162.59,
+          "end": 162.65,
+          "confidence": 0.97,
+          "parts": []
+        },
+        {
+          "text": "comeu",
+          "start": 162.71,
+          "end": 162.91,
+          "confidence": 0.669,
+          "parts": [
+            {
+              "text": "co",
+              "start": 162.71,
+              "end": 162.81
+            },
+            {
+              "text": "meu",
+              "start": 162.81,
+              "end": 162.91
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l35",
+      "start": 163.01,
+      "end": 164.531,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "máis",
+          "start": 163.01,
+          "end": 163.211,
+          "confidence": 0.992,
+          "parts": []
+        },
+        {
+          "text": "nada",
+          "start": 163.311,
+          "end": 163.531,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "na",
+              "start": 163.311,
+              "end": 163.471
+            },
+            {
+              "text": "da",
+              "start": 163.471,
+              "end": 163.531
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 163.611,
+          "end": 163.671,
+          "confidence": 0.98,
+          "parts": []
+        },
+        {
+          "text": "herba",
+          "start": 163.751,
+          "end": 163.911,
+          "confidence": 0.578,
+          "parts": [
+            {
+              "text": "her",
+              "start": 163.751,
+              "end": 163.851
+            },
+            {
+              "text": "ba",
+              "start": 163.851,
+              "end": 163.911
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 163.971,
+          "end": 164.011,
+          "confidence": 0.944,
+          "parts": []
+        },
+        {
+          "text": "montaña.",
+          "start": 164.091,
+          "end": 164.531,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 164.091,
+              "end": 164.251
+            },
+            {
+              "text": "ta",
+              "start": 164.251,
+              "end": 164.431
+            },
+            {
+              "text": "ña.",
+              "start": 164.431,
+              "end": 164.531
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l36",
+      "start": 166.012,
+      "end": 168.074,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Co",
+          "start": 166.012,
+          "end": 166.072,
+          "confidence": 0.904,
+          "parts": []
+        },
+        {
+          "text": "meu",
+          "start": 166.153,
+          "end": 166.273,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "leite",
+          "start": 166.333,
+          "end": 166.513,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "lei",
+              "start": 166.333,
+              "end": 166.453
+            },
+            {
+              "text": "te",
+              "start": 166.453,
+              "end": 166.513
+            }
+          ]
+        },
+        {
+          "text": "faríanse",
+          "start": 166.593,
+          "end": 167.053,
+          "confidence": 0.967,
+          "parts": [
+            {
+              "text": "fa",
+              "start": 166.593,
+              "end": 166.673
+            },
+            {
+              "text": "rí",
+              "start": 166.673,
+              "end": 166.793
+            },
+            {
+              "text": "an",
+              "start": 166.793,
+              "end": 166.933
+            },
+            {
+              "text": "se",
+              "start": 166.933,
+              "end": 167.053
+            }
+          ]
+        },
+        {
+          "text": "queixos?",
+          "start": 167.654,
+          "end": 168.074,
+          "confidence": 0.929,
+          "parts": [
+            {
+              "text": "quei",
+              "start": 167.654,
+              "end": 167.854
+            },
+            {
+              "text": "xos?",
+              "start": 167.854,
+              "end": 168.074
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l37",
+      "start": 169.735,
+      "end": 171.376,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Queixos",
+          "start": 169.735,
+          "end": 170.115,
+          "confidence": 0.988,
+          "parts": [
+            {
+              "text": "Quei",
+              "start": 169.735,
+              "end": 169.935
+            },
+            {
+              "text": "xos",
+              "start": 169.935,
+              "end": 170.115
+            }
+          ]
+        },
+        {
+          "text": "e...",
+          "start": 170.275,
+          "end": 170.295,
+          "confidence": 0.088,
+          "parts": []
+        },
+        {
+          "text": "e",
+          "start": 170.816,
+          "end": 170.836,
+          "confidence": 0.816,
+          "parts": []
+        },
+        {
+          "text": "galletas.",
+          "start": 170.896,
+          "end": 171.376,
+          "confidence": 0.902,
+          "parts": [
+            {
+              "text": "ga",
+              "start": 170.896,
+              "end": 170.996
+            },
+            {
+              "text": "lle",
+              "start": 170.996,
+              "end": 171.176
+            },
+            {
+              "text": "tas.",
+              "start": 171.176,
+              "end": 171.376
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l38",
+      "start": 173.958,
+      "end": 175.039,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Dás",
+          "start": 173.958,
+          "end": 174.118,
+          "confidence": 0.424,
+          "parts": []
+        },
+        {
+          "text": "que",
+          "start": 174.178,
+          "end": 174.238,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "dicir",
+          "start": 174.358,
+          "end": 174.558,
+          "confidence": 0.898,
+          "parts": [
+            {
+              "text": "di",
+              "start": 174.358,
+              "end": 174.458
+            },
+            {
+              "text": "cir",
+              "start": 174.458,
+              "end": 174.558
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 174.678,
+          "end": 174.758,
+          "confidence": 0.997,
+          "parts": []
+        },
+        {
+          "text": "así",
+          "start": 174.858,
+          "end": 175.039,
+          "confidence": 0.9,
+          "parts": [
+            {
+              "text": "a",
+              "start": 174.858,
+              "end": 174.938
+            },
+            {
+              "text": "sí",
+              "start": 174.938,
+              "end": 175.039
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l39",
+      "start": 175.859,
+      "end": 176.059,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Así.",
+          "start": 175.859,
+          "end": 176.059,
+          "confidence": 0.903,
+          "parts": [
+            {
+              "text": "A",
+              "start": 175.859,
+              "end": 175.959
+            },
+            {
+              "text": "sí.",
+              "start": 175.959,
+              "end": 176.059
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l40",
+      "start": 178.501,
+      "end": 180.142,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Pasía,",
+          "start": 178.501,
+          "end": 178.721,
+          "confidence": 0.026,
+          "parts": [
+            {
+              "text": "Pa",
+              "start": 178.501,
+              "end": 178.601
+            },
+            {
+              "text": "sí",
+              "start": 178.601,
+              "end": 178.701
+            },
+            {
+              "text": "a,",
+              "start": 178.701,
+              "end": 178.721
+            }
+          ]
+        },
+        {
+          "text": "como",
+          "start": 178.841,
+          "end": 178.961,
+          "confidence": 0.986,
+          "parts": [
+            {
+              "text": "co",
+              "start": 178.841,
+              "end": 178.921
+            },
+            {
+              "text": "mo",
+              "start": 178.921,
+              "end": 178.961
+            }
+          ]
+        },
+        {
+          "text": "sabe,",
+          "start": 179.061,
+          "end": 179.281,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "sa",
+              "start": 179.061,
+              "end": 179.221
+            },
+            {
+              "text": "be,",
+              "start": 179.221,
+              "end": 179.281
+            }
+          ]
+        },
+        {
+          "text": "a",
+          "start": 179.422,
+          "end": 179.442,
+          "confidence": 0.889,
+          "parts": []
+        },
+        {
+          "text": "montaña",
+          "start": 179.502,
+          "end": 179.862,
+          "confidence": 0.991,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 179.502,
+              "end": 179.662
+            },
+            {
+              "text": "ta",
+              "start": 179.662,
+              "end": 179.782
+            },
+            {
+              "text": "ña",
+              "start": 179.782,
+              "end": 179.862
+            }
+          ]
+        },
+        {
+          "text": "toda.",
+          "start": 179.962,
+          "end": 180.142,
+          "confidence": 0.948,
+          "parts": [
+            {
+              "text": "to",
+              "start": 179.962,
+              "end": 180.082
+            },
+            {
+              "text": "da.",
+              "start": 180.082,
+              "end": 180.142
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l41",
+      "start": 185.406,
+      "end": 186.987,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Sento",
+          "start": 185.406,
+          "end": 185.606,
+          "confidence": 0.519,
+          "parts": [
+            {
+              "text": "Sen",
+              "start": 185.406,
+              "end": 185.546
+            },
+            {
+              "text": "to",
+              "start": 185.546,
+              "end": 185.606
+            }
+          ]
+        },
+        {
+          "text": "no",
+          "start": 185.686,
+          "end": 185.746,
+          "confidence": 0.993,
+          "parts": []
+        },
+        {
+          "text": "baño",
+          "start": 185.806,
+          "end": 186.066,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "ba",
+              "start": 185.806,
+              "end": 185.986
+            },
+            {
+              "text": "ño",
+              "start": 185.986,
+              "end": 186.066
+            }
+          ]
+        },
+        {
+          "text": "e",
+          "start": 186.246,
+          "end": 186.286,
+          "confidence": 0.768,
+          "parts": []
+        },
+        {
+          "text": "a",
+          "start": 186.606,
+          "end": 186.626,
+          "confidence": 0.958,
+          "parts": []
+        },
+        {
+          "text": "pampa.",
+          "start": 186.706,
+          "end": 186.987,
+          "confidence": 0.408,
+          "parts": [
+            {
+              "text": "pam",
+              "start": 186.706,
+              "end": 186.927
+            },
+            {
+              "text": "pa.",
+              "start": 186.927,
+              "end": 186.987
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l42",
+      "start": 189.048,
+      "end": 190.689,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Miro",
+          "start": 189.048,
+          "end": 189.228,
+          "confidence": 0.96,
+          "parts": [
+            {
+              "text": "Mi",
+              "start": 189.048,
+              "end": 189.168
+            },
+            {
+              "text": "ro",
+              "start": 189.168,
+              "end": 189.228
+            }
+          ]
+        },
+        {
+          "text": "o",
+          "start": 189.368,
+          "end": 189.408,
+          "confidence": 0.662,
+          "parts": []
+        },
+        {
+          "text": "monte",
+          "start": 189.488,
+          "end": 189.688,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 189.488,
+              "end": 189.648
+            },
+            {
+              "text": "te",
+              "start": 189.648,
+              "end": 189.688
+            }
+          ]
+        },
+        {
+          "text": "arredido",
+          "start": 189.749,
+          "end": 190.149,
+          "confidence": 0.547,
+          "parts": [
+            {
+              "text": "a",
+              "start": 189.749,
+              "end": 189.769
+            },
+            {
+              "text": "rre",
+              "start": 189.769,
+              "end": 189.909
+            },
+            {
+              "text": "di",
+              "start": 189.909,
+              "end": 190.069
+            },
+            {
+              "text": "do",
+              "start": 190.069,
+              "end": 190.149
+            }
+          ]
+        },
+        {
+          "text": "ata",
+          "start": 190.409,
+          "end": 190.529,
+          "confidence": 0.914,
+          "parts": [
+            {
+              "text": "a",
+              "start": 190.409,
+              "end": 190.469
+            },
+            {
+              "text": "ta",
+              "start": 190.469,
+              "end": 190.529
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 190.609,
+          "end": 190.689,
+          "confidence": 0.918,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l43",
+      "start": 190.789,
+      "end": 191.85,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "se",
+          "start": 190.789,
+          "end": 190.849,
+          "confidence": 0.978,
+          "parts": []
+        },
+        {
+          "text": "me",
+          "start": 190.889,
+          "end": 190.949,
+          "confidence": 0.939,
+          "parts": []
+        },
+        {
+          "text": "dormen",
+          "start": 191.009,
+          "end": 191.209,
+          "confidence": 0.896,
+          "parts": [
+            {
+              "text": "dor",
+              "start": 191.009,
+              "end": 191.129
+            },
+            {
+              "text": "men",
+              "start": 191.129,
+              "end": 191.209
+            }
+          ]
+        },
+        {
+          "text": "as",
+          "start": 191.31,
+          "end": 191.37,
+          "confidence": 0.958,
+          "parts": []
+        },
+        {
+          "text": "pernas",
+          "start": 191.45,
+          "end": 191.85,
+          "confidence": 0.972,
+          "parts": [
+            {
+              "text": "per",
+              "start": 191.45,
+              "end": 191.65
+            },
+            {
+              "text": "nas",
+              "start": 191.65,
+              "end": 191.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l44",
+      "start": 193.391,
+      "end": 194.852,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Unha",
+          "start": 193.391,
+          "end": 193.511,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "U",
+              "start": 193.391,
+              "end": 193.431
+            },
+            {
+              "text": "nha",
+              "start": 193.431,
+              "end": 193.511
+            }
+          ]
+        },
+        {
+          "text": "falda",
+          "start": 193.591,
+          "end": 193.851,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "fal",
+              "start": 193.591,
+              "end": 193.791
+            },
+            {
+              "text": "da",
+              "start": 193.791,
+              "end": 193.851
+            }
+          ]
+        },
+        {
+          "text": "vermella,",
+          "start": 193.931,
+          "end": 194.392,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "ver",
+              "start": 193.931,
+              "end": 194.111
+            },
+            {
+              "text": "me",
+              "start": 194.111,
+              "end": 194.252
+            },
+            {
+              "text": "lla,",
+              "start": 194.252,
+              "end": 194.392
+            }
+          ]
+        },
+        {
+          "text": "vella",
+          "start": 194.532,
+          "end": 194.852,
+          "confidence": 0.993,
+          "parts": [
+            {
+              "text": "ve",
+              "start": 194.532,
+              "end": 194.712
+            },
+            {
+              "text": "lla",
+              "start": 194.712,
+              "end": 194.852
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l45",
+      "start": 196.293,
+      "end": 197.634,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Que",
+          "start": 196.293,
+          "end": 196.353,
+          "confidence": 0.958,
+          "parts": []
+        },
+        {
+          "text": "loce,",
+          "start": 196.433,
+          "end": 196.693,
+          "confidence": 0.726,
+          "parts": [
+            {
+              "text": "lo",
+              "start": 196.433,
+              "end": 196.613
+            },
+            {
+              "text": "ce,",
+              "start": 196.613,
+              "end": 196.693
+            }
+          ]
+        },
+        {
+          "text": "tendido",
+          "start": 196.893,
+          "end": 197.194,
+          "confidence": 0.637,
+          "parts": [
+            {
+              "text": "ten",
+              "start": 196.893,
+              "end": 197.013
+            },
+            {
+              "text": "di",
+              "start": 197.013,
+              "end": 197.134
+            },
+            {
+              "text": "do",
+              "start": 197.134,
+              "end": 197.194
+            }
+          ]
+        },
+        {
+          "text": "o",
+          "start": 197.294,
+          "end": 197.314,
+          "confidence": 0.989,
+          "parts": []
+        },
+        {
+          "text": "sol.",
+          "start": 197.414,
+          "end": 197.634,
+          "confidence": 0.999,
+          "parts": []
+        }
+      ]
+    },
+    {
+      "id": "l46",
+      "start": 200.176,
+      "end": 201.737,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Onda",
+          "start": 200.176,
+          "end": 200.416,
+          "confidence": 0.945,
+          "parts": [
+            {
+              "text": "On",
+              "start": 200.176,
+              "end": 200.356
+            },
+            {
+              "text": "da",
+              "start": 200.356,
+              "end": 200.416
+            }
+          ]
+        },
+        {
+          "text": "a",
+          "start": 200.556,
+          "end": 200.576,
+          "confidence": 0.925,
+          "parts": []
+        },
+        {
+          "text": "miña",
+          "start": 200.616,
+          "end": 200.796,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "mi",
+              "start": 200.616,
+              "end": 200.716
+            },
+            {
+              "text": "ña",
+              "start": 200.716,
+              "end": 200.796
+            }
+          ]
+        },
+        {
+          "text": "camisa",
+          "start": 200.896,
+          "end": 201.156,
+          "confidence": 0.984,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 200.896,
+              "end": 200.996
+            },
+            {
+              "text": "mi",
+              "start": 200.996,
+              "end": 201.096
+            },
+            {
+              "text": "sa",
+              "start": 201.096,
+              "end": 201.156
+            }
+          ]
+        },
+        {
+          "text": "de",
+          "start": 201.236,
+          "end": 201.276,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "tigres",
+          "start": 201.356,
+          "end": 201.737,
+          "confidence": 0.976,
+          "parts": [
+            {
+              "text": "ti",
+              "start": 201.356,
+              "end": 201.496
+            },
+            {
+              "text": "gres",
+              "start": 201.496,
+              "end": 201.737
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l47",
+      "start": 204.058,
+      "end": 206.3,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "O",
+          "start": 204.058,
+          "end": 204.078,
+          "confidence": 0.437,
+          "parts": []
+        },
+        {
+          "text": "novo",
+          "start": 204.158,
+          "end": 204.318,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "no",
+              "start": 204.158,
+              "end": 204.258
+            },
+            {
+              "text": "vo",
+              "start": 204.258,
+              "end": 204.318
+            }
+          ]
+        },
+        {
+          "text": "prato",
+          "start": 204.398,
+          "end": 204.659,
+          "confidence": 0.955,
+          "parts": [
+            {
+              "text": "pra",
+              "start": 204.398,
+              "end": 204.579
+            },
+            {
+              "text": "to",
+              "start": 204.579,
+              "end": 204.659
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 204.719,
+          "end": 204.779,
+          "confidence": 0.814,
+          "parts": []
+        },
+        {
+          "text": "ducha,",
+          "start": 204.839,
+          "end": 205.099,
+          "confidence": 0.909,
+          "parts": [
+            {
+              "text": "du",
+              "start": 204.839,
+              "end": 204.999
+            },
+            {
+              "text": "cha,",
+              "start": 204.999,
+              "end": 205.099
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 205.199,
+          "end": 205.259,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 205.339,
+          "end": 205.399,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "pode",
+          "start": 205.499,
+          "end": 205.679,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "po",
+              "start": 205.499,
+              "end": 205.619
+            },
+            {
+              "text": "de",
+              "start": 205.619,
+              "end": 205.679
+            }
+          ]
+        },
+        {
+          "text": "disimular",
+          "start": 205.779,
+          "end": 206.3,
+          "confidence": 0.934,
+          "parts": [
+            {
+              "text": "di",
+              "start": 205.779,
+              "end": 205.879
+            },
+            {
+              "text": "si",
+              "start": 205.879,
+              "end": 206.0
+            },
+            {
+              "text": "mu",
+              "start": 206.0,
+              "end": 206.12
+            },
+            {
+              "text": "lar",
+              "start": 206.12,
+              "end": 206.3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l48",
+      "start": 207.721,
+      "end": 210.843,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Que",
+          "start": 207.721,
+          "end": 207.781,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "aí",
+          "start": 207.861,
+          "end": 207.941,
+          "confidence": 0.971,
+          "parts": [
+            {
+              "text": "a",
+              "start": 207.861,
+              "end": 207.921
+            },
+            {
+              "text": "í",
+              "start": 207.921,
+              "end": 207.941
+            }
+          ]
+        },
+        {
+          "text": "estaba",
+          "start": 208.041,
+          "end": 208.301,
+          "confidence": 0.954,
+          "parts": [
+            {
+              "text": "es",
+              "start": 208.041,
+              "end": 208.141
+            },
+            {
+              "text": "ta",
+              "start": 208.141,
+              "end": 208.261
+            },
+            {
+              "text": "ba",
+              "start": 208.261,
+              "end": 208.301
+            }
+          ]
+        },
+        {
+          "text": "a",
+          "start": 208.381,
+          "end": 208.401,
+          "confidence": 0.771,
+          "parts": []
+        },
+        {
+          "text": "bañeira,",
+          "start": 208.461,
+          "end": 208.881,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "ba",
+              "start": 208.461,
+              "end": 208.581
+            },
+            {
+              "text": "ñei",
+              "start": 208.581,
+              "end": 208.801
+            },
+            {
+              "text": "ra,",
+              "start": 208.801,
+              "end": 208.881
+            }
+          ]
+        },
+        {
+          "text": "onde",
+          "start": 209.382,
+          "end": 209.542,
+          "confidence": 0.961,
+          "parts": [
+            {
+              "text": "on",
+              "start": 209.382,
+              "end": 209.482
+            },
+            {
+              "text": "de",
+              "start": 209.482,
+              "end": 209.542
+            }
+          ]
+        },
+        {
+          "text": "nos",
+          "start": 209.622,
+          "end": 209.742,
+          "confidence": 0.881,
+          "parts": []
+        },
+        {
+          "text": "despiollaron",
+          "start": 209.802,
+          "end": 210.382,
+          "confidence": 0.961,
+          "parts": [
+            {
+              "text": "des",
+              "start": 209.802,
+              "end": 209.962
+            },
+            {
+              "text": "pio",
+              "start": 209.962,
+              "end": 210.142
+            },
+            {
+              "text": "lla",
+              "start": 210.142,
+              "end": 210.282
+            },
+            {
+              "text": "ron",
+              "start": 210.282,
+              "end": 210.382
+            }
+          ]
+        },
+        {
+          "text": "a",
+          "start": 210.443,
+          "end": 210.483,
+          "confidence": 0.677,
+          "parts": []
+        },
+        {
+          "text": "todas",
+          "start": 210.543,
+          "end": 210.843,
+          "confidence": 0.926,
+          "parts": [
+            {
+              "text": "to",
+              "start": 210.543,
+              "end": 210.663
+            },
+            {
+              "text": "das",
+              "start": 210.663,
+              "end": 210.843
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l49",
+      "start": 215.686,
+      "end": 217.908,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "E",
+          "start": 215.686,
+          "end": 215.706,
+          "confidence": 0.925,
+          "parts": []
+        },
+        {
+          "text": "invento,",
+          "start": 215.806,
+          "end": 216.186,
+          "confidence": 0.99,
+          "parts": [
+            {
+              "text": "in",
+              "start": 215.806,
+              "end": 215.906
+            },
+            {
+              "text": "ven",
+              "start": 215.906,
+              "end": 216.126
+            },
+            {
+              "text": "to,",
+              "start": 216.126,
+              "end": 216.186
+            }
+          ]
+        },
+        {
+          "text": "invento,",
+          "start": 216.547,
+          "end": 216.867,
+          "confidence": 0.981,
+          "parts": [
+            {
+              "text": "in",
+              "start": 216.547,
+              "end": 216.647
+            },
+            {
+              "text": "ven",
+              "start": 216.647,
+              "end": 216.807
+            },
+            {
+              "text": "to,",
+              "start": 216.807,
+              "end": 216.867
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 216.947,
+          "end": 217.007,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "non",
+          "start": 217.107,
+          "end": 217.167,
+          "confidence": 0.975,
+          "parts": []
+        },
+        {
+          "text": "me",
+          "start": 217.207,
+          "end": 217.247,
+          "confidence": 0.978,
+          "parts": []
+        },
+        {
+          "text": "pasará",
+          "start": 217.327,
+          "end": 217.567,
+          "confidence": 0.812,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 217.327,
+              "end": 217.407
+            },
+            {
+              "text": "sa",
+              "start": 217.407,
+              "end": 217.507
+            },
+            {
+              "text": "rá",
+              "start": 217.507,
+              "end": 217.567
+            }
+          ]
+        },
+        {
+          "text": "nada",
+          "start": 217.687,
+          "end": 217.908,
+          "confidence": 0.994,
+          "parts": [
+            {
+              "text": "na",
+              "start": 217.687,
+              "end": 217.828
+            },
+            {
+              "text": "da",
+              "start": 217.828,
+              "end": 217.908
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l50",
+      "start": 219.309,
+      "end": 220.629,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Se",
+          "start": 219.309,
+          "end": 219.389,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "é",
+          "start": 219.449,
+          "end": 219.469,
+          "confidence": 0.0,
+          "parts": []
+        },
+        {
+          "text": "antes",
+          "start": 219.529,
+          "end": 219.729,
+          "confidence": 0.998,
+          "parts": [
+            {
+              "text": "an",
+              "start": 219.529,
+              "end": 219.609
+            },
+            {
+              "text": "tes",
+              "start": 219.609,
+              "end": 219.729
+            }
+          ]
+        },
+        {
+          "text": "de",
+          "start": 219.809,
+          "end": 219.849,
+          "confidence": 0.924,
+          "parts": []
+        },
+        {
+          "text": "que",
+          "start": 219.889,
+          "end": 219.949,
+          "confidence": 0.996,
+          "parts": []
+        },
+        {
+          "text": "chegue",
+          "start": 219.989,
+          "end": 220.169,
+          "confidence": 0.791,
+          "parts": [
+            {
+              "text": "che",
+              "start": 219.989,
+              "end": 220.109
+            },
+            {
+              "text": "gue",
+              "start": 220.109,
+              "end": 220.169
+            }
+          ]
+        },
+        {
+          "text": "o",
+          "start": 220.209,
+          "end": 220.229,
+          "confidence": 0.864,
+          "parts": []
+        },
+        {
+          "text": "inverno,",
+          "start": 220.309,
+          "end": 220.629,
+          "confidence": 0.99,
+          "parts": [
+            {
+              "text": "in",
+              "start": 220.309,
+              "end": 220.369
+            },
+            {
+              "text": "ver",
+              "start": 220.369,
+              "end": 220.549
+            },
+            {
+              "text": "no,",
+              "start": 220.549,
+              "end": 220.629
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l51",
+      "start": 220.669,
+      "end": 221.73,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "non",
+          "start": 220.669,
+          "end": 220.729,
+          "confidence": 0.008,
+          "parts": []
+        },
+        {
+          "text": "me",
+          "start": 220.75,
+          "end": 220.81,
+          "confidence": 0.96,
+          "parts": []
+        },
+        {
+          "text": "sei",
+          "start": 220.91,
+          "end": 221.11,
+          "confidence": 0.962,
+          "parts": []
+        },
+        {
+          "text": "o",
+          "start": 221.33,
+          "end": 221.35,
+          "confidence": 0.986,
+          "parts": []
+        },
+        {
+          "text": "nome",
+          "start": 221.45,
+          "end": 221.73,
+          "confidence": 0.991,
+          "parts": [
+            {
+              "text": "no",
+              "start": 221.45,
+              "end": 221.67
+            },
+            {
+              "text": "me",
+              "start": 221.67,
+              "end": 221.73
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l52",
+      "start": 223.111,
+      "end": 225.072,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "De",
+          "start": 223.111,
+          "end": 223.191,
+          "confidence": 0.98,
+          "parts": []
+        },
+        {
+          "text": "todas",
+          "start": 223.331,
+          "end": 223.732,
+          "confidence": 0.995,
+          "parts": [
+            {
+              "text": "to",
+              "start": 223.331,
+              "end": 223.531
+            },
+            {
+              "text": "das",
+              "start": 223.531,
+              "end": 223.732
+            }
+          ]
+        },
+        {
+          "text": "as",
+          "start": 223.892,
+          "end": 223.972,
+          "confidence": 0.921,
+          "parts": []
+        },
+        {
+          "text": "árbores",
+          "start": 224.092,
+          "end": 224.432,
+          "confidence": 0.941,
+          "parts": [
+            {
+              "text": "ár",
+              "start": 224.092,
+              "end": 224.212
+            },
+            {
+              "text": "bo",
+              "start": 224.212,
+              "end": 224.312
+            },
+            {
+              "text": "res",
+              "start": 224.312,
+              "end": 224.432
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 224.492,
+          "end": 224.552,
+          "confidence": 0.922,
+          "parts": []
+        },
+        {
+          "text": "montaña.",
+          "start": 224.632,
+          "end": 225.072,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 224.632,
+              "end": 224.772
+            },
+            {
+              "text": "ta",
+              "start": 224.772,
+              "end": 224.952
+            },
+            {
+              "text": "ña.",
+              "start": 224.952,
+              "end": 225.072
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l53",
+      "start": 227.094,
+      "end": 228.815,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Se",
+          "start": 227.094,
+          "end": 227.154,
+          "confidence": 0.99,
+          "parts": []
+        },
+        {
+          "text": "xa",
+          "start": 227.234,
+          "end": 227.334,
+          "confidence": 0.987,
+          "parts": []
+        },
+        {
+          "text": "hoxe,",
+          "start": 227.474,
+          "end": 227.714,
+          "confidence": 0.99,
+          "parts": [
+            {
+              "text": "ho",
+              "start": 227.474,
+              "end": 227.614
+            },
+            {
+              "text": "xe,",
+              "start": 227.614,
+              "end": 227.714
+            }
+          ]
+        },
+        {
+          "text": "durmo",
+          "start": 227.994,
+          "end": 228.235,
+          "confidence": 0.893,
+          "parts": [
+            {
+              "text": "dur",
+              "start": 227.994,
+              "end": 228.175
+            },
+            {
+              "text": "mo",
+              "start": 228.175,
+              "end": 228.235
+            }
+          ]
+        },
+        {
+          "text": "sabendo",
+          "start": 228.355,
+          "end": 228.815,
+          "confidence": 0.984,
+          "parts": [
+            {
+              "text": "sa",
+              "start": 228.355,
+              "end": 228.475
+            },
+            {
+              "text": "ben",
+              "start": 228.475,
+              "end": 228.735
+            },
+            {
+              "text": "do",
+              "start": 228.735,
+              "end": 228.815
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l54",
+      "start": 230.696,
+      "end": 232.557,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Que",
+          "start": 230.696,
+          "end": 230.776,
+          "confidence": 0.978,
+          "parts": []
+        },
+        {
+          "text": "paxaro",
+          "start": 230.856,
+          "end": 231.317,
+          "confidence": 0.859,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 230.856,
+              "end": 231.016
+            },
+            {
+              "text": "xa",
+              "start": 231.016,
+              "end": 231.217
+            },
+            {
+              "text": "ro",
+              "start": 231.217,
+              "end": 231.317
+            }
+          ]
+        },
+        {
+          "text": "cantou",
+          "start": 231.497,
+          "end": 231.737,
+          "confidence": 0.817,
+          "parts": [
+            {
+              "text": "can",
+              "start": 231.497,
+              "end": 231.637
+            },
+            {
+              "text": "tou",
+              "start": 231.637,
+              "end": 231.737
+            }
+          ]
+        },
+        {
+          "text": "antes",
+          "start": 231.837,
+          "end": 232.057,
+          "confidence": 0.942,
+          "parts": [
+            {
+              "text": "an",
+              "start": 231.837,
+              "end": 231.937
+            },
+            {
+              "text": "tes",
+              "start": 231.937,
+              "end": 232.057
+            }
+          ]
+        },
+        {
+          "text": "na",
+          "start": 232.117,
+          "end": 232.177,
+          "confidence": 0.992,
+          "parts": []
+        },
+        {
+          "text": "horta?",
+          "start": 232.237,
+          "end": 232.557,
+          "confidence": 0.869,
+          "parts": [
+            {
+              "text": "hor",
+              "start": 232.237,
+              "end": 232.477
+            },
+            {
+              "text": "ta?",
+              "start": 232.477,
+              "end": 232.557
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l55",
+      "start": 233.878,
+      "end": 235.62,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Non",
+          "start": 233.878,
+          "end": 233.978,
+          "confidence": 0.095,
+          "parts": []
+        },
+        {
+          "text": "pasará",
+          "start": 234.059,
+          "end": 234.339,
+          "confidence": 0.033,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 234.059,
+              "end": 234.139
+            },
+            {
+              "text": "sa",
+              "start": 234.139,
+              "end": 234.279
+            },
+            {
+              "text": "rá",
+              "start": 234.279,
+              "end": 234.339
+            }
+          ]
+        },
+        {
+          "text": "non",
+          "start": 234.919,
+          "end": 234.999,
+          "confidence": 0.99,
+          "parts": []
+        },
+        {
+          "text": "pasará",
+          "start": 235.059,
+          "end": 235.319,
+          "confidence": 0.96,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 235.059,
+              "end": 235.139
+            },
+            {
+              "text": "sa",
+              "start": 235.139,
+              "end": 235.259
+            },
+            {
+              "text": "rá",
+              "start": 235.259,
+              "end": 235.319
+            }
+          ]
+        },
+        {
+          "text": "nada,",
+          "start": 235.419,
+          "end": 235.62,
+          "confidence": 0.991,
+          "parts": [
+            {
+              "text": "na",
+              "start": 235.419,
+              "end": 235.56
+            },
+            {
+              "text": "da,",
+              "start": 235.56,
+              "end": 235.62
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l56",
+      "start": 235.7,
+      "end": 237.681,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "porque",
+          "start": 235.7,
+          "end": 235.88,
+          "confidence": 0.98,
+          "parts": [
+            {
+              "text": "por",
+              "start": 235.7,
+              "end": 235.8
+            },
+            {
+              "text": "que",
+              "start": 235.8,
+              "end": 235.88
+            }
+          ]
+        },
+        {
+          "text": "se",
+          "start": 235.96,
+          "end": 236.0,
+          "confidence": 0.987,
+          "parts": []
+        },
+        {
+          "text": "pasa",
+          "start": 236.1,
+          "end": 236.34,
+          "confidence": 0.987,
+          "parts": [
+            {
+              "text": "pa",
+              "start": 236.1,
+              "end": 236.26
+            },
+            {
+              "text": "sa",
+              "start": 236.26,
+              "end": 236.34
+            }
+          ]
+        },
+        {
+          "text": "virá",
+          "start": 236.48,
+          "end": 236.64,
+          "confidence": 0.841,
+          "parts": [
+            {
+              "text": "vi",
+              "start": 236.48,
+              "end": 236.56
+            },
+            {
+              "text": "rá",
+              "start": 236.56,
+              "end": 236.64
+            }
+          ]
+        },
+        {
+          "text": "por",
+          "start": 236.76,
+          "end": 236.84,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "min",
+          "start": 236.9,
+          "end": 237.001,
+          "confidence": 0.846,
+          "parts": []
+        },
+        {
+          "text": "aos",
+          "start": 237.061,
+          "end": 237.141,
+          "confidence": 0.662,
+          "parts": [
+            {
+              "text": "a",
+              "start": 237.061,
+              "end": 237.081
+            },
+            {
+              "text": "os",
+              "start": 237.081,
+              "end": 237.141
+            }
+          ]
+        },
+        {
+          "text": "cazadores.",
+          "start": 237.181,
+          "end": 237.681,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 237.181,
+              "end": 237.281
+            },
+            {
+              "text": "za",
+              "start": 237.281,
+              "end": 237.421
+            },
+            {
+              "text": "do",
+              "start": 237.421,
+              "end": 237.541
+            },
+            {
+              "text": "res.",
+              "start": 237.541,
+              "end": 237.681
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l57",
+      "start": 239.022,
+      "end": 240.563,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Os",
+          "start": 239.022,
+          "end": 239.102,
+          "confidence": 0.963,
+          "parts": []
+        },
+        {
+          "text": "canles",
+          "start": 239.182,
+          "end": 239.482,
+          "confidence": 0.256,
+          "parts": [
+            {
+              "text": "can",
+              "start": 239.182,
+              "end": 239.362
+            },
+            {
+              "text": "les",
+              "start": 239.362,
+              "end": 239.482
+            }
+          ]
+        },
+        {
+          "text": "fameados",
+          "start": 239.502,
+          "end": 239.922,
+          "confidence": 0.913,
+          "parts": [
+            {
+              "text": "fa",
+              "start": 239.502,
+              "end": 239.622
+            },
+            {
+              "text": "me",
+              "start": 239.622,
+              "end": 239.762
+            },
+            {
+              "text": "a",
+              "start": 239.762,
+              "end": 239.822
+            },
+            {
+              "text": "dos",
+              "start": 239.822,
+              "end": 239.922
+            }
+          ]
+        },
+        {
+          "text": "dos",
+          "start": 239.983,
+          "end": 240.063,
+          "confidence": 0.042,
+          "parts": []
+        },
+        {
+          "text": "cazadores,",
+          "start": 240.123,
+          "end": 240.563,
+          "confidence": 0.992,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 240.123,
+              "end": 240.243
+            },
+            {
+              "text": "za",
+              "start": 240.243,
+              "end": 240.363
+            },
+            {
+              "text": "do",
+              "start": 240.363,
+              "end": 240.463
+            },
+            {
+              "text": "res,",
+              "start": 240.463,
+              "end": 240.563
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l58",
+      "start": 240.663,
+      "end": 242.484,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "os",
+          "start": 240.663,
+          "end": 240.723,
+          "confidence": 0.985,
+          "parts": []
+        },
+        {
+          "text": "coches",
+          "start": 240.783,
+          "end": 241.063,
+          "confidence": 0.976,
+          "parts": [
+            {
+              "text": "co",
+              "start": 240.783,
+              "end": 240.923
+            },
+            {
+              "text": "ches",
+              "start": 240.923,
+              "end": 241.063
+            }
+          ]
+        },
+        {
+          "text": "catro",
+          "start": 241.163,
+          "end": 241.323,
+          "confidence": 0.985,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 241.163,
+              "end": 241.263
+            },
+            {
+              "text": "tro",
+              "start": 241.263,
+              "end": 241.323
+            }
+          ]
+        },
+        {
+          "text": "por",
+          "start": 241.383,
+          "end": 241.464,
+          "confidence": 0.152,
+          "parts": []
+        },
+        {
+          "text": "catro",
+          "start": 241.564,
+          "end": 241.764,
+          "confidence": 0.878,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 241.564,
+              "end": 241.684
+            },
+            {
+              "text": "tro",
+              "start": 241.684,
+              "end": 241.764
+            }
+          ]
+        },
+        {
+          "text": "dos",
+          "start": 241.844,
+          "end": 241.924,
+          "confidence": 0.989,
+          "parts": []
+        },
+        {
+          "text": "cazadores.",
+          "start": 241.984,
+          "end": 242.484,
+          "confidence": 0.982,
+          "parts": [
+            {
+              "text": "ca",
+              "start": 241.984,
+              "end": 242.084
+            },
+            {
+              "text": "za",
+              "start": 242.084,
+              "end": 242.204
+            },
+            {
+              "text": "do",
+              "start": 242.204,
+              "end": 242.324
+            },
+            {
+              "text": "res.",
+              "start": 242.324,
+              "end": 242.484
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l59",
+      "start": 246.307,
+      "end": 247.988,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Puiden",
+          "start": 246.307,
+          "end": 246.587,
+          "confidence": 0.848,
+          "parts": [
+            {
+              "text": "Pui",
+              "start": 246.307,
+              "end": 246.447
+            },
+            {
+              "text": "den",
+              "start": 246.447,
+              "end": 246.587
+            }
+          ]
+        },
+        {
+          "text": "ser",
+          "start": 246.687,
+          "end": 246.847,
+          "confidence": 0.999,
+          "parts": []
+        },
+        {
+          "text": "unha",
+          "start": 247.067,
+          "end": 247.167,
+          "confidence": 0.999,
+          "parts": [
+            {
+              "text": "u",
+              "start": 247.067,
+              "end": 247.087
+            },
+            {
+              "text": "nha",
+              "start": 247.087,
+              "end": 247.167
+            }
+          ]
+        },
+        {
+          "text": "vaca",
+          "start": 247.207,
+          "end": 247.368,
+          "confidence": 0.812,
+          "parts": [
+            {
+              "text": "va",
+              "start": 247.207,
+              "end": 247.307
+            },
+            {
+              "text": "ca",
+              "start": 247.307,
+              "end": 247.368
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 247.428,
+          "end": 247.488,
+          "confidence": 0.765,
+          "parts": []
+        },
+        {
+          "text": "montaña",
+          "start": 247.548,
+          "end": 247.988,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 247.548,
+              "end": 247.708
+            },
+            {
+              "text": "ta",
+              "start": 247.708,
+              "end": 247.868
+            },
+            {
+              "text": "ña",
+              "start": 247.868,
+              "end": 247.988
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l60",
+      "start": 250.089,
+      "end": 252.011,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Unha",
+          "start": 250.089,
+          "end": 250.209,
+          "confidence": 0.904,
+          "parts": [
+            {
+              "text": "U",
+              "start": 250.089,
+              "end": 250.109
+            },
+            {
+              "text": "nha",
+              "start": 250.109,
+              "end": 250.209
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 250.29,
+          "end": 250.35,
+          "confidence": 0.993,
+          "parts": []
+        },
+        {
+          "text": "nunca",
+          "start": 250.41,
+          "end": 250.61,
+          "confidence": 0.894,
+          "parts": [
+            {
+              "text": "nun",
+              "start": 250.41,
+              "end": 250.55
+            },
+            {
+              "text": "ca",
+              "start": 250.55,
+              "end": 250.61
+            }
+          ]
+        },
+        {
+          "text": "saíu",
+          "start": 250.71,
+          "end": 250.95,
+          "confidence": 0.658,
+          "parts": [
+            {
+              "text": "sa",
+              "start": 250.71,
+              "end": 250.83
+            },
+            {
+              "text": "íu",
+              "start": 250.83,
+              "end": 250.95
+            }
+          ]
+        },
+        {
+          "text": "dos",
+          "start": 251.01,
+          "end": 251.13,
+          "confidence": 0.836,
+          "parts": []
+        },
+        {
+          "text": "prados",
+          "start": 251.19,
+          "end": 251.43,
+          "confidence": 0.87,
+          "parts": [
+            {
+              "text": "pra",
+              "start": 251.19,
+              "end": 251.33
+            },
+            {
+              "text": "dos",
+              "start": 251.33,
+              "end": 251.43
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 251.49,
+          "end": 251.53,
+          "confidence": 0.959,
+          "parts": []
+        },
+        {
+          "text": "montaña",
+          "start": 251.59,
+          "end": 252.011,
+          "confidence": 0.988,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 251.59,
+              "end": 251.75
+            },
+            {
+              "text": "ta",
+              "start": 251.75,
+              "end": 251.891
+            },
+            {
+              "text": "ña",
+              "start": 251.891,
+              "end": 252.011
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l61",
+      "start": 253.832,
+      "end": 254.753,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Que",
+          "start": 253.832,
+          "end": 253.892,
+          "confidence": 0.831,
+          "parts": []
+        },
+        {
+          "text": "na",
+          "start": 253.952,
+          "end": 254.012,
+          "confidence": 0.926,
+          "parts": []
+        },
+        {
+          "text": "súa",
+          "start": 254.072,
+          "end": 254.172,
+          "confidence": 0.716,
+          "parts": [
+            {
+              "text": "sú",
+              "start": 254.072,
+              "end": 254.152
+            },
+            {
+              "text": "a",
+              "start": 254.152,
+              "end": 254.172
+            }
+          ]
+        },
+        {
+          "text": "vida",
+          "start": 254.212,
+          "end": 254.352,
+          "confidence": 0.897,
+          "parts": [
+            {
+              "text": "vi",
+              "start": 254.212,
+              "end": 254.292
+            },
+            {
+              "text": "da",
+              "start": 254.292,
+              "end": 254.352
+            }
+          ]
+        },
+        {
+          "text": "non",
+          "start": 254.412,
+          "end": 254.472,
+          "confidence": 0.994,
+          "parts": []
+        },
+        {
+          "text": "comeu",
+          "start": 254.532,
+          "end": 254.753,
+          "confidence": 0.935,
+          "parts": [
+            {
+              "text": "co",
+              "start": 254.532,
+              "end": 254.632
+            },
+            {
+              "text": "meu",
+              "start": 254.632,
+              "end": 254.753
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l62",
+      "start": 254.833,
+      "end": 256.374,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "máis",
+          "start": 254.833,
+          "end": 255.053,
+          "confidence": 0.991,
+          "parts": []
+        },
+        {
+          "text": "nada",
+          "start": 255.173,
+          "end": 255.353,
+          "confidence": 0.979,
+          "parts": [
+            {
+              "text": "na",
+              "start": 255.173,
+              "end": 255.293
+            },
+            {
+              "text": "da",
+              "start": 255.293,
+              "end": 255.353
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 255.453,
+          "end": 255.513,
+          "confidence": 0.451,
+          "parts": []
+        },
+        {
+          "text": "herba",
+          "start": 255.573,
+          "end": 255.733,
+          "confidence": 0.293,
+          "parts": [
+            {
+              "text": "her",
+              "start": 255.573,
+              "end": 255.673
+            },
+            {
+              "text": "ba",
+              "start": 255.673,
+              "end": 255.733
+            }
+          ]
+        },
+        {
+          "text": "da",
+          "start": 255.793,
+          "end": 255.853,
+          "confidence": 0.97,
+          "parts": []
+        },
+        {
+          "text": "montaña",
+          "start": 255.913,
+          "end": 256.374,
+          "confidence": 0.983,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 255.913,
+              "end": 256.093
+            },
+            {
+              "text": "ta",
+              "start": 256.093,
+              "end": 256.274
+            },
+            {
+              "text": "ña",
+              "start": 256.274,
+              "end": 256.374
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l63",
+      "start": 257.815,
+      "end": 260.496,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Co",
+          "start": 257.815,
+          "end": 257.875,
+          "confidence": 0.962,
+          "parts": []
+        },
+        {
+          "text": "meu",
+          "start": 257.955,
+          "end": 258.075,
+          "confidence": 0.863,
+          "parts": []
+        },
+        {
+          "text": "leite",
+          "start": 258.135,
+          "end": 258.355,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "lei",
+              "start": 258.135,
+              "end": 258.295
+            },
+            {
+              "text": "te",
+              "start": 258.295,
+              "end": 258.355
+            }
+          ]
+        },
+        {
+          "text": "faríanse",
+          "start": 258.435,
+          "end": 258.895,
+          "confidence": 0.911,
+          "parts": [
+            {
+              "text": "fa",
+              "start": 258.435,
+              "end": 258.535
+            },
+            {
+              "text": "rí",
+              "start": 258.535,
+              "end": 258.675
+            },
+            {
+              "text": "an",
+              "start": 258.675,
+              "end": 258.795
+            },
+            {
+              "text": "se",
+              "start": 258.795,
+              "end": 258.895
+            }
+          ]
+        },
+        {
+          "text": "queixos,",
+          "start": 259.196,
+          "end": 259.576,
+          "confidence": 0.867,
+          "parts": [
+            {
+              "text": "quei",
+              "start": 259.196,
+              "end": 259.376
+            },
+            {
+              "text": "xos,",
+              "start": 259.376,
+              "end": 259.576
+            }
+          ]
+        },
+        {
+          "text": "queixos.",
+          "start": 260.116,
+          "end": 260.496,
+          "confidence": 0.97,
+          "parts": [
+            {
+              "text": "quei",
+              "start": 260.116,
+              "end": 260.316
+            },
+            {
+              "text": "xos.",
+              "start": 260.316,
+              "end": 260.496
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l64",
+      "start": 262.358,
+      "end": 264.119,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Queixos",
+          "start": 262.358,
+          "end": 262.658,
+          "confidence": 0.987,
+          "parts": [
+            {
+              "text": "Quei",
+              "start": 262.358,
+              "end": 262.518
+            },
+            {
+              "text": "xos",
+              "start": 262.518,
+              "end": 262.658
+            }
+          ]
+        },
+        {
+          "text": "e...",
+          "start": 262.778,
+          "end": 262.798,
+          "confidence": 0.939,
+          "parts": []
+        },
+        {
+          "text": "e",
+          "start": 263.579,
+          "end": 263.599,
+          "confidence": 0.951,
+          "parts": []
+        },
+        {
+          "text": "galletas.",
+          "start": 263.659,
+          "end": 264.119,
+          "confidence": 0.997,
+          "parts": [
+            {
+              "text": "ga",
+              "start": 263.659,
+              "end": 263.759
+            },
+            {
+              "text": "lle",
+              "start": 263.759,
+              "end": 263.959
+            },
+            {
+              "text": "tas.",
+              "start": 263.959,
+              "end": 264.119
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l65",
+      "start": 265.54,
+      "end": 267.581,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Tras",
+          "start": 265.54,
+          "end": 265.68,
+          "confidence": 0.161,
+          "parts": []
+        },
+        {
+          "text": "que",
+          "start": 265.76,
+          "end": 265.82,
+          "confidence": 0.995,
+          "parts": []
+        },
+        {
+          "text": "dicir",
+          "start": 265.92,
+          "end": 266.14,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "di",
+              "start": 265.92,
+              "end": 266.0
+            },
+            {
+              "text": "cir",
+              "start": 266.0,
+              "end": 266.14
+            }
+          ]
+        },
+        {
+          "text": "que",
+          "start": 266.28,
+          "end": 266.34,
+          "confidence": 0.99,
+          "parts": []
+        },
+        {
+          "text": "é",
+          "start": 266.4,
+          "end": 266.42,
+          "confidence": 0.519,
+          "parts": []
+        },
+        {
+          "text": "así,",
+          "start": 266.48,
+          "end": 266.621,
+          "confidence": 0.958,
+          "parts": [
+            {
+              "text": "a",
+              "start": 266.48,
+              "end": 266.541
+            },
+            {
+              "text": "sí,",
+              "start": 266.541,
+              "end": 266.621
+            }
+          ]
+        },
+        {
+          "text": "así.",
+          "start": 267.381,
+          "end": 267.581,
+          "confidence": 0.926,
+          "parts": [
+            {
+              "text": "a",
+              "start": 267.381,
+              "end": 267.481
+            },
+            {
+              "text": "sí.",
+              "start": 267.481,
+              "end": 267.581
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l66",
+      "start": 270.143,
+      "end": 272.545,
+      "singer": "s1",
+      "role": "lead",
+      "words": [
+        {
+          "text": "Así,",
+          "start": 270.143,
+          "end": 270.343,
+          "confidence": 0.561,
+          "parts": [
+            {
+              "text": "A",
+              "start": 270.143,
+              "end": 270.263
+            },
+            {
+              "text": "sí,",
+              "start": 270.263,
+              "end": 270.343
+            }
+          ]
+        },
+        {
+          "text": "e",
+          "start": 270.823,
+          "end": 270.843,
+          "confidence": 0.98,
+          "parts": []
+        },
+        {
+          "text": "como",
+          "start": 270.923,
+          "end": 271.044,
+          "confidence": 0.994,
+          "parts": [
+            {
+              "text": "co",
+              "start": 270.923,
+              "end": 271.004
+            },
+            {
+              "text": "mo",
+              "start": 271.004,
+              "end": 271.044
+            }
+          ]
+        },
+        {
+          "text": "sabe,",
+          "start": 271.164,
+          "end": 271.384,
+          "confidence": 0.996,
+          "parts": [
+            {
+              "text": "sa",
+              "start": 271.164,
+              "end": 271.324
+            },
+            {
+              "text": "be,",
+              "start": 271.324,
+              "end": 271.384
+            }
+          ]
+        },
+        {
+          "text": "a",
+          "start": 271.724,
+          "end": 271.744,
+          "confidence": 0.995,
+          "parts": []
+        },
+        {
+          "text": "montaña",
+          "start": 271.804,
+          "end": 272.244,
+          "confidence": 0.857,
+          "parts": [
+            {
+              "text": "mon",
+              "start": 271.804,
+              "end": 272.004
+            },
+            {
+              "text": "ta",
+              "start": 272.004,
+              "end": 272.164
+            },
+            {
+              "text": "ña",
+              "start": 272.164,
+              "end": 272.244
+            }
+          ]
+        },
+        {
+          "text": "toda.",
+          "start": 272.344,
+          "end": 272.545,
+          "confidence": 0.956,
+          "parts": [
+            {
+              "text": "to",
+              "start": 272.344,
+              "end": 272.485
+            },
+            {
+              "text": "da.",
+              "start": 272.485,
+              "end": 272.545
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "lyrics_source": "user",
+    "separation_model": "vocals_mel_band_roformer.ckpt",
+    "asr_model": null,
+    "align_model": "proxectonos/Nos_ASR-wav2vec2-xls-r-300m-gl@05a9b49121aa",
+    "engine_version": "karaoke-engine 3.0.0",
+    "language_fallbacks": []
+  },
+  "edited": false
+}

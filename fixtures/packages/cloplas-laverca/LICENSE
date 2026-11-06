@@ -1,0 +1,18 @@
+Song: laverca by Clo Plas (Berio Molina and Xiana Arias), from the album "bafi" (2022)
+Licence: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+Source: https://archive.org/details/bafi_20220513
+
+Lyrics: transcribed by ear for the Galician benchmark (bench/sets/gl/cloplas-laverca) and shared
+under the same licence.
+Timings: made by Proxecto Karaoke en Galego 3.0.0 (`karaoke make`, with the lyrics), not corrected by hand. This is
+the demo song of the project; the screenshots and the animation in docs/assets/ show it and are
+shared under CC BY-SA 4.0 too.
+
+The audio (vocals.wav, instrumental.wav) is never versioned. To rebuild it:
+  uv run karaoke-bench fetch --set gl
+  uv run karaoke make bench/data/gl/cloplas-laverca/audio.mp3 --lang gl \
+    --lyrics bench/sets/gl/cloplas-laverca/lyrics.txt --title laverca --artist "Clo Plas" \
+    --out bench/data/paquetes/cloplas-laverca
+  for stem in instrumental vocals; do
+    ffmpeg -i bench/data/paquetes/cloplas-laverca/$stem.m4a <this folder>/$stem.wav
+  done

@@ -29,6 +29,22 @@ describe('nextFocus', () => {
 		expect(nextFocus(box(0, 0), items, 'right')).toBe('aligned');
 	});
 
+	it('keeps to the row: right from a wide name goes to the menu, not to the field below', () => {
+		// The top of the library on a TV: the app's name, the menu on its row, the search below.
+		const name = box(250, 19, 384, 48);
+		const items = [
+			{ id: 'search', rect: box(242, 120, 480, 44) },
+			{ id: 'songs', rect: box(705, 16, 80, 54) },
+			{ id: 'party', rect: box(805, 16, 80, 54) }
+		];
+		expect(nextFocus(name, items, 'right')).toBe('songs');
+	});
+
+	it('still moves off the row when nothing is in line that way', () => {
+		const items = [{ id: 'below-right', rect: box(300, 300) }];
+		expect(nextFocus(box(0, 0), items, 'right')).toBe('below-right');
+	});
+
 	it('stops at the edges', () => {
 		expect(nextFocus(GRID[2].rect, GRID, 'right')).toBeNull();
 		expect(nextFocus(GRID[0].rect, GRID, 'up')).toBeNull();

@@ -98,6 +98,10 @@
   ],
   "packages": [
     {
+      "package": "cloplas-laverca",
+      "expected": "Puiden ser unha vaca da montaña"
+    },
+    {
       "package": "cortez-feel-stripped",
       "expected": "What is it that you want from me, want from me?"
     },

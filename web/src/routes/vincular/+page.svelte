@@ -30,7 +30,7 @@
 	});
 </script>
 
-<svelte:head><title>{t.pair} · Foliada</title></svelte:head>
+<svelte:head><title>{t.pair} · Proxecto Karaoke en Galego</title></svelte:head>
 
 <main class="pair">
 	<h1>{t.title}</h1>

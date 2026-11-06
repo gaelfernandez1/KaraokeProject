@@ -208,7 +208,10 @@
 	}
 </script>
 
-<svelte:head><title>{doc ? `${doc.title} · Foliada` : 'Foliada'}</title></svelte:head>
+<svelte:head
+	><title>{doc ? `${doc.title} · Proxecto Karaoke en Galego` : 'Proxecto Karaoke en Galego'}</title
+	></svelte:head
+>
 <svelte:window onkeydown={onKey} onpointermove={wake} />
 <svelte:document onfullscreenchange={() => (fullscreen = isFullscreen())} />
 

@@ -1,39 +1,44 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use Proxecto Karaoke en Galego in your work, please cite it as below."
 type: software
-title: "Sistema Automático de Xeración de Karaoke con Intelixencia Artificial"
-abstract: "Sistema multilingüe de xeración automática de vídeos de karaoke optimizado para idiomas minoritarios mediante técnicas de deep learning, separación de fontes musicais e aliñamento temporal forzado."
+title: "Proxecto Karaoke en Galego"
+abstract: >-
+  Proxecto Karaoke en Galego turns any song into a karaoke whose lyrics light up exactly as they
+  are sung. It is built for Galician first and works with songs in any language: it separates the
+  vocals, transcribes the lyrics or aligns the ones given with a model for each language, and
+  plays the result on phones, laptops and TVs from a home server, or exports it as video. Every
+  model was chosen with a benchmark of freely licensed songs.
 authors:
   - family-names: "Fernández Quintela"
     given-names: "Gael"
     email: "gael.fernandez1@udc.es"
-    orcid: "https://orcid.org/0000-0000-0000-0000"
     affiliation: "Universidade da Coruña"
 repository-code: "https://github.com/gaelfernandez1/KaraokeProject"
 url: "https://github.com/gaelfernandez1/KaraokeProject"
 license: MIT
-version: "1.0.0"
-date-released: "2025-10-31"
+version: "3.0.0"
+date-released: "2026-11-06"
 keywords:
-  - "karaoke"
-  - "artificial intelligence"
-  - "galician language"
-  - "speech recognition"
-  - "source separation"
-  - "minority languages"
-  - "automatic transcription"
-  - "forced alignment"
-  - "microservices"
-  - "docker"
-  - "whisperx"
-  - "demucs"
-preferred-citation:
-  type: thesis
-  title: "Desenvolvemento dunha plataforma multilingüe de xeración automática de vídeos de Karaoke con Intelixencia Artificial"
-  authors:
-    - family-names: "Fernández Quintela"
-      given-names: "Gael"
-  institution: "Universidade da Coruña"
-  department: "Departamento de Computación"
-  year: 2025
-  thesis-type: "Traballo de Fin de Grao"
+  - karaoke
+  - Galician
+  - multilingual
+  - lyrics alignment
+  - forced alignment
+  - speech recognition
+  - music source separation
+  - low-resource languages
+  - web application
+references:
+  - type: thesis
+    title: >-
+      Desenvolvemento dunha plataforma multilingüe de xeración automática de vídeos de Karaoke
+      con Intelixencia Artificial
+    authors:
+      - family-names: "Fernández Quintela"
+        given-names: "Gael"
+    institution:
+      name: "Universidade da Coruña"
+    department: "Departamento de Computación"
+    year: 2025
+    thesis-type: "Traballo de Fin de Grao"
+    url: "https://github.com/gaelfernandez1/KaraokeProject/blob/main/docs/tfg/memoria-tfg.pdf"

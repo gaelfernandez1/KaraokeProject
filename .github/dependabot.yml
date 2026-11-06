@@ -1,0 +1,45 @@
+# Version updates once a month, grouped so they arrive as a few pull requests. Security updates
+# come as soon as an advisory is published (a repository setting, not this file).
+version: 2
+updates:
+  # The uv workspace: one entry at the root updates the lock of every package.
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      python-minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Pinned on purpose: faster-whisper 1.2.1 is CUDA 12 next to torch for CUDA 13 (see
+      # karaoke_bench/baseline/whisper.py), audio-separator 0.47.1 and Demucs 4.0.1 were chosen
+      # with the benchmark. Changing them is measured first (docs/benchmark.md).
+      - dependency-name: faster-whisper
+      - dependency-name: audio-separator
+      - dependency-name: demucs
+      - dependency-name: fastapi
+        update-types: [version-update:semver-minor]
+
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: monthly
+    groups:
+      web-tooling:
+        dependency-type: development
+        update-types: [minor, patch]
+      web-runtime:
+        dependency-type: production
+        update-types: [minor, patch]
+    ignore:
+      # Ubuntu's corepack cannot install pnpm 11 or newer (docs/development.md).
+      - dependency-name: pnpm
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]

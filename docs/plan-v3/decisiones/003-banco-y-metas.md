@@ -7,7 +7,7 @@
 ## Contexto
 
 `00-vision.md` §1 tenía metas provisionales para que C2 las fijara tras medir. El banco
-(`docs/banco.md`) mide dos líneas base hechas con librerías actuales:
+(`docs/benchmark.md`) mide dos líneas base hechas con librerías actuales:
 
 - **`base-legacy`**: lo que hacía el sistema v2. Demucs, Whisper `small` adivinando el idioma y
   alineación CTC con los modelos por defecto.
