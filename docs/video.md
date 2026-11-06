@@ -1,73 +1,77 @@
-# Vídeo
+# Video
 
-Fondos de las canciones y exportación MP4 con la letra animada. Las decisiones están en
-`docs/plan-v3/decisiones/008-video.md`; los tiempos, en `bench/results/2026-10-30-c6-render/`.
+Song backgrounds and MP4 export with the animated lyrics. The decisions are in
+[`plan-v3/decisiones/008-video.md`](plan-v3/decisiones/008-video.md) (in Spanish); the timings, in
+`bench/results/2026-10-30-c6-render/`.
 
-## El fondo de un paquete
+## A package's background
 
-`karaoke make` guarda lo que la canción trae para la vista:
+`karaoke make` keeps what the song brings for the picture:
 
-- **`background.mp4`** si el fichero tiene vídeo (un videoclip de YouTube, por ejemplo): H.264 que
-  reproduce cualquier móvil o tele, como mucho 1280×720 y 30 fps, un fotograma clave por segundo (los
-  saltos son instantáneos), el índice al principio y sin audio. Va en `video.background`.
-- **`cover.jpg`**: la carátula incrustada si la hay (mp3, m4a) o, si no, un fotograma a un tercio
-  del vídeo. Va en `cover`.
+- **`background.mp4`** if the file has video (a music video from YouTube, for example): H.264 that
+  any phone or TV plays, at most 1280×720 and 30 fps, one keyframe per second (seeking is instant),
+  the index at the start and no audio. It goes in `video.background`.
+- **`cover.jpg`**: the embedded artwork if there is one (mp3, m4a) or, if not, a frame a third of
+  the way into the video. It goes in `cover`.
 
-Para un paquete ya hecho (o para cambiarle el fondo):
+For a package already made (or to change its background):
 
 ```bash
-uv run karaoke background <paquete> <vídeo, canción con carátula o imagen>
+uv run karaoke background <package> <video, song with artwork, or image>
 ```
 
-Código: `karaoke_engine.video.media` (`probe_video`, `extract_background`, `extract_cover`,
+Code: `karaoke_engine.video.media` (`probe_video`, `extract_background`, `extract_cover`,
 `add_background`, `mean_luma`).
 
-## Exportar el MP4
+## Exporting the MP4
 
 ```bash
-uv run karaoke render <paquete> [--theme clasico] [--aspect 16:9|9:16] [--background auto]
+uv run karaoke render <package> [--theme clasico] [--aspect 16:9|9:16] [--background auto]
                                 [--vocals 0.3] [--dim 0.8] [--size 1280x720] [-o video.mp4]
 ```
 
-- **Fondo** (`--background`): `auto` usa el vídeo del paquete, si no su portada y si no un
-  degradado con los colores del tema; también `video`, `cover`, `gradient` o la ruta de un vídeo o
-  una imagen. Un fondo con la misma forma que el vídeo lo llena; con otra forma se ve entero sobre
-  una copia ampliada, desenfocada y más oscura, nunca deformado ni cortado. En 9:16 se sube para
-  dejar abajo la letra. Una imagen se mueve muy despacio.
-- **Legibilidad**: el fondo se oscurece según su brillo (`--dim` lo fija a mano: 1 es sin
-  oscurecer) y una franja oscura degradada va detrás de la letra.
-- **Letra**: el ASS de los subtítulos (`docs/subtitulos.md`) con la misma maquetación que la web,
-  más **título y artista** al principio (si la primera línea tarda 4 s o más) y **créditos** al
-  final (título, artista y el primer párrafo de `LICENSE`, si quedan 4 s o más).
-- **Audio**: el instrumental tal cual; con `--vocals`, mezclado con la voz guía a ese nivel.
-- **Miniatura**: junto al vídeo, un `.jpg` de 1280 px con el título sobre el fondo.
-- **Codificación**: NVENC en la GPU y, si no se puede, x264.
+- **Background** (`--background`): `auto` uses the package's video, otherwise its cover and
+  otherwise a gradient in the theme's colours; also `video`, `cover`, `gradient` or the path to a
+  video or an image. A background with the video's shape fills it; with another shape it is shown
+  whole over an enlarged, blurred and darker copy, never stretched or cropped. In 9:16 it moves up to
+  leave the lyrics below. An image moves very slowly.
+- **Legibility**: the background is darkened according to its brightness (`--dim` sets it by hand:
+  1 means no darkening) and a dark gradient band goes behind the lyrics.
+- **Lyrics**: the ASS of the subtitles ([`subtitles.md`](subtitles.md)) with the same layout as the
+  web app, plus the **title and artist** at the start (if the first line comes 4 s or more in) and
+  **credits** at the end (title, artist and the first paragraph of `LICENSE`, if 4 s or more are
+  left).
+- **Audio**: the instrumental as is; with `--vocals`, mixed with the guide vocals at that level.
+- **Thumbnail**: next to the video, a 1280 px `.jpg` with the title over the background.
+- **Encoding**: NVENC on the GPU and, if that is not possible, x264.
 
-Una canción de 4 min sale en 27–45 s en la RTX 3050 (el fondo de vídeo es el más caro).
+A 4-minute song takes 27–45 s on the RTX 3050 with a video or gradient background, and about a
+minute with a cover image.
 
-Código: `karaoke_engine.video.render` (`render`, `title_events`, `credits_text`),
-`karaoke_engine.video.graph` (el grafo de filtros del fondo) y `karaoke_engine.video.encode`.
+Code: `karaoke_engine.video.render` (`render`, `title_events`, `credits_text`),
+`karaoke_engine.video.graph` (the background's filter graph) and `karaoke_engine.video.encode`.
 
-## En la web
+## In the web app
 
-`BackgroundSync` (`web/src/lib/video/background.ts`) mantiene un `<video>` mudo al paso del audio:
-lo arranca y lo para con el reloj, salta si se desvía más de 0,3 s y, entre 40 ms y 0,3 s, acelera
-o frena un 5 % como mucho hasta alcanzarlo. Si el vídeo es más corto que la canción, da la vuelta.
+`BackgroundSync` (`web/src/lib/video/background.ts`) keeps a muted `<video>` in step with the audio:
+it starts and stops it with the clock, jumps if it drifts more than 0.3 s and, between 40 ms and
+0.3 s, speeds it up or slows it down by 5 % at most until it catches up. If the video is shorter than
+the song, it loops.
 
 ```ts
 const sync = new BackgroundSync(videoElement, { now: () => engine.now(), get playing() { return engine.playing; } });
-// en cada fotograma:
+// on every frame:
 sync.tick();
 ```
 
-`/proba-letra` lo enseña con el fondo como en el MP4 (portada desenfocada detrás, vídeo entero,
-oscurecido, franja bajo la letra). El servidor de desarrollo sirve los vídeos con peticiones Range,
-sin las que un navegador no puede saltar en un vídeo; el servidor de verdad (C8) debe hacer lo mismo.
+`/proba-letra` shows it with the background as in the MP4 (a blurred cover behind, the whole video,
+darkened, a band under the lyrics). Both the development server and the real one serve videos with
+Range requests, without which a browser cannot seek in a video.
 
-## Pruebas
+## Tests
 
 ```bash
 uv run pytest packages/engine/tests/test_video_*.py packages/engine/tests/test_make.py
 pnpm --dir web test                 # BackgroundSync
-pnpm --dir web test:e2e             # el vídeo de fondo sigue al reloj (Chromium)
+pnpm --dir web test:e2e             # the background video follows the clock (Chromium)
 ```

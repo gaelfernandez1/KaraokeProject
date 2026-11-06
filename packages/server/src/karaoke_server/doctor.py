@@ -10,7 +10,7 @@ from karaoke_server.config import Settings
 from karaoke_server.jobs.child import scope_available
 from karaoke_server.network import NetworkState, probe_network
 
-GUIDE = "docs/servidor.md"
+GUIDE = "docs/server.md"
 
 
 @dataclass(frozen=True)
@@ -69,7 +69,7 @@ def tool_checks(settings: Settings) -> list[Check]:
             "links (yt-dlp)",
             ytdlp,
             "uvx and node" if ytdlp else "uvx or node missing",
-            "install uv and Node 22 (docs/desarrollo.md)",
+            "install uv and Node 22 (docs/development.md)",
         )
     )
     separator = Path.home() / ".cache/karaoke/models/audio-separator/vocals_mel_band_roformer.ckpt"
