@@ -88,7 +88,7 @@
 		.catch(() => {});
 
 	// A party this TV was running (the page was reloaded) can be picked up again.
-	(async () => {
+	void (async () => {
 		let last: string | null;
 		try {
 			last = localStorage.getItem(LAST_KEY);
@@ -151,7 +151,7 @@
 	function join(event: SubmitEvent) {
 		event.preventDefault();
 		const clean = code.trim().toUpperCase();
-		if (clean) goto(resolve('/festa/[code]', { code: clean }));
+		if (clean) void goto(resolve('/festa/[code]', { code: clean }));
 	}
 
 	$effect(() => {
@@ -202,7 +202,7 @@
 	/** Stops the party on this TV (the phones see it as finished when the server forgets it). */
 	function endParty() {
 		confirmingEnd = false;
-		host?.stop();
+		void host?.end();
 		host = null;
 		resumable = null;
 		showSettings = false;

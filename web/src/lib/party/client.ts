@@ -31,6 +31,11 @@ export function getParty(code: string, fetchImpl?: Fetch): Promise<PartyState> {
 	return apiRequest(partyUrl(code), {}, fetchImpl);
 }
 
+/** Host only: ends the party; the phones are told and stop following it. */
+export function endParty(code: string, token: string, fetchImpl?: Fetch): Promise<void> {
+	return apiRequest(partyUrl(code), withToken(token, { method: 'DELETE' }), fetchImpl);
+}
+
 /** Joining again with the same name gives back the same guest and token. */
 export function joinParty(code: string, name: string, fetchImpl?: Fetch): Promise<Joined> {
 	return apiRequest(`${partyUrl(code)}/guests`, jsonBody('POST', { name }), fetchImpl);

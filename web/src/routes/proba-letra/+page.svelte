@@ -126,7 +126,7 @@
 				loadedFor = chosen;
 				message = '';
 			} catch (error) {
-				message = `Non se puido cargar o audio: ${error}`;
+				message = `Non se puido cargar o audio: ${String(error)}`;
 				return;
 			}
 		}

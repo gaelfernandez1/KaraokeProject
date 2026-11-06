@@ -8,8 +8,11 @@ export interface Subscription {
 
 export interface SubscribeOptions {
 	onOpen?: () => void;
-	/** Called when the connection drops; the browser is already retrying. */
-	onError?: () => void;
+	/**
+	 * Called when the connection drops. Usually the browser is already retrying; `closed` says it
+	 * gave up for good (the URL answered an error, such as 404).
+	 */
+	onError?: (closed: boolean) => void;
 	/** Tests pass a fake. */
 	createSource?: (url: string) => EventSource;
 }
@@ -32,6 +35,7 @@ export function subscribe(
 		});
 	}
 	if (options.onOpen) source.addEventListener('open', options.onOpen);
-	if (options.onError) source.addEventListener('error', options.onError);
+	const onError = options.onError;
+	if (onError) source.addEventListener('error', () => onError(source.readyState === 2));
 	return { close: () => source.close() };
 }

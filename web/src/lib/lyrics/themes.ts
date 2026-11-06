@@ -1,5 +1,5 @@
 import type { Theme } from '#lib/contracts';
-import { FontMetrics, type MetricsData } from './metrics';
+import { FontMetrics } from './metrics';
 // One copy of the themes and fonts: the Python package's, which the video export uses too.
 import clasico from '../../../../packages/engine/src/karaoke_engine/subtitles/themes/clasico.json';
 import contraste from '../../../../packages/engine/src/karaoke_engine/subtitles/themes/contraste.json';
@@ -21,10 +21,10 @@ export const THEMES: Record<string, Theme> = {
 export const DEFAULT_THEME = 'clasico';
 
 const FONTS: Record<string, { metrics: FontMetrics; url: string }> = {
-	'Nunito-Black.ttf': { metrics: new FontMetrics(nunitoMetrics as MetricsData), url: nunitoUrl },
-	'Inter-ExtraBold.ttf': { metrics: new FontMetrics(interMetrics as MetricsData), url: interUrl },
+	'Nunito-Black.ttf': { metrics: new FontMetrics(nunitoMetrics), url: nunitoUrl },
+	'Inter-ExtraBold.ttf': { metrics: new FontMetrics(interMetrics), url: interUrl },
 	'AtkinsonHyperlegibleNext-ExtraBold.ttf': {
-		metrics: new FontMetrics(atkinsonMetrics as MetricsData),
+		metrics: new FontMetrics(atkinsonMetrics),
 		url: atkinsonUrl
 	}
 };

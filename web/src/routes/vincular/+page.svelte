@@ -16,7 +16,7 @@
 		pairDevice(code)
 			.then(() => {
 				result = 'paired';
-				owner.refresh();
+				void owner.refresh();
 			})
 			.catch((error: unknown) => {
 				result = 'failed';

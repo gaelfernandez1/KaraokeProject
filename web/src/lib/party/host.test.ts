@@ -3,8 +3,10 @@ import type { PlayerSession } from '#lib/player/session.svelte.js';
 import type { PartyState, QueueItem } from './types';
 
 const advance = vi.fn(async (...args: unknown[]) => void args);
+const endParty = vi.fn(async (...args: unknown[]) => void args);
 vi.mock('./client', () => ({
 	advance: (...args: unknown[]) => advance(...args),
+	endParty: (...args: unknown[]) => endParty(...args),
 	publishPlayback: async () => {},
 	updateSettings: async () => {}
 }));
@@ -22,7 +24,7 @@ vi.mock('#lib/api', () => ({
 		)
 }));
 
-const { HostParty } = await import('./host.svelte');
+const { HostParty, ERROR_GRACE_MS } = await import('./host.svelte');
 
 class FakeSession {
 	state = 'idle';
@@ -119,6 +121,60 @@ describe('HostParty', () => {
 		host.startNow();
 		await flush();
 		expect(session.plays).toBe(1);
+	});
+
+	it('a song started before its lyrics arrive waits for them instead of ending', async () => {
+		const { host, session } = setup([item('a'), item('b', 'queued', 2)]);
+		host.frame();
+		loads[0].resolve();
+		await flush();
+		host.startNow();
+		await flush();
+		// Song a plays to its end; the session still says so while b is announced.
+		session.playing = false;
+		session.state = 'ended';
+		host.frame();
+		await flush();
+		host.frame();
+		expect(host.current?.id).toBe('b');
+		host.startNow(); // before b's karaoke.json has arrived
+		await flush();
+		host.frame();
+		await flush();
+		// Nothing of b plays (nor a's audio again) until b is loaded.
+		expect(session.plays).toBe(1);
+		expect(host.phase).toBe('countdown');
+		expect(advance.mock.calls.map((c) => `${String(c[2])}:${String(c[3])}`)).not.toContain(
+			'b:done'
+		);
+		loads[1].resolve();
+		await new Promise((r) => setTimeout(r, 150));
+		expect(host.phase).toBe('singing');
+		expect(session.plays).toBe(2);
+	});
+
+	it('a song whose sound fails while singing is skipped after a moment', async () => {
+		const { host, session } = setup([item('a'), item('b', 'queued', 2)]);
+		host.frame(0);
+		loads[0].resolve();
+		await flush();
+		host.startNow();
+		await flush();
+		expect(host.phase).toBe('singing');
+		session.state = 'error'; // the browser stopped playing it
+		host.frame(1000);
+		await flush();
+		expect(host.phase).toBe('singing');
+		host.frame(1000 + ERROR_GRACE_MS + 1);
+		await flush();
+		expect(host.phase).not.toBe('singing');
+		expect(advance.mock.calls.map((c) => `${String(c[2])}:${String(c[3])}`)).toContain('a:skipped');
+	});
+
+	it('ending the party tells the server, with the TV token', async () => {
+		const { host } = setup([item('a')]);
+		await host.end();
+		expect(endParty).toHaveBeenCalledWith('ABCD', 't');
 	});
 
 	it('starts a song once however many times play is asked for', async () => {

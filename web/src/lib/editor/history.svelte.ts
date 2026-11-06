@@ -49,6 +49,16 @@ export class History<T> {
 		this.current = next as T;
 	}
 
+	/**
+	 * The server stored `sent` as `stored`. Starts over from `stored` (true) unless something was
+	 * edited while the save was on its way: those edits stay, with their undo steps (false).
+	 */
+	settle(sent: T, stored: T): boolean {
+		if (this.current !== sent) return false;
+		this.reset(stored);
+		return true;
+	}
+
 	/** Starts over from `value`, forgetting every step (another song, or a reload). */
 	reset(value: T): void {
 		this.current = value;
