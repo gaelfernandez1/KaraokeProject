@@ -26,3 +26,6 @@ aparte, como en castellano. La regla de `005` era no cambiar nunca el texto most
   raro con «che» detrás se queda sin juntar. Se puede ampliar la lista en `clitics.py`.
 - La norma reintegracionista escribe el pronombre con guion («dixo-lle»): eso ya llega junto y no
   se toca.
+- Ampliada en `012`: tampoco se junta cuando la palabra anterior al verbo es un determinante
+  («un bico che dou», «o meu soño te…»: nombres escritos como un verbo) ni cuando un «que»,
+  «non», «cando»… anterior en la misma frase pide el pronombre delante.
