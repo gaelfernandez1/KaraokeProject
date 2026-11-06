@@ -7,19 +7,16 @@ repos:
         entry: uv run ruff format
         language: system
         types: [python]
-        exclude: ^legacy/
       - id: ruff-check
         name: ruff check
         entry: uv run ruff check --fix
         language: system
         types: [python]
-        exclude: ^legacy/
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
-        exclude: ^(legacy/|schemas/)
+        exclude: ^schemas/
       - id: check-yaml
-        exclude: ^legacy/
       - id: check-added-large-files
         args: [--maxkb=1024]

@@ -48,6 +48,10 @@ export const en = {
 			engine_failed: 'Something went wrong making the karaoke.',
 			interrupted: 'The server stopped while it was being made.',
 			song_missing: 'The song is no longer in the library.',
+			invalid_doc:
+				'Some timings in the lyrics are impossible: undo the last change and save again.',
+			invalid_request: 'The server did not understand the request.',
+			not_found: 'That is no longer on the server.',
 			not_owner: 'Only the laptop or a paired device can do this.',
 			not_paired: 'This device is not paired with the laptop.'
 		}
@@ -256,6 +260,7 @@ export const en = {
 		join: 'Join the party',
 		yourName: 'Your name',
 		unknownCode: 'There is no party with that code.',
+		ended: 'The party is over. Thanks for singing!',
 		otherCode: 'Another party’s code',
 		go: 'Go',
 		tabRequest: 'Request',

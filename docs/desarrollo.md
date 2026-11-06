@@ -46,7 +46,9 @@ Referencia: el portátil del proyecto (Windows 11 + WSL2 con Ubuntu 26.04, RTX 3
 |---|---|
 | Todas las comprobaciones de CI en local | `make ci` |
 | Formatear Python | `make format` |
-| Tests de Python | `make test` (o `uv run pytest packages/engine -q`) |
+| Tests de Python | `make test`: en paralelo, unos 60 s (o `uv run pytest packages/engine -q`) |
+| Los tests que cargan modelos (con la GPU libre) | `make test-models` |
+| Las reglas de calidad (formato, lint, dependencias, fronteras) | `make lint` (guía: [`docs/calidad.md`](calidad.md)) |
 | Web en modo desarrollo | `pnpm --dir web dev` |
 | El servidor con la web compilada (para el móvil y la tele) | `make serve` (guía: [`docs/servidor.md`](servidor.md)) |
 | Qué le falta al servidor (red, GPU, modelos…) | `uv run karaoke-server doctor` |
@@ -69,4 +71,4 @@ El banco de pruebas tiene su propia guía: [`docs/banco.md`](banco.md).
   siguiente.
 - **Cachés de root** (`.mypy_cache/3.10`, `input/`, `output/`) que dejó el Docker de la versión
   anterior: están ignorados por git; si molestan, `sudo rm -rf` sobre ellos.
-- **Aviso de NumPy al importar torch**: inofensivo; desaparece cuando el motor añada NumPy.
+- **No pases la batería con un karaoke haciéndose**: el trabajo de la GPU ya usa 4–5 GB de RAM.

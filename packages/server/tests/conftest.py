@@ -1,5 +1,4 @@
 import json
-import shutil
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
@@ -36,12 +35,6 @@ def db(settings: Settings) -> Database:
     database = Database(settings.db_path)
     database.migrate()
     return database
-
-
-@pytest.fixture
-def ffmpeg() -> None:
-    if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
-        pytest.skip("ffmpeg and ffprobe are not installed")
 
 
 HOME_IP = "192.168.1.20"

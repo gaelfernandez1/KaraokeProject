@@ -63,6 +63,7 @@ def test_every_language_has_a_pinned_model() -> None:
         assert len(spec.revision) == 40
 
 
+@pytest.mark.models
 @pytest.mark.usefixtures("ffmpeg")
 def test_emissions_cover_the_audio() -> None:
     torch = pytest.importorskip("torch")

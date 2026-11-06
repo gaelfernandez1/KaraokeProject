@@ -77,6 +77,19 @@ describe('PlayerSession', () => {
 		expect(engine.offset).toBeCloseTo(0.08);
 	});
 
+	it('a song loaded after another one ended starts fresh, not ended', async () => {
+		// The party TV keeps one session for the whole night.
+		const { engine, player } = session();
+		await player.load(URLS, { vocals: 0, latencyMs: 0 });
+		await player.play();
+		engine.end();
+		player.tick();
+		expect(player.state).toBe('ended');
+		await player.load({ instrumental: 'b.m4a', vocals: 'bv.m4a' }, { vocals: 0, latencyMs: 0 });
+		player.tick();
+		expect(player.state).toBe('ready');
+	});
+
 	it('reports a failed load and can try again', async () => {
 		const { engine, player } = session();
 		engine.failLoad = true;
@@ -95,7 +108,7 @@ describe('PlayerSession', () => {
 		await player.toggle();
 		player.tick();
 		expect(player.state).toBe('playing');
-		player.toggle();
+		void player.toggle();
 		player.tick();
 		expect(engine.playing).toBe(false);
 		expect(player.state).toBe('paused');

@@ -102,3 +102,38 @@ def test_invisible_characters_from_web_pages_are_ignored() -> None:
 
 def test_unusual_line_breaks_split_lines() -> None:
     assert _texts(parse_lyrics("A\rB\u2028C")) == ["A", "B", "C"]
+
+
+def test_repeat_mark_after_a_section_label_repeats_the_section() -> None:
+    text = "[Estribillo]\nA\n\n[Verso]\nB\n\n[Estribillo] x2\n\n[Final]\nC\n"
+    assert _texts(parse_lyrics(text)) == ["A", "B", "A", "A", "C"]
+    text = "[Estribillo]\nA\n\n[Estribillo] (x2)\n"
+    assert _texts(parse_lyrics(text)) == ["A", "A", "A"]
+    assert _texts(parse_lyrics("[Coro]\nA\n\n[Coro] (bis)\n")) == ["A", "A", "A"]
+
+
+def test_number_first_repeat_marks_from_portuguese_sites() -> None:
+    assert _texts(parse_lyrics("Linha um (2x)\nFim\n")) == ["Linha um", "Linha um", "Fim"]
+    assert _texts(parse_lyrics("Linha um 2x\nFim\n")) == ["Linha um", "Linha um", "Fim"]
+    assert _texts(parse_lyrics("[Refrão 2x]\nA\n[Verso]\nB\n")) == ["A", "A", "B"]
+    assert _texts(parse_lyrics("[Refrão]\nA\n\n[Refrão] 2x\n")) == ["A", "A", "A"]
+
+
+def test_a_name_like_x6_at_the_end_of_a_line_is_lyrics() -> None:
+    assert _texts(parse_lyrics("Baixo do BMW X6\nFin\n")) == ["Baixo do BMW X6", "Fin"]
+    assert _texts(parse_lyrics("Isto é x0\nFin\n")) == ["Isto é x0", "Fin"]
+
+
+def test_accents_typed_apart_are_composed() -> None:
+    [line] = parse_lyrics("collín che\n")
+    assert line.text == "collín che"
+
+
+def test_a_named_chorus_takes_the_singer_of_its_new_label() -> None:
+    text = "[Estribillo: Ana]\nA\n\n[Verso: Brais]\nB\n\n[Estribillo: Uxía]\n"
+    lines = parse_lyrics(text)
+    assert [(line.text, line.singer) for line in lines] == [
+        ("A", "Ana"),
+        ("B", "Brais"),
+        ("A", "Uxía"),
+    ]

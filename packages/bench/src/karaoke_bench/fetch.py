@@ -31,8 +31,8 @@ class FetchError(RuntimeError):
 def http_download(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_name(f".{dest.name}.part")
-    request = urllib.request.Request(url, headers={"User-Agent": f"karaoke-bench/{__version__}"})
-    with urllib.request.urlopen(request, timeout=60) as response, tmp.open("wb") as out:
+    request = urllib.request.Request(url, headers={"User-Agent": f"karaoke-bench/{__version__}"})  # noqa: S310 - URLs come from the set files in the repo
+    with urllib.request.urlopen(request, timeout=60) as response, tmp.open("wb") as out:  # noqa: S310 - URLs come from the set files in the repo
         shutil.copyfileobj(response, out)
     os.replace(tmp, dest)
 

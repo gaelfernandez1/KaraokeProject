@@ -1,4 +1,4 @@
-.PHONY: setup lint format typecheck test contracts web check-env ci serve
+.PHONY: setup lint format typecheck test test-models contracts web check-env ci serve
 
 # --inexact keeps packages that are already installed, so torch from `uv sync --extra ml`
 # survives a later `make setup` on the GPU machine.
@@ -10,6 +10,9 @@ setup:
 lint:
 	uv run ruff format --check .
 	uv run ruff check .
+	# Every import a package makes is declared by that package (deptry reads its pyproject).
+	for p in packages/*/; do (cd $$p && uv run deptry src) || exit 1; done
+	uv run lint-imports
 
 format:
 	uv run ruff format .
@@ -18,8 +21,21 @@ format:
 typecheck:
 	uv run mypy
 
+# Six workers: about a minute and 2.5 GB of RAM. The tests that load real models run apart.
 test:
-	uv run pytest -q
+	uv run pytest -q -n 6
+
+# The tests that load real models, one file per process (each needs 2 to 3 GB and torch keeps it
+# until the process ends). Never next to a karaoke being made: two models do not fit in 4 GB of
+# GPU nor in the RAM WSL has.
+test-models:
+	@if [ -n "$$(nvidia-smi --query-compute-apps=pid --format=csv,noheader 2>/dev/null)" ] || \
+		systemctl --user list-units 'karaoke-*.scope' --state=running --no-legend 2>/dev/null | grep -q .; then \
+		echo "A karaoke is being made (the GPU is busy): try again when it ends." >&2; exit 1; \
+	fi
+	for f in $$(uv run pytest -q --co -m models | grep '::' | cut -d: -f1 | sort -u); do \
+		uv run pytest -q -m models $$f || exit 1; \
+	done
 
 # Regenerates schemas/ from the pydantic models and the server's API, then the TS types.
 contracts:

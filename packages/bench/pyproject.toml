@@ -27,6 +27,14 @@ ml = [
 [project.scripts]
 karaoke-bench = "karaoke_bench.cli:main"
 
+[tool.deptry]
+package_module_name_map = { "nvidia-ml-py" = "pynvml" }
+
+[tool.deptry.per_rule_ignores]
+# Declared but never imported by name: demucs imports torchaudio (pinned here so it comes from
+# the CUDA index), and cuBLAS 12 is preloaded by path for CTranslate2.
+DEP002 = ["torchaudio", "nvidia-cublas-cu12"]
+
 [build-system]
 requires = ["uv_build>=0.13,<0.14"]
 build-backend = "uv_build"

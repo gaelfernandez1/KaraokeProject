@@ -95,14 +95,35 @@ def test_wrap_prefers_break_after_comma() -> None:
 
 
 def test_wrap_shrinks_when_two_rows_do_not_fit() -> None:
-    rows, scale = wrap(["a" * 20, "b" * 20, "c" * 20], 75, 900, 2, MONO)
+    rows, scale = wrap(["a" * 18, "b" * 18, "c" * 18], 75, 900, 2, MONO)
 
     assert rows == [[0], [1, 2]]
-    assert scale == 0.6
+    assert scale == pytest.approx(900 / (37 * 37.5))
 
 
 def test_wrap_shrinks_a_single_long_word() -> None:
     assert wrap(["a" * 30], 75, 900, 2, MONO) == ([[0]], 0.8)
+
+
+def test_a_line_too_long_for_two_rows_takes_more_rather_than_being_cut() -> None:
+    # Rap lines from lyrics sites on a phone held upright: two rows would not fit even shrunk.
+    rows, scale = wrap(["a" * 20, "b" * 20, "c" * 20], 75, 900, 2, MONO)
+    assert rows == [[0], [1], [2]]
+    assert scale == 1.0
+    rows, scale = wrap(["a" * 20, "b" * 20, "c" * 20, "d" * 20], 75, 900, 2, MONO)
+    assert rows == [[0], [1], [2], [3]]
+
+
+def test_text_always_fits_the_screen() -> None:
+    # One word wider than the screen even at the smallest size: it shrinks further to fit.
+    rows, scale = wrap(["a" * 60], 75, 900, 2, MONO)
+    assert rows == [[0]]
+    assert 60 * 37.5 * scale == pytest.approx(900)
+    # And with more words than rows to give, the rows still fit.
+    words = ["a" * 30] * 5
+    rows, scale = wrap(words, 75, 900, 2, MONO)
+    widest = max(MONO.width(" ".join(words[i] for i in row), 75) for row in rows)
+    assert widest * scale <= 900 + 1e-6
 
 
 def test_wrap_keeps_one_row_when_max_rows_is_one() -> None:
@@ -309,7 +330,10 @@ def test_scroll_offsets_put_the_focus_line_on_the_anchor() -> None:
 def test_scroll_groups_show_while_within_reach_of_the_focus() -> None:
     layout = _layout(*SCROLL_LINES, theme=_scroll_theme())
 
-    assert [g.show for g in layout.groups] == pytest.approx([0, 0, 0, 11.85])
+    # The first lines come in like a page does, `lead_in` before singing starts: a long intro
+    # leaves the screen to the title card (video export) instead of the lyrics list.
+    first = 10 - _scroll_theme().animation.lead_in
+    assert [g.show for g in layout.groups] == pytest.approx([first, first, first, 11.85])
     assert [g.hide for g in layout.groups] == pytest.approx([14.25, 16.8, 27.8, 27.8])
 
 

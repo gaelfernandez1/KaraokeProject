@@ -160,15 +160,15 @@
 		{#if joined}<p class="me">{joined.guest.name}</p>{/if}
 	</header>
 
-	{#if exists === false}
+	{#if exists === false || connection?.ended}
 		<main class="panel">
-			<p class="message">{t.unknownCode}</p>
+			<p class="message">{connection?.ended ? t.ended : t.unknownCode}</p>
 			<form
 				class="other"
 				onsubmit={(e) => {
 					e.preventDefault();
 					if (otherCode.trim())
-						goto(resolve('/festa/[code]', { code: otherCode.trim().toUpperCase() }));
+						void goto(resolve('/festa/[code]', { code: otherCode.trim().toUpperCase() }));
 				}}
 			>
 				<label for="other-code">{t.otherCode}</label>

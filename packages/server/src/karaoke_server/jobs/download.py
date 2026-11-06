@@ -78,7 +78,7 @@ class YtDlp:
     async def download(
         self, url: str, dest: Path, on_progress: Callable[[float], None], parts: int = 1
     ) -> Path:
-        dest.mkdir(parents=True, exist_ok=True)
+        dest.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240 - metadata only
         args = [
             *self.command,
             "--no-playlist",

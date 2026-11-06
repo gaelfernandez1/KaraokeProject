@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+	preferPlayback,
 	AudioEngine,
 	AudioStalledError,
 	MAX_SEMITONES,
@@ -65,8 +66,17 @@ class FakeContext {
 	destination = new FakeNode();
 	sources: FakeSource[] = [];
 	gains: FakeGain[] = [];
+	#listeners: (() => void)[] = [];
 	async resume() {
 		this.state = 'running';
+	}
+	addEventListener(type: string, listener: () => void) {
+		if (type === 'statechange') this.#listeners.push(listener);
+	}
+	/** What a phone call or the lock screen does to the context on a phone. */
+	interrupt(state = 'interrupted') {
+		this.state = state;
+		for (const listener of this.#listeners) listener();
 	}
 	createGain() {
 		const gain = new FakeGain();
@@ -119,6 +129,22 @@ describe('a browser that will not start the sound', () => {
 		} finally {
 			vi.useRealTimers();
 		}
+	});
+});
+
+describe('the system taking the sound away', () => {
+	it('pauses when a call or the lock screen interrupts the audio', async () => {
+		await engine.play();
+		context.interrupt();
+		expect(engine.playing).toBe(false);
+		expect(playing()).toHaveLength(0);
+	});
+
+	it('asks a phone to play even with the silent switch on', () => {
+		const phone = { audioSession: { type: 'auto' } };
+		preferPlayback(phone);
+		expect(phone.audioSession.type).toBe('playback');
+		expect(() => preferPlayback({})).not.toThrow();
 	});
 });
 

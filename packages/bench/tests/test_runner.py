@@ -50,6 +50,27 @@ def test_run_lyrics_mode_with_smoke_pipeline(paths: BenchPaths) -> None:
     assert (paths.runs / out.name / "demo.json").is_file()
 
 
+def test_asr_wer_is_measured_against_what_is_sung(paths: BenchPaths, tmp_path: Path) -> None:
+    from karaoke_bench.reference import load_reference
+
+    song_dir = paths.data / "private" / "demo"
+    sung = load_reference(song_dir / "reference.json").lyrics_text()
+    # Lyrics as a web page writes them: a header and a line that is not sung.
+    (song_dir / "lyrics.txt").write_text(f"[Estribillo]\n{sung}\nunha liña que non se canta\n")
+    words = " ".join(sung.split())
+    pipeline = _pipeline(
+        tmp_path,
+        'target = "karaoke_bench.fakes:EvenSplitAligner"',
+        '[steps.transcriber]\ntarget = "karaoke_bench.fakes:FixedTranscriber"\n'
+        f'params = {{ text = "{words}" }}',
+    )
+
+    out = run(RunOptions(pipeline, "private", "asr"), paths)
+
+    [song] = load_results(out / "results.json").songs
+    assert song.wer == 0.0
+
+
 def test_run_asr_mode_reports_wer_and_language(paths: BenchPaths, tmp_path: Path) -> None:
     pipeline = _pipeline(
         tmp_path,
@@ -84,6 +105,11 @@ def test_failing_song_is_reported_not_fatal(
     assert by_id["bad-song"].error is not None
     assert by_id["demo"].timing is not None
     assert results.summary["all"].failed == 1
+    # The failed song's words count as words nobody placed: a pipeline that fails on the hard
+    # songs must not look better than one that tries them.
+    summary_timing = results.summary["all"].timing
+    assert summary_timing is not None
+    assert summary_timing.coverage == pytest.approx(0.5, abs=0.05)
 
 
 def test_mismatched_line_count_marks_error(paths: BenchPaths, tmp_path: Path) -> None:

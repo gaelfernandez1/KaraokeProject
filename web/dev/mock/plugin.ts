@@ -255,11 +255,15 @@ export function mockApi(options: MockOptions = {}): Plugin {
 						const ok = (done: unknown) =>
 							done ? send(res, 204) : send(res, 403, { detail: 'Not allowed' });
 						if (parts.length === 2 && method === 'GET') return send(res, 200, state);
+						if (parts.length === 2 && method === 'DELETE') return ok(parties.end(code, who));
 						switch (`${method} ${parts[2]}`) {
 							case 'GET events': {
 								const unsubscribe: (() => void)[] = [];
 								const emit = openStream(req, res, () => unsubscribe.forEach((stop) => stop()));
-								const stop = parties.subscribe(code, who || null, emit);
+								const stop = parties.subscribe(code, who || null, (event, data) => {
+									emit(event, data);
+									if (event === 'ended') res.end();
+								});
 								if (stop) unsubscribe.push(stop);
 								return;
 							}

@@ -16,7 +16,7 @@ import type { Library } from './library.ts';
 const CODE_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ';
 const MAX_NAME = 24;
 
-type Listener = (event: 'state' | 'command', data: unknown) => void;
+type Listener = (event: 'state' | 'command' | 'ended', data: unknown) => void;
 
 interface Room {
 	state: PartyState;
@@ -193,6 +193,16 @@ export class Parties {
 		room.listeners.add(entry);
 		listener('state', room.state);
 		return () => room.listeners.delete(entry);
+	}
+
+	/** The host ends the party: every phone is told and it is forgotten. */
+	end(code: string, who: string): boolean {
+		const room = this.#rooms.get(code.toUpperCase());
+		if (!room || room.hostToken !== who) return false;
+		this.#rooms.delete(room.state.code);
+		for (const { listener } of room.listeners) listener('ended', room.state);
+		room.listeners.clear();
+		return true;
 	}
 
 	isHost(code: string, who: string): boolean {

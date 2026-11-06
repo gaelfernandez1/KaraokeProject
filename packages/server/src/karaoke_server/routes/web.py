@@ -19,7 +19,7 @@ _NOT_BUILT = """<!doctype html><meta charset="utf-8"><title>Karaoke</title>
 <p>The web app is not built yet. Run <code>pnpm --dir web build</code> and reload.</p>"""
 
 
-@router.get("/{path:path}", include_in_schema=False)
+@router.api_route("/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
 async def web(path: str, request: Request) -> Response:
     if path == "api" or path.startswith(("api/", "media/")):
         raise ApiError(404, "not_found", "Not found")

@@ -21,12 +21,15 @@ ENGINE_STAGE = {
 
 # Stage → (fixed seconds, seconds per second of song), measured with the server on the
 # RTX 3050 (bench/results/2026-11-05-c8-servidor). Downloads go by yt-dlp's own percentage.
+# "audio" is only the wait for the package audio, which is made during the alignment since
+# bench/results/2026-11-06-c9-calidad (4 to 5 s left for a 287 s song); the alignment shares the
+# CPU with it meanwhile (12 to 14 s).
 DEFAULTS: dict[str, tuple[float, float]] = {
     "download": (5.0, 0.06),
     "separate": (4.0, 0.22),
     "transcribe": (8.0, 0.05),
-    "align": (2.0, 0.033),
-    "audio": (3.0, 0.1),
+    "align": (2.0, 0.038),
+    "audio": (1.0, 0.013),
     "video": (5.0, 0.085),
 }
 TIME_BASED = ("separate", "transcribe", "align", "audio", "video")

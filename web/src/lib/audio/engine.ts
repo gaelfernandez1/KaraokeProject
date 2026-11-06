@@ -68,6 +68,19 @@ const fetchArrayBuffer = async (url: string): Promise<ArrayBuffer> => {
 	return response.arrayBuffer();
 };
 
+/**
+ * On an iPhone, Web Audio counts as "ambient" sound by default, which the silent switch mutes:
+ * the song would play with no sound and nothing to say why. Asking for "playback" (Safari 16.4+)
+ * makes it sound like any music app. Call it before the audio context is created.
+ */
+export function preferPlayback(
+	nav: { audioSession?: { type: string } } = navigator as Navigator & {
+		audioSession?: { type: string };
+	}
+): void {
+	if (nav.audioSession) nav.audioSession.type = 'playback';
+}
+
 // Signalsmith Stretch (MIT): WASM in an AudioWorklet, loaded only when someone changes the key.
 const loadStretch = async (context: AudioContext): Promise<PitchNode> => {
 	const { default: SignalsmithStretch } = await import('signalsmith-stretch');
@@ -113,6 +126,11 @@ export class AudioEngine implements PlaybackClock {
 		this.#vocalGain = context.createGain();
 		this.#vocalGain.connect(this.#master);
 		this.#clock = this.#newClock(0);
+		// A phone call, Siri or the lock screen stops the context under our feet: pause, so the
+		// lyrics, the video and the controls say so instead of freezing on "playing".
+		context.addEventListener('statechange', () => {
+			if (context.state !== 'running') this.pause();
+		});
 	}
 
 	get duration(): number {

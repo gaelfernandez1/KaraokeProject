@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ApiError } from '#lib/api';
 import { PartyConnection } from './connection.svelte';
 import type { PartyCommand, PartyState } from './types';
 
@@ -6,6 +7,7 @@ import type { PartyCommand, PartyState } from './types';
 class FakeSource {
 	readonly url: string;
 	closed = false;
+	readyState = 1;
 	readonly #listeners = new Map<string, ((event: unknown) => void)[]>();
 
 	constructor(url: string) {
@@ -50,10 +52,11 @@ function snapshot(version: number, title = 'Song'): PartyState {
 	};
 }
 
-function connect() {
+function connect(fetchParty: (code: string) => Promise<unknown> = async () => ({})) {
 	const sources: FakeSource[] = [];
 	const commands: PartyCommand[] = [];
 	const connection = new PartyConnection('bcdf', 'tok', {
+		fetchParty,
 		createSource: (url) => {
 			const source = new FakeSource(url);
 			sources.push(source);
@@ -66,6 +69,31 @@ function connect() {
 }
 
 describe('PartyConnection', () => {
+	it('knows when the TV ends the party, and stops listening', () => {
+		const { connection, source } = connect();
+		source.emit('state', snapshot(3));
+		source.emit('ended', snapshot(3));
+		expect(connection.ended).toBe(true);
+		expect(source.closed).toBe(true);
+	});
+
+	it('takes a party the server no longer has as ended', async () => {
+		const gone = new ApiError(404, 'No such party', 'not_found');
+		const { connection, source } = connect(() => Promise.reject(gone));
+		source.readyState = 2; // the browser gave up: the events URL answered 404
+		source.emit('error');
+		await Promise.resolve();
+		await Promise.resolve();
+		expect(connection.ended).toBe(true);
+	});
+
+	it('keeps waiting while the browser is still reconnecting', async () => {
+		const { connection, source } = connect(() => Promise.reject(new Error('should not ask')));
+		source.emit('error');
+		await Promise.resolve();
+		expect(connection.ended).toBe(false);
+	});
+
 	it('listens to the party events with its token', () => {
 		const { connection, source } = connect();
 		expect(source.url).toBe('/api/parties/BCDF/events?token=tok');

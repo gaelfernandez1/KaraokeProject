@@ -56,3 +56,15 @@ def test_media_refuses_escapes_and_hidden_files(
 def test_media_needs_a_reader(settings: Settings, make_client: MakeClient) -> None:
     write_package(settings.library_dir / "song")
     assert make_client("remote").get("/media/song/instrumental.wav").status_code == 403
+
+
+def test_media_and_the_app_answer_head_requests(
+    settings: Settings, make_client: MakeClient
+) -> None:
+    folder = write_package(settings.library_dir / "song")
+    (folder / "background.mp4").write_bytes(bytes(1024))
+    client = make_client("home")
+    head = client.head("/media/song/background.mp4")
+    assert head.status_code == 200
+    assert head.headers["content-length"] == "1024"
+    assert client.head("/media/song/karaoke.json").status_code == 200

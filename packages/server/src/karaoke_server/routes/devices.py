@@ -75,7 +75,9 @@ async def pair(body: PairRequest, request: Request, response: Response) -> Devic
     devices = request.app.state.services.devices
     name = body.name or device_name(request.headers.get("user-agent", ""))
     try:
-        paired = devices.pair(body.code, name)
+        who = caller(request)
+        address = request.client.host if request.client else ""
+        paired = devices.pair(body.code, name, client=f"{who.zone}:{address}")
     except PairingLockedError as exc:
         raise ApiError(429, "locked", str(exc)) from exc
     if paired is None:

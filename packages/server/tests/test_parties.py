@@ -205,3 +205,25 @@ def test_guest_limit(parties: Parties) -> None:
         assert parties.join(code, f"Guest {n}") is not None
     assert parties.join(code, "One too many") is None
     assert parties.join(code, "guest 3") is not None
+
+
+def test_ending_a_party_tells_everyone_and_forgets_it(parties: Parties, db: Database) -> None:
+    created = parties.create()
+    events: list[str] = []
+    parties.subscribe(created.code, None, lambda event, data: events.append(event))
+    joined = parties.join(created.code, "Ana")
+    assert joined
+    assert not parties.end(created.code, joined.token)  # only the TV ends it
+    assert parties.end(created.code, created.host_token)
+    assert events[-1] == "ended"
+    assert parties.get(created.code) is None
+    assert db.query("SELECT code FROM parties") == []
+
+
+def test_an_expired_party_tells_its_phones(parties: Parties, clock: Clock) -> None:
+    created = parties.create()
+    events: list[str] = []
+    parties.subscribe(created.code, None, lambda event, data: events.append(event))
+    clock.t += 25 * 3600
+    parties.expire()
+    assert events[-1] == "ended"

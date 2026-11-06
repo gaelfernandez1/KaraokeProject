@@ -29,13 +29,25 @@ def h264_encoders(quality: int) -> list[list[str]]:
 def run_encoder(
     head: list[str], encoders: list[list[str]], tail: list[str], cwd: Path | None = None
 ) -> list[str]:
-    """Runs `head + encoder + tail` with each encoder until one works; returns the one used."""
+    """Runs `head + encoder + tail` with each encoder until one works; returns the one used.
+
+    The last item of `tail` is the output file: ffmpeg writes it aside and it is moved into place
+    only when the encode works, so a failed export never leaves a broken or empty video behind.
+    """
+    *options, out = tail
+    final = Path(out) if Path(out).is_absolute() else (cwd or Path.cwd()) / out
+    partial = final.with_name(f".{final.stem}.part{final.suffix}")
     error = ""
-    for encoder in encoders:
-        result = subprocess.run(
-            [*head, *encoder, *tail], cwd=cwd, capture_output=True, text=True, check=False
-        )
-        if result.returncode == 0:
-            return encoder
-        error = result.stderr
+    try:
+        for encoder in encoders:
+            result = subprocess.run(
+                [*head, *encoder, *options, str(partial)],
+                cwd=cwd, capture_output=True, text=True, check=False,
+            )  # fmt: skip
+            if result.returncode == 0:
+                partial.replace(final)
+                return encoder
+            error = result.stderr
+    finally:
+        partial.unlink(missing_ok=True)
     raise RuntimeError(f"ffmpeg failed: {error.strip()[-600:]}")

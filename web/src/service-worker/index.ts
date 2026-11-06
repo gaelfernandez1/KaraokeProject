@@ -9,6 +9,7 @@ import { dev, version } from '$app/env';
 import { assets, immutable } from '$app/manifest';
 import { resolve } from '$app/paths';
 import { APP_CACHE_PREFIX, OFFLINE_SONGS_URL, SONGS_CACHE } from '#lib/offline/names.js';
+import { networkOr, within } from '#lib/offline/fallback.js';
 import { rangeResponse } from '#lib/offline/range.js';
 
 const APP_CACHE = APP_CACHE_PREFIX + version;
@@ -25,13 +26,6 @@ const PRECACHED = new Set(
  * unreachable server can take a minute to fail, while at home it answers in milliseconds.
  */
 const NETWORK_TIMEOUT_MS = 4000;
-
-function within<T>(promise: Promise<T>, ms: number): Promise<T> {
-	return new Promise((resolve, reject) => {
-		const timer = setTimeout(() => reject(new Error('The server did not answer in time')), ms);
-		promise.then(resolve, reject).finally(() => clearTimeout(timer));
-	});
-}
 
 /** A copy fit to store: a redirected response cannot answer a navigation, and only the type matters. */
 async function storable(response: Response): Promise<Response> {
@@ -66,11 +60,11 @@ async function cleanUp(): Promise<void> {
 
 /** Network first, so a new version is seen; the cached shell when there is none. */
 async function navigate(request: Request): Promise<Response> {
+	const shell = async () => (await caches.open(APP_CACHE)).match(SHELL);
 	try {
-		return await within(fetch(request), NETWORK_TIMEOUT_MS);
+		return await networkOr(fetch(request), shell, NETWORK_TIMEOUT_MS);
 	} catch {
-		const shell = await (await caches.open(APP_CACHE)).match(SHELL);
-		return shell ?? Response.error();
+		return Response.error();
 	}
 }
 
@@ -97,17 +91,11 @@ async function freshDoc(request: Request, songs: Cache, stored: Response): Promi
 
 /** The server's library; without it, the songs saved on this device. */
 async function songList(request: Request): Promise<Response> {
-	const network = fetch(request);
 	const saved = await (await caches.open(SONGS_CACHE)).match(OFFLINE_SONGS_URL);
-	if (!saved) return network;
-	try {
-		return await within(network, NETWORK_TIMEOUT_MS);
-	} catch {
-		network.catch(() => {
-			// Already answered with the saved list.
-		});
-		return saved;
-	}
+	if (!saved) return fetch(request);
+	// A refusal (an unpaired phone away from home) is shown as such; only a server that is
+	// down or unreachable falls back to the songs saved here.
+	return networkOr(fetch(request), async () => saved, NETWORK_TIMEOUT_MS);
 }
 
 async function fromApp(request: Request): Promise<Response> {

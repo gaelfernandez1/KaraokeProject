@@ -113,3 +113,7 @@ real (biblioteca, subir hasta cantar, vincular un móvil, fiesta con tele y móv
 - C9: `packages/server` entra en ruff, mypy estricto y pytest; las pruebas de navegador contra el
   servidor real son `pnpm --dir web test:e2e:server` (no van en la CI: necesitan el entorno
   completo).
+- Ampliada en `012`: `DELETE /api/parties/{code}` (solo la tele) termina la fiesta y el SSE manda
+  `ended` antes de cerrarse (también al caducar); todos los errores llevan `{detail, code}`; `HEAD`
+  en `/media` y en la app; las unidades de systemd llevan la marca de su biblioteca y se paran las
+  que deja un servidor muerto antes de retomar sus trabajos.

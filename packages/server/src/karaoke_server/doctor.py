@@ -25,7 +25,9 @@ class Check:
 
 def _run(*command: str) -> str:
     try:
-        return subprocess.run(command, capture_output=True, text=True, timeout=20).stdout
+        return subprocess.run(
+            command, capture_output=True, text=True, timeout=20, check=False
+        ).stdout
     except (OSError, subprocess.TimeoutExpired):
         return ""
 

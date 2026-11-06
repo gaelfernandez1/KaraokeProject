@@ -1,7 +1,7 @@
 import { getDoc, mediaUrl } from '#lib/api';
 import type { KaraokeDoc } from '#lib/contracts';
 import { PlayerSession } from '#lib/player/session.svelte.js';
-import { advance, publishPlayback, updateSettings } from './client';
+import { advance, endParty, publishPlayback, updateSettings } from './client';
 import { PartyConnection } from './connection.svelte';
 import { nowPlaying, upcoming } from './rotation';
 import type { PartyCommand, PartyCreated, QueueItem } from './types';
@@ -10,6 +10,8 @@ import type { PartyCommand, PartyCreated, QueueItem } from './types';
 export const COUNTDOWN = 10;
 /** How often the TV tells the phones where the song is, besides every change. */
 const PUBLISH_EVERY = 5000;
+/** A song whose sound stops (the output sleeps, the browser refuses it) is skipped after this. */
+export const ERROR_GRACE_MS = 8000;
 
 export type HostPhase = 'lobby' | 'countdown' | 'singing';
 
@@ -45,6 +47,10 @@ export class HostParty {
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
 	readonly #ended = new Set<string>();
 	#starting = false;
+	/** Whether the announced song is loaded (or failed to): only then can it start. */
+	#loaded = false;
+	/** When the sound of the song being sung failed, to skip it after ERROR_GRACE_MS. */
+	#errorSince: number | null = null;
 
 	constructor(created: PartyCreated, options: HostOptions) {
 		this.code = created.code;
@@ -71,6 +77,13 @@ export class HostParty {
 			void this.#finish('done');
 			return;
 		}
+		if (this.phase === 'singing' && this.session.state === 'error') {
+			this.#errorSince ??= now;
+			if (now - this.#errorSince > ERROR_GRACE_MS) {
+				void this.#finish('skipped');
+				return;
+			}
+		} else this.#errorSince = null;
 		if (this.phase === 'lobby' && !this.#busy && this.state) {
 			// A song left playing (the TV was reloaded) comes back first.
 			const playing = nowPlaying(this.state);
@@ -96,6 +109,15 @@ export class HostParty {
 		await updateSettings(this.code, this.#token, { guests_control: allowed });
 	}
 
+	/**
+	 * Ends the party for everyone: the phones are told and stop following it. If the server
+	 * cannot be reached, they find out when it forgets the party.
+	 */
+	async end(): Promise<void> {
+		this.stop();
+		await endParty(this.code, this.#token).catch(() => {});
+	}
+
 	stop(): void {
 		this.#clearTimer();
 		this.connection.close();
@@ -107,6 +129,7 @@ export class HostParty {
 		this.#busy = true;
 		this.current = item;
 		this.doc = null;
+		this.#loaded = false;
 		this.phase = 'countdown';
 		this.countdown = COUNTDOWN;
 		this.#clearTimer();
@@ -126,6 +149,7 @@ export class HostParty {
 				},
 				this.#device
 			);
+			if (generation === this.#generation) this.#loaded = true;
 		} catch {
 			// A song that cannot be loaded is skipped rather than blocking the party.
 			if (generation === this.#generation) await this.#finish('skipped');
@@ -139,8 +163,8 @@ export class HostParty {
 		const generation = this.#generation;
 		this.#starting = true;
 		try {
-			// Wait for the audio if the countdown was cut short.
-			while (this.session.state === 'loading' && generation === this.#generation) {
+			// Wait for the song (its lyrics, then its audio) if the countdown was cut short.
+			while (!this.#loaded && generation === this.#generation) {
 				await new Promise((r) => setTimeout(r, 100));
 			}
 			// Skipped (or another song announced) while it loaded.
