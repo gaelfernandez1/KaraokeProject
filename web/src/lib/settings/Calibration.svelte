@@ -10,7 +10,7 @@
 		estimateLatency,
 		manualOffset
 	} from '#lib/audio/calibration.js';
-	import { resumeWithin } from '#lib/audio/engine.js';
+	import { preferPlayback, resumeWithin } from '#lib/audio/engine.js';
 	import { i18n } from '#lib/i18n';
 	import Button from '#lib/ui/Button.svelte';
 
@@ -49,6 +49,7 @@
 	}
 
 	async function start() {
+		if (!context) preferPlayback();
 		context ??= new AudioContext();
 		try {
 			await resumeWithin(context);
@@ -63,8 +64,10 @@
 		tapCount = 0;
 		phase = 'running';
 		const last = clicks[clicks.length - 1];
-		setTimeout(finish, (last - context.currentTime + CLICK_INTERVAL) * 1000);
+		timer = setTimeout(finish, (last - context.currentTime + CLICK_INTERVAL) * 1000);
 	}
+
+	let timer: ReturnType<typeof setTimeout> | null = null;
 
 	function tap(event?: PointerEvent) {
 		if (phase !== 'running' || !context) return;
@@ -107,7 +110,11 @@
 		}
 	}
 
-	$effect(() => () => void context?.close());
+	// Leaving mid-way stops it: a calibration nobody finished is not saved.
+	$effect(() => () => {
+		if (timer) clearTimeout(timer);
+		void context?.close();
+	});
 </script>
 
 <svelte:window onkeydown={onKey} />

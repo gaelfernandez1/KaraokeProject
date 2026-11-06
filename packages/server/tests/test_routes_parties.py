@@ -142,3 +142,19 @@ def test_sse_unsubscribes_when_the_client_goes(make_client: MakeClient) -> None:
 
 def test_sse_for_a_missing_party_is_404(make_client: MakeClient) -> None:
     assert make_client("local").get("/api/parties/ZZZZ/events").status_code == 404
+
+
+def test_ending_the_party_closes_the_phones_streams(make_client: MakeClient) -> None:
+    app = _app(make_client)
+    with live_server(app) as base, httpx.Client(base_url=base, timeout=10) as http:
+        created = http.post("/api/parties").json()
+        code, host = created["code"], created["host_token"]
+        with http.stream("GET", f"/api/parties/{code}/events") as stream:
+            lines = stream.iter_lines()
+            read_events(lines, 1)
+            assert http.delete(f"/api/parties/{code}").status_code == 403  # not the TV
+            ended = http.delete(f"/api/parties/{code}", headers={"Authorization": f"Bearer {host}"})
+            assert ended.status_code == 204
+            assert read_events(lines, 1)[0][0] == "ended"
+            assert list(lines) == [] or all(not line.startswith("data") for line in lines)
+        assert http.get(f"/api/parties/{code}").status_code == 404

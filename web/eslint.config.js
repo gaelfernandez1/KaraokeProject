@@ -7,6 +7,11 @@ import globals from 'globals';
 import ts from 'typescript-eslint';
 
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
+const typedRules = Object.fromEntries(
+	ts.configs.recommendedTypeCheckedOnly
+		.flatMap((config) => Object.entries(config.rules ?? {}))
+		.filter(([name]) => name.startsWith('@typescript-eslint/'))
+);
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
@@ -35,8 +40,40 @@ export default defineConfig(
 		}
 	},
 	{
-		// Override or add rule settings here, such as:
-		// 'svelte/button-has-type': 'error'
-		rules: {}
+		// The app itself (what ships to phones and TVs) also gets the rules that need types:
+		// promises nobody awaits and `any` flowing out of JSON. (no-unnecessary-condition was tried:
+		// it only flagged feature detection and guards for older packages, which must stay.)
+		files: ['src/**/*.ts', 'src/**/*.svelte'],
+		languageOptions: {
+			parserOptions: {
+				projectService: true,
+				extraFileExtensions: ['.svelte'],
+				parser: ts.parser,
+				tsconfigRootDir: import.meta.dirname
+			}
+		},
+		rules: {
+			// Only the typed rules: the configs also set the TS parser, which would replace Svelte's.
+			...typedRules,
+			// An async function without await is often an interface (a store, a fake): not a bug.
+			'@typescript-eslint/require-await': 'off'
+		}
+	},
+	{
+		// Svelte's template expressions reach the type checker as `any` (event handlers, bindings):
+		// the unsafe-any rules only see that gap there.
+		files: ['src/**/*.svelte'],
+		rules: {
+			'@typescript-eslint/no-unsafe-argument': 'off',
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-call': 'off',
+			'@typescript-eslint/no-unsafe-member-access': 'off',
+			'@typescript-eslint/no-unsafe-return': 'off'
+		}
+	},
+	{
+		// Generated from the OpenAPI and JSON Schemas.
+		files: ['src/lib/*/generated/**'],
+		extends: [ts.configs.disableTypeChecked]
 	}
 );

@@ -226,3 +226,29 @@ def test_temperatures_reach_whisper(tmp_path: Path) -> None:
     )
 
     assert whisper.calls[0]["temperature"] == [0.0, 0.5]
+
+
+def test_segmenter_keeps_names_that_look_like_repeat_marks() -> None:
+    from karaoke_engine.steps import Transcript, TranscriptSegment
+    from karaoke_engine.transcribe import LineSegmenter
+
+    transcript = Transcript(
+        language="gl",
+        segments=(TranscriptSegment(0.0, 2.0, "Baixo do BMW X6 x2"),),
+    )
+
+    assert LineSegmenter().segment(transcript) == ["Baixo do BMW X6"]
+
+
+def test_a_transcriber_killed_for_memory_is_an_error_not_a_hang(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from karaoke_engine.transcribe import transcribe_in_child
+
+    # The child process imports the stand-in by name, as it would the real worker.
+    monkeypatch.syspath_prepend(str(Path(__file__).parent))
+    import child_crash
+
+    # A MemoryError: the server reports it as "out of memory" and tries once more.
+    with pytest.raises(MemoryError, match="out of memory"):
+        transcribe_in_child(tmp_path / "vocals.wav", "gl", work=child_crash.die)

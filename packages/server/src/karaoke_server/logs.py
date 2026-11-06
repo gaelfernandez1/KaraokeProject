@@ -3,6 +3,7 @@
 import json
 import logging
 import logging.handlers
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -11,6 +12,21 @@ from typing import Any
 _STANDARD = set(vars(logging.makeLogRecord({}))) | {"message", "asctime", "taskName"}
 # Names of the handlers set up here, so setting up again replaces them instead of adding more.
 _OURS = ("karaoke-file", "karaoke-console")
+
+
+_SECRET = re.compile(r"\b(token|code)=[^&\s\"]+")
+
+
+class RedactSecrets(logging.Filter):
+    """Party tokens and pairing codes travel in URLs (EventSource cannot send headers): the
+    access log keeps the request, not them."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if isinstance(record.args, tuple):
+            record.args = tuple(
+                _SECRET.sub(r"\1=…", arg) if isinstance(arg, str) else arg for arg in record.args
+            )
+        return True
 
 
 class JsonFormatter(logging.Formatter):
@@ -47,5 +63,8 @@ def setup_logging(logs_dir: Path, verbose: bool = False) -> None:
     root.addHandler(to_file)
     root.addHandler(console)
     root.setLevel(logging.DEBUG if verbose else logging.INFO)
+    access = logging.getLogger("uvicorn.access")
+    if not any(isinstance(f, RedactSecrets) for f in access.filters):
+        access.addFilter(RedactSecrets())
     # It tells about every part of every upload.
     logging.getLogger("python_multipart").setLevel(logging.WARNING)

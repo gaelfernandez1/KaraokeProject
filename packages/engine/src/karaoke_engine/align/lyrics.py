@@ -8,13 +8,20 @@ lines and keeps each line's text exactly as written, for display.
 
 import re
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
-_HEADER = re.compile(r"^\[([^\]]*)\]$")
-_REPEAT = r"(?:[x\u00d7]\s?(\d+)|\(\s*[x\u00d7]\s?(\d+)\s*\)|\(\s*bis\s*\))"
-_TRAILING_REPEAT = re.compile(rf"\s+{_REPEAT}\s*$", re.IGNORECASE)
+# Repeat marks: "x2", "\u00d73" and "2x" (as Portuguese and Galician sites write it), 2 to 9 times.
+_N = r"([2-9])"
+_MARK = rf"(?:[x\u00d7]\s?{_N}|{_N}\s?[x\u00d7])"
+_ANY_CASE_MARK = rf"(?:[xX\u00d7]\s?{_N}|{_N}\s?[xX\u00d7])"
+_PAREN_MARK = rf"\(\s*(?:{_ANY_CASE_MARK}|(?i:bis))\s*\)"
+# After a sung word only a lowercase mark counts: "BMW X6" is a name, not "six times".
+_TRAILING_REPEAT = re.compile(rf"\s+(?:{_MARK}|{_PAREN_MARK})\s*$")
 # A bare "bis" only counts alone on its line: at the end of a sung line it may be a word.
-_ONLY_REPEAT = re.compile(rf"^(?:{_REPEAT}|bis)$", re.IGNORECASE)
+_ONLY_REPEAT = re.compile(rf"^(?:{_ANY_CASE_MARK}|{_PAREN_MARK}|(?i:bis))$")
+# A section label, with an optional repeat mark inside ("[Coro x2]") or after it ("[Coro] x2").
+_HEADER = re.compile(rf"^\[([^\]]*)\]\s*(?:{_ANY_CASE_MARK}|{_PAREN_MARK})?$")
+_LABEL_REPEAT = re.compile(rf"\s+(?:{_ANY_CASE_MARK}|{_PAREN_MARK})\s*$")
 # Zero-width characters and stray byte order marks that web pages leave in copied text.
 _INVISIBLE = re.compile("[\u200b-\u200d\u2060\ufeff]")
 _PARENS = re.compile(r"\(([^()]*)\)")
@@ -44,11 +51,16 @@ def parse_lyrics(text: str) -> list[LyricLine]:
     stanza: list[LyricLine] = []
     # A repeat mark alone after a blank line repeats the stanza before the blank.
     previous: list[LyricLine] = []
-    for raw in _INVISIBLE.sub("", text).splitlines():
+    # Composed accents: "í" typed as "i" plus a mark looks the same and is matched as one letter.
+    text = unicodedata.normalize("NFC", _INVISIBLE.sub("", text))
+    for raw in text.splitlines():
         row = raw.strip()
         header = _HEADER.match(row)
         if header:
-            sections.append(_header_section(header.group(1)))
+            section = _header_section(header.group(1))
+            if row[header.end(1) + 1 :].strip():  # "[Estribillo] x2"
+                section.repeat *= _count(header, skip=1)
+            sections.append(section)
             stanza, previous = [], []
             continue
         if not row:
@@ -77,7 +89,7 @@ def parse_lyrics(text: str) -> list[LyricLine]:
 
 def _header_section(label: str) -> _Section:
     repeat = 1
-    trailing = _TRAILING_REPEAT.search(label)
+    trailing = _LABEL_REPEAT.search(label)
     if trailing:
         repeat = _count(trailing)
         label = label[: trailing.start()]
@@ -113,14 +125,17 @@ def _expand(sections: list[_Section]) -> list[LyricLine]:
         key = (section.name or "").casefold()
         if not lines and key in seen:
             lines = seen[key]
+            # Named again, maybe by someone else: "[Estribillo: Uxía]".
+            if section.singer:
+                lines = [replace(line, singer=section.singer) for line in lines]
         elif lines and key:
             seen[key] = lines
         out += lines * section.repeat
     return out
 
 
-def _count(match: re.Match[str]) -> int:
-    number = next((group for group in match.groups() if group), None)
+def _count(match: re.Match[str], skip: int = 0) -> int:
+    number = next((group for group in match.groups()[skip:] if group), None)
     return int(number) if number else 2
 
 

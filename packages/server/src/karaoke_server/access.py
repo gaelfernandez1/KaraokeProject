@@ -47,6 +47,8 @@ _HOME_NETWORKS = [ipaddress.ip_network(n) for n in _HOME.split()]
 CODE_LETTERS = "BCDFGHJKLMNPQRSTVWXZ"
 PAIRING_SECONDS = 600
 MAX_FAILURES = 10
+# From all clients together: a code has about 35 bits, so this still makes guessing hopeless.
+MAX_FAILURES_ALL = 100
 COOKIE = "karaoke_device"
 
 
@@ -96,7 +98,7 @@ def _loopback_name(host: str | None) -> bool:
 def wsl_networking_mode() -> str | None:
     try:
         result = subprocess.run(
-            ["wslinfo", "--networking-mode"], capture_output=True, text=True, timeout=5
+            ["wslinfo", "--networking-mode"], capture_output=True, text=True, timeout=5, check=False
         )
     except (OSError, subprocess.TimeoutExpired):
         return None
@@ -139,7 +141,8 @@ class Devices:
     def __init__(self, db: Database, now: Callable[[], float] = time.time) -> None:
         self.db = db
         self.now = now
-        self._failures: list[float] = []
+        # Wrong codes per client: one phone guessing locks itself out, not the owner.
+        self._failures: dict[str, list[float]] = {}
 
     def start_pairing(self) -> Pairing:
         """A code for one device to pair with (stored, so `karaoke-server pair` works too)."""
@@ -149,18 +152,29 @@ class Devices:
         self.db.execute("INSERT INTO pairings (code, expires_at) VALUES (?, ?)", (code, expires))
         return Pairing(code, expires)
 
-    def pair(self, code: str, name: str) -> tuple[Device, str] | None:
-        """Exchanges a pairing code for a device and its token (the only time it is seen)."""
+    def pair(self, code: str, name: str, client: str = "") -> tuple[Device, str] | None:
+        """Exchanges a pairing code for a device and its token (the only time it is seen).
+
+        `client` says who is asking (zone and address): too many wrong codes lock that client
+        out for a while, and the whole server only after many more (MAX_FAILURES_ALL).
+        """
         now = self.now()
-        self._failures = [t for t in self._failures if t > now - PAIRING_SECONDS]
-        if len(self._failures) >= MAX_FAILURES:
+        recent = now - PAIRING_SECONDS
+        self._failures = {
+            who: kept
+            for who, times in self._failures.items()
+            if (kept := [t for t in times if t > recent])
+        }
+        mine = self._failures.get(client, [])
+        everyone = sum(len(times) for times in self._failures.values())
+        if len(mine) >= MAX_FAILURES or everyone >= MAX_FAILURES_ALL:
             raise PairingLockedError("too many wrong codes; try again in a few minutes")
         clean = re.sub(r"[\s-]", "", code).upper()
         # Taken in one statement, so a code is never used twice.
         if not self.db.execute(
             "DELETE FROM pairings WHERE code = ? AND expires_at > ?", (clean, now)
         ):
-            self._failures.append(now)
+            self._failures.setdefault(client, []).append(now)
             return None
         token = secrets.token_urlsafe(32)
         device = Device(

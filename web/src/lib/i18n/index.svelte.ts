@@ -5,7 +5,6 @@ import type { Locale } from './plural';
 
 export type { Locale } from './plural';
 export type { Messages } from './gl';
-export { plural } from './plural';
 
 export const LOCALES: readonly Locale[] = ['gl', 'es', 'en'];
 /** Each language's name in itself, for the language picker. */

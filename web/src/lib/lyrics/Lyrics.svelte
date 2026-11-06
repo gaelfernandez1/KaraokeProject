@@ -7,6 +7,7 @@
 	 * so seeking and pausing show the right state at once.
 	 */
 	import type { KaraokeDoc, PlaybackClock, Theme } from '#lib/contracts';
+	import { loadFontOnce } from './fontload';
 	import type { Attachment } from 'svelte/attachments';
 	import { fillSegments, fillX, type FillSegment } from './fill';
 	import { buildLayout, type BreakBar, type Dot, type Row } from './layout';
@@ -92,13 +93,10 @@
 	$effect(() => {
 		const face = fontFaceFor(theme);
 		if (!face) return;
-		const font = new FontFace(face.family, `url(${face.url})`);
 		let cancelled = false;
-		font
-			.load()
-			.then((loaded) => {
+		loadFontOnce(face.family, face.url)
+			.then(() => {
 				if (cancelled) return;
-				document.fonts.add(loaded);
 				for (const view of views) measure(view);
 			})
 			.catch(() => {

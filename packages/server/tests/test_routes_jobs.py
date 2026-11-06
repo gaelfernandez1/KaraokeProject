@@ -147,6 +147,9 @@ def test_upload_checks(app, tmp_path: Path) -> None:  # type: ignore[no-untyped-
         assert post(picture).json()["code"] == "no_audio"
         assert post(long_song).json()["code"] == "too_long"
         assert post(long_song, language="Galego").json()["code"] == "bad_language"
+        # The three-letter code would lose every Galician model: refused at once, not after
+        # waiting for the GPU.
+        assert post(long_song, language="glg").json()["code"] == "bad_language"
         assert post(long_song, lyrics="[Estribillo]").json()["code"] == "bad_lyrics"
         assert http.post("/api/jobs", data={"language": "gl"}).json()["code"] == "bad_form"
         assert (
@@ -298,3 +301,31 @@ def test_export_theme_must_be_a_plain_name(make_client: MakeClient, settings: Se
         answer = local.post("/api/songs/song/exports", json={"aspect": "16:9", "theme": theme})
         assert answer.status_code == 422, theme
         assert answer.json()["code"] == "bad_theme"
+
+
+def test_every_error_has_a_code_the_app_can_translate(
+    settings: Settings, make_client: MakeClient
+) -> None:
+    write_package(settings.library_dir / "song")
+    owner = make_client("local")
+    invalid = owner.put("/api/songs/song/doc", json={"duration": -1})
+    assert invalid.status_code == 422
+    assert invalid.json()["code"] == "invalid_request"
+    assert isinstance(invalid.json()["detail"], str)
+    unknown = owner.post("/api/nothing-here")
+    assert unknown.status_code in (404, 405)
+    assert unknown.json()["code"] in ("not_found", "method_not_allowed")
+
+
+def test_a_broken_upload_is_a_clear_error_and_leaves_nothing(
+    app,  # type: ignore[no-untyped-def]
+) -> None:
+    with live_server(app) as base, httpx.Client(base_url=base, timeout=30) as http:
+        broken = http.post(
+            "/api/jobs",
+            content=b"--xyz\r\nContent-Disposition: form-data\r\n\r\nnot closed",
+            headers={"Content-Type": "multipart/form-data; boundary=xyz"},
+        )
+        assert broken.status_code == 400
+        assert broken.json()["code"] == "bad_form"
+    assert list(app.state.services.settings.jobs_dir.iterdir()) == []

@@ -49,6 +49,9 @@ export const es = {
 			engine_failed: 'Algo ha fallado al hacer el karaoke.',
 			interrupted: 'El servidor se paró mientras se hacía.',
 			song_missing: 'La canción ya no está en la biblioteca.',
+			invalid_doc: 'Hay tiempos imposibles en la letra: deshaz el último cambio y guarda de nuevo.',
+			invalid_request: 'El servidor no entendió la petición.',
+			not_found: 'Eso ya no está en el servidor.',
 			not_owner: 'Esto solo se puede hacer desde el portátil o un dispositivo vinculado.',
 			not_paired: 'Este dispositivo no está vinculado con el portátil.'
 		}
@@ -258,6 +261,7 @@ export const es = {
 		join: 'Entrar en la fiesta',
 		yourName: 'Tu nombre',
 		unknownCode: 'No hay ninguna fiesta con ese código.',
+		ended: 'La fiesta ha terminado. ¡Gracias por cantar!',
 		otherCode: 'Código de otra fiesta',
 		go: 'Ir',
 		tabRequest: 'Pedir',

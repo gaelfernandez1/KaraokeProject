@@ -63,6 +63,18 @@ def pair_words(ref_words: Sequence[RefWord], hyp_words: Sequence[Word]) -> list[
     ]
 
 
+def pair_scored(
+    all_ref_words: Sequence[RefWord], scored: Sequence[RefWord], hyp_words: Sequence[Word]
+) -> list[WordPair]:
+    """The pairs of the scored reference words, found against every reference word.
+
+    Pairing only the scored words would let a repeated chorus whose first copy is left out
+    (unsure) match the first copy sung, with an error of a whole chorus.
+    """
+    keep = {id(word) for word in scored}
+    return [pair for pair in pair_words(all_ref_words, hyp_words) if id(pair.ref) in keep]
+
+
 class TimingErrors(BaseModel):
     """Signed errors (prediction minus reference) of the paired words of one song."""
 

@@ -73,7 +73,7 @@
 				if (songId !== id) return;
 				doc = loaded;
 				if (frozenAt !== null) return;
-				session.load(
+				void session.load(
 					{
 						instrumental: mediaUrl(songId, loaded.audio.instrumental),
 						vocals: loaded.audio.vocals ? mediaUrl(songId, loaded.audio.vocals) : null
@@ -112,7 +112,7 @@
 		return setMediaSession(
 			{ title: doc.title, artist: doc.artist, artwork: doc.cover ? mediaUrl(id, doc.cover) : null },
 			{
-				play: () => session.play(),
+				play: () => void session.play(),
 				pause: () => session.pause(),
 				previous: () => jumpLine(-1),
 				next: () => jumpLine(1),
@@ -178,7 +178,7 @@
 				return toggleScreen();
 			case 'exit':
 				if (panelOpen) panelOpen = false;
-				else if (!isFullscreen()) goto(resolve('/'));
+				else if (!isFullscreen()) void goto(resolve('/'));
 		}
 	}
 
@@ -188,7 +188,7 @@
 			wake();
 			return;
 		}
-		if (session.state === 'playing' || session.state === 'paused') session.toggle();
+		if (session.state === 'playing' || session.state === 'paused') void session.toggle();
 		wake();
 	}
 
@@ -237,7 +237,14 @@
 					session.state === 'paused' ||
 					session.state === 'ended'}
 			/>
-			<button class="hit" type="button" tabindex="-1" aria-hidden="true" onpointerup={onStage}
+			<!-- It never takes the focus: a focused button would swallow the player's keys. -->
+			<button
+				class="hit"
+				type="button"
+				tabindex="-1"
+				aria-hidden="true"
+				onpointerdown={(event) => event.preventDefault()}
+				onpointerup={onStage}
 			></button>
 		</div>
 
@@ -286,7 +293,7 @@
 						icon="play"
 						onclick={() => {
 							session.seek(0);
-							session.play();
+							void session.play();
 						}}>{t.again}</Button
 					>
 					<Button href={resolve('/')}>{t.toLibrary}</Button>

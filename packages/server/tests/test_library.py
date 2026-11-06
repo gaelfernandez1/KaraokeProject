@@ -165,6 +165,29 @@ def test_import_copies_a_valid_package(
     assert library.summary(song_id) is not None
 
 
+def test_import_copies_the_package_files_only_never_links(library: Library, tmp_path: Path) -> None:
+    # A package from someone else, with links to the owner's files and extra files: once in the
+    # library, anything with a media extension would be served to every phone at home.
+    secret = tmp_path / "secret.txt"
+    secret.write_text("private", encoding="utf-8")
+    pictures = tmp_path / "Pictures"
+    pictures.mkdir()
+    (pictures / "private.jpg").write_bytes(b"jpg")
+    src = write_package(tmp_path / "pkg", title="Shared")
+    (src / "bonus.mp3").symlink_to(secret)
+    (src / "gallery").symlink_to(pictures, target_is_directory=True)
+    (src / "extra.mp3").write_bytes(b"not referenced")
+    (src / "LICENSE").write_text("CC BY 4.0", encoding="utf-8")
+
+    folder = library.folder(library.import_package(src))
+
+    assert folder is not None
+    names = {p.name for p in folder.iterdir()}
+    assert names.isdisjoint({"bonus.mp3", "gallery", "extra.mp3"})
+    assert {"karaoke.json", "LICENSE"} <= names
+    assert not any(p.is_symlink() for p in folder.rglob("*"))
+
+
 def test_import_rejects_invalid_package(library: Library, tmp_path: Path) -> None:
     src = write_package(tmp_path / "bad")
     (src / "instrumental.wav").unlink()

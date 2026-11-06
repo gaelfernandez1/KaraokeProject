@@ -3,6 +3,7 @@ import pytest
 from karaoke_bench.metrics import (
     TimingErrors,
     line_start_errors,
+    pair_scored,
     pair_words,
     text_errors,
     timing_errors,
@@ -140,3 +141,27 @@ def test_start_within_wide_uses_half_a_second() -> None:
     assert stats is not None
     assert stats.start_within == 0.0
     assert stats.start_within_wide == pytest.approx(0.5)
+
+
+def test_a_perfect_aligner_scores_perfectly_when_a_chorus_repeats() -> None:
+    # The first chorus is left out of the scores (unsure); its repetition is scored. Paired
+    # against the scored words alone, the second chorus would match the first one sung.
+    def ref_line(text: str, start: float, status: str) -> RefLine:
+        words = [
+            RefWord(text=w, start=start + i, end=start + i + 0.5)
+            for i, w in enumerate(text.split())
+        ]
+        return RefLine(text=text, start=start, end=start + len(words), words=words, status=status)  # type: ignore[arg-type]
+
+    lines = [
+        ref_line("ola mar", 0, "unsure"),
+        ref_line("de vigo", 5, "ok"),
+        ref_line("ola mar", 10, "ok"),
+    ]
+    sung = [Word(text=w.text, start=w.start, end=w.end) for line in lines for w in line.words]
+    scored = [w for line in lines if line.status == "ok" for w in line.words]
+
+    pairs = pair_scored([w for line in lines for w in line.words], scored, sung)
+
+    assert len(pairs) == 4
+    assert all(pair.hyp_start == pair.ref.start for pair in pairs)

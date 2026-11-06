@@ -418,6 +418,40 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "parties"
+        ],
+        "summary": "End Party",
+        "description": "Only the TV (the host token) ends its party; the phones are told and their streams end.",
+        "operationId": "end_party_api_parties__code__delete",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/parties/{code}/events": {
@@ -426,7 +460,7 @@
           "parties"
         ],
         "summary": "Party Events",
-        "description": "The full state at once and after every change; commands go to the TV only.",
+        "description": "The full state at once and after every change; commands go to the TV only; `ended`\nwhen the TV ends the party (or it expires), and then the stream closes.",
         "operationId": "party_events_api_parties__code__events_get",
         "parameters": [
           {

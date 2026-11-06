@@ -39,7 +39,7 @@
 	}
 
 	$effect(() => {
-		owner.refresh().then(loadDevices);
+		void owner.refresh().then(loadDevices);
 	});
 
 	async function newPairing() {

@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -26,7 +27,8 @@ from karaoke_engine.steps import Transcript, TranscriptSegment
 CACHE = Path.home() / ".cache" / "karaoke" / "models" / "ct2"
 _NOTE_BRACKETS = re.compile(r"\[[^\]]*\]|[♪♫]")
 _NOTE_WORD = re.compile(r"\(\s*[^()\s]+\s*\)")
-_REPEAT_MARK = re.compile(r"^[x\u00d7]\d+$", re.IGNORECASE)
+# What the lyrics parser reads as a repeat mark after a word (lowercase: "BMW X6" is a name).
+_REPEAT_MARK = re.compile(r"^(?:[x\u00d7][2-9]|[2-9][x\u00d7])$")
 _HOP = 0.02
 # A segment needs at least this share of voiced time; Whisper fills silences with stock phrases.
 MIN_VOICE_SHARE = 0.3
@@ -222,17 +224,34 @@ def _sentences(text: str) -> list[str]:
     return out
 
 
-def transcribe_in_child(vocals: Path, language: str) -> tuple[Transcript, str]:
+def transcribe_in_child(
+    vocals: Path,
+    language: str,
+    *,
+    work: Callable[[str, str], tuple[str, list[tuple[float, float, str]], str]] | None = None,
+) -> tuple[Transcript, str]:
     """Transcribes in a fresh process, and says with which model.
 
     CTranslate2 and torch keep their memory in the process that used them: alongside the
     separator and the aligner, a large-v3 pushed `karaoke make` to 5.7 GB of RAM. In a child, its
-    memory goes back to the system as soon as the text is out.
+    memory goes back to the system as soon as the text is out. A child killed on the way (the
+    kernel or the job's memory limit ending it) is an error, never an endless wait.
     """
     import multiprocessing
+    from concurrent.futures import ProcessPoolExecutor
+    from concurrent.futures.process import BrokenProcessPool
 
-    with multiprocessing.get_context("spawn").Pool(1) as pool:
-        found, segments, model = pool.apply(_transcribe_here, (str(vocals), language))
+    context = multiprocessing.get_context("spawn")
+    with ProcessPoolExecutor(max_workers=1, mp_context=context) as pool:
+        try:
+            found, segments, model = pool.submit(
+                work or _transcribe_here, str(vocals), language
+            ).result()
+        except BrokenProcessPool as exc:
+            raise MemoryError(
+                "the transcriber process was killed (out of memory?): close other programs "
+                "or give the lyrics so it is not needed"
+            ) from exc
     return Transcript(found, tuple(TranscriptSegment(*s) for s in segments)), model
 
 
@@ -271,7 +290,7 @@ def prepare(name: str) -> Path:
             f"converting {spec.repo} the first time needs about {CONVERSION_MEMORY_GB:.0f} GB of "
             f"free memory and {free:.1f} GB are free: close other programs and try again"
         )
-    print(f"First use of {spec.repo}: downloading and converting it once.", file=sys.stderr)
+    print(f"First use of {spec.repo}: downloading and converting it once.", file=sys.stderr)  # noqa: T201 - a minutes-long wait the user should know about
     source = _download(spec)
     side = target.with_name(target.name + ".partial")
     shutil.rmtree(side, ignore_errors=True)

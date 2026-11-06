@@ -77,6 +77,6 @@ def _nvml() -> Any | None:
         import pynvml
 
         pynvml.nvmlInit()
-    except Exception:
+    except Exception:  # noqa: BLE001 - NVML is optional: any failure means no GPU figures
         return None
     return pynvml

@@ -133,7 +133,7 @@ def _build_song(paths: BenchPaths, entry: dict[str, Any], version: str, out_dir:
     if not found:
         raise AudioError(source_dir, "no audio; run `karaoke-bench fetch --set jamendo` first")
     audio = load_stereo(found[0], _RATE)
-    rng = random.Random(entry["seed"])
+    rng = random.Random(entry["seed"])  # noqa: S311 - test data, seeded on purpose
     lines = [line.text for line in ref.lines]
     lyrics = "\n".join(lines)
 

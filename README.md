@@ -1,4 +1,4 @@
-> **En reconstrución (plan v3).** O sistema anterior está en [`legacy/`](legacy/) e na etiqueta `v2-final`;
+> **En reconstrución (plan v3).** O sistema anterior está na etiqueta [`v2-final`](https://github.com/gaelfernandez1/KaraokeProject/tree/v2-final);
 > as instrucións de abaixo corresponden a esa versión e deixarán de valer ao longo da reconstrución.
 
 # 🎤 Karaoke con IA - Proxecto TFG - Gael Fernández

@@ -214,10 +214,11 @@
 			return;
 		}
 		saving = true;
+		const sent = doc;
 		try {
-			const stored = await saveDoc(id, doc);
-			history?.reset(stored);
-			saved = stored;
+			const stored = await saveDoc(id, sent);
+			// Edits made while the save was on its way stay, still to be saved.
+			saved = history && !history.settle(sent, stored) ? sent : stored;
 			notice = t.saved;
 		} catch (error) {
 			notice = explain(error, t.saveError, i18n.t);

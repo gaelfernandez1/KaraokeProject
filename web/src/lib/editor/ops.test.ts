@@ -48,7 +48,7 @@ describe('checkDoc', () => {
 	});
 
 	it('describes every broken rule', () => {
-		const broken = structuredClone(DEMO) as KaraokeDoc;
+		const broken = structuredClone<KaraokeDoc>(DEMO);
 		const [l1, l2, l3, l4] = broken.lines;
 		l1.words[1].end = 4.5; // mar: 4.9 → 4.5
 		l1.words[3].parts[0].text = 'Ve'; // Vigo, spelled "Vego,"
@@ -75,7 +75,7 @@ describe('checkDoc', () => {
 	});
 
 	it('tolerates a millisecond, like the contract', () => {
-		const doc = structuredClone(DEMO) as KaraokeDoc;
+		const doc = structuredClone<KaraokeDoc>(DEMO);
 		doc.lines[1].words[0].start = 7.4995; // 0.5 ms before its line
 		doc.lines[3].end = 32.0009;
 		doc.lines[3].words[2].end = 32.0009;
@@ -84,7 +84,7 @@ describe('checkDoc', () => {
 	});
 
 	it('flags lines without words, unknown singers and repeated ids', () => {
-		const doc = structuredClone(DEMO) as KaraokeDoc;
+		const doc = structuredClone<KaraokeDoc>(DEMO);
 		doc.lines[1].id = 'l1';
 		doc.lines[2].singer = 's9';
 		doc.lines[3].words = [];
@@ -120,6 +120,18 @@ describe('setWordText', () => {
 		expect(word(doc, OLA).text).toBe('Hola,');
 		expect(word(doc, OLA).parts).toEqual([]);
 		expect(checkDoc(doc)).toEqual([]);
+	});
+
+	it('keeps accents typed apart and emoji whole when it re-splits', () => {
+		// «Vígo» with the accent as a separate mark (as some keyboards and sites send it) is
+		// stored composed, which looks the same, and the accent stays on its letter.
+		const decomposed = setWordText(DEMO, VIGO, 'Vígo,');
+		expect(word(decomposed, VIGO).text).toBe('Vígo,');
+		expect(word(decomposed, VIGO).parts.map((p) => p.text)).toEqual(['Ví', 'go,']);
+		const emoji = setWordText(DEMO, VIGO, 'Vigo\u{1F44D}\u{1F3FD}');
+		expect(word(emoji, VIGO).parts.map((p) => p.text)).toEqual(['Vi', 'go\u{1F44D}\u{1F3FD}']);
+		expect(checkDoc(decomposed)).toEqual([]);
+		expect(checkDoc(emoji)).toEqual([]);
 	});
 
 	it('re-splits the same letters over the syllables', () => {

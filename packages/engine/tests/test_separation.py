@@ -1,4 +1,3 @@
-import shutil
 import subprocess
 import types
 from pathlib import Path
@@ -41,9 +40,11 @@ def test_roformer_separator_is_a_separator() -> None:
     assert separator.version
 
 
-@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+@pytest.mark.models
+@pytest.mark.usefixtures("ffmpeg")
 def test_roformer_separator_writes_two_stems(tmp_path: Path) -> None:
     torch = pytest.importorskip("torch")
+    pytest.importorskip("audio_separator")
     if not torch.cuda.is_available():
         pytest.skip("needs a CUDA GPU")
     model = "vocals_mel_band_roformer.ckpt"
@@ -132,7 +133,7 @@ def _separate_with_recorder(source: Path, work_dir: Path) -> tuple[Path, int]:
     return recorder.inputs[-1], recorder.sizes[-1]
 
 
-@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+@pytest.mark.usefixtures("ffmpeg")
 def test_separate_decodes_inputs_libsndfile_cannot_open(tmp_path: Path) -> None:
     source = tmp_path / "song.m4a"
     subprocess.run(
@@ -156,7 +157,7 @@ def test_separate_keeps_wav_inputs_as_they_are(tmp_path: Path) -> None:
     assert _separate_with_recorder(source, tmp_path / "work")[0] == source
 
 
-@pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+@pytest.mark.usefixtures("ffmpeg")
 def test_decoded_input_is_not_left_behind(tmp_path: Path) -> None:
     source = tmp_path / "song.m4a"
     subprocess.run(

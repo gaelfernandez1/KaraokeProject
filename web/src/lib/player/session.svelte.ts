@@ -1,5 +1,5 @@
 import type { PlaybackClock } from '#lib/contracts';
-import { AudioEngine, MAX_SEMITONES, type StemUrls } from '#lib/audio/engine.js';
+import { AudioEngine, MAX_SEMITONES, preferPlayback, type StemUrls } from '#lib/audio/engine.js';
 import { BackgroundSync } from '#lib/video/background.js';
 
 /** What the session needs from the audio engine (tests use a fake). */
@@ -72,6 +72,7 @@ export class PlayerSession {
 			options.createEngine ??
 			(() => {
 				// One audio context for the whole session (browsers allow only a few), closed at the end.
+				preferPlayback();
 				this.#context = new AudioContext();
 				return new AudioEngine(this.#context);
 			});
@@ -105,6 +106,9 @@ export class PlayerSession {
 		this.state = 'loading';
 		this.error = null;
 		this.#started = false;
+		// A session plays many songs (the party TV): nothing of the last one may carry over.
+		this.#ended = false;
+		this.#stallWatch = null;
 		try {
 			await engine.load(urls);
 		} catch {

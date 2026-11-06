@@ -19,7 +19,6 @@ htmlcov/
 .env
 .env.*
 !.env.example
-!legacy/.env.example
 
 # Media and generated artifacts (songs never go into the repo)
 *.mp4
@@ -29,7 +28,6 @@ htmlcov/
 *.ogg
 *.flac
 *.srt
-!legacy/fixtures/*.srt
 input/
 output/
 separated/

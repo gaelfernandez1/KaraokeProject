@@ -103,3 +103,20 @@ def test_serve_listens_on_both_ports(tmp_path: Path) -> None:
         process.send_signal(signal.SIGINT)
         # uvicorn ends with the signal it was stopped by, as a well-behaved program should.
         assert process.wait(timeout=20) in (0, -signal.SIGINT)
+
+
+def test_a_closed_terminal_stops_the_server_cleanly_unless_nohup_asked_to_ignore_it() -> None:
+    import signal
+
+    from karaoke_server.serve import hang_up_as_terminate
+
+    previous = signal.getsignal(signal.SIGHUP)
+    try:
+        signal.signal(signal.SIGHUP, signal.SIG_IGN)  # nohup
+        hang_up_as_terminate()
+        assert signal.getsignal(signal.SIGHUP) == signal.SIG_IGN
+        signal.signal(signal.SIGHUP, signal.SIG_DFL)
+        hang_up_as_terminate()
+        assert callable(signal.getsignal(signal.SIGHUP))
+    finally:
+        signal.signal(signal.SIGHUP, previous)

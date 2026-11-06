@@ -60,6 +60,27 @@ def slugify(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", folded.lower()).strip("-")[:60].strip("-")
 
 
+def _copy_package(src: Path, doc: KaraokeDoc, dest: Path) -> None:
+    """Copies karaoke.json, the media it names and the licence; nothing else, and never a link.
+
+    A package can come from anyone: a link in it (or any file with a media extension) would be
+    copied into the library and served to every phone at home.
+    """
+    refs = [doc.audio.instrumental, doc.audio.vocals, doc.cover]
+    if doc.video is not None:
+        refs.append(doc.video.background)
+    dest.mkdir(parents=True)
+    shutil.copyfile(src / DOC, dest / DOC)
+    for ref in filter(None, refs):
+        target = dest / ref
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # resolve_media refuses anything outside the package, links included.
+        shutil.copyfile(resolve_media(src, ref), target)
+    licence = src / "LICENSE"
+    if licence.is_file() and not licence.is_symlink():
+        shutil.copyfile(licence, dest / "LICENSE")
+
+
 def iso(timestamp: float) -> str:
     return datetime.fromtimestamp(timestamp, UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -166,8 +187,8 @@ class Library:
             raise InvalidDocError(issues)
         doc = load_doc(src / DOC)
         staging = self.root / f".import-{int(time.time() * 1000)}"
-        shutil.copytree(src, staging, ignore=shutil.ignore_patterns(".*"))
         try:
+            _copy_package(src, doc, staging)
             return self.adopt(staging, doc.title)
         except BaseException:
             shutil.rmtree(staging, ignore_errors=True)

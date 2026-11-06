@@ -86,10 +86,9 @@ class JobStore:
         self.db = db
 
     def add(self, record: JobRecord) -> None:
-        marks = ", ".join("?" for _ in _COLUMNS)
-        self.db.execute(
-            f"INSERT INTO jobs ({', '.join(_COLUMNS)}) VALUES ({marks})", _to_row(record)
-        )
+        columns, marks = ", ".join(_COLUMNS), ", ".join("?" for _ in _COLUMNS)
+        insert = f"INSERT INTO jobs ({columns}) VALUES ({marks})"  # noqa: S608 - names from code
+        self.db.execute(insert, _to_row(record))
 
     def get(self, job_id: str) -> JobRecord | None:
         rows = self.db.query("SELECT * FROM jobs WHERE id = ?", (job_id,))
@@ -103,7 +102,7 @@ class JobStore:
             setattr(record, key, value)
         record.updated_at = iso(time.time())
         sets = ", ".join(f"{name} = ?" for name in _COLUMNS[1:])
-        self.db.execute(f"UPDATE jobs SET {sets} WHERE id = ?", [*_to_row(record)[1:], job_id])
+        self.db.execute(f"UPDATE jobs SET {sets} WHERE id = ?", [*_to_row(record)[1:], job_id])  # noqa: S608 - column names come from code
         return record
 
     def recent(self, limit: int = 50) -> list[JobRecord]:

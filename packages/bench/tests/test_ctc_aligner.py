@@ -18,6 +18,7 @@ def test_default_models_are_pinned() -> None:
     assert all(len(revision) == 40 for _, revision in DEFAULT_MODELS.values())
 
 
+@pytest.mark.models
 @pytest.mark.usefixtures("ffmpeg")
 def test_ctc_aligner_returns_one_line_per_lyric_line() -> None:
     torch = pytest.importorskip("torch")

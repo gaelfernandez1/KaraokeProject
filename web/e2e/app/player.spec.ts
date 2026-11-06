@@ -17,6 +17,19 @@ test('a song plays, pauses and jumps with the keyboard', async ({ page }) => {
 	await expect.poll(() => time(page)).toBeGreaterThan(paused + 4.5);
 });
 
+test('the keyboard still works after clicking the picture', async ({ page }, testInfo) => {
+	test.skip(testInfo.project.name === 'phone', 'phones have no keyboard');
+	await page.goto('/cantar/demo-sintetico');
+	const sing = page.getByRole('button', { name: 'Cantar' });
+	await expect(sing).toBeEnabled({ timeout: 15_000 });
+	await sing.click();
+	await expect(page.locator('.player')).toHaveAttribute('data-state', 'playing');
+	await page.locator('.hit').click(); // pauses
+	await expect(page.locator('.player')).toHaveAttribute('data-state', 'paused');
+	await page.keyboard.press('Space');
+	await expect(page.locator('.player')).toHaveAttribute('data-state', 'playing');
+});
+
 test('the sound panel changes the guide vocals and the lyrics style', async ({ page }) => {
 	await page.goto('/cantar/demo-sintetico');
 	await page.getByRole('button', { name: 'Son' }).click();

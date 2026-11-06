@@ -11,6 +11,8 @@ router = APIRouter(tags=["media"])
 
 
 @router.get("/media/{song_id}/{rel:path}", response_class=Response)
+# HEAD too: some TV players and download managers ask it before the file.
+@router.head("/media/{song_id}/{rel:path}", response_class=Response, include_in_schema=False)
 async def media(
     song_id: str, rel: str, request: Request, who: Reader, download: bool = False
 ) -> Response:

@@ -78,4 +78,22 @@ describe('History', () => {
 		expect(history.canUndo).toBe(false);
 		expect(history.canRedo).toBe(false);
 	});
+
+	it('keeps the edits made while a save was on its way', () => {
+		const history = new History('a');
+		history.push('b');
+		const sent = history.current;
+		history.push('c'); // a nudge while the server answers
+		expect(history.settle(sent, 'b stored')).toBe(false);
+		expect(history.current).toBe('c');
+		expect(history.canUndo).toBe(true);
+	});
+
+	it('starts over from what the server stored when nothing changed meanwhile', () => {
+		const history = new History('a');
+		history.push('b');
+		expect(history.settle('b', 'b stored')).toBe(true);
+		expect(history.current).toBe('b stored');
+		expect(history.canUndo).toBe(false);
+	});
 });

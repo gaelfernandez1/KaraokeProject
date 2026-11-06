@@ -172,7 +172,7 @@ describe('sceneAt in scroll mode', () => {
 	test('lines fade with their distance from the one being sung', () => {
 		const opacities = sceneAt(scroll, 13, 0.25).groups.map((g) => g.opacity);
 
-		expect(opacities).toEqual([0.4, 1, 0.88, 0.76].map((o) => expect.closeTo(o)));
+		expect(opacities).toEqual([0.4, 1, 0.88, 0.76].map((o): unknown => expect.closeTo(o)));
 	});
 
 	test('pages mode does not move', () => {

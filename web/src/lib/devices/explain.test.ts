@@ -9,6 +9,13 @@ describe('explain', () => {
 		expect(explain(error, 'fallo', gl)).toBe(gl.errors.server.too_long);
 	});
 
+	it('explains a correction the server refused, so nobody retries it in vain', () => {
+		const refused = new ApiError(422, 'invalid', 'invalid_doc');
+		expect(explain(refused, 'fallback', gl)).not.toBe('fallback');
+		expect(explain(new ApiError(404, 'gone', 'not_found'), 'fallback', gl)).not.toBe('fallback');
+		expect(explain(new ApiError(422, 'x', 'invalid_request'), 'fallback', gl)).not.toBe('fallback');
+	});
+
 	it('says the server cannot be reached', () => {
 		expect(explain(new ApiError(0, 'network'), 'fallo', gl)).toBe(gl.errors.network);
 	});
