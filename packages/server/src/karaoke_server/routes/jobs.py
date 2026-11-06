@@ -14,7 +14,7 @@ from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from karaoke_engine.align.lyrics import parse_lyrics
 from karaoke_engine.languages import TWO_LETTERS
-from karaoke_engine.subtitles.themes import THEMES_DIR
+from karaoke_engine.subtitles.themes import theme_names
 from karaoke_server.access import Owner, Reader
 from karaoke_server.errors import ApiError
 from karaoke_server.jobs.intake import IntakeError, media_info, receive_form
@@ -25,8 +25,6 @@ from karaoke_server.models import ExportRequest, Job, MakeRequest
 router = APIRouter(tags=["jobs"])
 
 LANGUAGE = re.compile(r"^[a-z]{2,3}$")
-# A theme is a file name in THEMES_DIR: nothing that could walk out of it.
-THEME = re.compile(r"^[a-z0-9][a-z0-9-]{0,39}$")
 LOG_LINES = 200
 
 
@@ -177,7 +175,8 @@ async def job_events(
 
 @router.post("/api/songs/{song_id}/exports", status_code=201)
 async def export_video(song_id: str, body: ExportRequest, request: Request, who: Owner) -> Job:
-    if not THEME.match(body.theme) or not (THEMES_DIR / f"{body.theme}.json").is_file():
+    # One of the installed themes, by name: what the request says never becomes a path.
+    if body.theme not in theme_names():
         raise ApiError(422, "bad_theme", f"There is no lyrics style called {body.theme}")
     job = _queue(request).submit_export(song_id, body)
     if job is None:

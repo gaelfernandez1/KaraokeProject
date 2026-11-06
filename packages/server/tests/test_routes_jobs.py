@@ -297,7 +297,7 @@ async def test_job_events_start_from_the_job_as_it_is_once_subscribed() -> None:
 def test_export_theme_must_be_a_plain_name(make_client: MakeClient, settings: Settings) -> None:
     write_package(settings.library_dir / "song")
     local = make_client("local")
-    for theme in ("../themes/clasico", "clasico/../clasico", "/etc/passwd", ".hidden"):
+    for theme in ("../themes/clasico", "clasico/../clasico", "/etc/passwd", ".hidden", "clasico\n"):
         answer = local.post("/api/songs/song/exports", json={"aspect": "16:9", "theme": theme})
         assert answer.status_code == 422, theme
         assert answer.json()["code"] == "bad_theme"
