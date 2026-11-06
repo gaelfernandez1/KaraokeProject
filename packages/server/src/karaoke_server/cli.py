@@ -5,6 +5,7 @@ import json
 import sys
 from collections.abc import Sequence
 from datetime import UTC, datetime
+from importlib import metadata
 from pathlib import Path
 
 from karaoke_server.config import REPO, Settings
@@ -12,6 +13,11 @@ from karaoke_server.config import REPO, Settings
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="karaoke-server", description=__doc__)
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"karaoke-server {metadata.version('karaoke-server')}",
+    )
     parser.add_argument("--data", type=Path, help="data folder (default: ~/.local/share/karaoke)")
     commands = parser.add_subparsers(dest="command", required=True)
     serve = commands.add_parser("serve", help="run the server")
