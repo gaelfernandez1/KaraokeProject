@@ -26,7 +26,7 @@ def main(argv: list[str]) -> int:
             if callable(getattr(step, "load", None)):
                 step.load()
                 load_seconds = time.perf_counter() - started
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - one failing song is recorded, never ends the run
             for item in job["items"]:
                 _write(out, {"key": item["key"], "output": None, "seconds": 0.0,
                              "error": f"could not build the step: {_describe(exc)}"})  # fmt: skip
@@ -45,7 +45,7 @@ def _run_item(spec: StepSpec, step: Any, item: dict[str, Any]) -> dict[str, Any]
     started = time.perf_counter()
     try:
         output = encode_output(spec.kind, invoke(spec.kind, step, item["args"], work_dir))
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - one failing song is recorded, never ends the run
         return {"key": item["key"], "output": None, "seconds": 0.0, "error": _describe(exc)}
     return {"key": item["key"], "output": output, "seconds": time.perf_counter() - started,
             "error": None}  # fmt: skip

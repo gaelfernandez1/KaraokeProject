@@ -26,7 +26,7 @@ from karaoke_bench.files import write_text_atomic
 from karaoke_bench.metrics import (
     TimingErrors,
     line_start_errors,
-    pair_words,
+    pair_scored,
     text_errors,
     timing_errors,
     timing_stats,
@@ -293,27 +293,32 @@ def _score(
     if state.transcript is not None:
         result.language_reported = state.transcript.language
         result.language_switch = state.transcript.language != song.language
-        lyrics = song.lyrics_text()
+        # What is sung: the reference when there is one. The pasted lyrics (lyrics.txt) may
+        # carry headers, "x2" or lines nobody sings (on purpose in the stress set).
+        lyrics = ref.lyrics_text() if ref is not None else song.lyrics_text()
         if lyrics:
             hypothesis = " ".join(segment.text for segment in state.transcript.segments)
             errors = text_errors(lyrics, hypothesis)
             result.wer, result.cer = errors.wer, errors.cer
             result.ref_words, result.ref_chars = errors.ref_words, errors.ref_chars
-    if state.error or state.aligned is None:
-        return result
-    problem = _check_aligned(state)
-    if problem:
-        result.error = f"aligner: {problem}"
+    # A draft nobody has finished checking by ear is not a reference yet.
+    scorable = ref is not None and result.reference_validated is not False
+    if state.error or state.aligned is None or (problem := _check_aligned(state)):
+        if state.error is None and state.aligned is not None:
+            result.error = f"aligner: {problem}"
+        if scorable and ref is not None:
+            # Its words count as unplaced: failing on the hard songs must not raise the scores.
+            timing[song.song_id] = timing_errors([], len(ref.scored_words()))
         return result
     words = [word for line in state.aligned for word in line.words]
     if state.vocals is not None:
         active = vocal_activity(load_mono16k(state.vocals), SAMPLE_RATE, _HOP)
         result.outside_voice = outside_voice(words, active, _HOP)
     result.low_confidence = low_confidence(words)
-    # A draft nobody has finished checking by ear is not a reference yet.
-    if ref is not None and result.reference_validated is not False:
+    if scorable and ref is not None:
         scored = ref.scored_words()
-        timing[song.song_id] = timing_errors(pair_words(scored, words), len(scored))
+        everything = [word for line in ref.lines for word in line.words]
+        timing[song.song_id] = timing_errors(pair_scored(everything, scored, words), len(scored))
         result.timing = timing_stats([timing[song.song_id]])
         # Lines pair by position, which only means something when the aligner kept the lines.
         if mode == "lyrics" and state.lyrics_text is None:
@@ -347,7 +352,7 @@ def _write(
     paths: BenchPaths,
 ) -> Path:
     base = (
-        f"{date.today().isoformat()}-{results.pipeline['name']}-"
+        f"{date.today().isoformat()}-{results.pipeline['name']}-"  # noqa: DTZ011 - the report's date, on the local calendar
         f"{results.set_name.replace('/', '_')}-{results.mode}"
     )
     name, n = base, 1
