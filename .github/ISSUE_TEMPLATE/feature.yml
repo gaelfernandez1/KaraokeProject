@@ -1,0 +1,21 @@
+name: An idea
+description: Something the karaoke could do, or do better.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: moment
+    attributes:
+      label: The moment it would help
+      description: When you missed it — at a party, making a karaoke, correcting a song…
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you would like
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do today instead
