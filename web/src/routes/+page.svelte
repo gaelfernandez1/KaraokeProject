@@ -27,10 +27,9 @@
 	let search = $state<HTMLInputElement | null>(null);
 	let wall = $state<HTMLElement | null>(null);
 
-	// On a TV driven by a keyboard or a clicker, the arrows move between posters.
-	$effect(() => {
-		if (wall) return arrowNavigation(wall);
-	});
+	// On a TV driven by a keyboard or a clicker, the arrows move around the whole page: the
+	// posters, and the search, the filters and the menu above them.
+	$effect(() => arrowNavigation(document.body, () => wall?.querySelector<HTMLElement>('a')));
 
 	const t = $derived(i18n.t.library);
 	const languages = $derived(songs ? languagesOf(songs) : []);
@@ -51,13 +50,13 @@
 				error instanceof ApiError && error.status === 0 ? i18n.t.errors.network : t.loadError;
 		}
 	}
-	load();
+	void load();
 
 	function open(song: SongSummary, event: MouseEvent) {
 		if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
 		event.preventDefault();
 		opening = transitionName(song.id);
-		goto(resolve('/cantar/[id]', { id: song.id }));
+		void goto(resolve('/cantar/[id]', { id: song.id }));
 	}
 
 	function clearFilters() {
@@ -80,7 +79,7 @@
 	onkeydown={onKey}
 	ononline={() => {
 		online = true;
-		load();
+		void load();
 	}}
 	onoffline={() => (online = false)}
 />

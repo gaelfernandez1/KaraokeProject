@@ -30,7 +30,7 @@ function fakeFetch(body: unknown = null, status = 200) {
 	const calls: Call[] = [];
 	const impl = async (url: string | URL | Request, init: RequestInit = {}) => {
 		calls.push({
-			url: String(url),
+			url: url instanceof Request ? url.url : url.toString(),
 			method: init.method ?? 'GET',
 			headers: new Headers(init.headers),
 			body: typeof init.body === 'string' ? JSON.parse(init.body) : init.body
@@ -41,7 +41,7 @@ function fakeFetch(body: unknown = null, status = 200) {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	};
-	return { calls, impl: impl as typeof fetch };
+	return { calls, impl: impl };
 }
 
 function memory() {

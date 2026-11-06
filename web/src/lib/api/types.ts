@@ -9,13 +9,10 @@ type Schemas = components['schemas'];
 
 /** A song in the library, without its lyrics. */
 export type SongSummary = Schemas['SongSummary'];
-export type LyricsSource = SongSummary['lyrics_source'];
 
 /** `make` turns a song into a karaoke; `export` renders its MP4. */
 export type Job = Schemas['Job'];
 export type JobStage = Job['stage'];
-/** Why a job failed, for a message in the singer's language. */
-export type JobErrorCode = NonNullable<Job['error_code']>;
 
 export type ExportInput = Schemas['ExportRequest'];
 

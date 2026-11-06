@@ -110,6 +110,18 @@ describe('jobs', () => {
 });
 
 describe('parties', () => {
+	it('end when the host says so, telling every phone, like the server', () => {
+		const parties = new Parties(new Library([]));
+		const { code, host_token } = parties.create();
+		const events: string[] = [];
+		parties.subscribe(code, null, (event) => events.push(event));
+		const guest = parties.join(code, 'Ana')!;
+		expect(parties.end(code, guest.token)).toBe(false);
+		expect(parties.end(code, host_token)).toBe(true);
+		expect(events.at(-1)).toBe('ended');
+		expect(parties.get(code)).toBeUndefined();
+	});
+
 	const setup = () => {
 		const library = new Library([libraryDir()]);
 		const parties = new Parties(library);

@@ -34,7 +34,7 @@
 	let top = $state<HTMLElement | null>(null);
 
 	const t = $derived(i18n.t.create);
-	jobs.refresh();
+	void jobs.refresh();
 
 	const preview = $derived<SongSummary | null>(
 		file || url.trim()

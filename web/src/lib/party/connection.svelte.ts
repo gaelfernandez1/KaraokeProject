@@ -1,5 +1,6 @@
+import { ApiError } from '#lib/api';
 import { subscribe, type Subscription } from '#lib/api/events.js';
-import { partyEventsUrl } from './client';
+import { getParty, partyEventsUrl } from './client';
 import type { PartyCommand, PartyState } from './types';
 
 export interface ConnectionOptions {
@@ -7,6 +8,8 @@ export interface ConnectionOptions {
 	createSource?: (url: string) => EventSource;
 	/** Remote control presses; the server sends them only to the host. */
 	onCommand?: (command: PartyCommand) => void;
+	/** Asks whether the party still exists; tests replace it. */
+	fetchParty?: (code: string) => Promise<unknown>;
 }
 
 /**
@@ -18,6 +21,8 @@ export class PartyConnection {
 	/** Replaced whole on every change, never edited, so it need not be deeply reactive. */
 	state = $state.raw<PartyState | null>(null);
 	connected = $state(false);
+	/** The TV ended the party (or the server forgot it): nothing more will come. */
+	ended = $state(false);
 
 	readonly code: string;
 	readonly #token: string;
@@ -38,7 +43,8 @@ export class PartyConnection {
 			partyEventsUrl(this.code, this.#token),
 			{
 				state: (data) => this.#apply(data as PartyState),
-				command: (data) => this.#options.onCommand?.(data as PartyCommand)
+				command: (data) => this.#options.onCommand?.(data as PartyCommand),
+				ended: () => this.#end()
 			},
 			{
 				createSource: this.#options.createSource,
@@ -46,8 +52,10 @@ export class PartyConnection {
 					this.connected = true;
 					this.#fresh = true;
 				},
-				onError: () => {
+				onError: (closed) => {
 					this.connected = false;
+					// The browser gave up (the events URL answered an error): is the party gone?
+					if (closed) void this.#checkGone();
 				}
 			}
 		);
@@ -57,6 +65,19 @@ export class PartyConnection {
 		this.#subscription?.close();
 		this.#subscription = null;
 		this.connected = false;
+	}
+
+	#end(): void {
+		this.ended = true;
+		this.close();
+	}
+
+	async #checkGone(): Promise<void> {
+		try {
+			await (this.#options.fetchParty ?? getParty)(this.code);
+		} catch (error) {
+			if (error instanceof ApiError && error.status === 404) this.#end();
+		}
 	}
 
 	/**

@@ -57,29 +57,32 @@ const FOCUSABLE =
 	'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
- * Arrow keys move the focus between the focusable elements inside `root`. Keys typed into
- * fields and sliders are left alone. Returns a function that stops it.
+ * Arrow keys move the focus between the focusable elements inside `root`. Keys a field or a
+ * slider needs are left to it (a one-line field lets up and down out, as on a TV). A focus
+ * outside `root` is left alone. With nothing focused, the first arrow goes to `first()` (the
+ * main content) or else to the first element. Returns a function that stops it.
  */
-export function arrowNavigation(root: HTMLElement): () => void {
+export function arrowNavigation(
+	root: HTMLElement,
+	first?: () => HTMLElement | null | undefined
+): () => void {
 	const onKey = (event: KeyboardEvent) => {
 		const direction = KEYS[event.key];
 		if (!direction || event.defaultPrevented) return;
 		const active = document.activeElement as HTMLElement | null;
-		if (
-			active?.matches(
-				'input[type="range"], input[type="text"], input[type="search"], textarea, select'
-			)
-		)
-			return;
+		if (active?.matches('input[type="range"], textarea, select')) return;
+		const sideways = direction === 'left' || direction === 'right';
+		if (sideways && active?.matches('input[type="text"], input[type="search"]')) return;
 		const items = [...root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
 			(el) => el.offsetParent !== null
 		);
 		if (items.length === 0) return;
-		if (!active || !root.contains(active) || active === document.body) {
-			items[0].focus();
+		if (!active || active === document.body) {
+			(first?.() ?? items[0]).focus();
 			event.preventDefault();
 			return;
 		}
+		if (!root.contains(active)) return;
 		const rect = (el: HTMLElement): Rect => {
 			const r = el.getBoundingClientRect();
 			return { x: r.left, y: r.top, w: r.width, h: r.height };

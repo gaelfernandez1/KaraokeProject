@@ -44,9 +44,12 @@ async function request<T>(
 		let detail = response.statusText;
 		let code: string | null = null;
 		try {
-			const body = await response.json();
-			if (typeof body?.detail === 'string') detail = body.detail;
-			if (typeof body?.code === 'string') code = body.code;
+			const body: unknown = await response.json();
+			if (typeof body === 'object' && body !== null) {
+				const fields = body as { detail?: unknown; code?: unknown };
+				if (typeof fields.detail === 'string') detail = fields.detail;
+				if (typeof fields.code === 'string') code = fields.code;
+			}
 		} catch {
 			// Not JSON: the status text says enough.
 		}

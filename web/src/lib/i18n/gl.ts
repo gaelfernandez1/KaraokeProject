@@ -48,6 +48,9 @@ export const gl = {
 			engine_failed: 'Algo fallou ao facer o karaoke.',
 			interrupted: 'O servidor parou mentres se facía.',
 			song_missing: 'A canción xa non está na biblioteca.',
+			invalid_doc: 'Hai tempos imposibles na letra: desfai o último cambio e garda de novo.',
+			invalid_request: 'O servidor non entendeu a petición.',
+			not_found: 'Iso xa non está no servidor.',
 			not_owner: 'Isto só se pode facer dende o portátil ou un aparello vinculado.',
 			not_paired: 'Este aparello non está vinculado co portátil.'
 		}
@@ -256,6 +259,7 @@ export const gl = {
 		join: 'Entrar na festa',
 		yourName: 'O teu nome',
 		unknownCode: 'Non hai ningunha festa con ese código.',
+		ended: 'A festa rematou. Grazas por cantar!',
 		otherCode: 'Código doutra festa',
 		go: 'Ir',
 		tabRequest: 'Pedir',

@@ -115,7 +115,7 @@ function server(options: { id?: string; fail?: string[]; lengths?: boolean; doc?
 	const { id = 's1', fail = [], lengths = true, doc = DOC } = options;
 	const requested: string[] = [];
 	const impl = async (input: RequestInfo | URL): Promise<Response> => {
-		const url = String(input);
+		const url = input instanceof Request ? input.url : input.toString();
 		requested.push(url);
 		const prefix = `/media/${encodeURIComponent(id)}/`;
 		const file = url.startsWith(prefix) ? url.slice(prefix.length) : '';
@@ -136,7 +136,7 @@ function server(options: { id?: string; fail?: string[]; lengths?: boolean; doc?
 		if (lengths) headers.set('Content-Length', String(body.byteLength));
 		return new Response(stream, { headers });
 	};
-	return { requested, fetch: impl as typeof fetch };
+	return { requested, fetch: impl };
 }
 
 function setup(options: { quota?: number; fail?: string[]; lengths?: boolean } = {}) {

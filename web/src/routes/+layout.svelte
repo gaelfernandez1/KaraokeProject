@@ -20,7 +20,7 @@
 
 	initLocale();
 	// Karaoke jobs keep being followed from any screen (the Create tab shows their progress).
-	jobs.refresh();
+	void jobs.refresh();
 
 	// A new version waits until the singer says so: an update must never cut a song.
 	let applyUpdate = $state<(() => void) | null>(null);

@@ -21,13 +21,13 @@ interface Call {
 function fakeFetch(body: unknown, status = 200) {
 	const calls: Call[] = [];
 	const impl = async (url: string | URL | Request, init?: RequestInit) => {
-		calls.push({ url: String(url), init });
+		calls.push({ url: url instanceof Request ? url.url : url.toString(), init });
 		return new Response(JSON.stringify(body), {
 			status,
 			headers: { 'Content-Type': 'application/json' }
 		});
 	};
-	return { calls, impl: impl as typeof fetch };
+	return { calls, impl: impl };
 }
 
 describe('api client', () => {
@@ -129,7 +129,7 @@ describe('api client, server additions', () => {
 		const { calls, impl } = fakeFetch({ id: 'd1', name: 'iPhone · Safari' });
 		await pairDevice('BCDF GHJK', impl);
 		expect(calls[0].url).toBe('/api/devices/pair');
-		expect(JSON.parse(String(calls[0].init?.body))).toEqual({ code: 'BCDF GHJK' });
+		expect(JSON.parse(calls[0].init?.body as string)).toEqual({ code: 'BCDF GHJK' });
 	});
 
 	it('asks who it is, starts a pairing and manages devices', async () => {
