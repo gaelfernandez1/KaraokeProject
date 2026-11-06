@@ -99,8 +99,10 @@ The architecture and the reasoning behind each decision: [`docs/architecture.md`
 
 ## Quick start
 
-You need Linux or Windows 11 with WSL 2 (Ubuntu), Node 22 or newer and ffmpeg. An NVIDIA GPU with
-4 GB is recommended; without one it works, more slowly.
+You need Linux or Windows 11 with WSL 2 (Ubuntu), Node 22 or newer and ffmpeg. Making karaokes
+needs an **NVIDIA GPU from the RTX 20 series on**, with 4 GB of video memory or more; any newer or
+larger NVIDIA card works the same, only faster. Without one, the server, the player, the party and
+the editor still work with karaokes made elsewhere.
 
 ```bash
 git clone https://github.com/gaelfernandez1/KaraokeProject.git
@@ -137,6 +139,8 @@ and design decisions are in Spanish.
 Version 3.0 is a full rebuild. What it does not do yet:
 
 - It needs Linux or WSL 2; there is no native Windows or macOS version.
+- Making karaokes needs an NVIDIA GPU (RTX 20 series or newer): AMD, Intel or Apple graphics
+  cannot make them yet.
 - Singers are told apart only when the lyrics say who sings; there is no automatic speaker
   detection yet.
 - Without lyrics, Galician transcription still gets about one word in four wrong: pasting the

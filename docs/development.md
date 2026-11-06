@@ -6,8 +6,9 @@ machine: the project's laptop (Windows 11 + WSL 2 with Ubuntu 26.04, RTX 3050 La
 ## Requirements
 
 - Windows with WSL 2 and an Ubuntu distribution. On native Linux, the same without the Windows part.
-- The NVIDIA driver installed **on Windows** (not inside WSL). Inside WSL, `nvidia-smi` must show
-  the GPU.
+- To make karaokes, an NVIDIA GPU from the RTX 20 series on (PyTorch's CUDA 13 build needs compute
+  capability 7.5), with its driver installed **on Windows** (not inside WSL). Inside WSL,
+  `nvidia-smi` must show the GPU. The tests, the server and the web app run without one.
 - Node 22 or newer.
 
 ## Installing with one command
@@ -56,8 +57,8 @@ To develop, also run `make setup` (pre-commit hooks and the quality tools).
    ```bash
    make check-env
    ```
-   Everything required must say `OK`. NVENC and torch show as `warning` if missing, because the code
-   also works without a GPU (more slowly).
+   Everything required must say `OK`. NVENC and torch show as `warning` if missing: the tests, the
+   server and the web app work without a GPU, but making karaokes needs one.
 
 ## Everyday commands
 
