@@ -152,7 +152,7 @@
 	}
 </script>
 
-<svelte:head><title>{t.title} {code} · Foliada</title></svelte:head>
+<svelte:head><title>{t.title} {code} · Proxecto Karaoke en Galego</title></svelte:head>
 
 <div class="remote" style:--me={myColor ?? 'var(--farol)'}>
 	<header class="bar">

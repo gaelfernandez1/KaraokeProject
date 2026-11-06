@@ -303,7 +303,9 @@
 	};
 </script>
 
-<svelte:head><title>{doc ? t.title(doc.title) : t.help} · Foliada</title></svelte:head>
+<svelte:head
+	><title>{doc ? t.title(doc.title) : t.help} · Proxecto Karaoke en Galego</title></svelte:head
+>
 <svelte:window onkeydown={onKey} onbeforeunload={(e) => dirty && e.preventDefault()} />
 
 <div class="editor">

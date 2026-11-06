@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-	<!-- The F of the name in the poster face, half sung: amber on the left, still white on the right. -->
+	<!-- The K of "Karaoke" in the poster face, half sung: amber on the left, still white on the right. -->
 	<defs><clipPath id="sung"><rect x="0" y="0" width="262.5" height="512"/></clipPath></defs>
 	<rect width="512" height="512" rx="0" fill="#16122E"/>
-	<path transform="translate(189.44 381.00) scale(0.15625 -0.15625)" fill="#F3EFFA" d="M80 0V1600H772V1336H380V946H752V682H380V0Z"/>
-	<g clip-path="url(#sung)"><path transform="translate(189.44 381.00) scale(0.15625 -0.15625)" fill="#FFC531" d="M80 0V1600H772V1336H380V946H752V682H380V0Z"/></g>
+	<path transform="translate(173.50 381.00) scale(0.15625 -0.15625)" fill="#F3EFFA" d="M80 0V1600H400L396 1212L342 854H396L492 1212L636 1600H964L698 942L976 0H672L498 610L386 368V0Z"/>
+	<g clip-path="url(#sung)"><path transform="translate(173.50 381.00) scale(0.15625 -0.15625)" fill="#FFC531" d="M80 0V1600H400L396 1212L342 854H396L492 1212L636 1600H964L698 942L976 0H672L498 610L386 368V0Z"/></g>
 </svg>

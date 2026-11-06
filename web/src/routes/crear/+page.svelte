@@ -122,7 +122,7 @@
 	}
 </script>
 
-<svelte:head><title>{t.title} · Foliada</title></svelte:head>
+<svelte:head><title>{t.title} · Proxecto Karaoke en Galego</title></svelte:head>
 
 <main class="create" bind:this={top}>
 	<header>

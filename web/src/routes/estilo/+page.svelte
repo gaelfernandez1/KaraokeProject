@@ -58,7 +58,7 @@
 	let progress = $state(0.4);
 </script>
 
-<svelte:head><title>Estilo · Foliada</title></svelte:head>
+<svelte:head><title>Estilo · Proxecto Karaoke en Galego</title></svelte:head>
 
 <main>
 	<h1><Wordmark size="var(--t-6)" /></h1>

@@ -20,8 +20,17 @@ export function nextFocus(
 ): string | null {
 	const cx = from.x + from.w / 2;
 	const cy = from.y + from.h / 2;
+	const sideways = direction === 'left' || direction === 'right';
+	// Something in line (overlapping across the direction pressed) wins over anything off to the
+	// side, however close: right from a wide title goes along its row, not to a field below it.
+	const inLine = (rect: Rect) =>
+		sideways
+			? rect.y < from.y + from.h && rect.y + rect.h > from.y
+			: rect.x < from.x + from.w && rect.x + rect.w > from.x;
 	let best: string | null = null;
 	let bestScore = Infinity;
+	let bestInLine: string | null = null;
+	let bestInLineScore = Infinity;
 	for (const { id, rect } of candidates) {
 		const x = rect.x + rect.w / 2;
 		const y = rect.y + rect.h / 2;
@@ -42,8 +51,12 @@ export function nextFocus(
 			bestScore = score;
 			best = id;
 		}
+		if (inLine(rect) && score < bestInLineScore) {
+			bestInLineScore = score;
+			bestInLine = id;
+		}
 	}
-	return best;
+	return bestInLine ?? best;
 }
 
 const KEYS: Record<string, Direction> = {
