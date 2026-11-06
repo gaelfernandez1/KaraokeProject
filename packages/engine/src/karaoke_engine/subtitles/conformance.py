@@ -17,6 +17,11 @@ from karaoke_engine.subtitles.themes import load_theme, theme_metrics
 ROOT = Path(__file__).resolve().parents[5]
 CASES_DIR = ROOT / "fixtures/lyrics-layout"
 SIZES = {"tv": (1920, 1080), "phone": (390, 844), "vertical": (1080, 1920)}
+# A rap line as lyrics sites write it: too long for two rows on a phone held upright.
+LONG_LINE = (
+    "Eu non sei se mañá vou estar aquí contigo, pero hoxe bailamos"
+    " ata que saia o sol na praia de Riazor"
+)
 
 
 def _word(text: str, start: float, end: float, parts: list[Any] | None = None) -> dict[str, Any]:
@@ -128,6 +133,19 @@ def _synthetic() -> dict[str, dict[str, Any]]:
                 _line("l3", [_word("¡vamos!", 2.4, 3.0)]),
             ],
         ),
+        "longa": _doc(
+            "longa",
+            [
+                _line(
+                    "l1",
+                    [
+                        _word(w, 4.0 + j * 0.25, 4.0 + (j + 1) * 0.25)
+                        for j, w in enumerate(LONG_LINE.split())
+                    ],
+                ),
+                _line("l2", [_word("Fin", 10.0, 11.0)]),
+            ],
+        ),
         "duo": _doc(
             "duo",
             [
@@ -167,6 +185,18 @@ def cases() -> dict[str, dict[str, Any]]:
         for size in ("tv", "phone"):
             inputs.append((f"{name}-clasico-{size}", synthetic, "clasico", size))
         inputs.append((f"{name}-moderno-phone", synthetic, "moderno", "phone"))
+    longa = _synthetic()["longa"]
+    for theme_name in ("clasico", "contraste"):
+        inputs.append((f"longa-{theme_name}-vertical", longa, theme_name, "vertical"))
+    # Scrolling with a long intro: the first lines come in lead_in before they are sung.
+    inputs.append(
+        (
+            "esencia-moderno-phone",
+            "fixtures/packages/nandomalo-esencia/karaoke.json",
+            "moderno",
+            "phone",
+        )
+    )
     out: dict[str, dict[str, Any]] = {}
     for case_id, source, theme_id, size in inputs:
         if isinstance(source, str):

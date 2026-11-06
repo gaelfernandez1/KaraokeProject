@@ -15,8 +15,8 @@ from karaoke_engine.video.render import credits_text, render, title_events
 FIXTURES = Path(__file__).resolve().parents[3] / "fixtures/packages"
 
 
-def _layout(package: str, width: int = 1920, height: int = 1080):  # type: ignore[no-untyped-def]
-    theme = load_theme("clasico")
+def _layout(package: str, theme_name: str = "clasico", width: int = 1920, height: int = 1080):  # type: ignore[no-untyped-def]
+    theme = load_theme(theme_name)
     doc = load_doc(FIXTURES / package / "karaoke.json")
     return doc, theme, build_layout(doc, theme, width, height, theme_metrics(theme))
 
@@ -33,6 +33,14 @@ def test_title_when_singing_starts_late() -> None:
     # The first line shows at 16.47 s: the title is on from 0.5 s until 0.5 s before it.
     assert ("0:00:00.50", "0:00:15.92", "Esencia") in _stamps(events)
     assert ("0:00:00.50", "0:00:15.92", "NANDOMALO") in _stamps(events)
+
+
+def test_the_scrolling_theme_gets_its_title_too() -> None:
+    doc, theme, layout = _layout("nandomalo-esencia", "moderno")
+
+    events = title_events(doc, theme, layout, 1920, 1080, None)
+
+    assert any("Esencia" in event for event in events)
 
 
 def test_no_title_when_singing_starts_early() -> None:
@@ -174,3 +182,55 @@ def test_thumbnail_shows_the_title_at_full_strength(demo: Path, tmp_path: Path) 
         if raw[i] > 220 and 170 < raw[i + 1] < 220 and raw[i + 2] < 90
     )
     assert yellow > 200
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_the_guide_vocals_mix_leaves_headroom(demo: Path, tmp_path: Path) -> None:
+    # Two loud stems: their sum goes past the limiter, which must not push it back to 0 dBFS.
+    seconds = json.loads((demo / "karaoke.json").read_text(encoding="utf-8"))["duration"]
+    for stem in ("instrumental.wav", "vocals.wav"):
+        subprocess.run(
+            ["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i",
+             f"sine=f=220:d={seconds},volume=7", "-ac", "2", str(demo / stem)],
+            check=True,
+        )  # fmt: skip
+    out = tmp_path / "loud.mp4"
+    render(demo, out, load_theme("clasico"), size=(160, 90), vocals=1.0)
+
+    report = subprocess.run(
+        ["ffmpeg", "-i", str(out), "-af", "astats=measure_overall=Peak_level", "-f", "null", "-"],
+        capture_output=True, text=True, check=True,
+    ).stderr  # fmt: skip
+    peak = max(float(line.split()[-1]) for line in report.splitlines() if "Peak level dB" in line)
+    assert peak < -0.1
+
+
+@pytest.mark.usefixtures("ffmpeg")
+def test_a_failed_export_leaves_no_file(
+    demo: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import karaoke_engine.video.render as render_module
+
+    # An encoder that refuses to start, as libx264 does with an odd size.
+    monkeypatch.setattr(
+        render_module, "h264_encoders", lambda quality: [["-c:v", "libx264", "-profile:v", "x"]]
+    )
+    out = tmp_path / "broken.mp4"
+    with pytest.raises(RuntimeError):
+        render(demo, out, load_theme("clasico"), size=(160, 90))
+    assert [p.name for p in tmp_path.iterdir() if p.name.startswith("broken")] == []
+
+
+def test_odd_sizes_are_refused_before_encoding(demo: Path, tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="even"):
+        render(demo, tmp_path / "odd.mp4", load_theme("clasico"), size=(161, 91))
+
+
+def test_media_outside_the_package_is_refused(demo: Path, tmp_path: Path) -> None:
+    outside = tmp_path / "private.jpg"
+    outside.write_bytes(b"\xff\xd8")
+    doc = json.loads((demo / "karaoke.json").read_text(encoding="utf-8"))
+    doc["cover"] = str(outside)
+    (demo / "karaoke.json").write_text(json.dumps(doc), encoding="utf-8")
+    with pytest.raises(ValueError, match="inside the package"):
+        render(demo, tmp_path / "out.mp4", load_theme("clasico"), size=(160, 90))

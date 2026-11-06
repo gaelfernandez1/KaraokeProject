@@ -12,6 +12,8 @@ import type { FontMetrics } from './metrics';
 const BREAK_AFTER = ',.;:!?…»)';
 const PUNCTUATION_BONUS = 0.9;
 const MIN_SCALE = 0.6;
+/** Rows a line may take when maxRows would push it off the screen. */
+const MAX_FALLBACK_ROWS = 4;
 const BACKING_ATTACH = 1.5;
 const MIN_LEAD = 0.5;
 const SCROLL_GAP = 0.35;
@@ -122,7 +124,13 @@ export function normalizeDoc(doc: KaraokeDoc): KaraokeDoc {
 const range = (from: number, to: number): number[] =>
 	Array.from({ length: to - from }, (_, i) => from + i);
 
-/** Rows (word indices) for a line, and how much to shrink it so the widest row fits. */
+/**
+ * Rows (word indices) for a line, and how much to shrink it so the widest row fits.
+ *
+ * Up to `maxRows` rows, shrunk down to MIN_SCALE. A line that still would not fit (a long rap
+ * line on a phone held upright) takes up to MAX_FALLBACK_ROWS balanced rows instead, and
+ * shrinks below MIN_SCALE only if even that is not enough: text is never cut off the screen.
+ */
 export function wrap(
 	words: string[],
 	px: number,
@@ -133,7 +141,10 @@ export function wrap(
 	const full = metrics.width(words.join(' '), px);
 	if (full <= maxWidth) return [[range(0, words.length)], 1];
 	if (maxRows < 2 || words.length < 2) {
-		return [[range(0, words.length)], Math.max(MIN_SCALE, maxWidth / full)];
+		if (full * MIN_SCALE > maxWidth && words.length >= 2) {
+			return wrapMore(words, px, maxWidth, metrics, 2);
+		}
+		return [[range(0, words.length)], fit(maxWidth, full)];
 	}
 	let best = 1;
 	let bestCost = 0;
@@ -148,7 +159,67 @@ export function wrap(
 	}
 	const rows = [range(0, best), range(best, words.length)];
 	if (bestWidest <= maxWidth) return [rows, 1];
-	return [rows, Math.max(MIN_SCALE, maxWidth / bestWidest)];
+	if (bestWidest * MIN_SCALE > maxWidth && words.length >= 3) {
+		return wrapMore(words, px, maxWidth, metrics, 3);
+	}
+	return [rows, fit(maxWidth, bestWidest)];
+}
+
+/** MIN_SCALE at the least, unless only a smaller size keeps the text on the screen. */
+function fit(maxWidth: number, widest: number): number {
+	return widest * MIN_SCALE <= maxWidth
+		? Math.max(MIN_SCALE, maxWidth / widest)
+		: maxWidth / widest;
+}
+
+/** The fewest rows (`first` up to MAX_FALLBACK_ROWS) whose widest fits at MIN_SCALE. */
+function wrapMore(
+	words: string[],
+	px: number,
+	maxWidth: number,
+	metrics: FontMetrics,
+	first: number
+): [number[][], number] {
+	const n = words.length;
+	const width = Array.from({ length: n + 1 }, () => new Array<number>(n + 1).fill(0));
+	for (let i = 0; i < n; i++) {
+		for (let j = i + 1; j <= n; j++) width[i][j] = metrics.width(words.slice(i, j).join(' '), px);
+	}
+	let rows: number[][] = [];
+	let widest = 0;
+	for (let count = first; count <= Math.min(MAX_FALLBACK_ROWS, n); count++) {
+		[rows, widest] = balanced(width, n, count);
+		if (widest * MIN_SCALE <= maxWidth) break;
+	}
+	return [rows, widest <= maxWidth ? 1 : fit(maxWidth, widest)];
+}
+
+/** `count` rows of consecutive words with the narrowest widest row (the first such split). */
+function balanced(width: number[][], n: number, count: number): [number[][], number] {
+	// best[r][j]: the narrowest widest row for the first j words in r rows; cut[r][j]: where the
+	// last of those rows starts.
+	const best = Array.from({ length: count + 1 }, () => new Array<number>(n + 1).fill(Infinity));
+	const cut = Array.from({ length: count + 1 }, () => new Array<number>(n + 1).fill(0));
+	best[0][0] = 0;
+	for (let r = 1; r <= count; r++) {
+		for (let j = r; j <= n; j++) {
+			for (let i = r - 1; i < j; i++) {
+				const candidate = Math.max(best[r - 1][i], width[i][j]);
+				if (candidate < best[r][j]) {
+					best[r][j] = candidate;
+					cut[r][j] = i;
+				}
+			}
+		}
+	}
+	const rows: number[][] = [];
+	let end = n;
+	for (let r = count; r > 0; r--) {
+		const start = cut[r][end];
+		rows.unshift(range(start, end));
+		end = start;
+	}
+	return [rows, best[count][n]];
 }
 
 function displayWords(line: Line, brackets: boolean): RowWord[] {
@@ -356,13 +427,15 @@ function scrollLayout(
 	const lastHide = ends.length > 0 ? Math.max(...ends) + 2 * anim.hold : 0;
 	const blockOf = new Map<number, number>();
 	blocks.forEach((members, b) => members.forEach((k) => blockOf.set(k, b)));
+	// The first lines come in `lead_in` before singing starts, as a page does.
+	const firstShow = starts.length > 0 ? Math.max(0, starts[0] - anim.lead_in) : 0;
 	const groups: Group[] = rowsByGroup.map((rows, k) => ({
 		index: k,
 		block: blockOf.get(k) ?? 0,
 		slot: 0,
 		start: starts[k],
 		end: ends[k],
-		show: k >= visible ? switches[k - visible] : 0,
+		show: k >= visible ? switches[k - visible] : firstShow,
 		hide: k + 1 < switches.length ? switches[k + 1] + anim.transition : lastHide,
 		rows: rows.map((row) => ({ ...row, x: width / 2, y: tops[k] + row.y }))
 	}));

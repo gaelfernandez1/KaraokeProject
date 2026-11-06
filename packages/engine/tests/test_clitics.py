@@ -91,6 +91,15 @@ def test_one_syllable_verb_becomes_two_parts() -> None:
         "vive nos meus soños",  # "nos" can be "in the"
         "dixen, che",  # punctuation in between
         "eu che digo",
+        # Nouns spelt like a verb form, after a determiner: "soño", "xogo", "bico", "camiño".
+        "en cada soño te vexo",
+        "que o xogo me leve",
+        "un bico che dou",
+        "o camiño che leva",
+        "o meu ollo te ve",
+        "sei que paso che dou",  # "que" before the verb asks for the pronoun in front
+        "cando onte paso te vin",  # so does a "cando" earlier in the clause
+        "nin dixo lle nada",  # "nin" asks for the pronoun in front too
     ],
 )
 def test_pronoun_stays_apart(text: str) -> None:
@@ -98,3 +107,17 @@ def test_pronoun_stays_apart(text: str) -> None:
     line = _line(*((w, i, i + 0.5, []) for i, w in enumerate(words)))
 
     assert _texts(join_clitics([line])[0]) == words
+
+
+@pytest.mark.parametrize(
+    ("text", "joined"),
+    [
+        ("ao dicir lle a verdade", "ao dicirlle a verdade"),  # "a" and "ao" before an infinitive
+        ("volvo a ver te", "volvo a verte"),
+    ],
+)
+def test_an_infinitive_after_a_preposition_takes_its_pronoun(text: str, joined: str) -> None:
+    words = text.split()
+    line = _line(*((w, i, i + 0.5, []) for i, w in enumerate(words)))
+
+    assert " ".join(_texts(join_clitics([line])[0])) == joined

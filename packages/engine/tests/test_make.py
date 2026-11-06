@@ -2,6 +2,7 @@ import shutil
 import subprocess
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -272,6 +273,27 @@ def test_make_rejects_a_bad_language_before_working(tmp_path: Path) -> None:
                      separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
 
 
+class SilentAligner(EvenAligner):
+    """An aligner that could not place a single line (lyrics its model cannot spell)."""
+
+    def align_text(self, vocals: Path, lyrics: str, language: str) -> list[Line]:
+        return []
+
+
+def test_make_refuses_a_karaoke_without_lyrics(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="no line of the lyrics"):
+        make_package(_song(tmp_path), tmp_path / "pkg", "gl", "Ola mar\n",
+                     separator=CopySeparator(), aligner=SilentAligner())  # fmt: skip
+    assert not (tmp_path / "pkg" / "karaoke.json").exists()
+
+
+@pytest.mark.parametrize(("code", "two_letters"), [("glg", "gl"), ("spa", "es"), ("por", "pt")])
+def test_make_asks_for_the_two_letter_code(tmp_path: Path, code: str, two_letters: str) -> None:
+    with pytest.raises(ValueError, match=f"'{two_letters}'"):
+        make_package(_song(tmp_path), tmp_path / "pkg", code, "Ola\n",
+                     separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
+
+
 def test_cli_reports_runtime_errors_cleanly(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -439,3 +461,41 @@ def test_cli_joins_pronouns_in_a_made_package(tmp_path: Path) -> None:
 
     assert [w.text for w in load_doc(out / "karaoke.json").lines[0].words] == ["Díxolle"]
     assert validate_package(out) == []
+
+
+def test_the_package_audio_is_made_while_the_lyrics_align(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import threading
+
+    import karaoke_engine.make as make_module
+
+    audio_started = threading.Event()
+    seen_by_aligner: list[bool] = []
+    real = make_module.package_audio
+
+    def package_audio(*args: Any) -> Any:
+        audio_started.set()
+        return real(*args)
+
+    class WaitingAligner(EvenAligner):
+        def align_text(self, vocals: Path, lyrics: str, language: str) -> list[Line]:
+            # Done one after the other, the audio would only start once this returns.
+            seen_by_aligner.append(audio_started.wait(timeout=5))
+            return super().align_text(vocals, lyrics, language)
+
+    monkeypatch.setattr(make_module, "package_audio", package_audio)
+    make_package(_song(tmp_path), tmp_path / "pkg", "gl", "Ola mar\n",
+                 separator=CopySeparator(), aligner=WaitingAligner())  # fmt: skip
+    assert seen_by_aligner == [True]
+
+
+def test_a_failed_alignment_leaves_no_half_made_files(tmp_path: Path) -> None:
+    out = tmp_path / "pkg"
+    with pytest.raises(RuntimeError):
+        make_package(_song(tmp_path), out, "gl", "Ola mar\n",
+                     separator=CopySeparator(), aligner=EvenAligner(fail=True))  # fmt: skip
+    assert not (out / "karaoke.json").exists()
+    assert list(out.glob(".make-*")) == []
+    # The audio made in the background meanwhile goes too: nothing of a failed run stays.
+    assert list(out.glob("*.m4a")) == []

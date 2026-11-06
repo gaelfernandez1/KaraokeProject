@@ -7,7 +7,7 @@ the real video export, with backgrounds and titles, is `karaoke render`.
 import tempfile
 from pathlib import Path
 
-from karaoke_contracts import Theme, load_doc
+from karaoke_contracts import Theme, load_doc, resolve_media
 from karaoke_engine.subtitles.ass import build_ass
 from karaoke_engine.subtitles.themes import fonts_dir
 from karaoke_engine.video.encode import h264_encoders, run_encoder
@@ -40,7 +40,7 @@ def render_preview(
         inputs = [
             "-f", "lavfi", "-i", f"color=c={BACKGROUND}:s={width}x{height}:r=30:d={length:.3f}",
             "-ss", f"{begin:.3f}", "-t", f"{length:.3f}",
-            "-i", str((package / doc.audio.instrumental).resolve()),
+            "-i", str(resolve_media(package, doc.audio.instrumental)),
         ]  # fmt: skip
         video = (
             f"[0:v]setpts=PTS+{begin:.3f}/TB,subtitles=lyrics.ass:fontsdir=fonts,"
@@ -48,7 +48,7 @@ def render_preview(
         )
         if doc.audio.vocals is not None:
             inputs += ["-ss", f"{begin:.3f}", "-t", f"{length:.3f}"]
-            inputs += ["-i", str((package / doc.audio.vocals).resolve())]
+            inputs += ["-i", str(resolve_media(package, doc.audio.vocals))]
             audio = f";[2:a]volume={VOCALS_LEVEL}[voc];[1:a][voc]amix=inputs=2:normalize=0[a]"
         else:
             audio = ";[1:a]anull[a]"

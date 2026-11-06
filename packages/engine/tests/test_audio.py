@@ -1,4 +1,3 @@
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -15,7 +14,7 @@ from karaoke_engine.audio import (
 )
 from karaoke_engine.steps import Stems
 
-pytestmark = pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="needs ffmpeg")
+pytestmark = pytest.mark.usefixtures("ffmpeg")
 
 
 def _lavfi(dest: Path, source: str, *extra: str) -> Path:
@@ -167,3 +166,28 @@ def test_converting_a_package_twice_keeps_the_whole_song(
 
     assert probe(package / "instrumental.m4a").duration == pytest.approx(first, abs=0.05)
     assert probe(package / "vocals.m4a").duration == pytest.approx(first, abs=0.05)
+
+
+def test_package_audio_measures_and_encodes_in_parallel(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import time
+
+    import karaoke_engine.audio as audio_module
+
+    def slow_measure(path: Path) -> audio_module.Loudness:
+        time.sleep(0.3)
+        return audio_module.Loudness(-20.0, -3.0)
+
+    def slow_encode(src: Path, dest: Path, gain_db: float, bitrate: str) -> Path:
+        time.sleep(0.3)
+        dest.write_bytes(b"m4a")
+        return dest
+
+    monkeypatch.setattr(audio_module, "measure", slow_measure)
+    monkeypatch.setattr(audio_module, "encode_m4a", slow_encode)
+    started = time.monotonic()
+    package_audio(tmp_path / "mix.wav", Stems(vocals=tmp_path / "v", instrumental=tmp_path / "i"),
+                  tmp_path / "pkg")  # fmt: skip
+    # Three measures and two encodes one after another would take 1.5 s.
+    assert time.monotonic() - started < 0.9

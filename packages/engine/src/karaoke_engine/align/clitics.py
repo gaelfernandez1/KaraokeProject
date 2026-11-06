@@ -7,8 +7,10 @@ and the joined word follows the usual accent rules: "dixo lle" → "díxolle", "
 seseo) stays as written.
 
 To stay on the safe side a pronoun is joined only when it cannot be anything else (not "o", "a",
-"nos" or "se") and the word before is a verb form this module knows: common verbs conjugated
-(regular paradigms plus the irregular ones) and gerunds.
+"nos" or "se"), the word before is a verb form this module knows (common verbs conjugated,
+regular paradigms plus the irregular ones, and gerunds), that word does not follow a determiner
+("un bico", "o meu soño": nouns spelt like verbs), and nothing earlier in the clause (que, non,
+cando…) calls the pronoun in front of the verb.
 """
 
 import unicodedata
@@ -37,6 +39,30 @@ PROCLITIC = {
     "contra", "fora", "fóra", "e", "ou", "mais", "pero", "eu", "ti", "tu", "el", "ela",
     "nós", "vós", "eles", "elas", "vostede", "isto", "iso", "aquilo",
 }  # fmt: skip
+
+# Words that call the pronoun in front of the verb from anywhere earlier in the same clause
+# (negation, subordinators, some adverbs): "que onte cho dixen", "cando mañá che chame".
+TRIGGERS = {
+    "non", "nunca", "xamais", "tampouco", "nin", "ninguén", "nada", "ningún", "ningunha",
+    "que", "se", "si", "cando", "como", "onde", "canto", "canta", "cantos", "cantas", "quen",
+    "cal", "cales", "porque", "pois", "mentres", "aínda", "xa", "tamén", "sempre", "só",
+    "soamente", "quizais", "quizá", "talvez", "seica", "acaso", "case",
+}  # fmt: skip
+
+# After these the next word is a noun, never a verb: "un bico", "o meu soño", "cada camiño".
+# Many nouns are spelt like a verb form (soño, bico, xogo, paso, camiño, regalo, ollo).
+DETERMINERS = {
+    "o", "a", "os", "as", "un", "unha", "uns", "unhas", "meu", "miña", "meus", "miñas",
+    "teu", "túa", "teus", "túas", "seu", "súa", "seus", "súas", "noso", "nosa", "nosos",
+    "nosas", "voso", "vosa", "vosos", "vosas", "este", "esta", "estes", "estas", "ese", "esa",
+    "eses", "esas", "aquel", "aquela", "aqueles", "aquelas", "do", "da", "dos", "das", "no",
+    "na", "nas", "ao", "á", "aos", "ás", "polo", "pola", "polos", "polas", "co", "coa",
+    "cos", "coas", "dun", "dunha", "nun", "nunha", "cun", "cunha", "cada", "mesmo", "mesma",
+}  # fmt: skip
+
+# Where a clause starts again: after these (or after punctuation) earlier triggers stop counting.
+_COORDINATORS = {"e", "ou", "pero", "mais"}
+_CLAUSE_END = tuple(",;:.!?¿¡\u2014\u2013")  # and the em and en dashes
 
 _ENDINGS = {
     "ar": (
@@ -248,13 +274,35 @@ def join_enclitic(verb: str, pronoun: str) -> str:
     return _accented_verb(verb, pronoun) + pronoun
 
 
-def _joinable(verb: Word, pronoun: Word) -> bool:
+def _joinable(before: list[Word], verb: Word, pronoun: Word) -> bool:
+    """`before`: the words of the line ahead of `verb`."""
     return (
         pronoun.text.lower() in PRONOUNS
         and verb.text[-1:].isalpha()
         and is_verb(verb.text)
         and unicodedata.is_normalized("NFC", verb.text)
+        and not (
+            before
+            and before[-1].text.lower() in DETERMINERS
+            # "ao dicirlle", "volvo a verte": before an infinitive, "a" and "ao" are prepositions.
+            and not verb.text.lower().endswith(("ar", "er", "ir"))
+        )
+        and not _proclisis_earlier(before)
     )
+
+
+def _proclisis_earlier(before: list[Word]) -> bool:
+    """Whether a trigger earlier in the same clause puts the pronoun before the verb."""
+    for word in reversed(before):
+        text = word.text.lower()
+        if text.endswith(_CLAUSE_END):
+            return False
+        bare = text.strip("".join(_CLAUSE_END) + "\"'«»“”")
+        if bare in _COORDINATORS:
+            return False
+        if bare in TRIGGERS:
+            return True
+    return False
 
 
 def _join(verb: Word, pronoun: Word) -> Word:
@@ -285,7 +333,7 @@ def join_clitics(lines: list[Line]) -> list[Line]:
     for line in lines:
         words: list[Word] = []
         for word in line.words:
-            if words and _joinable(words[-1], word):
+            if words and _joinable(words[:-1], words[-1], word):
                 words[-1] = _join(words[-1], word)
             else:
                 words.append(word)
