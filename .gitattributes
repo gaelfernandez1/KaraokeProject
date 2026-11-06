@@ -1,0 +1,19 @@
+# Line endings stay LF everywhere (the project runs on Linux and WSL).
+* text=auto eol=lf
+
+# Generated: collapsed in diffs and left out of the language statistics.
+schemas/*.json linguist-generated
+web/src/lib/contracts/generated/** linguist-generated
+web/src/lib/api/generated/** linguist-generated
+fixtures/lyrics-layout/** linguist-generated
+uv.lock linguist-generated
+web/pnpm-lock.yaml linguist-generated
+
+# Binary files.
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary
