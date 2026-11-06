@@ -64,3 +64,14 @@ def test_demo_never_writes_outside_the_package(bare_package: Path) -> None:
 
     assert main(["demo", str(bare_package)]) == 1
     assert outside.read_bytes() == b"keep me"
+
+
+def test_version_prints_the_product_version(capsys: pytest.CaptureFixture[str]) -> None:
+    from importlib import metadata
+
+    from karaoke_engine.cli import main as cli_main
+
+    with pytest.raises(SystemExit) as exit_info:
+        cli_main(["--version"])
+    assert exit_info.value.code == 0
+    assert capsys.readouterr().out.strip() == f"karaoke {metadata.version('karaoke-engine')}"

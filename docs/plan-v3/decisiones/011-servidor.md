@@ -109,7 +109,7 @@ real (biblioteca, subir hasta cantar, vincular un móvil, fiesta con tele y móv
   encendida; por Tailscale (HTTPS) sí. Un certificado válido para la IP de casa pediría una cuenta
   (DNS dinámico): pregunta abierta.
 - El servidor arranca al iniciar sesión en Windows, no antes, y se para si Windows suspende el
-  portátil (se documenta el ajuste de energía en `docs/servidor.md`).
+  portátil (se documenta el ajuste de energía en `docs/server.md`).
 - C9: `packages/server` entra en ruff, mypy estricto y pytest; las pruebas de navegador contra el
   servidor real son `pnpm --dir web test:e2e:server` (no van en la CI: necesitan el entorno
   completo).

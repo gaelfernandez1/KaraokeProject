@@ -38,9 +38,11 @@ test('with a remote, the arrows reach the search and filters above the posters',
 	await page.keyboard.press('ArrowUp'); // out of it, to what sits above
 	await expect(page.locator('.wall :focus')).toHaveCount(0);
 	await expect(page.locator(':focus')).toHaveCount(1);
-	// Further up, the menu (Crear, Festa, Axustes) is reachable too.
+	// Further up, the menu (Crear, Festa, Axustes) is reachable too: straight up, or up to the
+	// name above the search box and then right.
 	for (let i = 0; i < 5 && (await page.locator('nav :focus').count()) === 0; i++) {
-		await page.keyboard.press('ArrowUp');
+		const onName = (await page.locator('.brand:focus').count()) > 0;
+		await page.keyboard.press(onName ? 'ArrowRight' : 'ArrowUp');
 	}
 	await expect(page.locator('nav :focus')).toHaveCount(1);
 });

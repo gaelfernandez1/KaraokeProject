@@ -82,7 +82,7 @@ class FakeLocalStorage {
 const SONG: SongSummary = {
 	id: 's1',
 	title: 'Muiñeira',
-	artist: 'Foliada',
+	artist: 'Clo Plas',
 	language: 'gl',
 	duration: 180,
 	cover: 'cover.jpg',

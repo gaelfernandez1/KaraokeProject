@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 from collections.abc import Sequence
+from importlib import metadata
 from pathlib import Path
 from typing import Literal
 
@@ -17,6 +18,9 @@ from karaoke_engine.lyrics_lookup import find_lyrics
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="karaoke", description="Karaoke generator tools.")
+    parser.add_argument(
+        "--version", action="version", version=f"karaoke {metadata.version('karaoke-engine')}"
+    )
     commands = parser.add_subparsers(dest="command", required=True)
 
     validate = commands.add_parser(

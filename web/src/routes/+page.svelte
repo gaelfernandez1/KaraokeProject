@@ -74,7 +74,7 @@
 	}
 </script>
 
-<svelte:head><title>{t.title} · Foliada</title></svelte:head>
+<svelte:head><title>{t.title} · Proxecto Karaoke en Galego</title></svelte:head>
 <svelte:window
 	onkeydown={onKey}
 	ononline={() => {
@@ -86,7 +86,7 @@
 
 <main class="library">
 	<header class="head">
-		<a class="phone-brand" href={resolve('/')}><Wordmark animate size="var(--t-3)" /></a>
+		<a class="phone-brand" href={resolve('/')}><Wordmark animate size="min(var(--t-3), 8vw)" /></a>
 		<h1 class="visually-hidden">{t.title}</h1>
 		{#if songs && songs.length > 0}
 			<label class="search">

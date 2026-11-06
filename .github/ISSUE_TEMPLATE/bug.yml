@@ -1,0 +1,67 @@
+name: Something does not work
+description: A karaoke that comes out wrong, a screen that fails, an error.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. Please never attach songs you do not have the rights to share:
+        a link to where the song is, or a few seconds of it, is enough.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did and what you saw. Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to make it happen again
+      placeholder: |
+        1. Create a karaoke from …, language Galician, with pasted lyrics
+        2. Open it on the TV …
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      multiple: true
+      options:
+        - Making a karaoke (the engine)
+        - Lyrics timing or transcription
+        - The player (phone)
+        - The player (laptop)
+        - The player (TV)
+        - Party mode
+        - The editor
+        - MP4 export
+        - The server or the installation
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown by `uv run karaoke-server --version`, or the release you installed.
+      placeholder: "3.0.0"
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: "Pixel 8, Chrome 142 · Windows 11 + WSL 2, RTX 3050"
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `uv run karaoke-server doctor`
+      description: For problems with the server, the installation or making karaokes.
+      render: text

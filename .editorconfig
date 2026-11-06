@@ -1,0 +1,21 @@
+# Matches what the formatters write (ruff for Python, prettier in web/), for any editor.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{md,yml,yaml,json,toml,cff,sh}]
+indent_size = 2
+
+[Makefile]
+indent_style = tab
+
+# prettier in web/ uses tabs (web/prettier.config.js) and reads this file: a tab counts as 2.
+[web/**]
+indent_style = tab
+indent_size = 2

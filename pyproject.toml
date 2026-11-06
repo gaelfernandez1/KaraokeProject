@@ -1,6 +1,6 @@
 [project]
 name = "karaoke-workspace"
-version = "0.0.0"
+version = "3.0.0"
 description = "Workspace root for the v3 karaoke generator (Galician first)"
 requires-python = ">=3.12,<3.13"
 dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench", "karaoke-server"]
@@ -11,10 +11,28 @@ dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench", "karaoke
 ml = ["karaoke-engine[ml]", "karaoke-bench[ml]"]
 
 [dependency-groups]
-dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7", "httpx>=0.28", "deptry>=0.24", "import-linter>=2.5", "pytest-xdist>=3.8", "hypothesis>=6.140", "schemathesis>=4.0"]
+dev = [
+    "pytest>=8.4",
+    "ruff>=0.17",
+    "mypy>=2.4",
+    "pre-commit>=4.7",
+    "httpx>=0.28",
+    "deptry>=0.24",
+    "import-linter>=2.5",
+    "pytest-xdist>=3.8",
+    "hypothesis>=6.140",
+    "schemathesis>=4.0",
+    "shellcheck-py>=0.11",
+    "check-jsonschema>=0.39",
+]
 
 [tool.uv]
 package = false
+# audio-separator requires diffq (CC BY-NC 4.0, non-commercial) only for its Demucs models. The
+# engine loads RoFormer models and never imports it, so it is left out (scripts/licenses.py). Its
+# Windows build, diffq-fixed, stays: overriding it makes uv build its broken sdist on every lock,
+# and native Windows is not supported (NOTICE.md).
+override-dependencies = ["diffq; sys_platform == 'never'"]
 
 [tool.uv.workspace]
 members = ["packages/*"]
