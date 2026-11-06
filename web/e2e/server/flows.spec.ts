@@ -1,5 +1,9 @@
+import { readdirSync } from 'node:fs';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { phoneAtHome, tone } from './home';
+
+// serve.sh imports every example package.
+const EXAMPLES = readdirSync(new URL('../../../fixtures/packages/', import.meta.url)).length;
 
 // The whole app against the real server, as at home: the laptop (localhost) is the owner and the
 // TV; phones come in over the network. The engine is the fake one, so no GPU is needed.
@@ -19,7 +23,7 @@ async function upload(page: Page, title: string) {
 test('the library comes from the server and a song opens in the player', async ({ page }) => {
 	await page.goto('/');
 	const posters = page.locator('.wall .poster');
-	await expect(posters).toHaveCount(4);
+	await expect(posters).toHaveCount(EXAMPLES);
 	await page.getByRole('link', { name: /Esencia/ }).click();
 	await expect(page).toHaveURL(/\/cantar\/esencia$/);
 	await expect(page.getByRole('heading', { name: 'Esencia' })).toBeVisible();
