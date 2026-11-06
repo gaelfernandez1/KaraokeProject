@@ -1,7 +1,7 @@
 {
 	"id": "/",
-	"name": "Foliada",
-	"short_name": "Foliada",
+	"name": "Proxecto Karaoke en Galego",
+	"short_name": "Karaoke",
 	"description": "Karaoke de calquera canción, coa letra sincronizada.",
 	"lang": "gl",
 	"start_url": "/",
