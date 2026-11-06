@@ -86,7 +86,8 @@ def test_background_is_web_friendly(tmp_path: Path) -> None:
          "-show_entries", "frame=pts_time", "-of", "csv=p=0", str(out)],
         capture_output=True, text=True, check=True,
     ).stdout.split()  # fmt: skip
-    times = [float(t) for t in keys]
+    # Some ffprobe builds end each row with a comma (an empty side-data field): first field only.
+    times = [float(row.split(",")[0]) for row in keys if row.strip(",")]
     assert max(b - a for a, b in pairwise(times)) <= 1.05
 
 
