@@ -1,4 +1,6 @@
 import json
+import time
+from collections.abc import Callable
 
 import httpx
 
@@ -124,20 +126,30 @@ def test_sse_commands_reach_only_the_host(settings: Settings, make_client: MakeC
             assert (event, json.loads(data)) == ("command", {"type": "skip"})
 
 
+def _wait_for(condition: Callable[[], bool], seconds: float = 5) -> bool:
+    deadline = time.monotonic() + seconds
+    while not condition() and time.monotonic() < deadline:
+        time.sleep(0.05)
+    return condition()
+
+
 def test_sse_unsubscribes_when_the_client_goes(make_client: MakeClient) -> None:
     app = _app(make_client)
     parties = app.state.services.parties
     with live_server(app) as base, httpx.Client(base_url=base, timeout=10) as http:
         code = http.post("/api/parties").json()["code"]
         with http.stream("GET", f"/api/parties/{code}/events") as stream:
-            read_events(stream.iter_lines(), 1)
-            assert parties.listener_count(code) == 1
-        import time
-
-        deadline = time.monotonic() + 5
-        while parties.listener_count(code) and time.monotonic() < deadline:
-            time.sleep(0.05)
-        assert parties.listener_count(code) == 0
+            assert stream.status_code == 200
+            seen = read_events(stream.iter_lines(), 1)
+            assert seen, "the stream ended without an event"
+            assert seen[0][0] == "state", seen
+            assert json.loads(seen[0][1])["code"] == code, seen
+            # The server registers the stream before it sends the first state; this failed once
+            # in CI under the full parallel suite, so it now says what it saw if it fails again.
+            assert _wait_for(lambda: parties.listener_count(code) == 1), (
+                f"connected and got {seen}, but {parties.listener_count(code)} listeners"
+            )
+        assert _wait_for(lambda: parties.listener_count(code) == 0)
 
 
 def test_sse_for_a_missing_party_is_404(make_client: MakeClient) -> None:
