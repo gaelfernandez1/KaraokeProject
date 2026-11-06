@@ -263,7 +263,7 @@ Punto de partida para cada área; comprobar versiones y licencias antes de usar.
 | C7 | Frontend | app cuidada en móvil, portátil y tele | app web, modo TV, modo fiesta, editor, PWA, i18n |
 | C8 | Backend, servidor y despliegue | servidor sencillo que procesa en casa y sirve en todas partes | API, cola, biblioteca, acceso, red, arranque, despliegue |
 | C9 | Calidad de código | coherente, limpio, tipado, probado y sin restos | auditoría transversal, borrado de lo viejo |
-| C10 | Proyecto profesional | repo open source serio | README, documentación, releases, licencias, comunidad |
+| C10 | Proyecto profesional | repo profesional: se ve y funciona como un producto (`decisiones/013`) | README, documentación, versiones y releases, licencias, instalación, ajustes del repo |
 
 La mejora del código va al final porque casi todo el código viejo se sustituye: limpiarlo antes
 sería trabajo tirado. Las reglas de calidad se fijan desde C1 y cada área las cumple.
@@ -322,4 +322,5 @@ lo específico de su parte antes de planificar.
 - **C3/C4**: token de Hugging Face solo si algún modelo es restringido (p. ej. pyannote para dúos).
 - **C7**: probar en un móvil, un portátil y una tele reales.
 - **C8**: Tailscale o Cloudflare si quiere acceso desde fuera de casa.
-- **C10**: ajustes del repo en GitHub (descripción, temas, protección de rama, releases).
+- **C10**: ajustes del repo en GitHub (descripción, temas, protección de rama, seguridad,
+  releases) y subir la vista previa social (`docs/assets/social-preview.png`, sin API).

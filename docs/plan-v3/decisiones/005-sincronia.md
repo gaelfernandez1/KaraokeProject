@@ -29,7 +29,7 @@ instrumentales.
 
 ## Decisión
 
-**Alineador**: `karaoke_engine.align.aligner:LyricsAligner` (`docs/sincronia.md`), en
+**Alineador**: `karaoke_engine.align.aligner:LyricsAligner` (`docs/lyrics-sync.md`), en
 `bench/pipelines/c4-default.toml`, después del separador de `decisiones/004`. Hace esto:
 
 - lee la letra como se pega: cabeceras, cantantes, repeticiones, estribillos nombrados y coros
@@ -64,7 +64,7 @@ Un error de la primera versión que destapó el aviso «fuera de voz»: el blanc
 «Meer» esperó gratis 57 s de instrumental. Desde entonces, los blancos dentro de una palabra pagan
 el silencio. Fuera de voz pasó del 6–7 % al 0,1 %.
 
-**Modelos** (todos Apache-2.0 y con revisión fijada; tabla completa en `docs/sincronia.md`):
+**Modelos** (todos Apache-2.0 y con revisión fijada; tabla completa en `docs/lyrics-sync.md`):
 
 | Idioma | Modelo | Por qué |
 |---|---|---|

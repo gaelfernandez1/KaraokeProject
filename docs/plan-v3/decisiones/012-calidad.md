@@ -88,7 +88,7 @@ CPU ×6. Informe: `bench/results/2026-11-06-c9-calidad/`. Banco sin regresiones 
 
 ## Consecuencias
 
-- `make ci` y la CI piden lo de arriba; `docs/calidad.md` explica cada puerta.
+- `make ci` y la CI piden lo de arriba; `docs/quality.md` explica cada puerta.
 - Se quedan a propósito: volver a la fiesta con el mismo nombre recupera el turno (`010`, aunque
   otro invitado podría usarlo); sin topes de cola ni de flujos en casa; sin lista de nombres de
   `Host` (con `--open-home` una web maliciosa podría actuar como dueño); la cookie del dueño viaja
