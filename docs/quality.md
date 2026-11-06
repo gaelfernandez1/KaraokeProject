@@ -58,6 +58,15 @@ A new rule only goes in with a clean baseline. What a rule cannot know is justif
   `pnpm --dir web perf:frames` (time between the lyrics' frames with the CPU slowed down ×4 and ×6,
   like an average phone).
 
+## Accepted advisories
+
+Security alerts that were reviewed and accepted, with the reason (they are dismissed on GitHub
+with the same note). Review them again when the package that brings them changes.
+
+| Advisory | Where | Why it is accepted |
+|---|---|---|
+| `deepmerge` ≤ 4.3.1, prototype poisoning of merged objects | development only: `@sveltejs/vite-plugin-svelte` (7.3.1, the latest) | it merges the build configuration, never untrusted input; no fixed version exists |
+
 ## Auditing in depth (now and then)
 
 | What | How |
