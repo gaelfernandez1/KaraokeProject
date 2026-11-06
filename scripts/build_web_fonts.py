@@ -60,7 +60,7 @@ UNICODES = [
 
 
 def _download(url: str) -> bytes:
-    with urllib.request.urlopen(url, timeout=60) as response:
+    with urllib.request.urlopen(url, timeout=60) as response:  # noqa: S310 - fixed https URL
         data: bytes = response.read()
         return data
 

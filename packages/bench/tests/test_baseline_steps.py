@@ -21,6 +21,7 @@ def test_unknown_whisper_model_rejected() -> None:
         FasterWhisperTranscriber(model="tiny-x")
 
 
+@pytest.mark.models
 @pytest.mark.usefixtures("ffmpeg")
 def test_demucs_separator_writes_two_stems(tmp_path: Path) -> None:
     _needs_gpu()
@@ -39,6 +40,7 @@ def test_demucs_separator_writes_two_stems(tmp_path: Path) -> None:
     assert duration(stems.instrumental) == pytest.approx(duration(mix), abs=0.05)
 
 
+@pytest.mark.models
 @pytest.mark.usefixtures("ffmpeg")
 def test_demucs_separator_is_deterministic(tmp_path: Path) -> None:
     _needs_gpu()
@@ -55,6 +57,7 @@ def test_demucs_separator_is_deterministic(tmp_path: Path) -> None:
     assert first.vocals.read_bytes() == second.vocals.read_bytes()
 
 
+@pytest.mark.models
 @pytest.mark.usefixtures("ffmpeg")
 def test_whisper_reports_language(tmp_path: Path) -> None:
     _needs_gpu()

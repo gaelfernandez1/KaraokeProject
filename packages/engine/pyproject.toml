@@ -3,7 +3,7 @@ name = "karaoke-engine"
 version = "0.1.0"
 description = "Karaoke engine: audio, lyrics alignment, packaging and rendering"
 requires-python = ">=3.12,<3.13"
-dependencies = ["karaoke-contracts", "pydantic>=2.12"]
+dependencies = ["karaoke-contracts", "pydantic>=2.12", "numpy>=2.1"]
 
 [project.optional-dependencies]
 ml = [
@@ -11,6 +11,7 @@ ml = [
     "transformers>=5.21",
     "huggingface-hub",
     "faster-whisper==1.2.1",
+    "ctranslate2>=4.8",
     "nvidia-cublas-cu12",
     "audio-separator[cpu]==0.47.1",
     # Declared so they resolve like torch: torchvision from the CUDA index, and audioread,
@@ -21,6 +22,11 @@ ml = [
 
 [project.scripts]
 karaoke = "karaoke_engine.cli:main"
+
+[tool.deptry.per_rule_ignores]
+# Declared but never imported by name: cuBLAS 12 is preloaded by path for CTranslate2, torchvision
+# must resolve from the CUDA index like torch, and audio-separator imports audioread undeclared.
+DEP002 = ["nvidia-cublas-cu12", "torchvision", "audioread"]
 
 [build-system]
 requires = ["uv_build>=0.13,<0.14"]
