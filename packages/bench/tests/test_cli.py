@@ -193,3 +193,14 @@ def test_package_with_align_uses_the_pipeline_aligner(
         "vai o vento",
     ]
     assert "TextEvenSplitAligner" in (doc.provenance.align_model or "")
+
+
+def test_version_prints_the_product_version(capsys: pytest.CaptureFixture[str]) -> None:
+    from importlib import metadata
+
+    from karaoke_bench.cli import main as cli_main
+
+    with pytest.raises(SystemExit) as exit_info:
+        cli_main(["--version"])
+    assert exit_info.value.code == 0
+    assert capsys.readouterr().out.strip() == f"karaoke-bench {metadata.version('karaoke-bench')}"

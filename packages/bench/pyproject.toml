@@ -1,6 +1,6 @@
 [project]
 name = "karaoke-bench"
-version = "0.1.0"
+version = "3.0.0"
 description = "Benchmark for the karaoke engine: transcription, sync, speed and memory"
 requires-python = ">=3.12,<3.13"
 dependencies = [

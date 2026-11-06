@@ -1,6 +1,6 @@
 [project]
 name = "karaoke-server"
-version = "0.1.0"
+version = "3.0.0"
 description = "Karaoke server: library, job queue for one GPU, party rooms and the web app"
 requires-python = ">=3.12,<3.13"
 dependencies = [

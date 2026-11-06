@@ -120,3 +120,14 @@ def test_a_closed_terminal_stops_the_server_cleanly_unless_nohup_asked_to_ignore
         assert callable(signal.getsignal(signal.SIGHUP))
     finally:
         signal.signal(signal.SIGHUP, previous)
+
+
+def test_version_prints_the_product_version(capsys: pytest.CaptureFixture[str]) -> None:
+    from importlib import metadata
+
+    from karaoke_server.cli import main as cli_main
+
+    with pytest.raises(SystemExit) as exit_info:
+        cli_main(["--version"])
+    assert exit_info.value.code == 0
+    assert capsys.readouterr().out.strip() == f"karaoke-server {metadata.version('karaoke-server')}"
