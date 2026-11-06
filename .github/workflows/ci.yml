@@ -84,9 +84,12 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
+      # The background tests make a short video with ffmpeg.
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - run: uv sync --locked
-      # The demo song's audio is synthesised, not stored in git.
-      - run: uv run karaoke demo fixtures/packages/demo-sintetico
+      # The example songs' audio is not in git: synthetic beeps on every syllable stand in for it
+      # (locally the real songs come from the bench, docs/banco.md).
+      - run: for package in fixtures/packages/*/; do uv run karaoke demo "$package"; done
       - run: pnpm --dir web install --frozen-lockfile
       - run: pnpm --dir web exec playwright install --with-deps --only-shell chromium
       - run: pnpm --dir web test:e2e
