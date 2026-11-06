@@ -6,8 +6,8 @@
 # Safe to run again (it only does what is missing) and it never uses sudo: what needs the system
 # (ffmpeg, Node) is reported with the command to run, and the script stops. uv and pnpm are
 # installed for the user if missing. With an NVIDIA GPU it installs the engine with CUDA and
-# downloads the Galician models (several GB, once); without one, the server and the web app run
-# and karaokes are made more slowly on the CPU.
+# downloads the Galician models (several GB, once). Without one, the server and the web app run,
+# but making karaokes needs an NVIDIA GPU (RTX 20 series or newer).
 set -euo pipefail
 
 UV_VERSION=0.13.6
@@ -103,7 +103,7 @@ if [ "$gpu" = 1 ]; then
   # leaves the development tools out.
   uv sync --locked --inexact --no-dev --extra ml
 else
-  step "Installing the engine and the server (no NVIDIA GPU found: karaokes are made on the CPU)"
+  step "Installing the server and the web app (no NVIDIA GPU found: making karaokes needs one)"
   uv sync --locked --inexact --no-dev
 fi
 

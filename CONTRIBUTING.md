@@ -13,8 +13,9 @@ can agree on the approach before you spend time on it.
 
 ## Setting up
 
-You need Linux or Windows with WSL 2 (Ubuntu), Node 22 or newer and ffmpeg with libass. An NVIDIA
-GPU is optional: everything is designed to fit in 4 GB.
+You need Linux or Windows with WSL 2 (Ubuntu), Node 22 or newer and ffmpeg with libass. Making
+karaokes needs an NVIDIA GPU from the RTX 20 series on (4 GB of video memory is enough); the tests,
+the server and the web app run without one.
 
 ```bash
 make install    # the engine, the server, the web app and the models
