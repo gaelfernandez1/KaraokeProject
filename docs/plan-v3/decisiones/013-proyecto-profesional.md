@@ -1,7 +1,7 @@
 # 013 · Proyecto profesional: una versión, releases desde el CHANGELOG y licencias vigiladas
 
 - **Fecha**: 06/11/2026
-- **Estado**: propuesta (área C10); se aprueba con su PR
+- **Estado**: aceptada (área C10, PR #12; v3.0.0 publicada el 06/11/2026)
 - **Afecta a**: todas las áreas (versión única, `make lint`, `make install`, `--version`); C3
   (`diffq` fuera), C4 (paquete de demostración), C7 (nombre definitivo), C8 (`--version`,
   `serve-forever.sh`)
