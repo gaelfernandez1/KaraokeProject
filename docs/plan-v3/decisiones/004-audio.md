@@ -10,7 +10,7 @@
 
 ### Qué se midió
 
-Con el banco (`docs/banco.md`) se cambió solo el separador de `base-turbo` (Demucs `htdemucs`).
+Con el banco (`docs/benchmark.md`) se cambió solo el separador de `base-turbo` (Demucs `htdemucs`).
 El resto de la cadena se dejó igual: Whisper `large-v3-turbo` y el alineador CTC provisional.
 Los modelos RoFormer van por [audio-separator](https://github.com/nomadkaraoke/python-audio-separator)
 0.47.1 (MIT), con 2 pasadas solapadas por trozo y autocast fp16. Con 8 pasadas, las que trae por
