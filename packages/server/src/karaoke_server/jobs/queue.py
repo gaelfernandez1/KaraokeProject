@@ -31,6 +31,8 @@ logger = logging.getLogger(__name__)
 MAX_ATTEMPTS = 2
 MAX_STARTS = 3
 KEEP_DAYS = 7
+# After an unexpected error, a lane waits this long before picking the next job.
+LANE_RETRY_SECONDS = 1.0
 TICK_SECONDS = 2.0
 
 Listener = Callable[[Job], None]
@@ -65,6 +67,7 @@ class JobQueue:
     # Lifecycle
 
     async def start(self) -> None:
+        await asyncio.to_thread(self.spawner.stop_leftovers)
         self.recover()
         self._gpu_wake, self._download_wake = asyncio.Event(), asyncio.Event()
         self._loops = [
@@ -143,6 +146,7 @@ class JobQueue:
             error_code=None,
             attempt=record.attempt + 1,
             stage_started=None,
+            stage_seconds=_kept_seconds(record),
         )
         assert updated is not None
         self._wake()
@@ -227,6 +231,7 @@ class JobQueue:
                 record.id,
                 stage="queued",
                 progress=0.0,
+                stage_seconds=_kept_seconds(record),
                 attempt=record.attempt + 1,
                 source=record.source,
                 stage_started=None,
@@ -251,43 +256,53 @@ class JobQueue:
         run: Callable[[JobRecord], Coroutine[Any, Any, None]],
         wake: asyncio.Event,
     ) -> None:
+        # A lane must outlive any error (a full disk making SQLite fail, say): if it died, every
+        # later song would wait in the queue until a restart.
         while True:
-            wake.clear()
-            record = pick()
-            if record is None:
-                await wake.wait()
-                continue
-            task = asyncio.create_task(run(record))
-            self._running[record.id] = task
             try:
-                await task
-            except asyncio.CancelledError:
-                current = asyncio.current_task()
-                if current is not None and current.cancelling():
-                    raise
-                # Only that job was cancelled: on to the next one. Cancelled before its first
-                # step, it could not mark itself, and it would be picked again.
-                latest = self.store.get(record.id)
-                if (
-                    record.id in self._cancelled
-                    and latest is not None
-                    and latest.stage not in TERMINAL
-                ):
-                    self._finish(record.id, stage="cancelled")
+                await self._lane_step(pick, run, wake)
             except Exception:
-                logger.exception("job %s failed inside the queue", record.id)
-                self._finish(
-                    record.id,
-                    stage="error",
-                    error_code="engine_failed",
-                    error="Something went wrong on the server",
-                )
-            finally:
-                # A link job moves from the download lane to the GPU lane: by now the entry may
-                # already be the GPU's, which must stay.
-                if self._running.get(record.id) is task:
-                    del self._running[record.id]
-                    self._cancelled.discard(record.id)
+                logger.exception("the job lane hit an error; it goes on in a moment")
+                await asyncio.sleep(LANE_RETRY_SECONDS)
+
+    async def _lane_step(
+        self,
+        pick: Callable[[], JobRecord | None],
+        run: Callable[[JobRecord], Coroutine[Any, Any, None]],
+        wake: asyncio.Event,
+    ) -> None:
+        wake.clear()
+        record = pick()
+        if record is None:
+            await wake.wait()
+            return
+        task = asyncio.create_task(run(record))
+        self._running[record.id] = task
+        try:
+            await task
+        except asyncio.CancelledError:
+            current = asyncio.current_task()
+            if current is not None and current.cancelling():
+                raise
+            # Only that job was cancelled: on to the next one. Cancelled before its first
+            # step, it could not mark itself, and it would be picked again.
+            latest = self.store.get(record.id)
+            if record.id in self._cancelled and latest is not None and latest.stage not in TERMINAL:
+                self._finish(record.id, stage="cancelled")
+        except Exception:
+            logger.exception("job %s failed inside the queue", record.id)
+            self._finish(
+                record.id,
+                stage="error",
+                error_code="engine_failed",
+                error="Something went wrong on the server",
+            )
+        finally:
+            # A link job moves from the download lane to the GPU lane: by now the entry may
+            # already be the GPU's, which must stay.
+            if self._running.get(record.id) is task:
+                del self._running[record.id]
+                self._cancelled.discard(record.id)
 
     async def _run_download(self, record: JobRecord) -> None:
         url = str(record.request["url"])
@@ -363,7 +378,7 @@ class JobQueue:
             spec, final = prepared
             self._set_stage(record.id, "video")
         else:
-            if not (record.source and Path(record.source).is_file()):
+            if not (record.source and Path(record.source).is_file()):  # noqa: ASYNC240 - metadata only
                 self._finish(
                     record.id,
                     stage="error",
@@ -393,9 +408,13 @@ class JobQueue:
                 self._finish(record.id, stage="cancelled")
                 if record.kind == "make":
                     shutil.rmtree(folder / "out", ignore_errors=True)
+                else:
+                    _drop_partial(Path(str(spec["out"])))
                 return
             raise
         if not outcome.ok:
+            if record.kind == "export":
+                _drop_partial(Path(str(spec["out"])))
             self._failed(record.id, outcome)
             return
         if record.kind == "export":
@@ -444,6 +463,12 @@ class JobQueue:
         )
 
     def _finish_export(self, job_id: str, partial: Path, final: Path) -> None:
+        if not partial.is_file():  # the song was deleted while it rendered
+            _drop_partial(partial)
+            self._finish(
+                job_id, stage="error", error_code="song_missing", error="The song was deleted"
+            )
+            return
         partial.replace(final)
         thumb = partial.with_suffix(".jpg")
         if thumb.exists():
@@ -456,7 +481,12 @@ class JobQueue:
         if outcome.transient and record.attempt < MAX_ATTEMPTS:
             logger.warning("job %s failed (%s); trying once more", job_id, outcome.code)
             updated = self.store.update(
-                job_id, stage="queued", progress=0.0, stage_started=None, attempt=record.attempt + 1
+                job_id,
+                stage="queued",
+                progress=0.0,
+                stage_started=None,
+                attempt=record.attempt + 1,
+                stage_seconds=_kept_seconds(record),
             )
             assert updated is not None
             self._emit(updated)
@@ -541,7 +571,30 @@ class JobQueue:
         """Running stages move on with time: tell the listeners every few seconds."""
         while True:
             await asyncio.sleep(TICK_SECONDS)
-            for job_id in list(self._running):
-                record = self.store.get(job_id)
-                if record and record.stage in TIME_BASED and self._listeners.get(job_id):
-                    self._emit(record)
+            try:
+                for job_id in list(self._running):
+                    record = self.store.get(job_id)
+                    if record and record.stage in TIME_BASED and self._listeners.get(job_id):
+                        self._emit(record)
+            except Exception:
+                logger.exception("could not tell the listeners how the jobs go")
+
+
+def _drop_partial(partial: Path) -> None:
+    """The hidden file of an export that did not finish, its thumbnail, and the encoder's own
+    scratch file (left when the job is killed mid-encode, see video.encode.run_encoder)."""
+    partial.unlink(missing_ok=True)
+    partial.with_suffix(".jpg").unlink(missing_ok=True)
+    partial.with_name(f".{partial.stem}.part{partial.suffix}").unlink(missing_ok=True)
+
+
+def _kept_seconds(record: JobRecord) -> dict[str, float]:
+    """What a job starting again keeps of its stage times: only a download it will not redo.
+
+    Kept whole, the next run's times would add to them and the progress estimates, which learn
+    from finished jobs, would count those stages twice.
+    """
+    kept = (
+        {"download": record.stage_seconds["download"]} if "download" in record.stage_seconds else {}
+    )
+    return kept

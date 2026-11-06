@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -169,3 +170,41 @@ async def test_the_child_is_stopped_if_the_server_fails_handling_it(
         await anyio.sleep(0.1)
     with pytest.raises(ProcessLookupError):
         os.kill(pid, 0)
+
+
+def test_engine_units_are_named_after_their_library(settings: Settings, tmp_path: Path) -> None:
+    other = Settings(data_dir=tmp_path / "other")
+    mine, theirs = ProcessSpawner(settings), ProcessSpawner(other)
+    assert mine.unit_for("job1").startswith(mine.unit_prefix + "job1-")
+    assert mine.unit_prefix != theirs.unit_prefix
+    # Stopping what a dead server left behind never touches another library's jobs.
+    assert mine.leftovers_pattern() == mine.unit_prefix + "*.scope"
+
+
+def test_a_job_process_ends_with_the_server(tmp_path: Path) -> None:
+    pid_file = tmp_path / "child.pid"
+    child = (
+        "import os, sys, time; from karaoke_server.jobs.runner import die_with_parent;"
+        "die_with_parent(); open(sys.argv[1], 'w').write(str(os.getpid())); time.sleep(30)"
+    )
+    # The "server" starts the job, waits until it is under way, and then simply dies.
+    parent = (
+        "import os, subprocess, sys, time;"
+        "subprocess.Popen([sys.executable, '-c', sys.argv[1], sys.argv[2]],"
+        " env={**os.environ, 'KARAOKE_PARENT_PID': str(os.getpid())});"
+        "exec('while not os.path.exists(sys.argv[2]) or not open(sys.argv[2]).read():"
+        " time.sleep(0.05)')"
+    )
+    subprocess.run([sys.executable, "-c", parent, child, str(pid_file)], check=True)
+    deadline = time.monotonic() + 10
+    while not pid_file.exists() or not pid_file.read_text():
+        assert time.monotonic() < deadline
+        time.sleep(0.05)
+    pid = int(pid_file.read_text())
+    while True:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            break  # gone with its parent
+        assert time.monotonic() < deadline, "the job process outlived the server"
+        time.sleep(0.05)

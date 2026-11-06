@@ -164,6 +164,16 @@ def test_pairing_locks_after_ten_failures(devices: Devices, clock: Clock) -> Non
     assert devices.pair(devices.start_pairing().code, "owner") is not None
 
 
+def test_one_device_guessing_codes_does_not_lock_the_others(devices: Devices) -> None:
+    code = devices.start_pairing().code
+    for _ in range(10):
+        assert devices.pair("BBBBBBBB", "guess", client="home:192.168.1.50") is None
+    with pytest.raises(PairingLockedError):
+        devices.pair("BBBBBBBB", "guess", client="home:192.168.1.50")
+    # The owner at the laptop (and any other phone) can still pair.
+    assert devices.pair(code, "owner", client="local:127.0.0.1") is not None
+
+
 def test_tokens_are_stored_hashed(devices: Devices, db: Database) -> None:
     _, token = devices.pair(devices.start_pairing().code, "x")  # type: ignore[misc]
     stored = db.query("SELECT token_hash FROM devices")[0]["token_hash"]

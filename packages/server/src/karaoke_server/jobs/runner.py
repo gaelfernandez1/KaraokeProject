@@ -25,6 +25,25 @@ logger = logging.getLogger("karaoke_server.runner")
 DEMO = REPO / "fixtures" / "packages" / "demo-sintetico"
 
 
+def die_with_parent() -> None:
+    """Ends this process when the server that started it ends, however it ends.
+
+    A server killed outright (a closed terminal, a crash) does not stop its jobs; the next one
+    would start the same job again, and two engines do not fit in a 4 GB GPU.
+    """
+    parent = os.environ.get("KARAOKE_PARENT_PID")
+    if not parent or not sys.platform.startswith("linux"):
+        return
+    import ctypes
+    import signal
+
+    pr_set_pdeathsig = 1
+    libc = ctypes.CDLL(None, use_errno=True)
+    libc.prctl(pr_set_pdeathsig, signal.SIGTERM)
+    if os.getppid() != int(parent):  # it ended before the line above
+        os._exit(1)
+
+
 def emit(**event: Any) -> None:
     print(json.dumps(event, ensure_ascii=False), flush=True)
 
@@ -102,24 +121,10 @@ def run_export(spec: dict[str, Any]) -> dict[str, Any]:
 
 def run_prepare(spec: dict[str, Any]) -> dict[str, Any]:
     """Downloads (and converts) every model a language needs, before the first song."""
-    from huggingface_hub import snapshot_download
-
-    from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
-    from karaoke_engine.make import default_separator
-    from karaoke_engine.transcribe import WhisperTranscriber
+    from karaoke_engine.make import prepare_models
 
     language = spec["language"]
-    emit(event="note", message="separator")
-    separator = default_separator()
-    load = getattr(separator, "load", None)
-    if callable(load):
-        load()
-        separator.unload()  # type: ignore[attr-defined]
-    emit(event="note", message="aligner")
-    model = MODELS[DEFAULT_BY_LANGUAGE.get(language, FALLBACK_MODEL)]
-    snapshot_download(model.repo, revision=getattr(model, "revision", None))
-    emit(event="note", message="transcriber")
-    WhisperTranscriber().prepare_for(language)
+    prepare_models(language, note=lambda step: emit(event="note", message=step))
     return {"language": language}
 
 
@@ -152,6 +157,7 @@ def fake_make(spec: dict[str, Any]) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
+    die_with_parent()
     logging.basicConfig(
         level=logging.INFO,
         stream=sys.stderr,

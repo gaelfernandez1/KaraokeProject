@@ -222,7 +222,11 @@ export interface paths {
         get: operations["get_party_api_parties__code__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * End Party
+         * @description Only the TV (the host token) ends its party; the phones are told and their streams end.
+         */
+        delete: operations["end_party_api_parties__code__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -237,7 +241,8 @@ export interface paths {
         };
         /**
          * Party Events
-         * @description The full state at once and after every change; commands go to the TV only.
+         * @description The full state at once and after every change; commands go to the TV only; `ended`
+         *     when the TV ends the party (or it expires), and then the stream closes.
          */
         get: operations["party_events_api_parties__code__events_get"];
         put?: never;
@@ -1290,6 +1295,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PartyState"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_party_api_parties__code__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
