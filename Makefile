@@ -1,4 +1,9 @@
-.PHONY: setup lint format typecheck test test-models contracts web check-env ci serve
+.PHONY: install setup lint format typecheck test test-models contracts web check-env ci serve
+
+# Everything a person needs to run the karaoke on this machine (docs/development.md). Developers also
+# run `make setup` for the git hooks.
+install:
+	scripts/install.sh
 
 # --inexact keeps packages that are already installed, so torch from `uv sync --extra ml`
 # survives a later `make setup` on the GPU machine.
@@ -7,12 +12,25 @@ setup:
 	uv run pre-commit install
 	pnpm --dir web install
 
+ISSUE_FORMS = $(filter-out %/config.yml,$(wildcard .github/ISSUE_TEMPLATE/*.yml))
+
 lint:
 	uv run ruff format --check .
 	uv run ruff check .
 	# Every import a package makes is declared by that package (deptry reads its pyproject).
 	for p in packages/*/; do (cd $$p && uv run deptry src) || exit 1; done
 	uv run lint-imports
+	uv run shellcheck scripts/*.sh web/e2e/server/serve.sh
+	# GitHub's own files and CITATION.cff against their published schemas (bundled, offline).
+	uv run check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/*.yml
+	uv run check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml
+	uv run check-jsonschema --builtin-schema vendor.github-issue-forms $(ISSUE_FORMS)
+	uv run check-jsonschema --builtin-schema vendor.github-issue-config .github/ISSUE_TEMPLATE/config.yml
+	uv run check-jsonschema --builtin-schema vendor.citation-file-format CITATION.cff
+	# One version in every package, the web app and CITATION.cff, with its CHANGELOG entry.
+	uv run python scripts/release.py check
+	# Every installed package has an accepted licence (NOTICE.md); on the GPU machine, the models' too.
+	uv run python scripts/licenses.py
 
 format:
 	uv run ruff format .
