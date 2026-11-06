@@ -8,6 +8,7 @@ stops only the job. Cancelling stops the whole scope (or, without systemd, the p
 import asyncio
 import contextlib
 import functools
+import hashlib
 import json
 import logging
 import os
@@ -38,6 +39,7 @@ def scope_available() -> bool:
             ["systemd-run", "--user", "--scope", "--quiet", "true"],
             capture_output=True,
             timeout=10,
+            check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
         return False
@@ -52,6 +54,32 @@ class ProcessSpawner:
     def __init__(self, settings: Settings, command: Callable[[Path], list[str]] = _runner) -> None:
         self.settings = settings
         self.command = command
+        # Units carry their library's mark: a server stops what it left behind, never the jobs
+        # of another library on the same machine (the browser tests run their own).
+        mark = hashlib.sha256(str(settings.data_dir.resolve()).encode()).hexdigest()[:8]
+        self.unit_prefix = f"karaoke-{mark}-"
+
+    def unit_for(self, job_id: str) -> str:
+        # Unique per run: systemd keeps a unit's name for a moment after it ends.
+        return f"{self.unit_prefix}{job_id}-{secrets.token_hex(3)}"
+
+    def leftovers_pattern(self) -> str:
+        return f"{self.unit_prefix}*.scope"
+
+    def stop_leftovers(self) -> None:
+        """Stops engines a server that died suddenly (a closed terminal, a crash) left running.
+
+        Their job is about to run again: two engines would not fit in the GPU nor in the RAM.
+        """
+        if not scope_available():
+            return
+        try:
+            subprocess.run(
+                ["systemctl", "--user", "stop", self.leftovers_pattern()],
+                capture_output=True, timeout=30, check=False,
+            )  # fmt: skip
+        except (OSError, subprocess.TimeoutExpired):
+            logger.warning("could not stop engines left by a previous server")
 
     def memory_limit(self) -> int:
         if self.settings.memory_max:
@@ -88,9 +116,14 @@ class ProcessSpawner:
         spec_path.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
         tmp = self.settings.tmp_dir / job_id
         tmp.mkdir(parents=True, exist_ok=True)
-        env = {**os.environ, "TMPDIR": str(tmp), "PYTHONUNBUFFERED": "1"}
-        # Unique per run: systemd keeps a unit's name for a moment after it ends.
-        unit = f"karaoke-{job_id}-{secrets.token_hex(3)}"
+        env = {
+            **os.environ,
+            "TMPDIR": str(tmp),
+            "PYTHONUNBUFFERED": "1",
+            # The runner ends itself if this process goes away (see runner.die_with_parent).
+            "KARAOKE_PARENT_PID": str(os.getpid()),
+        }
+        unit = self.unit_for(job_id)
         with log.open("ab") as stderr:
             process = await asyncio.create_subprocess_exec(
                 *self.full_command(unit, spec_path),

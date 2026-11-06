@@ -7,12 +7,19 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from importlib import metadata
 
 from fastapi import Depends, FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from karaoke_server.access import Devices, same_origin, wsl_gateways
 from karaoke_server.backup import backup_daily
 from karaoke_server.config import Settings
 from karaoke_server.db import Database
-from karaoke_server.errors import ApiError, api_error_handler
+from karaoke_server.errors import (
+    ApiError,
+    api_error_handler,
+    http_error_handler,
+    validation_error_handler,
+)
 from karaoke_server.jobs.child import ProcessSpawner
 from karaoke_server.jobs.download import YtDlp
 from karaoke_server.jobs.queue import JobQueue
@@ -97,6 +104,8 @@ def create_app(settings: Settings, *, services: Services | None = None) -> FastA
     )
     app.state.services = services
     app.add_exception_handler(ApiError, api_error_handler)
+    app.add_exception_handler(RequestValidationError, validation_error_handler)
+    app.add_exception_handler(StarletteHTTPException, http_error_handler)
 
     @app.middleware("http")
     async def security_headers(
@@ -105,6 +114,9 @@ def create_app(settings: Settings, *, services: Services | None = None) -> FastA
         response = await call_next(request)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("Referrer-Policy", "same-origin")
+        # No other site may frame the app: inside a frame, its clicks would count as the owner's.
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Content-Security-Policy", "frame-ancestors 'none'")
         return response
 
     for module in (songs, media, devices, server, parties, jobs):

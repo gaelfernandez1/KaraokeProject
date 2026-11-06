@@ -21,6 +21,10 @@ class Outcome:
 
 
 class Spawner(Protocol):
+    def stop_leftovers(self) -> None:
+        """Stops engines a server that died suddenly left running."""
+        ...
+
     async def run(
         self, job_id: str, spec: dict[str, Any], log: Path, on_event: Callable[[Event], None]
     ) -> Outcome:

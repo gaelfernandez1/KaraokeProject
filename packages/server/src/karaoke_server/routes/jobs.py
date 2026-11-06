@@ -11,9 +11,9 @@ from urllib.parse import urlsplit
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import PlainTextResponse
 from fastapi.sse import EventSourceResponse, ServerSentEvent
-from starlette.requests import ClientDisconnect
 
 from karaoke_engine.align.lyrics import parse_lyrics
+from karaoke_engine.languages import TWO_LETTERS
 from karaoke_engine.subtitles.themes import THEMES_DIR
 from karaoke_server.access import Owner, Reader
 from karaoke_server.errors import ApiError
@@ -42,6 +42,8 @@ def _make_request(fields: dict[str, str]) -> MakeRequest:
     language = text("language")
     if not language or not LANGUAGE.match(language):
         raise IntakeError(422, "bad_language", "Choose a language, like gl")
+    if language in TWO_LETTERS:
+        raise IntakeError(422, "bad_language", f"Write the language as {TWO_LETTERS[language]}")
     lyrics = text("lyrics")
     if lyrics is not None and not parse_lyrics(lyrics):
         raise IntakeError(422, "bad_lyrics", "The lyrics have no sung lines")
@@ -96,7 +98,8 @@ async def create_job(request: Request, who: Owner) -> Job:
     except IntakeError as exc:
         shutil.rmtree(folder, ignore_errors=True)
         raise ApiError(exc.status, exc.code, str(exc)) from exc
-    except (ClientDisconnect, asyncio.CancelledError):
+    except BaseException:
+        # A client gone, a cancel, a broken body, ffprobe missing: never an empty job folder.
         shutil.rmtree(folder, ignore_errors=True)
         raise
 

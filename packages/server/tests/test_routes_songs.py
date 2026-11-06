@@ -86,3 +86,6 @@ def test_security_headers(make_client: MakeClient) -> None:
     assert response.status_code == 200
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["referrer-policy"] == "same-origin"
+    # No other site may frame the app: inside a frame, clicks would count as the owner's.
+    assert response.headers["x-frame-options"] == "DENY"
+    assert "frame-ancestors 'none'" in response.headers["content-security-policy"]

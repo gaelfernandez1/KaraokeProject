@@ -158,7 +158,7 @@ def _prepare(settings: Settings, args: argparse.Namespace) -> int:
     spec.write_text(json.dumps({"kind": "prepare", "language": args.lang}), encoding="utf-8")
     # In a process of its own: converting a model takes most of the memory for a while.
     return subprocess.run(
-        [sys.executable, "-m", "karaoke_server.jobs.runner", str(spec)]
+        [sys.executable, "-m", "karaoke_server.jobs.runner", str(spec)], check=False
     ).returncode
 
 

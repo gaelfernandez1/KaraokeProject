@@ -14,6 +14,7 @@ from pathlib import Path, PurePath
 from urllib.parse import parse_qsl
 
 from python_multipart import FormParser
+from python_multipart.exceptions import FormParserError
 from python_multipart.multipart import Field, File, parse_options_header
 
 MIB = 1024 * 1024
@@ -74,7 +75,7 @@ async def receive_form(
     def on_file(file: File) -> None:
         files.append(file)
 
-    dest.mkdir(parents=True, exist_ok=True)
+    dest.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240 - metadata only
     config = {
         "UPLOAD_DIR": str(dest),
         "MAX_MEMORY_FILE_SIZE": 0,
@@ -85,13 +86,16 @@ async def receive_form(
         content_type.decode(), on_field, on_file, boundary=params[b"boundary"], config=config
     )
     try:
-        async for chunk in chunks:
-            parser.write(chunk)
-        parser.finalize()
+        try:
+            async for chunk in chunks:
+                parser.write(chunk)
+            parser.finalize()
+        except FormParserError as exc:
+            raise IntakeError(400, "bad_form", "The upload is not a complete form") from exc
     except BaseException:
         for file in files:
             _discard(file)
-        for leftover in dest.iterdir():
+        for leftover in dest.iterdir():  # noqa: ASYNC240 - metadata only
             leftover.unlink(missing_ok=True)
         raise
 
@@ -111,7 +115,7 @@ async def receive_form(
         else str(upload.actual_file_name)
     )
     final = dest / f"source{_extension(filename)}"
-    temp.replace(final)
+    temp.replace(final)  # noqa: ASYNC240 - metadata only
     return Form(fields, final, filename)
 
 

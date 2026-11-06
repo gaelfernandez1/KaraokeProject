@@ -42,7 +42,7 @@ EXPIRE_HOURS = 24
 # The first is orange, not the lyric amber, which means "sung".
 SINGER_COLORS = ("#FF8A3D", "#4FD1FF", "#FF6FB5", "#7CE38B")
 
-Event = Literal["state", "command"]
+Event = Literal["state", "command", "ended"]
 Listener = Callable[[Event, PartyState | SimpleCommand | ValueCommand], None]
 
 
@@ -130,10 +130,25 @@ class Parties:
 
     def expire(self, hours: float = EXPIRE_HOURS) -> None:
         limit = self.now() - hours * 3600
-        for code, room in list(self._rooms.items()):
+        for room in list(self._rooms.values()):
             if room.updated < limit:
-                del self._rooms[code]
+                self._close(room)
         self.db.execute("DELETE FROM parties WHERE updated_at < ?", (limit,))
+
+    def end(self, code: str, who: str) -> bool:
+        """The TV ends the party: every phone is told, and the party is forgotten."""
+        room = self._rooms.get(code.upper())
+        if room is None or _hash(who) != room.host_hash:
+            return False
+        self._close(room)
+        self.db.execute("DELETE FROM parties WHERE code = ?", (room.state.code,))
+        return True
+
+    def _close(self, room: _Room) -> None:
+        del self._rooms[room.state.code]
+        for _, listener in list(room.listeners):
+            listener("ended", room.state)
+        room.listeners.clear()
 
     # Guests and the queue
 

@@ -75,18 +75,27 @@ async def get_party(party: Party) -> PartyState:
     return party
 
 
+@router.delete("/api/parties/{code}", status_code=204)
+async def end_party(party: Party, request: Request) -> Response:
+    """Only the TV (the host token) ends its party; the phones are told and their streams end."""
+    return _done(_parties(request).end(party.code, _who(request)))
+
+
 @router.get("/api/parties/{code}/events", response_class=EventSourceResponse)
 async def party_events(party: Party, request: Request) -> AsyncIterable[ServerSentEvent]:
-    """The full state at once and after every change; commands go to the TV only."""
-    queue: asyncio.Queue[ServerSentEvent] = asyncio.Queue()
+    """The full state at once and after every change; commands go to the TV only; `ended`
+    when the TV ends the party (or it expires), and then the stream closes."""
+    queue: asyncio.Queue[ServerSentEvent | None] = asyncio.Queue()
 
     def listener(event: str, data: BaseModel) -> None:
         queue.put_nowait(ServerSentEvent(event=event, data=data.model_dump(mode="json")))
+        if event == "ended":
+            queue.put_nowait(None)  # and the stream ends: there is nothing more to follow
 
     unsubscribe = _parties(request).subscribe(party.code, _who(request) or None, listener)
     try:
-        while True:
-            yield await queue.get()
+        while (event := await queue.get()) is not None:
+            yield event
     finally:
         if unsubscribe:
             unsubscribe()

@@ -26,11 +26,19 @@ class FakeSpawner:
         self.gates: dict[str, asyncio.Event] = {}
         self.outcomes: dict[str, list[Outcome]] = {}
         self.max_parallel = 0
+        self.specs: dict[str, dict[str, object]] = {}
+
+    leftovers_stopped = 0
+
+    def stop_leftovers(self) -> None:
+        self.leftovers_stopped += 1
+        self.started_when_stopped = list(self.started)
 
     def gate(self, job_id: str) -> asyncio.Event:
         return self.gates.setdefault(job_id, asyncio.Event())
 
     async def run(self, job_id, spec, log, on_event):  # type: ignore[no-untyped-def]
+        self.specs[job_id] = spec
         self.started.append(job_id)
         self.running.append(job_id)
         self.max_parallel = max(self.max_parallel, len(self.running))
@@ -292,6 +300,23 @@ async def test_recover_requeues_running_jobs(
         await queue.stop()
 
 
+async def test_engines_left_by_a_server_that_died_are_stopped_before_resuming(
+    settings: Settings, db: Database, library: Library
+) -> None:
+    store = JobStore(db)
+    job = upload(make_queue(settings, db, library, FakeSpawner()), settings)
+    store.update(job.id, stage="separate", stage_started=1.0)
+    spawner = FakeSpawner()
+    queue = make_queue(settings, db, library, spawner)
+    await queue.start()
+    try:
+        await until(lambda: spawner.started == [job.id])
+        assert spawner.leftovers_stopped == 1
+        assert spawner.started_when_stopped == []  # before the job ran again
+    finally:
+        await queue.stop()
+
+
 async def test_recover_marks_jobs_without_input_interrupted(
     settings: Settings, db: Database, library: Library
 ) -> None:
@@ -350,6 +375,56 @@ async def test_export_of_a_deleted_song_fails_song_missing(
         spawner.gate(busy.id).set()
         await until(lambda: queue.get(job.id).stage == "error")  # type: ignore[union-attr]
         assert queue.get(job.id).error_code == "song_missing"  # type: ignore[union-attr]
+    finally:
+        await queue.stop()
+
+
+@pytest.mark.parametrize("ending", ["cancel", "fail"])
+async def test_an_export_that_does_not_finish_leaves_no_partial_video(
+    settings: Settings, db: Database, library: Library, ending: str
+) -> None:
+    folder = write_package(settings.library_dir / "song")
+    spawner = FakeSpawner()
+    queue = make_queue(settings, db, library, spawner)
+    await queue.start()
+    try:
+        job = queue.submit_export("song", ExportRequest())
+        assert job is not None
+        await until(lambda: job.id in spawner.started)
+        partial = Path(str(spawner.specs[job.id]["out"]))
+        partial.write_bytes(b"half a video")  # what ffmpeg had written so far
+        partial.with_suffix(".jpg").write_bytes(b"thumb")
+        # And the encoder's own scratch file, left when the runner is killed mid-encode.
+        partial.with_name(f".{partial.stem}.part{partial.suffix}").write_bytes(b"half")
+        if ending == "cancel":
+            await queue.cancel(job.id)
+        else:
+            spawner.outcomes[job.id] = [Outcome(ok=False, code="engine_failed", message="x")]
+            spawner.gate(job.id).set()
+            await until(lambda: queue.get(job.id).stage == "error")  # type: ignore[union-attr]
+        assert list((folder / "exports").iterdir()) == []
+    finally:
+        await queue.stop()
+
+
+async def test_a_retried_job_does_not_count_its_stages_twice(
+    settings: Settings, db: Database, library: Library
+) -> None:
+    spawner = FakeSpawner()
+    queue = make_queue(settings, db, library, spawner)
+    store = JobStore(db)
+    await queue.start()
+    try:
+        job = upload(queue, settings)
+        await until(lambda: job.id in spawner.started)
+        store.update(job.id, stage_seconds={"download": 5.0, "separate": 100.0})
+        oom = Outcome(ok=False, code="gpu_memory", message="CUDA out of memory", transient=True)
+        spawner.outcomes[job.id] = [oom, Outcome(ok=True)]
+        spawner.gate(job.id).set()
+        await until(lambda: spawner.started.count(job.id) == 2)
+        # The second attempt starts its stages from zero; a download is not done again.
+        assert store.get(job.id).stage_seconds.get("separate", 0.0) < 100.0  # type: ignore[union-attr]
+        assert store.get(job.id).stage_seconds["download"] == 5.0  # type: ignore[union-attr]
     finally:
         await queue.stop()
 
@@ -432,3 +507,32 @@ def test_following_a_job_leaves_nothing_behind(
     stop()
     stop()
     assert "job-1" not in queue._listeners
+
+
+@pytest.mark.anyio
+async def test_the_gpu_lane_survives_a_database_error(
+    settings: Settings, db: Database, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import sqlite3
+
+    from karaoke_server.jobs.store import JobStore
+
+    spawner = FakeSpawner()
+    queue = make_queue(settings, db, Library(settings, db), spawner)
+    await queue.start()
+    try:
+        first = upload(queue, settings, "Un")
+        await until(lambda: first.id in spawner.started)
+        real_update = JobStore.update
+
+        def full_disk(self: JobStore, job_id: str, **changes: object) -> object:
+            raise sqlite3.OperationalError("database or disk is full")
+
+        monkeypatch.setattr(JobStore, "update", full_disk)
+        spawner.gate(first.id).set()
+        await asyncio.sleep(0.2)
+        monkeypatch.setattr(JobStore, "update", real_update)  # space freed
+        second = upload(queue, settings, "Dous")
+        await until(lambda: second.id in spawner.started)
+    finally:
+        await queue.stop()

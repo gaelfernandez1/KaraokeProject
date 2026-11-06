@@ -1,6 +1,8 @@
 """Running the server: one uvicorn process listening on the home port and on the tunnel port."""
 
 import logging
+import os
+import signal
 import socket
 
 import uvicorn
@@ -30,4 +32,13 @@ def serve(settings: Settings, verbose: bool = False) -> None:
     config = uvicorn.Config(
         app, proxy_headers=False, log_config=None, server_header=False, timeout_graceful_shutdown=5
     )
+    hang_up_as_terminate()
     uvicorn.Server(config).run(sockets=[home, tunnel])
+
+
+def hang_up_as_terminate() -> None:
+    """Closing the terminal sends SIGHUP: shut down as for Ctrl+C, stopping the running job,
+    instead of dying on the spot and leaving its engine behind. Under `nohup` (SIGHUP ignored)
+    it keeps ignoring it."""
+    if signal.getsignal(signal.SIGHUP) is signal.SIG_DFL:
+        signal.signal(signal.SIGHUP, lambda *_: os.kill(os.getpid(), signal.SIGTERM))

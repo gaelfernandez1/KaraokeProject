@@ -26,7 +26,7 @@ def _default_data_dir() -> Path:
 @dataclass(frozen=True)
 class Settings:
     data_dir: Path
-    home_host: str = "0.0.0.0"
+    home_host: str = "0.0.0.0"  # noqa: S104 - the home socket must reach phones
     home_port: int = 8765
     # Tunnels (Tailscale Serve) connect here; everything on this port counts as remote.
     tunnel_port: int = 8766
