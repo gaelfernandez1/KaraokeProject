@@ -2,7 +2,7 @@
 # Keeps the karaoke server running. Windows starts it hidden at logon (karaoke-server autostart):
 # while it runs, WSL stays up. If the server stops with an error it starts again after 5 s.
 set -u
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 # Started from Windows there is no login shell: settings such as KARAOKE_BACKUP_DIR live here.
 SETTINGS="${XDG_CONFIG_HOME:-$HOME/.config}/karaoke/server.env"
 if [ -f "$SETTINGS" ]; then
