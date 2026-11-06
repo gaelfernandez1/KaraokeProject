@@ -92,7 +92,7 @@ def main() -> int:
     for name, required, check in CHECKS:
         try:
             ok, detail = check()
-        except Exception as exc:  # a broken tool should be reported, not crash the report
+        except Exception as exc:  # a broken tool should be reported, not crash the report  # noqa: BLE001 - any failure is a failed check
             ok, detail = False, f"error: {exc}"
         status = "OK" if ok else ("FALTA" if required else "aviso")
         print(f"{status:6} {name:30} {detail}")

@@ -24,13 +24,6 @@ def demo_json() -> Path:
 
 
 @pytest.fixture
-def ffmpeg() -> None:
-    """Skips the test when ffmpeg is missing (CI images may not have it)."""
-    if shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None:
-        pytest.skip("ffmpeg and ffprobe are not installed")
-
-
-@pytest.fixture
 def make_tone(tmp_path: Path) -> ToneMaker:
     """Writes a mono 16-bit sine wave: enough for anything that only needs real audio."""
 

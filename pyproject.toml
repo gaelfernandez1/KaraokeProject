@@ -11,7 +11,7 @@ dependencies = ["karaoke-contracts", "karaoke-engine", "karaoke-bench", "karaoke
 ml = ["karaoke-engine[ml]", "karaoke-bench[ml]"]
 
 [dependency-groups]
-dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7", "httpx>=0.28"]
+dev = ["pytest>=8.4", "ruff>=0.17", "mypy>=2.4", "pre-commit>=4.7", "httpx>=0.28", "deptry>=0.24", "import-linter>=2.5", "pytest-xdist>=3.8", "hypothesis>=6.140", "schemathesis>=4.0"]
 
 [tool.uv]
 package = false
@@ -36,12 +36,32 @@ explicit = true
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = ["legacy", "web"]
+extend-exclude = ["web"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PT"]
+# Beyond style: families that catch bugs (ASYNC: blocking the server's event loop; S: security;
+# BLE: swallowed errors; DTZ: naive datetimes; PLW/PLE, PIE, PGH, LOG/G, TRY: error handling).
+# ARG, FAST and PERF were tried and left out: here they only flagged FastAPI dependencies kept
+# for their side effect, protocol signatures and micro-optimisations.
+select = [
+    "E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF", "PT",
+    "ASYNC", "S", "BLE", "DTZ", "PIE", "PGH", "PLE", "PLW", "T20", "C4", "LOG", "G",
+    "TRY002", "TRY004", "TRY201", "TRY300", "TRY401",
+]
+# S603/S607: every subprocess here runs ffmpeg, yt-dlp or systemd tools from an argument list,
+# never through a shell. S101: asserts are for tests and type narrowing.
+ignore = ["S101", "S603", "S607"]
 # Lyrics legitimately use typographic apostrophes and accents.
 allowed-confusables = ["’", "‘", "´"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S106", "S108", "S310", "S311", "T20", "ASYNC", "PLW1510"]
+"scripts/**" = ["T20"]
+# Command-line entry points talk to the user on stdout; the job runner speaks JSON lines on it.
+"**/cli.py" = ["T20"]
+"packages/server/src/karaoke_server/jobs/runner.py" = ["T20"]
+"packages/engine/src/karaoke_engine/subtitles/conformance.py" = ["T20"]
+"packages/contracts/src/karaoke_contracts/schema_export.py" = ["T20"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["karaoke_contracts", "karaoke_engine", "karaoke_bench", "karaoke_server"]
@@ -70,5 +90,41 @@ init_forbid_extra = true
 init_typed = true
 
 [tool.pytest.ini_options]
-addopts = "-ra --import-mode=importlib"
+# Tests that load real models run apart (`make test-models`): together they need 5 GB of RAM.
+addopts = "-ra --import-mode=importlib -m \"not models\""
+markers = ["models: loads real ML models (2 to 3 GB of RAM); run alone with `make test-models`"]
 testpaths = ["packages", "scripts"]
+
+# Package boundaries, checked by `make lint` (lint-imports). Imports inside functions count too.
+[tool.importlinter]
+root_packages = ["karaoke_contracts", "karaoke_engine", "karaoke_bench", "karaoke_server"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Contracts, then the engine, then the bench and the server (which never import each other)"
+type = "layers"
+layers = ["karaoke_bench | karaoke_server", "karaoke_engine", "karaoke_contracts"]
+
+[[tool.importlinter.contracts]]
+name = "The contracts only need pydantic"
+type = "forbidden"
+source_modules = ["karaoke_contracts"]
+forbidden_modules = ["numpy", "torch", "fastapi", "starlette", "uvicorn", "jiwer", "transformers"]
+
+# The server process must stay small: models load only in the child process of a job
+# (jobs.runner), so a crash or the RAM a model keeps never takes the API down.
+[[tool.importlinter.contracts]]
+name = "The server process never imports the models"
+type = "forbidden"
+source_modules = ["karaoke_server"]
+forbidden_modules = [
+    "torch",
+    "torchaudio",
+    "transformers",
+    "faster_whisper",
+    "ctranslate2",
+    "audio_separator",
+    "demucs",
+    "huggingface_hub",
+]
+ignore_imports = ["karaoke_server.jobs.runner -> karaoke_engine.**"]
