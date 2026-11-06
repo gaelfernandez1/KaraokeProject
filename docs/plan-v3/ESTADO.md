@@ -13,7 +13,7 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 | C6 | Vídeo | hecho (PR #6, en `main` el 30/10); falta que el usuario elija el fondo por defecto | `v3/c6-video` | `make` guarda vídeo y portada; `karaoke render` 16:9 y 9:16 con fondo de vídeo, portada o degradado, oscurecido según su brillo, franja bajo la letra, título, créditos y miniatura, en 27–45 s para 4 min con NVENC (`decisiones/008`); vídeo de fondo sincronizado en la web | `karaoke_engine.video` (`render`, `add_background`, `extract_background`, `extract_cover`, `choose_background`); CLI `karaoke render\|background`; `#lib/video/background.js` (`BackgroundSync`); guía `docs/video.md` | ver notas C6 → C7, C8, C4 |
 | C7 | Frontend | hecho a falta del OK del usuario y de probarlo en su móvil, portátil y tele | `v3/c7-frontend` | app completa contra un servidor simulado: biblioteca de carteles, reproductor (voz guía, tono, retardo, descargas, vídeo), crear con progreso en vivo, fiesta con tele y móviles (turnos, mando, QR), editor de letra y tiempos, ajustes con calibración, PWA sin conexión, gl/es/en; revisada con capturas en cuatro rondas de un revisor independiente y una revisión de código (`decisiones/010`) | rutas `/`, `/crear`, `/cantar/<id>`, `/editar/<id>`, `/festa`, `/festa/<código>`, `/axustes`; `#lib/api` (cliente), `#lib/party` (turnos `upcoming`, conexión SSE), `#lib/player` (`PlayerSession`, `Stage`), `#lib/editor/ops`; servidor simulado `web/dev/mock/` (API esperada en `decisiones/010`); guía `docs/web.md` | ver notas C7 → C10, C3/C5/C6 |
 | C8 | Backend, servidor y despliegue | hecho a falta del OK del usuario y de sus pasos en Windows (red `mirrored`, cortafuegos, Tailscale Serve, arranque) | `v3/c8-servidor` (encima de C7) | `karaoke-server`: FastAPI en un proceso con dos sockets (casa 8765, túneles 8766), zonas de red y aparatos vinculados, cola de un trabajo de GPU a la vez con un proceso hijo por trabajo en un *scope* de systemd, subidas en streaming, enlaces con yt-dlp al día, progreso y tiempo restante con SSE, cancelar y reintentar, fiesta persistente, `doctor`, copias, arranque con Windows; OpenAPI y tipos TS generados; probado de punta a punta en la RTX 3050: 4:47 con letra en 106 s, 5:13 por enlace sin letra en 166 s, MP4 en 30 s, cancelar libera la GPU en 0,3 s (`decisiones/011`) | `karaoke-server serve|pair|devices|import|backup|prepare|openapi|doctor|autostart`; `make serve`; API en `schemas/openapi.json` (tipos en `web/src/lib/api/generated/`); `#lib/devices` (`owner`, `DevicePanel`); ruta `/vincular`; `pnpm --dir web test:e2e:server`; guía `docs/servidor.md` | ver notas C8 → C7, C3, C9, C10 |
-| C9 | Calidad de código | sin empezar | — | — | — | — |
+| C9 | Calidad de código | hecho, en su PR a `main` (06/11) | `v3/c9-calidad` | `legacy/` fuera; auditoría por siete revisiones independientes: 1 fallo de seguridad alto y unos 40 fallos confirmados arreglados con test (fiesta que saltaba canciones, letras largas cortadas, pronombres mal juntados, cola de la GPU que moría, banco que infravaloraba el gallego…); puertas nuevas (ruff ampliado, deptry, import-linter, eslint con tipos, knip, zizmor, política de saltos en la CI con ffmpeg); tests en paralelo (167 s → 60 s, 4,9 → 2,8 GB); `make` −19 % (`decisiones/012`, `docs/calidad.md`) | `make test-models`; `KARAOKE_STRICT_SKIPS`; fixture `ffmpeg` y marca `models` (`conftest.py`); `karaoke_engine.make.prepare_models`; `DELETE /api/parties/{code}` y evento SSE `ended`; `PartyConnection.ended`, `HostParty.end()`; `#lib/offline/fallback.js`; `pnpm perf:frames` | ver notas C9 → todas, C2, C3, C10 |
 | C10 | Proyecto profesional | sin empezar | — | — | — | — |
 
 ## Notas entre áreas
@@ -21,8 +21,8 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
 - C1 → todas: ya se puede trabajar en paralelo, como mucho dos áreas a la vez y cada una en su
-  rama. C1–C6 están en `main` (30/10); C7 (frontend) y C8 (servidor, apilado sobre C7) están en sus
-  ramas a la espera del OK del usuario; lo siguiente es C9 (calidad de código).
+  rama. C1–C8 están en `main` (05/11); C9 (calidad) está en su PR; lo siguiente es C10
+  (proyecto profesional).
 - C8 → C7: la API real es la de `decisiones/010` con añadidos (`decisiones/011`): `Job.error_code`,
   `overall`, `eta`, `can_retry`; errores `{detail, code}`; `/api/me`, vincular aparatos y
   `home_reachable`. Los tipos de `#lib/api` y `#lib/party` salen de `schemas/openapi.json` (`make
@@ -35,8 +35,22 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 - C8 → C3: el paso `encode` de `make_package` (`package_audio`) tarda 30–34 s en una canción de 5
   min, casi un tercio del total con letra: tres `loudnorm` y dos codificaciones AAC en serie. En
   paralelo serían unos 14 s (medido a mano, `bench/results/2026-11-05-c8-servidor/`).
-- C8 → C9: `packages/server` entra en ruff, mypy estricto y pytest (241 tests, ~20 s, sin GPU ni
-  red); usa ffmpeg en algunos tests (se saltan sin él) y systemd en uno (también se salta).
+- C9 → todas: `make ci` pide ahora deptry (cada paquete declara lo que importa), import-linter
+  (contratos → motor → banco/servidor; el proceso del servidor no importa torch ni modelos), ruff
+  con `ASYNC/S/BLE/DTZ/…`, eslint con tipos en `web/src` y knip (`docs/calidad.md`). Un test que
+  use ffmpeg pide el fixture `ffmpeg`; uno que cargue modelos lleva `@pytest.mark.models`. En la CI
+  cualquier otro salto es un fallo. `legacy/` ya no existe (etiqueta `v2-final`).
+- C9 → C2: el banco empareja contra toda la referencia (el gallego subía del 98,6 % al 99,8 % sobre
+  las mismas alineaciones), cuenta las canciones que fallan en la cobertura y mide el WER sin letra
+  contra lo cantado. Pendiente tuyo: avisar al comparar ejecuciones con canciones distintas, que la
+  caché sepa del código (hoy solo `version`), emparejar las transcripciones también por tiempo, y
+  los menores de la revisión (normalización desalineada con `parse_lyrics`, «validada de oído» en
+  referencias trianguladas, `drafting.py` con `KeyError` si falla el separador).
+- C9 → C3: el audio del paquete ya mide y codifica en paralelo y mientras la GPU alinea (−20 s por
+  canción). La separación va con la GPU al 92–100 %: más rápida solo con menos pasadas u otro
+  modelo (decisión tuya, con el banco).
+- C9 → C10: `README.md` línea 1 ya no enlaza `legacy/`; `CITATION.cff`, `CONTRIBUTING.md` y
+  `LICENSE` solo ganaron el salto de línea final.
 - C8 → C10: el `README.md` sigue describiendo el sistema viejo (Docker, Celery); arrancar ahora es
   `make serve` y la guía para personas es `docs/servidor.md`.
 - C7 → C10: nombre provisional «Foliada» (constante en `web/src/lib/ui/Wordmark.svelte`, el título
