@@ -88,7 +88,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
       - run: uv sync --locked
       # The example songs' audio is not in git: synthetic beeps on every syllable stand in for it
-      # (locally the real songs come from the bench, docs/banco.md).
+      # (locally the real songs come from the bench, docs/benchmark.md).
       - run: for package in fixtures/packages/*/; do uv run karaoke demo "$package"; done
       - run: pnpm --dir web install --frozen-lockfile
       - run: pnpm --dir web exec playwright install --with-deps --only-shell chromium
@@ -99,6 +99,31 @@ jobs:
           name: playwright-results
           path: web/test-results/
           retention-days: 7
+
+  install:
+    name: Install script (fresh Ubuntu, Node ${{ matrix.node }}, run twice)
+    # What `make install` does on a new machine: uv and pnpm are not preinstalled here, so the
+    # script installs them; the second run must find nothing left to do and still pass. Node 22
+    # brings corepack; Node 26 (LTS) no longer does, so pnpm comes from npm there.
+    runs-on: ubuntu-26.04
+    strategy:
+      matrix:
+        node: [22, 26]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+      - run: scripts/install.sh --no-models
+      - run: scripts/install.sh --no-models
+      - name: The app is built and the commands run
+        run: |
+          test -f web/build/index.html
+          .venv/bin/karaoke --help > /dev/null
+          .venv/bin/karaoke-server --help > /dev/null
 
   contracts:
     name: Contracts in sync (schemas and TS types)
