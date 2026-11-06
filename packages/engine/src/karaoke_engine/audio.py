@@ -11,6 +11,7 @@ import math
 import subprocess
 import tempfile
 from collections.abc import Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -54,7 +55,7 @@ class Gain:
 def probe(path: Path) -> AudioInfo:
     result = _run(
         path,
-        ["ffprobe", "-v", "error", "-select_streams", "a:0", "-count_packets", "-show_entries",
+        ["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries",
          "stream=codec_name,sample_rate,channels,duration,duration_ts,time_base:format=duration",
          "-of", "json", str(path)],
     )  # fmt: skip
@@ -126,16 +127,25 @@ def encode_m4a(src: Path, dest: Path, gain_db: float, bitrate: str) -> Path:
 
 
 def package_audio(mix: Path, stems: Stems, out_dir: Path) -> AudioRefs:
-    """Writes instrumental.m4a and vocals.m4a, levelled from the original mix."""
-    peaks = [measure(stems.instrumental).true_peak, measure(stems.vocals).true_peak]
-    gain = plan_gain(measure(mix), peaks)
+    """Writes instrumental.m4a and vocals.m4a, levelled from the original mix.
+
+    The three loudness measures run at once, and so do the two encodes: each ffmpeg uses one
+    core, and one after another they took a third of a song's whole processing time.
+    """
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        mix_level, *stem_levels = pool.map(measure, (mix, stems.instrumental, stems.vocals))
+    gain = plan_gain(mix_level, [level.true_peak for level in stem_levels])
     out_dir.mkdir(parents=True, exist_ok=True)
     # Encoded aside and then moved in: the stems may be the very files being replaced (a package
     # converted twice), and ffmpeg would truncate them while reading.
-    with tempfile.TemporaryDirectory(dir=out_dir) as tmp:
-        for role, src in (("instrumental", stems.instrumental), ("vocals", stems.vocals)):
-            encoded = encode_m4a(src, Path(tmp) / f"{role}.m4a", gain.db, BITRATES[role])
-            encoded.replace(out_dir / f"{role}.m4a")
+    with tempfile.TemporaryDirectory(dir=out_dir) as tmp, ThreadPoolExecutor(2) as pool:
+        roles = (("instrumental", stems.instrumental), ("vocals", stems.vocals))
+        jobs = [
+            pool.submit(encode_m4a, src, Path(tmp) / f"{role}.m4a", gain.db, BITRATES[role])
+            for role, src in roles
+        ]
+        for (role, _), job in zip(roles, jobs, strict=True):
+            job.result().replace(out_dir / f"{role}.m4a")
     return AudioRefs(
         instrumental="instrumental.m4a",
         vocals="vocals.m4a",

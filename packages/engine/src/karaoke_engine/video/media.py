@@ -102,8 +102,11 @@ def extract_background(source: Path, out: Path) -> Path:
     if info is None:
         raise ValueError(f"{source} has no video")
     fps = min(info.fps or MAX_FPS, MAX_FPS)
+    # The long side up to 1280 and the short one up to 720, whichever way the video stands: a
+    # phone video stays 720x1280, sharp enough for the vertical export and a phone held upright.
+    box = (MAX_WIDTH, MAX_HEIGHT) if info.width >= info.height else (MAX_HEIGHT, MAX_WIDTH)
     filters = (
-        f"scale='min({MAX_WIDTH},iw)':'min({MAX_HEIGHT},ih)'"
+        f"scale='min({box[0]},iw)':'min({box[1]},ih)'"
         ":force_original_aspect_ratio=decrease:force_divisible_by=2"
     )
     if info.fps > MAX_FPS:

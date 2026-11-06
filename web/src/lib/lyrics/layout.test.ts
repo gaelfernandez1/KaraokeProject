@@ -76,10 +76,30 @@ describe('wrap', () => {
 	});
 
 	test('shrinks when two rows do not fit', () => {
+		const [rows, scale] = wrap(['a'.repeat(18), 'b'.repeat(18), 'c'.repeat(18)], 75, 900, 2, MONO);
+		expect(rows).toEqual([[0], [1, 2]]);
+		expect(scale).toBeCloseTo(900 / (37 * 37.5));
+	});
+
+	test('takes more rows rather than cutting a line too long for two', () => {
 		expect(wrap(['a'.repeat(20), 'b'.repeat(20), 'c'.repeat(20)], 75, 900, 2, MONO)).toEqual([
-			[[0], [1, 2]],
-			0.6
+			[[0], [1], [2]],
+			1
 		]);
+		const [rows] = wrap(
+			['a', 'b', 'c', 'd'].map((c) => c.repeat(20)),
+			75,
+			900,
+			2,
+			MONO
+		);
+		expect(rows).toEqual([[0], [1], [2], [3]]);
+	});
+
+	test('always fits the screen, shrinking a huge word further', () => {
+		const [rows, scale] = wrap(['a'.repeat(60)], 75, 900, 2, MONO);
+		expect(rows).toEqual([[0]]);
+		expect(60 * 37.5 * scale).toBeCloseTo(900);
 	});
 });
 

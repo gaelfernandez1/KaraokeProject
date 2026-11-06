@@ -12,7 +12,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from karaoke_contracts import KaraokeDoc, Theme, load_doc
+from karaoke_contracts import KaraokeDoc, Theme, load_doc, resolve_media
 from karaoke_engine.subtitles.ass import (
     ass_color,
     ass_number,
@@ -204,6 +204,8 @@ def render(
     if aspect not in SIZES:
         raise ValueError(f"aspect must be one of {', '.join(SIZES)}")
     width, height = size or SIZES[aspect]
+    if width % 2 or height % 2:
+        raise ValueError(f"the size must be even on both sides (H.264), not {width}x{height}")
     # ffmpeg runs in a scratch folder: every path it gets must be absolute.
     package = package.resolve()
     doc = load_doc(package / "karaoke.json")
@@ -240,17 +242,17 @@ def render(
             graph += ";[bg]null[base]"
         graph += ";[base]subtitles=lyrics.ass:fontsdir=fonts,format=yuv420p[v]"
 
-        instrumental = (package / doc.audio.instrumental).resolve()
+        instrumental = resolve_media(package, doc.audio.instrumental)
         inputs += ["-i", str(instrumental)]
         audio_map = f"{index}:a"
         audio_codec = (
             ["-c:a", "copy"] if instrumental.suffix == ".m4a" else ["-c:a", "aac", "-b:a", "192k"]
         )
         if vocals > 0 and doc.audio.vocals:
-            inputs += ["-i", str((package / doc.audio.vocals).resolve())]
+            inputs += ["-i", str(resolve_media(package, doc.audio.vocals))]
             graph += (
                 f";[{index + 1}:a]volume={ass_number(vocals)}[voc];"
-                f"[{index}:a][voc]amix=inputs=2:normalize=0,alimiter=limit=0.95[a]"
+                f"[{index}:a][voc]amix=inputs=2:normalize=0,alimiter=limit=0.95:level=0[a]"
             )
             audio_map = "[a]"
             audio_codec = ["-c:a", "aac", "-b:a", "192k"]

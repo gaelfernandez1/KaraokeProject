@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-from karaoke_contracts import KaraokeDoc, Theme
+from karaoke_contracts import KaraokeDoc, Theme, resolve_media
 from karaoke_engine.video.media import IMAGES, probe_video
 
 # Shapes this close count as the same (16:9 against 1.85:1, say): cover and crop.
@@ -117,11 +117,11 @@ def choose_background(package: Path, doc: KaraokeDoc, choice: str = "auto") -> B
     if choice == "video" or (choice == "auto" and video is not None):
         if video is None:
             raise ValueError("the package has no background video")
-        return _picture(package / video, "video")
+        return _picture(resolve_media(package, video), "video")
     if choice in ("cover", "auto"):
         if doc.cover is None:
             raise ValueError("the package has no cover")
-        return _picture(package / doc.cover, "image")
+        return _picture(resolve_media(package, doc.cover), "image")
     path = Path(choice).resolve()
     if not path.is_file():
         raise ValueError(f"unknown background {choice!r}: auto, video, cover, gradient or a file")

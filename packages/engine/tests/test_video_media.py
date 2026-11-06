@@ -178,3 +178,10 @@ def test_a_failed_background_leaves_the_old_one(
 
     assert (package / "background.mp4").read_bytes() == b"old"
     assert (package / "karaoke.json").read_bytes() == before
+
+
+def test_a_vertical_video_keeps_its_resolution(tmp_path: Path) -> None:
+    out = extract_background(_clip(tmp_path / "v.mp4", size="1080x1920"), tmp_path / "bg.mp4")
+
+    (video,) = _streams(out)
+    assert (video["width"], video["height"]) == (720, 1280)

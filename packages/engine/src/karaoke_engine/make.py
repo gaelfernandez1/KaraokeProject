@@ -1,9 +1,9 @@
 """`karaoke make`: a song and its lyrics in, a karaoke package out.
 
-The steps run one after another in this process, each freeing the GPU before the next loads its
-model (a 4 GB card holds one at a time): decode the song, separate the voice, align the lyrics,
-level and encode the stems, and only then write karaoke.json, so an interrupted run never leaves
-a package that looks complete.
+The GPU steps run one after another in this process, each freeing the GPU before the next loads
+its model (a 4 GB card holds one at a time): decode the song, separate the voice, align the
+lyrics; levelling and encoding the stems runs on the CPU meanwhile. karaoke.json is written
+last, so an interrupted run never leaves a package that looks complete.
 """
 
 import logging
@@ -12,6 +12,7 @@ import subprocess
 import tempfile
 import unicodedata
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from importlib import metadata
 from pathlib import Path
 from typing import Any, Literal
@@ -30,8 +31,9 @@ from karaoke_contracts import (
 from karaoke_engine.align.aligner import LyricsAligner
 from karaoke_engine.align.clitics import join_clitics
 from karaoke_engine.align.lyrics import parse_lyrics, singer_id
-from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL
+from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
 from karaoke_engine.audio import decode, package_audio, probe
+from karaoke_engine.languages import TWO_LETTERS
 from karaoke_engine.separation import RoformerSeparator
 from karaoke_engine.steps import Separator, TextAligner, Transcriber
 from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber, transcribe_in_child
@@ -50,6 +52,32 @@ def default_separator() -> Separator:
 
 def default_aligner(**options: Any) -> TextAligner:
     return LyricsAligner(**options)
+
+
+def prepare_models(language: str, note: Callable[[str], None] | None = None) -> None:
+    """Downloads (and converts) every model `make` needs for a language, one at a time.
+
+    Meant for the installation: the first song then starts right away, and a model converted on
+    first use gets the memory before anything else is loaded.
+    """
+    say = note or (lambda step: None)
+    say("separator")
+    separator = default_separator()
+    load = getattr(separator, "load", None)
+    if callable(load):
+        load()
+        _unload(separator)
+    say("aligner")
+    spec = MODELS[DEFAULT_BY_LANGUAGE.get(language, FALLBACK_MODEL)]
+    _download(spec.repo, spec.revision)
+    say("transcriber")
+    WhisperTranscriber().prepare_for(language)
+
+
+def _download(repo: str, revision: str) -> None:
+    from huggingface_hub import snapshot_download
+
+    snapshot_download(repo, revision=revision)
 
 
 def make_package(
@@ -71,6 +99,8 @@ def make_package(
     # Everything that can fail cheaply fails before the long steps start.
     if not _LANGUAGE.match(language):
         raise ValueError(f"language must be a two or three letter code like gl, not {language!r}")
+    if language in TWO_LETTERS:
+        raise ValueError(f"write the language as {TWO_LETTERS[language]!r}, not {language!r}")
     probe(source)  # files without audio
     if lyrics is not None and not parse_lyrics(lyrics):
         raise ValueError("the lyrics have no sung lines (only labels or symbols)")
@@ -84,13 +114,42 @@ def make_package(
     out_dir.mkdir(parents=True, exist_ok=True)
     # An old document next to new audio would look like a finished package.
     (out_dir / "karaoke.json").unlink(missing_ok=True)
-    with tempfile.TemporaryDirectory(dir=out_dir, prefix=".make-") as tmp:
+    try:
+        return _make(source, out_dir, language, lyrics, separator, aligner, transcriber,
+                     lyrics_source, title, artist, step)  # fmt: skip
+    except BaseException:
+        # Nothing of a failed run stays: its audio was made in the background meanwhile.
+        for name in ("instrumental.m4a", "vocals.m4a"):
+            (out_dir / name).unlink(missing_ok=True)
+        raise
+
+
+def _make(
+    source: Path,
+    out_dir: Path,
+    language: str,
+    lyrics: str | None,
+    separator: Separator,
+    aligner: TextAligner,
+    transcriber: Transcriber | None,
+    lyrics_source: Literal["user", "lrclib"],
+    title: str | None,
+    artist: str | None,
+    step: Callable[[str], None],
+) -> KaraokeDoc:
+    # The package audio (loudness and m4a, on the CPU) is made while the GPU transcribes and
+    # aligns; leaving the `with` waits for it, so nothing is deleted under a running ffmpeg.
+    with (
+        tempfile.TemporaryDirectory(dir=out_dir, prefix=".make-") as tmp,
+        ThreadPoolExecutor(max_workers=1) as background,
+    ):
         work = Path(tmp)
         step("decode")
         mix = decode(source, work / "mix.wav")
         step("separate")
         stems = separator.separate(mix, work / "stems")
         _unload(separator)
+        audio = background.submit(package_audio, mix, stems, out_dir)
         asr_model = None
         source_kind: Literal["user", "asr", "lrclib"] = lyrics_source
         if lyrics is None:
@@ -106,10 +165,14 @@ def make_package(
         step("align")
         lines = aligner.align_text(stems.vocals, lyrics, language)
         _unload(aligner)
+        if not lines:
+            raise ValueError(
+                "no line of the lyrics could be placed in the song (is it in another language?)"
+            )
         if language == "gl":
             lines = join_clitics(lines)
         step("encode")
-        refs = package_audio(mix, stems, out_dir)
+        refs = audio.result()
         duration = probe(mix).duration
         video, cover = _keep_pictures(source, out_dir)
     name = title or source.stem

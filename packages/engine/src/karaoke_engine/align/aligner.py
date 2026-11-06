@@ -58,7 +58,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "11"
+    version = "12"  # parse_lyrics: "2x" and header repeat marks, NFC, "X6" kept as text
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -219,8 +219,9 @@ class LyricsAligner:
             found[word] = (first * seconds, (last + 1) * seconds, math.exp(total / count))
         times = _fill_gaps(found)
         words: list[Word] = []
-        for text, (start, end, confidence) in zip(line.words, times, strict=True):
-            end = _trim_end(start, end, active)
+        for text, (found_start, found_end, confidence) in zip(line.words, times, strict=True):
+            start = found_start
+            end = _trim_end(found_start, found_end, active)
             if self.refine_onsets and confidence > 0:
                 previous_end = words[-1].end if words else 0.0
                 start = max(_voice_onset(start, active), min(start, previous_end))

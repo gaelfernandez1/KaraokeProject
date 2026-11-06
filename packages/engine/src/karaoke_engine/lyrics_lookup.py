@@ -71,9 +71,9 @@ def _ask(url: str, fetch: Fetch, wait: Callable[[float], None]) -> list[dict[str
 
 
 def _http_get(url: str) -> tuple[int, bytes]:
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})  # noqa: S310 - fixed https URL
     try:
-        with urllib.request.urlopen(request, timeout=20) as response:
+        with urllib.request.urlopen(request, timeout=20) as response:  # noqa: S310 - fixed https URL
             return int(response.status), response.read()
     except urllib.error.HTTPError as exc:
         return int(exc.code), exc.read()

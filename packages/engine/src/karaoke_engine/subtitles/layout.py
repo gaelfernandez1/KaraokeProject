@@ -24,6 +24,8 @@ BREAK_AFTER = ",.;:!?…»)"
 # Wrapping prefers a break after punctuation unless it makes the longest row 10 % wider.
 PUNCTUATION_BONUS = 0.9
 MIN_SCALE = 0.6
+# Rows a line may take when max_rows would push it off the screen.
+MAX_FALLBACK_ROWS = 4
 # A backing line that overlaps no lead line joins the previous one if it starts this soon after.
 BACKING_ATTACH = 1.5
 # A line appears at least this long before it is sung, even if the line before in its slot is
@@ -131,12 +133,19 @@ class Layout(_Frozen):
 def wrap(
     words: list[str], px: float, max_width: float, max_rows: int, metrics: FontMetrics
 ) -> tuple[list[list[int]], float]:
-    """Rows (word indices) for a line, and how much to shrink it so the widest row fits."""
+    """Rows (word indices) for a line, and how much to shrink it so the widest row fits.
+
+    Up to `max_rows` rows, shrunk down to MIN_SCALE. A line that still would not fit (a long
+    rap line on a phone held upright) takes up to MAX_FALLBACK_ROWS balanced rows instead, and
+    shrinks below MIN_SCALE only if even that is not enough: text is never cut off the screen.
+    """
     full = metrics.width(" ".join(words), px)
     if full <= max_width:
         return [list(range(len(words)))], 1.0
     if max_rows < 2 or len(words) < 2:
-        return [list(range(len(words)))], max(MIN_SCALE, max_width / full)
+        if full * MIN_SCALE > max_width and len(words) >= 2:
+            return _wrap_more(words, px, max_width, metrics, first=2)
+        return [list(range(len(words)))], _fit(max_width, full)
     best = 1
     best_cost = 0.0
     best_widest = 0.0
@@ -148,7 +157,59 @@ def wrap(
     rows = [list(range(best)), list(range(best, len(words)))]
     if best_widest <= max_width:
         return rows, 1.0
-    return rows, max(MIN_SCALE, max_width / best_widest)
+    if best_widest * MIN_SCALE > max_width and len(words) >= 3:
+        return _wrap_more(words, px, max_width, metrics, first=3)
+    return rows, _fit(max_width, best_widest)
+
+
+def _fit(max_width: float, widest: float) -> float:
+    """MIN_SCALE at the least, unless only a smaller size keeps the text on the screen."""
+    return (
+        max(MIN_SCALE, max_width / widest)
+        if widest * MIN_SCALE <= max_width
+        else max_width / widest
+    )
+
+
+def _wrap_more(
+    words: list[str], px: float, max_width: float, metrics: FontMetrics, first: int
+) -> tuple[list[list[int]], float]:
+    """The fewest rows (`first` up to MAX_FALLBACK_ROWS) whose widest fits at MIN_SCALE."""
+    n = len(words)
+    width = [[0.0] * (n + 1) for _ in range(n + 1)]
+    for i in range(n):
+        for j in range(i + 1, n + 1):
+            width[i][j] = metrics.width(" ".join(words[i:j]), px)
+    rows: list[list[int]] = []
+    widest = 0.0
+    for count in range(first, min(MAX_FALLBACK_ROWS, n) + 1):
+        rows, widest = _balanced(width, n, count)
+        if widest * MIN_SCALE <= max_width:
+            break
+    return rows, (1.0 if widest <= max_width else _fit(max_width, widest))
+
+
+def _balanced(width: list[list[float]], n: int, count: int) -> tuple[list[list[int]], float]:
+    """`count` rows of consecutive words with the narrowest widest row (the first such split)."""
+    inf = float("inf")
+    # best[r][j]: the narrowest widest row for the first j words in r rows; cut[r][j]: where the
+    # last of those rows starts.
+    best = [[inf] * (n + 1) for _ in range(count + 1)]
+    cut = [[0] * (n + 1) for _ in range(count + 1)]
+    best[0][0] = 0.0
+    for r in range(1, count + 1):
+        for j in range(r, n + 1):
+            for i in range(r - 1, j):
+                candidate = max(best[r - 1][i], width[i][j])
+                if candidate < best[r][j]:
+                    best[r][j], cut[r][j] = candidate, i
+    rows: list[list[int]] = []
+    end = n
+    for r in range(count, 0, -1):
+        start = cut[r][end]
+        rows.insert(0, list(range(start, end)))
+        end = start
+    return rows, best[count][n]
 
 
 def _display_words(line: Line, brackets: bool) -> list[RowWord]:
@@ -357,8 +418,10 @@ def _scroll_layout(
     last_hide = max(ends) + 2 * anim.hold if ends else 0.0
     groups: list[Group] = []
     block_of = {k: b for b, members in enumerate(blocks) for k in members}
+    # The first lines come in `lead_in` before singing starts, as a page does.
+    first_show = max(0.0, starts[0] - anim.lead_in) if starts else 0.0
     for k, rows in enumerate(rows_by_group):
-        show = switches[k - visible] if k >= visible else 0.0
+        show = switches[k - visible] if k >= visible else first_show
         hide = switches[k + 1] + anim.transition if k + 1 < len(switches) else last_hide
         placed = [row.model_copy(update={"x": width / 2, "y": tops[k] + row.y}) for row in rows]
         groups.append(
