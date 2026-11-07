@@ -113,6 +113,25 @@ def test_auto_prefers_video(tmp_path: Path) -> None:
     assert choose_background(package, doc, str(package / "cover.jpg")).kind == "image"
 
 
+@pytest.mark.usefixtures("ffmpeg")
+def test_the_export_prefers_the_master_video(tmp_path: Path) -> None:
+    package = _package(tmp_path)
+    for name, size in (("background.mp4", "320x240"), ("master.mp4", "640x480")):
+        subprocess.run(
+            ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", f"testsrc2=s={size}:d=1",
+             str(package / name)],
+            check=True,
+        )  # fmt: skip
+    doc = load_doc(package / "karaoke.json").model_copy(
+        update={"video": VideoRefs(background="background.mp4", master="master.mp4")}
+    )
+
+    for choice in ("auto", "video"):
+        picked = choose_background(package, doc, choice)
+        assert (picked.kind, picked.width, picked.height) == ("video", 640, 480)
+        assert picked.path == package / "master.mp4"
+
+
 def test_asking_for_a_missing_background_fails(tmp_path: Path) -> None:
     package = _package(tmp_path)
 

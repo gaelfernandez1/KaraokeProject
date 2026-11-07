@@ -110,8 +110,9 @@ def _picture(path: Path, kind: Literal["video", "image"]) -> Background:
 
 def choose_background(package: Path, doc: KaraokeDoc, choice: str = "auto") -> Background:
     """`auto` (the package's video, else its cover, else a gradient), `video`, `cover`,
-    `gradient`, or the path of a video or picture."""
-    video = doc.video.background if doc.video else None
+    `gradient`, or the path of a video or picture. The package's video is its master if it has
+    one: the background is a lighter copy for players."""
+    video = (doc.video.master or doc.video.background) if doc.video else None
     if choice == "gradient" or (choice == "auto" and video is None and doc.cover is None):
         return Background("gradient")
     if choice == "video" or (choice == "auto" and video is not None):

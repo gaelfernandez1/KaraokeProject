@@ -2,10 +2,12 @@
 
 The background is re-encoded for browsers: H.264 that every phone and TV plays, a keyframe every
 second so seeking is instant, the index at the front so it starts at once, and no audio (the
-player plays the package stems).
+player plays the package stems). The master is the same video at its own quality, for the MP4
+export: copied as it came when it can be, so the export is the only lossy step after the source.
 """
 
 import json
+import logging
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,12 +15,20 @@ from pathlib import Path
 from karaoke_contracts import KaraokeDoc, VideoRefs, dump_doc, load_doc
 from karaoke_engine.video.encode import h264_encoders, run_encoder
 
+logger = logging.getLogger(__name__)
+
 # 720p: a dimmed background under the lyrics looks the same, at a third of the size of 1080p.
 MAX_WIDTH, MAX_HEIGHT = 1280, 720
 MAX_FPS = 30
 IMAGES = {".jpg", ".jpeg", ".png", ".webp"}
 COVER_SIZE = 1280
 BACKGROUND_QUALITY = 30
+# The master: up to 1080 on the short side, copied as is in a codec every decoder knows and at a
+# sane bitrate (a music video from the web is 2-5 Mb/s; a camera clip can be 50), else encoded.
+MASTER_SHORT_SIDE = 1080
+MASTER_CODECS = {"h264", "hevc", "vp9", "av1"}
+MASTER_MAX_BITRATE = 16_000_000
+MASTER_QUALITY = 18
 
 
 @dataclass(frozen=True)
@@ -27,6 +37,9 @@ class VideoInfo:
     height: int
     fps: float
     duration: float
+    codec: str = ""
+    # Bits per second of the video stream (or of the whole file if the stream does not say).
+    bitrate: int = 0
 
 
 def _ffprobe(path: Path) -> dict[str, list[dict[str, object]] | dict[str, object]]:
@@ -86,12 +99,16 @@ def probe_video(path: Path) -> VideoInfo | None:
         if _rotation(stream) % 180 == 90:
             width, height = height, width
         fmt = data.get("format", {})
-        duration = stream.get("duration") or (fmt.get("duration") if isinstance(fmt, dict) else 0)
+        fmt = fmt if isinstance(fmt, dict) else {}
+        duration = stream.get("duration") or fmt.get("duration") or 0
+        bitrate = stream.get("bit_rate") or fmt.get("bit_rate") or 0
         return VideoInfo(
             width=width,
             height=height,
             fps=fps,
-            duration=float(str(duration or 0)),
+            duration=float(str(duration)),
+            codec=str(stream.get("codec_name", "")),
+            bitrate=int(float(str(bitrate))),
         )
     return None
 
@@ -118,6 +135,35 @@ def extract_background(source: Path, out: Path) -> Path:
     ]  # fmt: skip
     tail = ["-g", keyframes, "-keyint_min", keyframes, "-movflags", "+faststart", str(out)]
     run_encoder(command, h264_encoders(BACKGROUND_QUALITY), tail)
+    return out
+
+
+def extract_master(source: Path, out: Path) -> Path:
+    """Writes the video of `source` at its own quality (up to 1080p) for the MP4 export."""
+    info = probe_video(source)
+    if info is None:
+        raise ValueError(f"{source} has no video")
+    head = ["ffmpeg", "-v", "error", "-y", "-i", str(source), "-map", "0:v:0", "-an", "-sn", "-dn"]
+    tail = ["-movflags", "+faststart", str(out)]
+    short = min(info.width, info.height)
+    if (
+        short <= MASTER_SHORT_SIDE
+        and info.codec in MASTER_CODECS
+        and info.bitrate <= MASTER_MAX_BITRATE
+    ):
+        # The same packets in an MP4: nothing is lost and it takes a second. If the MP4 cannot
+        # hold them, the video is encoded below like any other.
+        copied = subprocess.run([*head, "-c:v", "copy", *tail], capture_output=True, check=False)
+        if copied.returncode == 0:
+            return out
+        out.unlink(missing_ok=True)
+    filters = "format=yuv420p"
+    if short > MASTER_SHORT_SIDE:
+        side = "1080:-2" if info.width <= info.height else "-2:1080"
+        filters = f"scale={side}:flags=lanczos,{filters}"
+    if info.fps > 2 * MAX_FPS:
+        filters = f"fps={2 * MAX_FPS},{filters}"
+    run_encoder([*head, "-vf", filters], h264_encoders(MASTER_QUALITY), tail)
     return out
 
 
@@ -192,12 +238,19 @@ def add_background(package: Path, source: Path) -> KaraokeDoc:
     has_video = not picture and probe_video(source) is not None
     parts = {
         "background.mp4": package / ".background.part.mp4",
+        "master.mp4": package / ".master.part.mp4",
         "cover.jpg": package / ".cover.part.jpg",
     }
     staged: dict[str, Path] = {}
     try:
         if has_video:
             staged["background.mp4"] = extract_background(source, parts["background.mp4"])
+            # An extra, as in `make`: without it the export uses the background.
+            try:
+                staged["master.mp4"] = extract_master(source, parts["master.mp4"])
+            except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+                logger.warning("could not keep the full-quality video of %s: %s", source.name, exc)
+                parts["master.mp4"].unlink(missing_ok=True)
         if not has_video or doc.cover is None:
             cover = extract_cover(source, parts["cover.jpg"])
             if cover is not None:
@@ -210,7 +263,8 @@ def add_background(package: Path, source: Path) -> KaraokeDoc:
         raise
     updates: dict[str, object] = {}
     if "background.mp4" in staged:
-        updates["video"] = VideoRefs(background="background.mp4")
+        master = "master.mp4" if "master.mp4" in staged else None
+        updates["video"] = VideoRefs(background="background.mp4", master=master)
     if "cover.jpg" in staged:
         updates["cover"] = "cover.jpg"
     for name, part in staged.items():
