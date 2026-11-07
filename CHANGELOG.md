@@ -7,6 +7,34 @@ and the web app. How a release is made: [`docs/releasing.md`](docs/releasing.md)
 
 ## [Unreleased]
 
+### Added
+
+- **Descargar** in the player: the song's karaoke videos, made right there with their progress
+  live and kept to download (or delete) any time, plus the music without vocals, the vocals, the
+  synced lyrics and the offline copy. A video made before a correction of the lyrics says so.
+- The guide vocals in a video can be set from none (a karaoke) to the song as sung; each level
+  is a video of its own («… (karaoke, voz 30%).mp4»).
+- Downloads are named after the song («Artist - Title (karaoke).mp4», «… (sen voz).m4a»).
+- `GET /api/songs/{id}/exports`, `DELETE /api/songs/{id}/exports/{name}` and
+  `GET /media/{id}/{file}?download=1&name=…`.
+
+### Changed
+
+- Better MP4 exports: songs keep their video as it came (`master.mp4`, up to 1080p, contract
+  1.2.0) and the export draws on it instead of the player's 720p copy (36.9 → 43.3 dB XPSNR on a
+  1080p clip, about the same time). Links now download at up to 1080p. Songs made before keep
+  exporting as they did; making them again from their link adds the original.
+- The «Son» panel keeps only the sound settings and the lyrics style.
+
+### Fixed
+
+- The download button of a finished video never showed on the create page with the real server:
+  video jobs now carry their song from the start.
+- Asking again for a video that was still waiting or being made queued another copy of it; it
+  now gives the same job. A video waiting for the graphics card says so instead of «0 %».
+- Several players following their jobs at once could get errors (500): request checks ran in
+  worker threads and shared the database connection; they now run on the server's event loop.
+
 ## [3.0.0] - 2026-11-06
 
 A rebuild from scratch, under a new name: Proxecto Karaoke en Galego. The goal stays the same — a

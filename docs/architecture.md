@@ -85,7 +85,7 @@ language, the best available is used and noted in `provenance.language_fallbacks
 ## The karaoke package
 
 One folder per song. The document validates against
-[`schemas/karaoke.schema.json`](../schemas/karaoke.schema.json) (version 1.1.0), generated from the
+[`schemas/karaoke.schema.json`](../schemas/karaoke.schema.json) (version 1.2.0), generated from the
 pydantic models, like the web app's TypeScript types (`make contracts`).
 
 ```
@@ -93,8 +93,10 @@ pydantic models, like the web app's TypeScript types (`make contracts`).
   karaoke.json       lyrics: lines, words and syllables with their timings and confidence
   instrumental.m4a   without the lead vocals
   vocals.m4a         the guide vocals
-  background.mp4     optional: the song's video, web-ready
+  background.mp4     optional: the song's video, web-ready (720p)
+  master.mp4         optional: the same video at its own quality (up to 1080p), for the MP4 export
   cover.jpg          optional: the cover
+  exports/           the karaoke MP4 files made by the server, with their thumbnails
 ```
 
 Each line has its singer and its role (`lead` or `backing`: backing vocals may overlap the lead
@@ -172,3 +174,4 @@ offline). The API client uses types generated from the server's OpenAPI.
 | [011](plan-v3/decisiones/011-servidor.md) | Server | one process, one GPU queue, network zones |
 | [012](plan-v3/decisiones/012-calidad.md) | Quality | gates per class of bug; about 40 bugs fixed with tests |
 | [013](plan-v3/decisiones/013-proyecto-profesional.md) | Project | one version, releases from the changelog, licences checked |
+| [014](plan-v3/decisiones/014-descargas-y-video-original.md) | Downloads | a download panel in the player; the export draws on the original video (contract 1.2.0) |

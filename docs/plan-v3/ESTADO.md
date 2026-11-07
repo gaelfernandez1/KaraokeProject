@@ -20,6 +20,17 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
+- Mantenimiento → C1, C6, C7, C8 (07/11, rama `v3/descargar-video`, `decisiones/014`): contrato
+  **1.2.0** con `video.master` (el vídeo original, hasta 1080p, solo para el MP4; `karaoke make` y
+  `karaoke background` lo guardan con `extract_master` y `render` lo prefiere); los enlaces bajan
+  hasta 1080p; API nueva `GET`/`DELETE /api/songs/{id}/exports` y `?download=1&name=` en `/media`;
+  los trabajos de vídeo llevan `song_id` desde que se piden (antes el botón de descarga de «Crear»
+  no salía con el servidor real); en la web, panel «Descargar» en el reproductor
+  (`#lib/player/DownloadPanel`, `PlayerPanel`, `downloads.ts`) y «Son» solo con el sonido.
+  Después: `vocals` en las exportaciones (un fichero por nivel), una exportación igual pendiente
+  devuelve el mismo trabajo y **todas las dependencias de FastAPI son `async`** (las `def` corrían
+  en hilos con la conexión de SQLite del bucle: 500 con varios reproductores; lo vigila
+  `test_dependencies.py`).
 - C1 → todas: las diez áreas del plan v3 están en `main` y la versión 3.0.0 está publicada
   (06/11). `main` solo acepta cambios por PR con la CI en verde (ruleset de GitHub).
 - C10 → todas: una sola versión del producto (3.0.0) en los paquetes, la web y `CITATION.cff`;
