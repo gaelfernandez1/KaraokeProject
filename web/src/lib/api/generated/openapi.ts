@@ -58,6 +58,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/songs/{song_id}/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Exports
+         * @description The song's karaoke videos, newest first (made with POST /api/songs/{id}/exports).
+         */
+        get: operations["list_exports_api_songs__song_id__exports_get"];
+        put?: never;
+        /** Export Video */
+        post: operations["export_video_api_songs__song_id__exports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/songs/{song_id}/exports/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Export */
+        delete: operations["delete_export_api_songs__song_id__exports__name__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/media/{song_id}/{rel}": {
         parameters: {
             query?: never;
@@ -65,7 +103,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Media */
+        /**
+         * Media
+         * @description A file of the package; `download` asks the browser to save it, as `name` if given.
+         */
         get: operations["media_media__song_id___rel__get"];
         put?: never;
         post?: never;
@@ -482,23 +523,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/songs/{song_id}/exports": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Export Video */
-        post: operations["export_video_api_songs__song_id__exports_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -538,6 +562,31 @@ export interface components {
             /** Last Seen */
             last_seen: string;
         };
+        /**
+         * Export
+         * @description A karaoke video of a song, ready to download.
+         */
+        Export: {
+            /** File */
+            file: string;
+            /**
+             * Aspect
+             * @enum {string}
+             */
+            aspect: "16:9" | "9:16";
+            /** Theme */
+            theme: string;
+            /** Size */
+            size: number;
+            /** Created At */
+            created_at: string;
+            /** Thumbnail */
+            thumbnail: string | null;
+            /** Outdated */
+            outdated: boolean;
+            /** Vocals */
+            vocals: number;
+        };
         /** ExportRequest */
         ExportRequest: {
             /**
@@ -551,6 +600,11 @@ export interface components {
              * @default clasico
              */
             theme: string;
+            /**
+             * Vocals
+             * @default 0
+             */
+            vocals: number;
         };
         /** Guest */
         Guest: {
@@ -629,7 +683,7 @@ export interface components {
         KaraokeDoc: {
             /**
              * Schema Version
-             * @default 1.1.0
+             * @default 1.2.0
              */
             schema_version: string;
             /** Id */
@@ -937,8 +991,16 @@ export interface components {
         };
         /** VideoRefs */
         VideoRefs: {
-            /** Background */
+            /**
+             * Background
+             * @description The song's video, light enough for every player (720p).
+             */
             background?: string | null;
+            /**
+             * Master
+             * @description The same video at its own quality (up to 1080p), for the MP4 export.
+             */
+            master?: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -1062,10 +1124,107 @@ export interface operations {
             };
         };
     };
+    list_exports_api_songs__song_id__exports_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                song_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Export"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_video_api_songs__song_id__exports_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                song_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_export_api_songs__song_id__exports__name__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                song_id: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     media_media__song_id___rel__get: {
         parameters: {
             query?: {
                 download?: boolean;
+                name?: string | null;
             };
             header?: never;
             path: {
@@ -1809,41 +1968,6 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    export_video_api_songs__song_id__exports_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                song_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ExportRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Job"];
                 };
             };
             /** @description Validation Error */

@@ -47,7 +47,8 @@ class JobRecord:
             title=title,
             stage="queued",
             progress=0.0,
-            song_id=None,
+            # An export is of a song from the start; a karaoke gets its song when it is made.
+            song_id=request.get("song_id") if kind == "export" else None,
             file=None,
             error=None,
             error_code=None,
@@ -78,6 +79,9 @@ def _from_row(row: Any) -> JobRecord:
     for name in _JSON:
         values[name] = json.loads(values[name])
     values["with_lyrics"] = bool(values["with_lyrics"])
+    if values["kind"] == "export" and values["song_id"] is None:
+        # Exports used to keep their song only in the request.
+        values["song_id"] = values["request"].get("song_id")
     return JobRecord(**values)
 
 

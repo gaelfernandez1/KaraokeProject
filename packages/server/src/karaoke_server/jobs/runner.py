@@ -115,7 +115,13 @@ def run_export(spec: dict[str, Any]) -> dict[str, Any]:
     from karaoke_engine.subtitles.themes import load_theme
     from karaoke_engine.video.render import render
 
-    report = render(Path(spec["package"]), out, load_theme(spec["theme"]), aspect=spec["aspect"])
+    report = render(
+        Path(spec["package"]),
+        out,
+        load_theme(spec["theme"]),
+        aspect=spec["aspect"],
+        vocals=float(spec.get("vocals", 0.0)),
+    )
     return {"file": str(out), "seconds": report.seconds, "encoder": report.encoder}
 
 

@@ -181,7 +181,9 @@ minutes and 2 GB of free disk space left.
 
 - **Links** are downloaded with yt-dlp, always at its latest release (`uvx` fetches it the first
   time; YouTube changes often and an old version stops working). It is best effort: some sites
-  fail. Live streams and playlists are not accepted.
+  fail. Live streams and playlists are not accepted. The video comes at up to 1080p: the song keeps
+  it as it came for the MP4 export (`master.mp4`, [`video.md`](video.md)) and the players get a
+  lighter 720p copy.
 - Jobs go through the GPU **one at a time**, each in its own process with a memory limit: if one runs
   out of memory, it dies and WSL does not. Downloads progress at the same time.
 - A passing failure (out of memory, the process crashed) is retried once on its own. *Tentar de
@@ -190,6 +192,26 @@ minutes and 2 GB of free disk space left.
 
 Times on the RTX 3050 (`bench/results/2026-11-05-c8-servidor/`): a 4-minute song with lyrics,
 about 90 s; without lyrics, about 110 s; exporting the MP4, about 25 s.
+
+## Downloading
+
+In the player, **Descargar** (the arrow at the top) lists the song's karaoke videos and lets the
+laptop or a paired device make one (16:9 for the TV or YouTube, 9:16 for social media, in the
+lyrics style chosen, with the guide vocals from none to the song as sung), with its progress live.
+The GPU makes one thing at a time: a video waiting for its turn says so. Asking again for a video
+that is already waiting or being made gives that same job, never a second copy. Anyone who can see the song can download the videos,
+the music without vocals, the vocals and the synced lyrics. Files are saved under the song's name
+(«Artist - Title (karaoke).mp4»). A video made before a correction of the lyrics is marked as
+outdated.
+
+- `GET /api/songs/{id}/exports`: the videos, newest first (`file`, `aspect`, `theme`, `vocals`,
+  `size`, `created_at`, `thumbnail`, `outdated`); `DELETE /api/songs/{id}/exports/{name}` deletes
+  one (owner). `POST /api/songs/{id}/exports` (`aspect`, `theme`, `vocals` from 0 to 1, in
+  hundredths) makes one; its job carries the `song_id` from the start. Each shape, style and
+  vocals level is a file of its own: `exports/<id>-<16x9|9x16>-<style>[-v<percent>].mp4`.
+- `GET /media/{id}/{file}?download=1&name=…` sends any file of the package as an attachment, under
+  that name: the server keeps only its last part, drops the characters no file system takes, cuts
+  it to 120 characters and gives it the real file's extension.
 
 ## When something goes wrong
 
