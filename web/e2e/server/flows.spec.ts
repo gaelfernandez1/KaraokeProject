@@ -49,6 +49,32 @@ test('a song uploaded on the laptop is made and sung', async ({ page }) => {
 	await expect(page.getByRole('link', { name: new RegExp(`^${title},`) })).toBeVisible();
 });
 
+test('the karaoke video is made in the player and downloaded with the song name', async ({
+	page
+}) => {
+	const title = `Vídeo ${Date.now()}`;
+	await upload(page, title);
+	const card = page.locator('.job').filter({ hasText: title });
+	await card.getByRole('link', { name: 'Cantar agora' }).click({ timeout: 30_000 });
+	await page.getByRole('button', { name: 'Descargar' }).click();
+	const panel = page.getByRole('complementary', { name: 'Descargar' });
+	await panel.getByRole('button', { name: 'Vertical, para redes' }).click();
+
+	const link = panel.getByRole('link', { name: 'Descargar o vídeo' });
+	await expect(link).toBeVisible({ timeout: 30_000 });
+	await expect(panel.getByText('Vertical · Clásico')).toBeVisible();
+	const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
+	expect(download.suggestedFilename()).toBe(`${title} (karaoke vertical).mp4`);
+
+	// The video stays with the song: the create page offers it too, under the same name.
+	await page.goto('/crear');
+	const made = page.locator('.job').filter({ hasText: title });
+	await expect(made.getByRole('link', { name: 'Descargar o vídeo' })).toHaveAttribute(
+		'download',
+		`${title} (karaoke vertical).mp4`
+	);
+});
+
 test('a phone at home can browse, but creates only once it is paired', async ({
 	page: laptop,
 	browser

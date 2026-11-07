@@ -9,8 +9,6 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { ApiError, getDoc, mediaUrl } from '#lib/api';
-	import { explain } from '#lib/devices/explain.js';
-	import { jobs } from '#lib/create/jobs.svelte.js';
 	import type { KaraokeDoc, PlaybackClock } from '#lib/contracts';
 	import { i18n } from '#lib/i18n';
 	import { DEFAULT_THEME, THEMES } from '#lib/lyrics';
@@ -22,6 +20,7 @@
 		setMediaSession,
 		toggleFullscreen
 	} from '#lib/player/platform.js';
+	import DownloadPanel from '#lib/player/DownloadPanel.svelte';
 	import { lineSeek, lineSegments } from '#lib/player/seek.js';
 	import SeekBar from '#lib/player/SeekBar.svelte';
 	import { PlayerSession } from '#lib/player/session.svelte.js';
@@ -42,10 +41,11 @@
 	let doc = $state.raw<KaraokeDoc | null>(null);
 	let missing = $state(false);
 	let loadError = $state<string | null>(null);
-	let panelOpen = $state(false);
+	/** The side panel showing, if any. */
+	let panel = $state<'sound' | 'downloads' | null>(null);
+	const panelOpen = $derived(panel !== null);
 	let idle = $state(false);
 	let fullscreen = $state(false);
-	let notice = $state<string | null>(null);
 	let root = $state<HTMLElement | null>(null);
 	let controlsHeight = $state(0);
 
@@ -177,7 +177,7 @@
 			case 'fullscreen':
 				return toggleScreen();
 			case 'exit':
-				if (panelOpen) panelOpen = false;
+				if (panelOpen) panel = null;
 				else if (!isFullscreen()) void goto(resolve('/'));
 		}
 	}
@@ -192,15 +192,7 @@
 		wake();
 	}
 
-	async function exportVideo(aspect: '16:9' | '9:16') {
-		try {
-			await jobs.startExport(id, { aspect, theme: settings.theme });
-			notice = t.videoStarted;
-		} catch (error) {
-			notice = explain(error, i18n.t.errors.generic, i18n.t);
-		}
-		setTimeout(() => (notice = null), 5000);
-	}
+	const toggle = (which: 'sound' | 'downloads') => (panel = panel === which ? null : which);
 
 	function setLatency(ms: number) {
 		updateSettings({ latencyMs: ms });
@@ -263,9 +255,16 @@
 			<Button
 				variant="ghost"
 				iconOnly
+				icon="download"
+				aria-expanded={panel === 'downloads'}
+				onclick={() => toggle('downloads')}>{t.download}</Button
+			>
+			<Button
+				variant="ghost"
+				iconOnly
 				icon="sound"
-				aria-expanded={panelOpen}
-				onclick={() => (panelOpen = !panelOpen)}>{t.sound}</Button
+				aria-expanded={panel === 'sound'}
+				onclick={() => toggle('sound')}>{t.sound}</Button
 			>
 			{#if canFullscreen() && !touch}
 				<Button
@@ -354,21 +353,25 @@
 
 		{#if panelOpen}
 			<div class="panel-box">
-				<SoundPanel
-					{session}
-					{doc}
-					songId={id}
-					themeId={settings.theme}
-					latencyMs={settings.latencyMs}
-					ontheme={(themeId) => updateSettings({ theme: themeId })}
-					onlatency={setLatency}
-					onexport={exportVideo}
-					onclose={() => (panelOpen = false)}
-				/>
+				{#if panel === 'downloads'}
+					<DownloadPanel
+						{doc}
+						songId={id}
+						themeId={settings.theme}
+						onclose={() => (panel = null)}
+					/>
+				{:else}
+					<SoundPanel
+						{session}
+						themeId={settings.theme}
+						latencyMs={settings.latencyMs}
+						ontheme={(themeId) => updateSettings({ theme: themeId })}
+						onlatency={setLatency}
+						onclose={() => (panel = null)}
+					/>
+				{/if}
 			</div>
 		{/if}
-
-		{#if notice}<p class="notice" role="status">{notice}</p>{/if}
 	{:else if missing}
 		<div class="center static">
 			<p class="message">{t.notFound}</p>
@@ -392,6 +395,8 @@
 		grid-template-columns: minmax(0, 1fr);
 		background: var(--noite);
 		overflow: hidden;
+		/* The side panel's width on wide screens (wider on a TV, where the text is bigger). */
+		--panel-w: min(24rem, 100%);
 	}
 
 	.player.hide-controls {
@@ -403,10 +408,17 @@
 		inset: 0;
 	}
 
-	/* On wide screens the panel sits beside the lyrics instead of over them. */
+	/*
+	 * On wide screens the panel sits beside the lyrics instead of over them, and the top bar
+	 * makes room for it so its buttons stay at hand (to switch panels, edit, go full screen).
+	 */
 	@media (min-width: 60em) {
 		.panel-open .stage-box {
-			right: min(24rem, 100%);
+			right: var(--panel-w);
+		}
+
+		.panel-open .top {
+			padding-right: calc(var(--panel-w) + var(--s-3));
 		}
 	}
 
@@ -488,6 +500,7 @@
 			--t-0: 1.75rem;
 			--t-2: 2.6rem;
 			--target: 4rem;
+			--panel-w: min(34rem, 100%);
 		}
 
 		.top {
@@ -505,7 +518,7 @@
 	}
 
 	.panel-open .bottom {
-		padding-right: max(var(--page-x), min(24rem, 100%));
+		padding-right: max(var(--page-x), var(--panel-w));
 	}
 
 	@media (max-width: 59.99em) {
@@ -582,12 +595,13 @@
 		font-weight: 600;
 	}
 
+	/* As wide as the room the stage leaves it, whatever the panel holds. */
 	.panel-box {
 		position: absolute;
 		z-index: 3;
 		inset: 0 0 0 auto;
 		display: flex;
-		max-width: 100%;
+		width: var(--panel-w);
 	}
 
 	/* Phones: the panel is a sheet over the lower part of the screen. */
@@ -603,18 +617,5 @@
 			border-top: 1px solid var(--linha);
 			border-radius: 16px 16px 0 0;
 		}
-	}
-
-	.notice {
-		position: absolute;
-		z-index: 4;
-		left: 50%;
-		bottom: 9rem;
-		transform: translateX(-50%);
-		padding: var(--s-3) var(--s-5);
-		border-radius: var(--radius-control);
-		background: var(--papel);
-		color: var(--noite);
-		font-weight: 700;
 	}
 </style>

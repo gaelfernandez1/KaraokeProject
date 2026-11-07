@@ -15,6 +15,8 @@ export type Job = Schemas['Job'];
 export type JobStage = Job['stage'];
 
 export type ExportInput = Schemas['ExportRequest'];
+/** A finished karaoke video of a song. */
+export type Export = Schemas['Export'];
 
 /** Addresses of the server: `url` is the home network's, for the party QR code. */
 export type ServerInfo = Schemas['ServerInfo'];

@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
-import type { SongSummary } from '../../src/lib/api/types.ts';
+import type { Export, SongSummary } from '../../src/lib/api/types.ts';
 import type { KaraokeDoc } from '../../src/lib/contracts/generated/karaoke.ts';
 import { hookOf } from '../../src/lib/poster/hook.ts';
 
@@ -32,6 +32,9 @@ export class Library {
 	readonly #virtual = new Map<string, Virtual>();
 	readonly #edited = new Map<string, KaraokeDoc>();
 	readonly #deleted = new Set<string>();
+	/** Videos "made" by the mock export jobs (it cannot render: it serves stand-ins). */
+	readonly #exports = new Map<string, Export[]>();
+	readonly #editedAt = new Map<string, string>();
 
 	constructor(dirs: string[]) {
 		this.dirs = dirs;
@@ -156,7 +159,50 @@ export class Library {
 	saveDoc(id: string, doc: KaraokeDoc): KaraokeDoc {
 		const saved = { ...doc, id, edited: true };
 		this.#edited.set(id, saved);
+		this.#editedAt.set(id, new Date(Date.now() + 1).toISOString());
 		return saved;
+	}
+
+	/** The song's videos, newest first, like GET /api/songs/{id}/exports. */
+	exports(id: string): Export[] {
+		const edited = this.#editedAt.get(id);
+		return (this.#exports.get(id) ?? []).map((video) => ({
+			...video,
+			outdated: Boolean(edited && edited > video.created_at)
+		}));
+	}
+
+	/** Records a finished video; one per shape, style and vocals level, like the server. */
+	addExport(id: string, aspect: Export['aspect'], theme: string, vocals = 0): string {
+		const level = vocals > 0 ? `-v${Math.round(vocals * 100)}` : '';
+		const file = `exports/${id}-${aspect.replace(':', 'x')}-${theme}${level}.mp4`;
+		const others = (this.#exports.get(id) ?? []).filter((video) => video.file !== file);
+		const video: Export = {
+			file,
+			aspect,
+			theme,
+			size: 48_000_000,
+			created_at: new Date().toISOString(),
+			thumbnail: null,
+			outdated: false,
+			vocals
+		};
+		this.#exports.set(id, [video, ...others]);
+		return file;
+	}
+
+	deleteExport(id: string, name: string): boolean {
+		const videos = this.#exports.get(id) ?? [];
+		const left = videos.filter((video) => video.file !== `exports/${name}`);
+		this.#exports.set(id, left);
+		return left.length < videos.length;
+	}
+
+	/** What the mock serves for a video: the song's background if it has one, else nothing. */
+	exportFile(id: string, file: string): string | undefined {
+		if (!this.#exports.get(id)?.some((video) => video.file === file)) return undefined;
+		const background = this.doc(id)?.video?.background;
+		return background ? this.filePath(id, background) : undefined;
 	}
 
 	delete(id: string): boolean {
