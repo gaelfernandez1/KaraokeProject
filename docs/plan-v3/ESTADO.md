@@ -20,6 +20,14 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
+- Mantenimiento → C4, C7 (07/11, rama `v3/letra-pegada`, `decisiones/015`): la letra se pega
+  tal cual viene de la web. `karaoke_engine.align.pasted.strip_page_text` quita lo que añade la
+  página (recomendaciones y anuncios de Genius, créditos, enlaces, tiempos, acotaciones) y
+  reescribe las etiquetas sin corchetes como cabeceras; `parse_lyrics` lo llama siempre y
+  `make_package` con el título y el artista. `parse_lyrics` entiende además «Ela: …» (quién canta)
+  y «Repite el coro» con otro nombre del estribillo. Mismo resultado en las 107 letras del banco;
+  `LyricsAligner.version` = 13. En «Crear», el texto de ayuda de la letra lo dice.
+
 - Mantenimiento → C1, C6, C7, C8 (07/11, rama `v3/descargar-video`, `decisiones/014`): contrato
   **1.2.0** con `video.master` (el vídeo original, hasta 1080p, solo para el MP4; `karaoke make` y
   `karaoke background` lo guardan con `extract_master` y `render` lo prefiere); los enlaces bajan
