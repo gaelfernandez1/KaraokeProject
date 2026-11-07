@@ -32,6 +32,7 @@ from karaoke_engine.align.aligner import LyricsAligner
 from karaoke_engine.align.clitics import join_clitics
 from karaoke_engine.align.lyrics import parse_lyrics, singer_id
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
+from karaoke_engine.align.pasted import strip_page_text
 from karaoke_engine.audio import decode, package_audio, probe
 from karaoke_engine.languages import TWO_LETTERS
 from karaoke_engine.separation import RoformerSeparator
@@ -107,6 +108,9 @@ def make_package(
     if language in TWO_LETTERS:
         raise ValueError(f"write the language as {TWO_LETTERS[language]!r}, not {language!r}")
     probe(source)  # files without audio
+    if lyrics is not None:
+        # Only here the song's name is known: a page title pasted above the lyrics goes too.
+        lyrics = strip_page_text(lyrics, title=title, artist=artist)
     if lyrics is not None and not parse_lyrics(lyrics):
         raise ValueError("the lyrics have no sung lines (only labels or symbols)")
     if lyrics is None and transcriber is None:

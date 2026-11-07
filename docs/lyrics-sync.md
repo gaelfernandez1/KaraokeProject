@@ -6,12 +6,30 @@ Spanish), and how to measure in [`benchmark.md`](benchmark.md).
 
 ## What it does
 
-1. **Reads the lyrics as they are pasted** (`lyrics.parse_lyrics`). Lyrics sites write songs to be
-   read, not as they are sung:
+1. **Reads the lyrics as they are pasted** (`lyrics.parse_lyrics`). First it leaves out what the
+   web page added to the copy (`pasted.strip_page_text`), so nobody has to tidy the lyrics by hand:
+   - Genius: the "You might also like" block with its three songs, "See … Live / Get tickets as
+     low as …", the contributors, translations and "… Lyrics" title at the top, the description
+     ending in "Read More" and the trailing "Embed";
+   - credits, copyright and links from Musixmatch, Google, Letras, AZLyrics or a video
+     description ("Writer(s): …", "Fuente: Musixmatch", "Composição: …", "Prod: …", "© …",
+     "Instagram: …", URLs, hashtags), and the song's title and artist written above the lyrics
+     (`make` knows them);
+   - timings from subtitle and LRC files or video transcripts, and verse numbers alone;
+   - stage directions in parentheses ("(risas)", "(spoken)", "(instrumental)"), unless the line
+     sings the same word as an echo ("Pon a música (música)").
+
+   A line goes only when no song would sing it: text that could also be sung ("Solo", "Ponte
+   guapa", "Letra de amor") is only dropped above or below the lyrics, or not at all. Then the
+   song's own structure:
    - headers such as `[Estribillo]` or `[Verso 1: Ana]`: they give the section and who sings;
+     labels without brackets count too (`CORO:`, `Verso 2 (Ana):`, `(Estribillo x2)`, `**Verse**`,
+     `{Chorus}`, `Repetir estribillo`, `Coro: first line`);
+   - who sings a line in a duet (`Ela: …`, `Él: …`, `Os dous: …`), until someone else does;
    - repeats (`x2`, `×3`, `(x2)`, `(bis)`, or `x2` alone on a line to repeat the verse);
    - a chorus that is only named (`[Estribillo]` with nothing under it): the last one with that
-     name is repeated;
+     name is repeated, or the last chorus under another of its names (`Repite el coro` after an
+     `[Estribillo]`);
    - backing vocals in parentheses: they come out as separate lines, marked as backing.
 
    The text that is shown does not change — not the gheada, not the seseo, not the punctuation —

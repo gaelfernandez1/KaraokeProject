@@ -17,6 +17,12 @@ and the web app. How a release is made: [`docs/releasing.md`](docs/releasing.md)
 - Downloads are named after the song («Artist - Title (karaoke).mp4», «… (sen voz).m4a»).
 - `GET /api/songs/{id}/exports`, `DELETE /api/songs/{id}/exports/{name}` and
   `GET /media/{id}/{file}?download=1&name=…`.
+- Lyrics can be pasted exactly as they come from any lyrics site or video description: what the
+  page adds is left out before aligning — Genius's song recommendations and ticket adverts, its
+  title, contributors and «Embed», credits, copyright, links and hashtags, subtitle and LRC
+  timings, stage directions like «(risas)» and the song's title above the lyrics. Labels
+  without brackets («CORO:», «(Estribillo x2)», «Repetir estribillo») and who sings in a duet
+  («Ela: …») are understood like `[Estribillo]` headers.
 
 ### Changed
 
