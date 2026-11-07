@@ -114,6 +114,10 @@ class JobQueue:
         if doc is None:
             return None
         data = {"song_id": song_id, **request.model_dump()}
+        # The same video already waiting or being made: that job, not a second copy of it.
+        for pending in self.store.unfinished():
+            if pending.kind == "export" and pending.request == data:
+                return self.to_job(pending)
         record = JobRecord.new(self.new_id(), "export", doc.title, data, self.now())
         record.duration = doc.duration
         self.store.add(record)
@@ -433,7 +437,10 @@ class JobQueue:
             return None
         aspect = str(record.request.get("aspect", "16:9"))
         theme = str(record.request.get("theme", "clasico"))
-        final = package / "exports" / f"{song_id}-{aspect.replace(':', 'x')}-{theme}.mp4"
+        vocals = float(record.request.get("vocals", 0.0))
+        # One file per shape, style and vocals level (Library.exports reads the name back).
+        level = f"-v{round(vocals * 100)}" if vocals > 0 else ""
+        final = package / "exports" / f"{song_id}-{aspect.replace(':', 'x')}-{theme}{level}.mp4"
         final.parent.mkdir(exist_ok=True)
         # Hidden while it is written, so nobody downloads half a video.
         partial = final.with_name(f".partial-{final.name}")
@@ -443,6 +450,7 @@ class JobQueue:
             "out": str(partial),
             "aspect": aspect,
             "theme": theme,
+            "vocals": vocals,
             "fake": self.settings.fake_engine,
         }
         return spec, final

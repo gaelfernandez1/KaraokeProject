@@ -118,12 +118,154 @@
         }
       }
     },
+    "/api/songs/{song_id}/exports": {
+      "get": {
+        "tags": [
+          "songs"
+        ],
+        "summary": "List Exports",
+        "description": "The song's karaoke videos, newest first (made with POST /api/songs/{id}/exports).",
+        "operationId": "list_exports_api_songs__song_id__exports_get",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Export"
+                  },
+                  "title": "Response List Exports Api Songs  Song Id  Exports Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Export Video",
+        "operationId": "export_video_api_songs__song_id__exports_post",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/songs/{song_id}/exports/{name}": {
+      "delete": {
+        "tags": [
+          "songs"
+        ],
+        "summary": "Delete Export",
+        "operationId": "delete_export_api_songs__song_id__exports__name__delete",
+        "parameters": [
+          {
+            "name": "song_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Song Id"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/media/{song_id}/{rel}": {
       "get": {
         "tags": [
           "media"
         ],
         "summary": "Media",
+        "description": "A file of the package; `download` asks the browser to save it, as `name` if given.",
         "operationId": "media_media__song_id___rel__get",
         "parameters": [
           {
@@ -152,6 +294,22 @@
               "type": "boolean",
               "default": false,
               "title": "Download"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
             }
           }
         ],
@@ -1163,58 +1321,6 @@
           }
         }
       }
-    },
-    "/api/songs/{song_id}/exports": {
-      "post": {
-        "tags": [
-          "jobs"
-        ],
-        "summary": "Export Video",
-        "operationId": "export_video_api_songs__song_id__exports_post",
-        "parameters": [
-          {
-            "name": "song_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Song Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExportRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Job"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -1310,6 +1416,66 @@
         "title": "Device",
         "description": "A device paired with the server: it may create, correct and delete songs."
       },
+      "Export": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "title": "File"
+          },
+          "aspect": {
+            "type": "string",
+            "enum": [
+              "16:9",
+              "9:16"
+            ],
+            "title": "Aspect"
+          },
+          "theme": {
+            "type": "string",
+            "title": "Theme"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          },
+          "outdated": {
+            "type": "boolean",
+            "title": "Outdated"
+          },
+          "vocals": {
+            "type": "number",
+            "title": "Vocals"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "aspect",
+          "theme",
+          "size",
+          "created_at",
+          "thumbnail",
+          "outdated",
+          "vocals"
+        ],
+        "title": "Export",
+        "description": "A karaoke video of a song, ready to download."
+      },
       "ExportRequest": {
         "properties": {
           "aspect": {
@@ -1325,6 +1491,13 @@
             "type": "string",
             "title": "Theme",
             "default": "clasico"
+          },
+          "vocals": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Vocals",
+            "default": 0.0
           }
         },
         "type": "object",
@@ -1581,7 +1754,7 @@
             "type": "string",
             "pattern": "^1\\.\\d+\\.\\d+$",
             "title": "Schema Version",
-            "default": "1.1.0"
+            "default": "1.2.0"
           },
           "id": {
             "type": "string",
@@ -2435,7 +2608,21 @@
                 "type": "null"
               }
             ],
-            "title": "Background"
+            "title": "Background",
+            "description": "The song's video, light enough for every player (720p)."
+          },
+          "master": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Master",
+            "description": "The same video at its own quality (up to 1080p), for the MP4 export."
           }
         },
         "additionalProperties": true,

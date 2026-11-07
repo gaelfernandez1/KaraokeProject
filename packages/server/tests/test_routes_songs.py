@@ -1,4 +1,6 @@
 import json
+import os
+from pathlib import Path
 
 from karaoke_server.config import Settings
 from karaoke_server.db import Database
@@ -89,3 +91,107 @@ def test_security_headers(make_client: MakeClient) -> None:
     # No other site may frame the app: inside a frame, clicks would count as the owner's.
     assert response.headers["x-frame-options"] == "DENY"
     assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+
+
+def _video(folder: Path, name: str, when: float, size: int = 64) -> Path:
+    exports = folder / "exports"
+    exports.mkdir(exist_ok=True)
+    video = exports / name
+    video.write_bytes(bytes(size))
+    os.utime(video, (when, when))
+    return video
+
+
+def test_song_exports_are_listed_newest_first(settings: Settings, make_client: MakeClient) -> None:
+    folder = write_package(settings.library_dir / "mar")
+    os.utime(folder / "karaoke.json", (1000, 1000))
+    _video(folder, "mar-16x9-clasico.mp4", 2000, size=100)
+    (folder / "exports" / "mar-16x9-clasico.jpg").write_bytes(b"jpg")
+    _video(folder, "mar-9x16-moderno.mp4", 3000)
+    _video(folder, ".partial-mar-16x9-contraste.mp4", 4000)  # still being written
+    _video(folder, "notes.mp4", 4000)  # not ours: ignored
+
+    listed = make_client("home").get("/api/songs/mar/exports")
+
+    assert listed.status_code == 200
+    assert listed.json() == [
+        {
+            "file": "exports/mar-9x16-moderno.mp4",
+            "aspect": "9:16",
+            "theme": "moderno",
+            "size": 64,
+            "created_at": "1970-01-01T00:50:00Z",
+            "thumbnail": None,
+            "outdated": False,
+            "vocals": 0.0,
+        },
+        {
+            "file": "exports/mar-16x9-clasico.mp4",
+            "aspect": "16:9",
+            "theme": "clasico",
+            "size": 100,
+            "created_at": "1970-01-01T00:33:20Z",
+            "thumbnail": "exports/mar-16x9-clasico.jpg",
+            "outdated": False,
+            "vocals": 0.0,
+        },
+    ]
+
+
+def test_an_export_made_before_a_correction_is_outdated(
+    settings: Settings, make_client: MakeClient
+) -> None:
+    folder = write_package(settings.library_dir / "mar")
+    _video(folder, "mar-16x9-clasico.mp4", 1000)
+    os.utime(folder / "karaoke.json", (2000, 2000))
+    [video] = make_client("home").get("/api/songs/mar/exports").json()
+    assert video["outdated"] is True
+
+
+def test_song_exports_need_a_reader_and_a_song(settings: Settings, make_client: MakeClient) -> None:
+    write_package(settings.library_dir / "mar")
+    assert make_client("home").get("/api/songs/mar/exports").json() == []
+    assert make_client("remote").get("/api/songs/mar/exports").status_code == 403
+    assert make_client("home").get("/api/songs/missing/exports").status_code == 404
+
+
+def test_owner_deletes_an_export_and_its_thumbnail(
+    settings: Settings, make_client: MakeClient
+) -> None:
+    folder = write_package(settings.library_dir / "mar")
+    video = _video(folder, "mar-16x9-clasico.mp4", 1000)
+    thumb = folder / "exports" / "mar-16x9-clasico.jpg"
+    thumb.write_bytes(b"jpg")
+    url = "/api/songs/mar/exports/mar-16x9-clasico.mp4"
+
+    assert make_client("home").delete(url).json()["code"] == "not_owner"
+    local = make_client("local")
+    assert local.delete(url).status_code == 204
+    assert not video.exists()
+    assert not thumb.exists()
+    assert local.delete(url).status_code == 404
+    assert local.delete("/api/songs/mar/exports/..%2Fkaraoke.json").status_code in (404, 405)
+    assert local.delete("/api/songs/mar/exports/notes.mp4").status_code == 404
+    assert (folder / "karaoke.json").is_file()
+
+
+def test_exports_say_how_loud_the_guide_vocals_are(
+    settings: Settings, make_client: MakeClient
+) -> None:
+    folder = write_package(settings.library_dir / "mar")
+    _video(folder, "mar-16x9-clasico.mp4", 1000)
+    _video(folder, "mar-16x9-clasico-v30.mp4", 2000)
+    listed = make_client("home").get("/api/songs/mar/exports").json()
+    assert [(v["file"], v["theme"], v["vocals"]) for v in listed] == [
+        ("exports/mar-16x9-clasico-v30.mp4", "clasico", 0.3),
+        ("exports/mar-16x9-clasico.mp4", "clasico", 0.0),
+    ]
+
+
+def test_the_guide_vocals_level_goes_from_0_to_1(
+    settings: Settings, make_client: MakeClient
+) -> None:
+    write_package(settings.library_dir / "mar")
+    local = make_client("local")
+    too_loud = local.post("/api/songs/mar/exports", json={"vocals": 1.5})
+    assert too_loud.status_code == 422

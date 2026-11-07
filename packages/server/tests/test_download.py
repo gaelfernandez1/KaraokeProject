@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from karaoke_server.jobs.download import YtDlp
+from karaoke_server.jobs.download import FORMAT, YtDlp
 from karaoke_server.jobs.titles import clean_artist, clean_title, split_artist
 from karaoke_server.jobs.types import DownloadError
 
@@ -112,3 +112,8 @@ def test_clean_artist_and_split() -> None:
     assert clean_artist(None) is None
     assert split_artist("Banda - Canción") == ("Banda", "Canción")
     assert split_artist("Só un título") == (None, "Só un título")
+
+
+def test_links_bring_their_video_up_to_1080p() -> None:
+    # The MP4 export draws on the video as it came (the package master), not on the player's 720p.
+    assert FORMAT.startswith("bv*[height<=1080]+ba/b[height<=1080]")
