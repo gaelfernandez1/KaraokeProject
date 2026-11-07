@@ -17,7 +17,9 @@ Spanish), and how to measure in [`benchmark.md`](benchmark.md).
      (`make` knows them);
    - timings from subtitle and LRC files or video transcripts, and verse numbers alone;
    - stage directions in parentheses ("(risas)", "(spoken)", "(instrumental)"), unless the line
-     sings the same word as an echo ("Pon a música (música)").
+     sings the same word as an echo ("Pon a música (música)");
+   - Cyrillic or Greek letters that look Latin, which some sites slip into the lyrics to spot
+     copies ("dе" with a Cyrillic е): in a line written in Latin letters they become Latin.
 
    A line goes only when no song would sing it: text that could also be sung ("Solo", "Ponte
    guapa", "Letra de amor") is only dropped above or below the lyrics, or not at all. Then the
@@ -26,7 +28,10 @@ Spanish), and how to measure in [`benchmark.md`](benchmark.md).
      labels without brackets count too (`CORO:`, `Verso 2 (Ana):`, `(Estribillo x2)`, `**Verse**`,
      `{Chorus}`, `Repetir estribillo`, `Coro: first line`);
    - who sings a line in a duet (`Ela: …`, `Él: …`, `Os dous: …`), until someone else does;
-   - repeats (`x2`, `×3`, `(x2)`, `(bis)`, or `x2` alone on a line to repeat the verse);
+   - repeats (`x2`, `×3`, `(x2)`, `(bis)` before or after a line, or `x2` alone on a line to
+     repeat the verse). A mark after a line may stand for that line or for the lines before it
+     ("(x4)" after a couplet sung four times): the aligner tries each reading and keeps the one
+     the audio fits best (`repeat_marks`);
    - a chorus that is only named (`[Estribillo]` with nothing under it): the last one with that
      name is repeated, or the last chorus under another of its names (`Repite el coro` after an
      `[Estribillo]`);
@@ -43,11 +48,15 @@ Spanish), and how to measure in [`benchmark.md`](benchmark.md).
    the lyrics use leave the GPU.
 4. **Looks at where the voice sounds** (`activity.vocal_activity`): the separated voice's energy
    compared with the song's own singing.
-5. **Searches for the best path** (`ctc.align_segments`), with three freedoms classic CTC alignment
+5. **Searches for the best path** (`ctc.align_segments`), with four freedoms classic CTC alignment
    does not have:
    - a **filler** between lines that explains any sound at a cost: ad-libs, backing vocals not in
      the lyrics, leftovers of the instrumental;
    - **skipping a whole line** at a cost: lines the site has and nobody sings;
+   - **singing lines again** at a cost: after a line, the path may go back to an earlier line of
+     its stanza and sing the run again (up to four lines back, or any run that ends the stanza),
+     because sites write a couplet or a stanza sung several times in a row only once. Each time
+     comes out as a line of its own;
    - an **extra cost for each letter** where the voice is silent, so the lyrics do not slip into
      the instrumental breaks.
 6. **Adjusts the ends**: a word ends where its voice stops (at the first pause longer than 0.3 s),
@@ -93,6 +102,7 @@ audio instead of the long ones that are really sung.
 | `backing_skip_penalty` | the cost per letter of skipping a backing line (lower: backing vocals often overlap the voice or cannot be heard) |
 | `edge_skip_penalty` | the cost per letter of leaving out lines at the start or end of the lyrics (for clips or short versions); off, because on whole songs it can drop a verse that is sung |
 | `silence_penalty` | the extra cost per letter in a stretch without voice |
+| `repeat_penalty` | the cost of singing again lines of the same stanza right after them (lyrics that write a repeated couplet or stanza once); `inf` turns it off |
 | `refine_onsets` | move the starts to the voice's onset |
 | `parts` | give words syllables with timings (gl, es, pt) |
 | `overlap_backing` | give backing lines that do not fit in their place a second pass in which they may overlap the lead voice (off: with the public songs it places more words wrong than right, `decisiones/006`) |

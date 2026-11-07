@@ -7,8 +7,10 @@ it into a flat list of sung lines and keeps each line's text exactly as written,
 What the page itself adds (adverts, credits, labels without brackets…) goes first, in pasted.py.
 """
 
+import itertools
 import re
 import unicodedata
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 
 from karaoke_engine.align.pasted import strip_page_text
@@ -20,6 +22,8 @@ _ANY_CASE_MARK = rf"(?:[xX\u00d7]\s?{_N}|{_N}\s?[xX\u00d7])"
 _PAREN_MARK = rf"\(\s*(?:{_ANY_CASE_MARK}|(?i:bis))\s*\)"
 # After a sung word only a lowercase mark counts: "BMW X6" is a name, not "six times".
 _TRAILING_REPEAT = re.compile(rf"\s+(?:{_MARK}|{_PAREN_MARK})\s*$")
+# A mark before the line repeats that line: "(x3) Varre vasoira", "x2 Volta" (not "X6 …").
+_LEADING_REPEAT = re.compile(rf"^(?:{_MARK}|{_PAREN_MARK})\s+(?=\S)")
 # A bare "bis" only counts alone on its line: at the end of a sung line it may be a word.
 _ONLY_REPEAT = re.compile(rf"^(?:{_ANY_CASE_MARK}|{_PAREN_MARK}|(?i:bis))$")
 # A section label, with an optional repeat mark inside ("[Coro x2]") or after it ("[Coro] x2").
@@ -50,6 +54,9 @@ class LyricLine:
     section: str | None  # "Estribillo", "Verso 1"
     singer: str | None  # "Ana", "Ana, Brais", "Ela"
     backing: bool  # sung by the backing voices (written in parentheses)
+    # Lines between blank lines or headers share it; each copy of a repeated section gets its
+    # own. The aligner may sing a stanza's lines again when the site wrote them only once.
+    stanza: int = 0
 
 
 @dataclass
@@ -60,9 +67,27 @@ class _Section:
     lines: list[LyricLine]
 
 
-def parse_lyrics(text: str) -> list[LyricLine]:
+def parse_lyrics(text: str, scopes: Mapping[int, int] | None = None) -> list[LyricLine]:
+    """The sung lines. A repeat mark at the end of a line ("Fai moito tempo (x4)") repeats that
+    line, or with `scopes` (mark number → lines) that many lines ending with it: sites write
+    "(x4)" after a couplet sung four times as often as after a single line (see repeat_marks)."""
+    return _parse(text, scopes or {})[0]
+
+
+def repeat_marks(text: str) -> list[int]:
+    """For each repeat mark at the end of a line, in order, how many lines it could cover: the
+    line and those before it in its stanza. The aligner lets the audio choose (parse_lyrics)."""
+    return _parse(text, {})[1]
+
+
+def _parse(text: str, scopes: Mapping[int, int]) -> tuple[list[LyricLine], list[int]]:
     sections: list[_Section] = [_Section(None, None, 1, [])]
     stanza: list[LyricLine] = []
+    # The rows of the current stanza as written (each row: its lead and backing parts), what a
+    # repeat mark at the end of a row may cover; and how many rows each mark could cover.
+    written: list[list[LyricLine]] = []
+    marks: list[int] = []
+    number = 0  # of the current stanza
     # A repeat mark alone after a blank line repeats the stanza before the blank.
     previous: list[LyricLine] = []
     # "Ela: …" sings until someone else does or a new section starts.
@@ -78,7 +103,8 @@ def parse_lyrics(text: str) -> list[LyricLine]:
             if row[header.end(1) + 1 :].strip():  # "[Estribillo] x2"
                 section.repeat *= _count(header, skip=1)
             sections.append(section)
-            stanza, previous, voice = [], [], None
+            stanza, previous, voice, written = [], [], None, []
+            number += 1
             continue
         named = _VOICE.match(row)
         if named:
@@ -88,7 +114,8 @@ def parse_lyrics(text: str) -> list[LyricLine]:
         if not row:
             if stanza:
                 previous = stanza
-            stanza = []
+                number += 1
+            stanza, written = [], []
             continue
         current = sections[-1]
         only = _ONLY_REPEAT.match(row)
@@ -98,15 +125,23 @@ def parse_lyrics(text: str) -> list[LyricLine]:
             current.lines += extra
             stanza = source + extra
             continue
-        count = 1
-        trailing = _TRAILING_REPEAT.search(row)
-        if trailing:
+        count, scope = 1, 1
+        leading = _LEADING_REPEAT.match(row)
+        trailing = None if leading else _TRAILING_REPEAT.search(row)
+        if leading:
+            count = _count(leading)
+            row = row[leading.end() :]
+        elif trailing:
             count = _count(trailing)
             row = row[: trailing.start()]
-        parts = _split_backing(row, current, voice)
-        current.lines += parts * count
-        stanza += parts * count
-    return _expand(sections)
+            marks.append(len(written) + 1)
+            scope = max(1, min(scopes.get(len(marks) - 1, 1), len(written) + 1))
+        parts = _split_backing(row, current, voice, number)
+        block = [line for rows in written[len(written) - scope + 1 :] for line in rows] + parts
+        current.lines += parts + block * (count - 1)
+        stanza += parts + block * (count - 1)
+        written.append(parts)
+    return _expand(sections), marks
 
 
 def _header_section(label: str) -> _Section:
@@ -119,7 +154,7 @@ def _header_section(label: str) -> _Section:
     return _Section(name.strip() or None, singer.strip() or None, repeat, [])
 
 
-def _split_backing(row: str, section: _Section, voice: str | None) -> list[LyricLine]:
+def _split_backing(row: str, section: _Section, voice: str | None, stanza: int) -> list[LyricLine]:
     """The lead part and each parenthesised backing part, in the order they are written."""
     row = _INLINE_BRACKETS.sub(" ", row)
     pieces: list[tuple[str, bool]] = []
@@ -134,7 +169,7 @@ def _split_backing(row: str, section: _Section, voice: str | None) -> list[Lyric
         clean = _SPACES.sub(" ", piece).strip()
         if any(ch.isalnum() for ch in clean):
             lines.append(LyricLine(clean, tuple(clean.split()), section.name,
-                                   voice or section.singer, backing))  # fmt: skip
+                                   voice or section.singer, backing, stanza))  # fmt: skip
     return lines
 
 
@@ -143,6 +178,7 @@ def _expand(sections: list[_Section]) -> list[LyricLine]:
     out: list[LyricLine] = []
     seen: dict[str, list[LyricLine]] = {}
     chorus: list[LyricLine] = []
+    numbers = itertools.count()
     for section in sections:
         lines = section.lines
         key = (section.name or "").casefold()
@@ -155,7 +191,13 @@ def _expand(sections: list[_Section]) -> list[LyricLine]:
             seen[key] = lines
             if _is_chorus(key):
                 chorus = lines
-        out += lines * section.repeat
+        for _ in range(section.repeat):
+            # Each copy is a stanza of its own (or stanzas, as the section was written).
+            renumber: dict[int, int] = {}
+            for line in lines:
+                if line.stanza not in renumber:
+                    renumber[line.stanza] = next(numbers)
+                out.append(replace(line, stanza=renumber[line.stanza]))
     return out
 
 

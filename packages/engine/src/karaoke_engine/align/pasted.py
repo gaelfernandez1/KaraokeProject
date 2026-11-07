@@ -137,6 +137,16 @@ _LANGUAGES = frozenset({
     "български", "македонски", "ไทย", "romanization", "romanized",
 })  # fmt: skip
 
+# Cyrillic and Greek letters drawn like Latin ones: some sites swap a few into the lyrics to
+# spot copies. In a line written in the Latin alphabet they are read as their Latin twins.
+_TWINS = str.maketrans(
+    "\u0430\u0435\u043e\u0440\u0441\u0443\u0445\u0456\u0458\u0455\u04bb\u0501\u051b\u051d\u04cf"
+    "\u0410\u0412\u0415\u041a\u041c\u041d\u041e\u0420\u0421\u0422\u0425\u0423\u0406\u0408\u0405"
+    "\u03bf\u03b1\u03bd\u03c1\u03b9\u03ba\u03c5\u03c7"
+    "\u0391\u0392\u0395\u0396\u0397\u0399\u039a\u039c\u039d\u039f\u03a1\u03a4\u03a5\u03a7",
+    "aeopcyxijshdqwlABEKMHOPCTXYIJSoavpikuxABEZHIKMNOPTYX",
+)
+
 # Genius: "You might also like" then three songs, each its title and its artist.
 _MARKER = "You might also like"
 _TICKETS = re.compile(r"^Get tickets as low as\b")
@@ -177,7 +187,7 @@ def strip_page_text(text: str, *, title: str | None = None, artist: str | None =
     With the song's `title` and `artist`, lines above the lyrics that only name the song go too.
     """
     text = unicodedata.normalize("NFC", _INVISIBLE.sub("", text))
-    rows = _unglue(text.splitlines())
+    rows = _unglue(_latin_twins(row) for row in text.splitlines())
     rows = _drop_genius_inserts(rows)
     names = _Names.of(title, artist)
     start, end = _lyrics_span(rows, names)
@@ -233,6 +243,13 @@ def _label_line(row: str, *, shouting: bool = False) -> list[str] | None:
         if text.group("sep") == ":":
             return [_header(label, None, 1), text.group("text").strip()]
     return None
+
+
+def _latin_twins(row: str) -> str:
+    """Cyrillic and Greek look-alikes in a line written in Latin letters, as Latin letters."""
+    letters = [ch for ch in row if ch.isalpha()]
+    latin = sum(unicodedata.name(ch, "").startswith("LATIN") for ch in letters)
+    return row.translate(_TWINS) if latin * 2 > len(letters) else row
 
 
 def _header(label: str, singer: str | None, count: int) -> str:

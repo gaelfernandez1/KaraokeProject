@@ -5,7 +5,7 @@ import tracemalloc
 import numpy as np
 import pytest
 
-from karaoke_engine.align.ctc import Segment, align_segments
+from karaoke_engine.align.ctc import Segment, align_segments, best_path
 
 LOW = -8.0
 HIGH = -0.01
@@ -28,8 +28,20 @@ def _finish(lp: np.ndarray) -> np.ndarray:
     return lp
 
 
-def _segment(columns: list[int], skip: float = math.inf) -> Segment:
-    return Segment(tokens=tuple(columns), owner=tuple(range(len(columns))), skip_penalty=skip)
+def _segment(columns: list[int], skip: float = math.inf, group: int | None = None) -> Segment:
+    return Segment(
+        tokens=tuple(columns), owner=tuple(range(len(columns))), skip_penalty=skip, group=group
+    )
+
+
+def _sung(lp: np.ndarray, frame: int, columns: list[int]) -> None:
+    """The line's tokens two frames apart from `frame`."""
+    for k, column in enumerate(columns):
+        _peak(lp, frame + 2 * k, column)
+
+
+def _starts(spans: list[tuple[int, int]] | None) -> list[int]:
+    return [span[0] for span in spans or []]
 
 
 def test_tokens_land_on_their_peaks() -> None:
@@ -107,14 +119,17 @@ def test_no_frames_skips_everything() -> None:
     assert align_segments(lp, [_segment([2], 1.0)], filler_penalty=3.0)[0].spans is None
 
 
-def test_long_song_uses_compact_backpointers() -> None:
+@pytest.mark.parametrize("repeat_penalty", [math.inf, 40.0])
+def test_long_song_uses_compact_backpointers(repeat_penalty: float) -> None:
     rng = np.random.default_rng(0)
     lp = rng.uniform(-6.0, -0.1, size=(30_000, 102)).astype(np.float32)
-    segments = [_segment(list(rng.integers(2, 102, size=20)), 40.0) for _ in range(100)]
+    segments = [
+        _segment(list(rng.integers(2, 102, size=20)), 40.0, group=i // 6) for i in range(100)
+    ]
 
     tracemalloc.start()
     started = time.perf_counter()
-    align_segments(_finish(lp), segments, filler_penalty=3.0)
+    align_segments(_finish(lp), segments, filler_penalty=3.0, repeat_penalty=repeat_penalty)
     seconds = time.perf_counter() - started
     _, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
@@ -216,3 +231,84 @@ def test_edge_lines_are_kept_when_they_are_sung() -> None:
     paths = align_segments(_finish(lp), segments, filler_penalty=3.0)
 
     assert all(path.spans is not None for path in paths)
+
+
+def test_a_couplet_sung_more_times_than_written_is_found_each_time() -> None:
+    lp = _emissions(100, 6)
+    for frame in (10, 30, 50, 70):
+        _sung(lp, frame, [2, 3])
+        _sung(lp, frame + 10, [4, 5])
+    segments = [_segment([2, 3], 5.0, group=0), _segment([4, 5], 5.0, group=0)]
+
+    first, second = align_segments(_finish(lp), segments, filler_penalty=3.0, repeat_penalty=5.0)
+
+    assert [_starts(first.spans)] + [_starts(r) for r in first.repeats] == [
+        [10, 12], [30, 32], [50, 52], [70, 72],
+    ]  # fmt: skip
+    assert [_starts(second.spans)] + [_starts(r) for r in second.repeats] == [
+        [20, 22], [40, 42], [60, 62], [80, 82],
+    ]  # fmt: skip
+
+
+def test_repeats_are_off_unless_asked() -> None:
+    lp = _emissions(60, 6)
+    for frame in (10, 30):
+        _sung(lp, frame, [2, 3])
+    segments = [_segment([2, 3], 5.0, group=0)]
+
+    [path] = align_segments(_finish(lp), segments, filler_penalty=3.0)
+
+    assert path.repeats == ()
+
+
+def test_only_lines_of_the_same_stanza_are_sung_again() -> None:
+    lp = _emissions(60, 6)
+    _sung(lp, 10, [2, 3])
+    _sung(lp, 20, [4, 5])
+    _sung(lp, 30, [2, 3])  # the first stanza again, after the second
+    segments = [_segment([2, 3], 5.0, group=0), _segment([4, 5], 5.0, group=1)]
+
+    first, second = align_segments(_finish(lp), segments, filler_penalty=3.0, repeat_penalty=5.0)
+
+    assert _starts(first.spans) == [10, 12]
+    assert first.repeats == ()
+    assert _starts(second.spans) == [20, 22]
+
+
+def test_lines_without_a_stanza_are_never_sung_again() -> None:
+    lp = _emissions(60, 6)
+    for frame in (10, 30):
+        _sung(lp, frame, [2, 3])
+
+    [path] = align_segments(
+        _finish(lp), [_segment([2, 3], 5.0)], filler_penalty=3.0, repeat_penalty=5.0
+    )
+
+    assert path.repeats == ()
+
+
+def test_a_whole_long_stanza_sung_twice() -> None:
+    lines = [[2 + 2 * i, 3 + 2 * i] for i in range(6)]
+    lp = _emissions(150, 14)
+    for start in (5, 75):
+        for i, columns in enumerate(lines):
+            _sung(lp, start + 10 * i, columns)
+    segments = [_segment(columns, 5.0, group=0) for columns in lines]
+
+    paths = align_segments(_finish(lp), segments, filler_penalty=3.0, repeat_penalty=5.0)
+
+    assert [_starts(path.spans)[0] for path in paths] == [5, 15, 25, 35, 45, 55]
+    assert [_starts(path.repeats[0])[0] for path in paths] == [75, 85, 95, 105, 115, 125]
+
+
+def test_the_score_says_which_lyrics_fit_the_audio_better() -> None:
+    lp = _emissions(40, 8)
+    _sung(lp, 10, [2, 3])
+    _sung(lp, 20, [4, 5])
+    lp = _finish(lp)
+
+    right = best_path(lp, [_segment([2, 3], 5.0), _segment([4, 5], 5.0)], filler_penalty=3.0)
+    wrong = best_path(lp, [_segment([2, 3], 5.0), _segment([6, 7], 5.0)], filler_penalty=3.0)
+
+    assert right.score > wrong.score
+    assert [_starts(path.spans) for path in right.paths] == [[10, 12], [20, 22]]
