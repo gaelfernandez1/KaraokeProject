@@ -46,7 +46,7 @@ class PairRequest(BaseModel):
 
 @router.get("/api/me")
 async def me(request: Request) -> Me:
-    who: Caller = caller(request)
+    who: Caller = await caller(request)
     return Me(owner=who.owner, zone=who.zone, device=who.device)
 
 
@@ -75,7 +75,7 @@ async def pair(body: PairRequest, request: Request, response: Response) -> Devic
     devices = request.app.state.services.devices
     name = body.name or device_name(request.headers.get("user-agent", ""))
     try:
-        who = caller(request)
+        who = await caller(request)
         address = request.client.host if request.client else ""
         paired = devices.pair(body.code, name, client=f"{who.zone}:{address}")
     except PairingLockedError as exc:

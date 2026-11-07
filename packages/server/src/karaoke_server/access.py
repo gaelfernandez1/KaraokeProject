@@ -251,7 +251,7 @@ class Caller:
     owner: bool
 
 
-def caller(request: Request) -> Caller:
+async def caller(request: Request) -> Caller:
     services = request.app.state.services
     server = request.scope.get("server") or ("", 0)
     zone = classify(
@@ -268,14 +268,14 @@ def caller(request: Request) -> Caller:
     return Caller(zone, device, owner)
 
 
-def require_reader(who: Annotated[Caller, Depends(caller)]) -> Caller:
+async def require_reader(who: Annotated[Caller, Depends(caller)]) -> Caller:
     """The library is open to the home network and to paired devices."""
     if not (who.owner or who.zone == "home"):
         raise ApiError(403, "not_paired", "This device is not paired with the server")
     return who
 
 
-def require_owner(who: Annotated[Caller, Depends(caller)]) -> Caller:
+async def require_owner(who: Annotated[Caller, Depends(caller)]) -> Caller:
     if not who.owner:
         raise ApiError(403, "not_owner", "Only a paired device can do this")
     return who
@@ -285,7 +285,7 @@ def is_https(request: Request) -> bool:
     return request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https"
 
 
-def same_origin(request: Request) -> None:
+async def same_origin(request: Request) -> None:
     """Another site cannot make a browser change anything here (with SameSite cookies, too)."""
     if request.method in ("GET", "HEAD", "OPTIONS"):
         return
