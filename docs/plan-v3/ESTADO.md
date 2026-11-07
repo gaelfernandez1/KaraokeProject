@@ -20,6 +20,14 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
+- Mantenimiento → C4, C2 (07/11, rama `v3/repeticiones`, `decisiones/016`): las repeticiones que
+  la letra escribe una vez se cantan las veces que suenan. `align_segments(repeat_penalty=…)` deja
+  volver a versos de la misma estrofa (`Segment.group`, `SegmentPath.repeats`), `best_path`
+  devuelve la puntuación y el alineador elige con ella cuántos versos abarca cada «(xN)»
+  (`parse_lyrics(text, scopes)`, `repeat_marks`); `LyricLine.stanza`; `LyricsAligner.version` = 14.
+  El banco gana el conjunto `repeats` (`fetch --set repeats`). Mismo resultado en `jamendo`, `gl`,
+  `quick`, `stress` y las privadas.
+
 - Mantenimiento → C4, C7 (07/11, rama `v3/letra-pegada`, `decisiones/015`): la letra se pega
   tal cual viene de la web. `karaoke_engine.align.pasted.strip_page_text` quita lo que añade la
   página (recomendaciones y anuncios de Genius, créditos, enlaces, tiempos, acotaciones) y
