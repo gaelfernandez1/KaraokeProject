@@ -3,6 +3,8 @@
 The songs here are made up; each test copies the shape a real site leaves in the clipboard.
 """
 
+import time
+
 from karaoke_engine.align.lyrics import LyricLine, parse_lyrics
 from karaoke_engine.align.pasted import strip_page_text
 
@@ -243,3 +245,14 @@ def test_lines_in_other_alphabets_are_kept() -> None:
     text = f"{russian}\n{greek}\n"
 
     assert _texts(parse_lyrics(text)) == text.splitlines()
+
+
+def test_a_line_built_to_stall_the_hashtag_check_is_read_at_once() -> None:
+    row = "#" + "!#" * 26 + " x"
+
+    started = time.perf_counter()
+    lines = parse_lyrics(f"{row}\n#Ana #Mar\n")
+    seconds = time.perf_counter() - started
+
+    assert seconds < 0.5
+    assert _texts(lines) == [row]
