@@ -147,7 +147,7 @@ async def job_log(job_id: str, request: Request, who: Owner) -> str:
     return "\n".join(lines[-LOG_LINES:])
 
 
-def _existing(job_id: str, request: Request, who: Reader) -> Job:
+async def _existing(job_id: str, request: Request, who: Reader) -> Job:
     job = _queue(request).get(job_id)
     if job is None:
         raise ApiError(404, "not_found", "No such job")
