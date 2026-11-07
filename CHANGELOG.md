@@ -23,6 +23,12 @@ and the web app. How a release is made: [`docs/releasing.md`](docs/releasing.md)
   timings, stage directions like «(risas)» and the song's title above the lyrics. Labels
   without brackets («CORO:», «(Estribillo x2)», «Repetir estribillo») and who sings in a duet
   («Ela: …») are understood like `[Estribillo]` headers.
+- Repeats that the lyrics write once are sung as often as the song does: a couplet or a stanza
+  sung several times in a row comes out each time, with or without a mark, and a mark like
+  «(x4)» after a couplet repeats the couplet, not just its last line (the audio decides). Marks
+  before a line («(x3) Varre vasoira») count too.
+- Cyrillic and Greek letters that some lyrics sites slip into the text to spot copies («dе»
+  with a Cyrillic е) are read as the Latin letters they look like.
 
 ### Changed
 

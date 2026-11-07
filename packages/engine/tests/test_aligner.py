@@ -253,3 +253,43 @@ def test_parts_skip_words_with_a_letter_the_model_lacks(tmp_path: Path) -> None:
     [line] = _aligner(peaks).align_text(vocals, "søla\n", "gl")
 
     assert line.words[0].parts == []
+
+
+def _texts(lines: Sequence[object]) -> list[str]:
+    return [" ".join(w.text for w in line.words) for line in lines]  # type: ignore[attr-defined]
+
+
+def test_a_couplet_written_once_and_sung_twice_shows_each_time(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = []
+    for start in (20, 140):
+        peaks += _spell("ola mar", start) + _spell("vai vento", start + 50)
+
+    lines = _aligner(peaks, repeat_penalty=20.0).align_text(vocals, "Ola mar\nVai vento\n", "gl")
+
+    assert _texts(lines) == ["Ola mar", "Vai vento", "Ola mar", "Vai vento"]
+    assert [line.start for line in lines] == pytest.approx([0.4, 1.4, 2.8, 3.8])
+    assert len({line.id for line in lines}) == 4
+
+
+def test_the_audio_chooses_what_a_repeat_mark_covers(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 8.0)], seconds=8.0)
+    peaks = []
+    for start in (20, 140):
+        peaks += _spell("ola mar", start) + _spell("vai vento", start + 50)
+    peaks += _spell("adeus", 260)
+    text = "Ola mar\nVai vento (x2)\nAdeus\n"
+
+    lines = _aligner(peaks, repeat_penalty=math.inf).align_text(vocals, text, "gl")
+
+    assert _texts(lines) == ["Ola mar", "Vai vento", "Ola mar", "Vai vento", "Adeus"]
+
+
+def test_a_repeat_mark_over_one_line_keeps_that_reading(tmp_path: Path) -> None:
+    vocals = _vocals(tmp_path, [(0.0, 6.0)])
+    peaks = _spell("ola mar", 20) + _spell("vai vento", 70) + _spell("vai vento", 120)
+    text = "Ola mar\nVai vento (x2)\n"
+
+    lines = _aligner(peaks, repeat_penalty=math.inf).align_text(vocals, text, "gl")
+
+    assert _texts(lines) == ["Ola mar", "Vai vento", "Vai vento"]

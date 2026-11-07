@@ -220,6 +220,33 @@ def test_stripping_twice_changes_nothing() -> None:
     assert strip_page_text(once) == once
 
 
+def test_repeat_mark_before_the_line() -> None:
+    assert _texts(parse_lyrics("(x3) Varre vasoira\nFin\n")) == ["Varre vasoira"] * 3 + ["Fin"]
+    assert _texts(parse_lyrics("x2 Volta\nFin\n")) == ["Volta", "Volta", "Fin"]
+    assert _texts(parse_lyrics("(bis) Ola\n2x Linha\n")) == ["Ola", "Ola", "Linha", "Linha"]
+    # A name, not a mark.
+    assert _texts(parse_lyrics("X6 do meu pai\n")) == ["X6 do meu pai"]
+
+
+def test_letters_of_other_alphabets_hidden_in_latin_words() -> None:
+    # Some sites swap a few Latin letters for Cyrillic or Greek twins to spot copies.
+    text = "Deixade d\u0435 impoñernos\nNon é o hábitat dun r\u0435i\n\u041e mar e \u03bf ceo\n"
+
+    assert _texts(parse_lyrics(text)) == [
+        "Deixade de impoñernos",
+        "Non é o hábitat dun rei",
+        "O mar e o ceo",
+    ]
+
+
+def test_lines_in_other_alphabets_are_kept() -> None:
+    russian = "\u0414\u043e\u0431\u0440\u043e \u0443\u0442\u0440\u043e"
+    greek = "\u039a\u03b1\u03bb\u03b7\u03bc\u03ad\u03c1\u03b1"
+    text = f"{russian}\n{greek}\n"
+
+    assert _texts(parse_lyrics(text)) == text.splitlines()
+
+
 def test_a_line_built_to_stall_the_hashtag_check_is_read_at_once() -> None:
     row = "#" + "!#" * 26 + " x"
 

@@ -20,6 +20,7 @@ from karaoke_bench.package import PackageError, build_package
 from karaoke_bench.paths import BenchPaths
 from karaoke_bench.pipeline import Mode, PipelineError, load_pipeline
 from karaoke_bench.reference import dump_reference, load_reference
+from karaoke_bench.repeats import build_repeats
 from karaoke_bench.results import load_results
 from karaoke_bench.runner import RunOptions, run
 from karaoke_bench.sets import SetError, Song, load_set
@@ -39,7 +40,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands = parser.add_subparsers(dest="command", required=True)
 
     fetch = commands.add_parser("fetch", help="download a song set into bench/data")
-    fetch.add_argument("--set", dest="set_name", default="all", help="jamendo, gl, stress or all")
+    fetch.add_argument(
+        "--set", dest="set_name", default="all", help="jamendo, gl, stress, repeats or all"
+    )
 
     run_cmd = commands.add_parser("run", help="run a pipeline over a set and write a report")
     run_cmd.add_argument("--pipeline", type=Path, required=True, help="pipeline TOML file")
@@ -129,7 +132,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def _fetch(paths: BenchPaths, set_name: str) -> int:
     manifest_sets = sorted(p.parent.name for p in paths.sets.glob("*/manifest.toml"))
-    if set_name not in ("all", "jamendo", "stress", *manifest_sets):
+    if set_name not in ("all", "jamendo", "stress", "repeats", *manifest_sets):
         print(f"error: unknown set '{set_name}'", file=sys.stderr)
         return 2
     if set_name in ("all", "jamendo"):
@@ -139,6 +142,8 @@ def _fetch(paths: BenchPaths, set_name: str) -> int:
             print(f"{name}: {len(fetch_manifest_set(name, paths))} songs")
     if set_name in ("all", "stress"):
         print(f"stress: {len(build_stress(paths, paths.sets / 'stress.toml'))} songs")
+    if set_name in ("all", "repeats"):
+        print(f"repeats: {len(build_repeats(paths, paths.sets / 'repeats.toml'))} songs")
     return 0
 
 

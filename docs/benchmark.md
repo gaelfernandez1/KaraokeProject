@@ -25,6 +25,7 @@ Audio never goes into git: everything downloaded or computed goes to `bench/data
 | `quick` | 20 fixed songs (5 per language, varied genres), in `bench/sets/quick.txt` | the quick daily check |
 | `gl` | Galician songs with free licences and timings checked by ear (`bench/sets/gl/`) | the main goal |
 | `stress` | 24 songs from `quick` with the tricks of real songs (a 30 s instrumental, ad-libs, echoes, "lyrics site" text with headers and `x2`, a missing line or two extra ones), with JamendoLyrics' exact timings shifted; the recipe is in `bench/sets/stress.toml` and it is built with `fetch --set stress` | the aligner's robustness, per group |
+| `repeats` | the 45 JamendoLyrics songs that sing a line, a couplet or a stanza several times in a row, with lyrics that write it once, as lyrics sites do: `repeats-marked` with "(xN)" after the block's last line, `repeats-unmarked` with no mark; the audio and the hand-made timings stay exact and the stanza breaks come from the JamendoLyrics files; recipe in `bench/sets/repeats.toml`, built with `fetch --set repeats` | lyrics that leave out repeats |
 | `private` | your songs, in `bench/data/private/` | local only |
 | `<set>/<id>` | a single song | debugging |
 

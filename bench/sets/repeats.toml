@@ -1,0 +1,9 @@
+# Repeats set: the JamendoLyrics songs that sing a line, a couplet or a stanza several times in a
+# row, with lyrics that write it once, as lyrics sites do. Built locally with
+# `karaoke-bench fetch --set repeats` (needs the jamendo set); the audio and the hand-made
+# timings stay exact, only the lyrics change. Two versions of each song:
+#   repeats-marked    the block once, "(xN)" after its last line
+#   repeats-unmarked  the block once, with no mark at all
+# Bump `version` after changing anything here or in repeats.py: songs are rebuilt.
+version = 2
+groups = ["repeats-marked", "repeats-unmarked"]

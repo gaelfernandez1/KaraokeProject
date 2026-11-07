@@ -1,0 +1,16 @@
+# each language's default CTC model
+name = "repeticiones-antes"
+description = "c4-default before stanza repeats and reading repeat marks by the audio (the baseline of decision 016)"
+
+[steps.separator]
+target = "karaoke_engine.separation:RoformerSeparator"
+params = { model = "vocals_mel_band_roformer.ckpt", segment_size = 801 }
+
+[steps.transcriber]
+target = "karaoke_engine.transcribe:WhisperTranscriber"
+
+[steps.segmenter]
+target = "karaoke_engine.transcribe:LineSegmenter"
+
+[steps.aligner]
+target = "karaoke_engine.align.aligner:LyricsAligner"

@@ -2,14 +2,15 @@
 
 It reads the lyrics the way a lyrics site writes them (parse_lyrics), turns each word into the
 letters a singer says (spoken), and lets the CTC path rest between lines, skip lines nobody
-sings and keep letters out of the instrumental breaks (align_segments). After the path, line
-starts move back to where the voice really starts (CTC tends to place the first letter late)
-and word ends are kept out of silence.
+sings, sing a stanza's lines again where the site wrote them once, and keep letters out of the
+instrumental breaks (align_segments). A repeat mark that may cover more than its line ("(x4)"
+after a couplet) is read the way the audio fits best. After the path, word ends are kept out of
+silence.
 """
 
 import itertools
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -20,9 +21,9 @@ import numpy.typing as npt
 from karaoke_contracts import Line, Part, Word
 from karaoke_engine.align.activity import vocal_activity
 from karaoke_engine.align.audio import SAMPLE_RATE, load_mono16k
-from karaoke_engine.align.ctc import Segment, align_segments
+from karaoke_engine.align.ctc import BestPath, Segment, align_segments, best_path
 from karaoke_engine.align.emissions import EmissionModel, Emissions, Vocab
-from karaoke_engine.align.lyrics import LyricLine, parse_lyrics, singer_id
+from karaoke_engine.align.lyrics import LyricLine, parse_lyrics, repeat_marks, singer_id
 from karaoke_engine.align.models import DEFAULT_BY_LANGUAGE, FALLBACK_MODEL, MODELS
 from karaoke_engine.align.spoken import spoken
 from karaoke_engine.align.syllables import syllables
@@ -36,6 +37,10 @@ _END_SLACK = 0.1
 _END_GAP = 0.3
 # A backing part may start this long before the lead line it answers.
 _BACKING_MARGIN = 0.5
+# A repeat mark covers more than its line only if that reading's path scores this much better,
+# and no more than this many readings are tried in one song (each is a path search).
+_READING_MARGIN = 1.0
+_MAX_READINGS = 24
 
 
 class _Model(Protocol):
@@ -58,7 +63,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "13"  # parse_lyrics: leaves out what a pasted web page adds (align/pasted.py)
+    version = "14"  # stanza repeats, repeat marks read by the audio, Latin twins, leading marks
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
@@ -76,6 +81,7 @@ class LyricsAligner:
         backing_min_confidence: float = 0.05,
         edge_skip_penalty: float = math.inf,
         silence_penalty: float = 4.0,
+        repeat_penalty: float = 30.0,
         refine_onsets: bool = False,
         parts: bool = True,
         char_map: dict[str, str] | None = None,
@@ -92,6 +98,7 @@ class LyricsAligner:
         self.backing_min_confidence = backing_min_confidence
         self.edge_skip_penalty = edge_skip_penalty
         self.silence_penalty = silence_penalty
+        self.repeat_penalty = repeat_penalty
         self.refine_onsets = refine_onsets
         self.parts = parts
         self.char_map = char_map or {}
@@ -112,7 +119,15 @@ class LyricsAligner:
         lines = parse_lyrics(lyrics)
         model = self._model_for(language)
         vocab = model.vocab
-        tokens = [self._tokens(line, vocab, language) for line in lines]
+        known: dict[tuple[str, ...], _Tokens] = {}
+
+        def tokens_of(line: LyricLine) -> _Tokens:
+            if line.words not in known:
+                known[line.words] = self._tokens(line, vocab, language)
+            return known[line.words]
+
+        # Every reading of the repeat marks repeats these same lines: one set of columns.
+        tokens = [tokens_of(line) for line in lines]
         used = sorted({token for line in tokens for token in line.ids})
         column = {token: i + 2 for i, token in enumerate(used)}
 
@@ -122,16 +137,29 @@ class LyricsAligner:
         frame_active = _resample(active, emissions.log_probs.shape[0], emissions.frame_seconds)
         penalty = np.where(frame_active, 0.0, self.silence_penalty).astype(np.float32)
 
+        def search(lines: list[LyricLine]) -> tuple[list[int], BestPath]:
+            order = [i for i in range(len(lines)) if tokens_of(lines[i]).ids]
+            segments = [self._segment(lines[i], tokens_of(lines[i]), column) for i in order]
+            found = best_path(emissions.log_probs, segments, self.filler_penalty, penalty,
+                              self.repeat_penalty)  # fmt: skip
+            return order, found
+
+        scopes = self._read_marks(
+            lyrics, lambda reading: search(parse_lyrics(lyrics, reading))[1].score
+        )
+        if scopes:
+            lines = parse_lyrics(lyrics, scopes)
+            tokens = [tokens_of(line) for line in lines]
+
         # One path through every line, backing parts in their written place (mostly echoes and
         # answers right after the lead). With overlap_backing, a backing part that does not fit
         # there gets a second chance alone, over its lead line; off by default, because on the
         # public songs it placed more words wrong than right (decision 006).
-        order = [i for i in range(len(lines)) if tokens[i].ids]
+        order, found = search(lines)
         segments = {i: self._segment(lines[i], tokens[i], column) for i in order}
-        paths = align_segments(
-            emissions.log_probs, [segments[i] for i in order], self.filler_penalty, penalty
-        )
-        placed = {i: p.spans for i, p in zip(order, paths, strict=True) if p.spans is not None}
+        paths = dict(zip(order, found.paths, strict=True))
+        placed = {i: path.spans for i, path in paths.items() if path.spans is not None}
+        again = [(i, spans) for i, path in paths.items() for spans in path.repeats]
         first_pass = set(placed)
         leads = [i for i in order if not lines[i].backing]
         skipped = [i for i in order if lines[i].backing and i not in placed]
@@ -147,7 +175,7 @@ class LyricsAligner:
                 placed[i] = [(a + first, b + first) for a, b in path.spans]
 
         out: list[Line] = []
-        for i, spans in placed.items():
+        for i, spans in [*placed.items(), *again]:
             words = self._words(lines[i], tokens[i], spans, emissions, column, active, language)
             overlapped = lines[i].backing and i not in first_pass
             if overlapped and _mean_confidence(words) < self.backing_min_confidence:
@@ -166,6 +194,26 @@ class LyricsAligner:
         out.sort(key=lambda line: line.start)
         return [line.model_copy(update={"id": f"l{k + 1}"}) for k, line in enumerate(out)]
 
+    def _read_marks(self, lyrics: str, score: Callable[[dict[int, int]], float]) -> dict[int, int]:
+        """How many lines each repeat mark covers ("(x4)" after a couplet): for each mark that
+        could cover more than its line, in order, the reading whose path scores best."""
+        marks = repeat_marks(lyrics)
+        if not any(most > 1 for most in marks):
+            return {}
+        scopes: dict[int, int] = {}
+        best = score(scopes)
+        tries = 1
+        for mark, most in enumerate(marks):
+            for option in sorted({2, 3, 4, most} & set(range(2, most + 1))):
+                if tries >= _MAX_READINGS:
+                    return scopes
+                trial = {**scopes, mark: option}
+                tried = score(trial)
+                tries += 1
+                if tried > best + _READING_MARGIN:
+                    best, scopes = tried, trial
+        return scopes
+
     def _segment(self, line: LyricLine, tokens: _Tokens, column: dict[int, int]) -> Segment:
         count = len(tokens.ids)
         rate = self.backing_skip_penalty if line.backing else self.skip_penalty
@@ -174,6 +222,7 @@ class LyricsAligner:
             owner=tokens.owner,
             skip_penalty=rate * count,
             edge_skip_penalty=min(rate, self.edge_skip_penalty) * count,
+            group=line.stanza,
         )
 
     def _tokens(self, line: LyricLine, vocab: Vocab, language: str) -> _Tokens:

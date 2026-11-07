@@ -1,4 +1,4 @@
-from karaoke_engine.align.lyrics import LyricLine, parse_lyrics
+from karaoke_engine.align.lyrics import LyricLine, parse_lyrics, repeat_marks
 
 
 def _texts(lines: list[LyricLine]) -> list[str]:
@@ -137,3 +137,33 @@ def test_a_named_chorus_takes_the_singer_of_its_new_label() -> None:
         ("B", "Brais"),
         ("A", "Uxía"),
     ]
+
+
+def test_a_repeat_mark_may_cover_the_lines_before_it() -> None:
+    text = "A\nB (x2)\nC\n"
+
+    assert _texts(parse_lyrics(text)) == ["A", "B", "B", "C"]
+    assert _texts(parse_lyrics(text, scopes={0: 2})) == ["A", "B", "A", "B", "C"]
+
+
+def test_repeat_marks_say_how_many_lines_they_could_cover() -> None:
+    text = "A\nB (x2)\nC x3\n\nD x2\n[Coro]\nE\nF (bis)\n"
+
+    assert repeat_marks(text) == [2, 3, 1, 2]
+
+
+def test_a_mark_covers_no_more_than_its_stanza() -> None:
+    text = "A\n\nB\nC (x2)\n"
+
+    assert _texts(parse_lyrics(text, scopes={0: 5})) == ["A", "B", "C", "B", "C"]
+
+
+def test_lines_know_their_stanza() -> None:
+    lines = parse_lyrics("A\nB x2\n\nC\n[Coro x2]\nD\nE\n")
+    stanzas = [line.stanza for line in lines]
+
+    # A B B | C | D E | D E: each copy of a repeated section is a stanza of its own.
+    assert stanzas[0] == stanzas[1] == stanzas[2]
+    assert len({stanzas[0], stanzas[3], stanzas[4], stanzas[6]}) == 4
+    assert stanzas[4] == stanzas[5]
+    assert stanzas[6] == stanzas[7]
