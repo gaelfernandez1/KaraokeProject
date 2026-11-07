@@ -6,7 +6,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.2.0"
 
 Seconds = Annotated[float, Field(ge=0, description="Seconds from the start of the song audio.")]
 NonEmptyStr = Annotated[str, StringConstraints(min_length=1)]
@@ -71,7 +71,13 @@ class AudioRefs(_Model):
 
 
 class VideoRefs(_Model):
-    background: MediaRef | None = None
+    background: MediaRef | None = Field(
+        default=None, description="The song's video, light enough for every player (720p)."
+    )
+    master: MediaRef | None = Field(
+        default=None,
+        description="The same video at its own quality (up to 1080p), for the MP4 export.",
+    )
 
 
 class LanguageFallback(_Model):

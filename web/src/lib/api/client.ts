@@ -3,6 +3,7 @@ import { normalizeDoc } from '#lib/lyrics/layout.js';
 import type {
 	CreateJobInput,
 	Device,
+	Export,
 	ExportInput,
 	Job,
 	Me,
@@ -149,12 +150,32 @@ export function retryJob(id: string, fetchImpl?: Fetch): Promise<Job> {
 	return request(`/api/jobs/${encodeURIComponent(id)}/retry`, { method: 'POST' }, fetchImpl);
 }
 
+/** A file of the package that the browser saves (as `name`) instead of opening. */
+export function downloadUrl(id: string, file: string, name: string): string {
+	return `${mediaUrl(id, file)}?download=1&name=${encodeURIComponent(name)}`;
+}
+
 export function jobEventsUrl(id: string): string {
 	return `/api/jobs/${encodeURIComponent(id)}/events`;
 }
 
 export function createExport(id: string, input: ExportInput, fetchImpl?: Fetch): Promise<Job> {
 	return request(`/api/songs/${encodeURIComponent(id)}/exports`, json('POST', input), fetchImpl);
+}
+
+/** The song's karaoke videos, newest first. */
+export function listExports(id: string, fetchImpl?: Fetch): Promise<Export[]> {
+	return request(`/api/songs/${encodeURIComponent(id)}/exports`, {}, fetchImpl);
+}
+
+/** Deletes one of the song's videos; `file` is its path in the package (`exports/…`). */
+export function deleteExport(id: string, file: string, fetchImpl?: Fetch): Promise<void> {
+	const name = file.split('/').pop() ?? file;
+	return request(
+		`/api/songs/${encodeURIComponent(id)}/exports/${encodeURIComponent(name)}`,
+		{ method: 'DELETE' },
+		fetchImpl
+	);
 }
 
 export function serverInfo(fetchImpl?: Fetch): Promise<ServerInfo> {

@@ -5,7 +5,7 @@ The web's TypeScript types are generated from the OpenAPI description these mode
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 LyricsSource = Literal["user", "asr", "lrclib"]
 
@@ -24,6 +24,24 @@ class SongSummary(BaseModel):
     edited: bool
     lyrics_source: LyricsSource
     hook: str | None
+
+
+class Export(BaseModel):
+    """A karaoke video of a song, ready to download."""
+
+    # Its path inside the song's package, for /media.
+    file: str
+    aspect: Literal["16:9", "9:16"]
+    theme: str
+    # Bytes.
+    size: int
+    created_at: str
+    # A still with the title, next to the video, if there is one.
+    thumbnail: str | None
+    # The lyrics were corrected after the video was made.
+    outdated: bool
+    # The guide vocals in it, 0-1.
+    vocals: float
 
 
 class Device(BaseModel):
@@ -183,3 +201,11 @@ class MakeRequest(BaseModel):
 class ExportRequest(BaseModel):
     aspect: Literal["16:9", "9:16"] = "16:9"
     theme: str = "clasico"
+    # The guide vocals in the video: 0 is a karaoke without them, 1 the song as sung.
+    vocals: Annotated[float, Field(ge=0, le=1)] = 0.0
+
+    @field_validator("vocals")
+    @classmethod
+    def _in_hundredths(cls, value: float) -> float:
+        # One video per level: 0.333 and 0.33 are the same file.
+        return round(value, 2)

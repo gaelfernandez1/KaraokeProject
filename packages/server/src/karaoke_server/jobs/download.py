@@ -15,8 +15,9 @@ from karaoke_server.jobs.types import DownloadError, RemoteInfo
 
 logger = logging.getLogger(__name__)
 
-# Up to 720p is plenty for a karaoke background; the audio is the best there is.
-FORMAT = "bv*[height<=720]+ba/b[height<=720]/b"
+# Up to 1080p: the package keeps it as it came for the MP4 export (players get a 720p copy).
+# The audio is the best there is.
+FORMAT = "bv*[height<=1080]+ba/b[height<=1080]/b"
 # Our progress lines. In --progress-template, «download:» is the kind of line, not printed text.
 _PERCENT = re.compile(r"^progress\s*([\d.]+)%")
 

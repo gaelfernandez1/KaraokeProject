@@ -27,9 +27,11 @@ from karaoke_contracts import (
 from karaoke_server.config import Settings
 from karaoke_server.db import Database
 from karaoke_server.hook import hook_of
-from karaoke_server.models import SongSummary
+from karaoke_server.models import Export, SongSummary
 
 SONG_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,79}$")
+# Exported videos are «exports/<id>-<16x9|9x16>-<theme>[-v<vocals %>].mp4» (see jobs.queue).
+_EXPORT = r"-(?P<aspect>16x9|9x16)-(?P<theme>[a-z0-9][a-z0-9_-]*?)(?:-v(?P<vocals>\d{1,3}))?\.mp4"
 # Trash entries are «<id>-<unix time of deletion>».
 _TRASHED_AT = re.compile(r"-(\d{10})$")
 
@@ -68,7 +70,7 @@ def _copy_package(src: Path, doc: KaraokeDoc, dest: Path) -> None:
     """
     refs = [doc.audio.instrumental, doc.audio.vocals, doc.cover]
     if doc.video is not None:
-        refs.append(doc.video.background)
+        refs += [doc.video.background, doc.video.master]
     dest.mkdir(parents=True)
     shutil.copyfile(src / DOC, dest / DOC)
     for ref in filter(None, refs):
@@ -139,7 +141,43 @@ class Library:
             return None
         return folder / pure
 
+    def exports(self, song_id: str) -> builtins.list[Export] | None:
+        """The song's finished videos, newest first; None if there is no such song."""
+        folder = self.folder(song_id)
+        if folder is None:
+            return None
+        edited = (folder / DOC).stat().st_mtime
+        found = []
+        for video, match in self._export_files(folder, song_id):
+            stat = video.stat()
+            thumb = video.with_suffix(".jpg")
+            found.append(
+                Export(
+                    file=f"exports/{video.name}",
+                    aspect="16:9" if match["aspect"] == "16x9" else "9:16",
+                    theme=match["theme"],
+                    size=stat.st_size,
+                    created_at=iso(stat.st_mtime),
+                    thumbnail=f"exports/{thumb.name}" if thumb.is_file() else None,
+                    outdated=stat.st_mtime < edited,
+                    vocals=int(match["vocals"] or 0) / 100,
+                )
+            )
+        return sorted(found, key=lambda e: (e.created_at, e.file), reverse=True)
+
     # Changing
+
+    def delete_export(self, song_id: str, name: str) -> bool:
+        """Deletes one of the song's videos (and its thumbnail); False if there is no such video."""
+        folder = self.folder(song_id)
+        if folder is None:
+            return False
+        for video, _ in self._export_files(folder, song_id):
+            if video.name == name:
+                video.unlink()
+                video.with_suffix(".jpg").unlink(missing_ok=True)
+                return True
+        return False
 
     def save_doc(self, song_id: str, doc: KaraokeDoc) -> KaraokeDoc:
         """Stores corrected lyrics; the first correction keeps the original beside it."""
@@ -248,6 +286,20 @@ class Library:
         )
         return created
 
+    @staticmethod
+    def _export_files(folder: Path, song_id: str) -> builtins.list[tuple[Path, re.Match[str]]]:
+        exports = folder / "exports"
+        if not exports.is_dir():
+            return []
+        pattern = re.compile(re.escape(song_id) + _EXPORT)
+        return [
+            (video, match)
+            for video in exports.iterdir()
+            if (match := pattern.fullmatch(video.name))
+            and video.is_file()
+            and not video.is_symlink()
+        ]
+
     def _free_id(self, base: str) -> str:
         song_id, n = base, 2
         while (self.root / song_id).exists():
@@ -261,6 +313,7 @@ class Library:
             "audio.instrumental": doc.audio.instrumental,
             "audio.vocals": doc.audio.vocals,
             "video.background": doc.video.background if doc.video else None,
+            "video.master": doc.video.master if doc.video else None,
             "cover": doc.cover,
         }
         issues: builtins.list[Issue] = []

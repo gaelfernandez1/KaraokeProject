@@ -36,7 +36,7 @@ the demo's, and the end of each `LICENSE` says how to make the real songs'.
 |---|---|
 | `/` | **Cancións**: the wall of posters, with search (ignoring accents and case) and a language filter. `/` focuses the search box. |
 | `/crear` | **Crear karaoke**: a file or a link, the language (Galician by default), optional lyrics or LRCLIB; jobs are followed live from any screen (a ring on «Crear»). |
-| `/cantar/<id>` | **Reprodutor**: a full-screen stage (video, cover or the poster's colour) with the lyrics; the «Son» panel has guide vocals, pitch, delay, lyrics style, downloads and video. `?t=12.3` freezes the lyrics without sound (for screenshots and tests). |
+| `/cantar/<id>` | **Reprodutor**: a full-screen stage (video, cover or the poster's colour) with the lyrics; the «Son» panel has guide vocals, pitch, delay and lyrics style; «Descargar» has the song's karaoke videos (made there, with their progress live, and kept to download any time), the music without vocals, the vocals and the lyrics, all named after the song, and the offline copy. `?t=12.3` freezes the lyrics without sound (for screenshots and tests). |
 | `/editar/<id>` | **Editor**: correct words and timings, listen to a line or loop it, tap the rhythm with the space bar. |
 | `/festa` | **Festa (TV)**: code, QR code, the queue by turns, an «Agora canta» poster with a countdown, and the song. |
 | `/festa/<code>` | **Remote (phone)**: join with a name, ask for songs, see the queue and control the player if the host allows it. |
@@ -73,8 +73,8 @@ The queue lives on the server; every screen works out the turns with the same fu
 
 The app can be installed (manifest and icons in `web/static/`) and has its own service worker
 (`web/src/service-worker/`): it keeps the interface so it opens without a network and, in the
-player's «Son» panel, «Gardar sen conexión» downloads the whole song (lyrics, audio, cover and video)
-to the device. Saved songs show a marked corner and a «Gardadas» filter in the library, and are
+player's «Descargar» panel, «Gardar sen conexión» downloads the whole song (lyrics, audio, cover
+and the 720p video, never the full-quality one kept for the export) to the device. Saved songs show a marked corner and a «Gardadas» filter in the library, and are
 managed in Axustes. A new version of the app waits until «Actualizar» is pressed: it never cuts a
 song short.
 
