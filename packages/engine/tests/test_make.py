@@ -212,6 +212,18 @@ def test_make_lists_singers(tmp_path: Path) -> None:
     assert [line.singer for line in doc.lines] == [singer_id("Ana"), singer_id("Brais"), "s1"]
 
 
+def test_make_leaves_out_the_title_pasted_above_the_lyrics(tmp_path: Path) -> None:
+    lyrics = "Mar\nAna\n\nOla mar\nVai o vento\n"
+
+    doc = make_package(_song(tmp_path), tmp_path / "pkg", "gl", lyrics, title="Mar", artist="Ana",
+                       separator=CopySeparator(), aligner=EvenAligner())  # fmt: skip
+
+    assert [[word.text for word in line.words] for line in doc.lines] == [
+        ["Ola", "mar"],
+        ["Vai", "o", "vento"],
+    ]
+
+
 def test_cli_make_looks_lyrics_up_when_asked(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

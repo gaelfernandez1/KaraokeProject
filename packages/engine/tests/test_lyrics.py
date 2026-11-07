@@ -54,9 +54,9 @@ def test_other_repeat_marks() -> None:
 
 
 def test_x2_alone_repeats_stanza() -> None:
-    text = "Intro\n\nA\nB\n(x2)\nC\n"
+    text = "Ola\n\nA\nB\n(x2)\nC\n"
 
-    assert _texts(parse_lyrics(text)) == ["Intro", "A", "B", "A", "B", "C"]
+    assert _texts(parse_lyrics(text)) == ["Ola", "A", "B", "A", "B", "C"]
 
 
 def test_header_repeat_mark_repeats_its_section() -> None:

@@ -58,7 +58,7 @@ class _Tokens:
 class LyricsAligner:
     name = "lyrics-ctc"
     # Bumped when a default changes too: defaults are not part of the bench cache key.
-    version = "12"  # parse_lyrics: "2x" and header repeat marks, NFC, "X6" kept as text
+    version = "13"  # parse_lyrics: leaves out what a pasted web page adds (align/pasted.py)
 
     # Defaults measured on the quick, stress, private and jamendo sets (decision 005). Skip costs
     # are per letter: a flat cost per line rewarded cramming many short lines into the audio.
