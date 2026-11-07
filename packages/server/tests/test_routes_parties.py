@@ -140,15 +140,15 @@ def test_sse_unsubscribes_when_the_client_goes(make_client: MakeClient) -> None:
         code = http.post("/api/parties").json()["code"]
         with http.stream("GET", f"/api/parties/{code}/events") as stream:
             assert stream.status_code == 200
-            seen = read_events(stream.iter_lines(), 1)
+            # Kept in a variable: a line iterator that is dropped closes the connection, and the
+            # server rightly lets the listener go (in CI it often did before this was counted).
+            lines = stream.iter_lines()
+            seen = read_events(lines, 1)
             assert seen, "the stream ended without an event"
             assert seen[0][0] == "state", seen
             assert json.loads(seen[0][1])["code"] == code, seen
-            # The server registers the stream before it sends the first state; this failed once
-            # in CI under the full parallel suite, so it now says what it saw if it fails again.
-            assert _wait_for(lambda: parties.listener_count(code) == 1), (
-                f"connected and got {seen}, but {parties.listener_count(code)} listeners"
-            )
+            time.sleep(0.5)  # time enough for the server to notice a disconnection, were there one
+            assert parties.listener_count(code) == 1
         assert _wait_for(lambda: parties.listener_count(code) == 0)
 
 
