@@ -96,7 +96,7 @@ export const es = {
 		language: 'Idioma de la canción',
 		lyrics: 'Letra',
 		lyricsHint:
-			'Pégala tal como viene de la web. Los títulos como [Estribillo] y las repeticiones se entienden; los coros, entre paréntesis.',
+			'Pégala tal como viene de la web, sin retocarla: se quita lo que no se canta (anuncios, créditos, quién canta…) y se entienden los títulos como [Estribillo] y las repeticiones. Los coros, entre paréntesis.',
 		lrclib: 'Buscar la letra en internet si no la pegas',
 		lrclibHint:
 			'Usamos LRCLIB, una base de letras abierta. Funciona mejor con canciones conocidas.',

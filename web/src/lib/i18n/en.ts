@@ -96,7 +96,7 @@ export const en = {
 		language: 'Song language',
 		lyrics: 'Lyrics',
 		lyricsHint:
-			'Paste them as they come from the website. Headers like [Chorus] and repeats are understood; backing vocals go in parentheses.',
+			'Paste them as they come from the website, untouched: what is not sung (adverts, credits, who sings…) is left out, and headers like [Chorus] and repeats are understood. Backing vocals go in parentheses.',
 		lrclib: 'Look the lyrics up online if you do not paste them',
 		lrclibHint: 'We use LRCLIB, an open lyrics database. Works best with well-known songs.',
 		songTitle: 'Title',

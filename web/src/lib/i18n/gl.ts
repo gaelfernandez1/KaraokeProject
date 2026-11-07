@@ -95,7 +95,7 @@ export const gl = {
 		language: 'Idioma da canción',
 		lyrics: 'Letra',
 		lyricsHint:
-			'Pégaa tal como vén da web. Os títulos como [Estribillo] e as repeticións enténdense; os coros, entre parénteses.',
+			'Pégaa tal como vén da web, sen retocala: quítase o que non se canta (anuncios, créditos, quen canta…) e enténdense os títulos como [Estribillo] e as repeticións. Os coros, entre parénteses.',
 		lrclib: 'Buscar a letra en internet se non a pegas',
 		lrclibHint: 'Usamos LRCLIB, unha base de letras aberta. Vai mellor con cancións coñecidas.',
 		songTitle: 'Título',
