@@ -96,7 +96,8 @@ _NEVER_SUNG = [
 ]
 # LRC tags ([ti:Title], [ar:Artist]…) are written in lowercase; a header «[Al: Ana]» is not one.
 _LRC_TAG = re.compile(r"^\[(?:ti|ar|al|au|by|length|offset|re|ve|id|la|lang|tool|#)\s*:[^\]]*\]$")
-_HASHTAGS = re.compile(r"^(?:[#@]\S+\s*)+$")
+# Tags apart by spaces: with the spaces optional, «#!#!#!…» could be split countless ways.
+_HASHTAGS = re.compile(r"^[#@]\S+(?:\s+[#@]\S+)*\s*$")
 
 # Page text that could also be sung: dropped only above or below the lyrics.
 _PAGE_EDGE = [
