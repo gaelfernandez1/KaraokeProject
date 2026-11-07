@@ -1,8 +1,10 @@
 # Video
 
 Song backgrounds and MP4 export with the animated lyrics. The decisions are in
-[`plan-v3/decisiones/008-video.md`](plan-v3/decisiones/008-video.md) (in Spanish); the timings, in
-`bench/results/2026-10-30-c6-render/`.
+[`plan-v3/decisiones/008-video.md`](plan-v3/decisiones/008-video.md) and
+[`014-descargas-y-video-original.md`](plan-v3/decisiones/014-descargas-y-video-original.md) (in
+Spanish); the timings, in `bench/results/2026-10-30-c6-render/`, and the export quality, in
+`bench/results/2026-11-07-export-calidad/`.
 
 ## A package's background
 
@@ -10,7 +12,13 @@ Song backgrounds and MP4 export with the animated lyrics. The decisions are in
 
 - **`background.mp4`** if the file has video (a music video from YouTube, for example): H.264 that
   any phone or TV plays, at most 1280×720 and 30 fps, one keyframe per second (seeking is instant),
-  the index at the start and no audio. It goes in `video.background`.
+  the index at the start and no audio. It goes in `video.background`; the players use it.
+- **`master.mp4`**: the same video at its own quality, for the MP4 export (`video.master`,
+  contract 1.2.0). The stream is copied as it came (a second, nothing lost) when its short side is
+  at most 1080, its codec is H.264, HEVC, VP9 or AV1 and it is under 16 Mb/s; otherwise it is
+  encoded to 1080 on the short side (H.264, CQ 18). Exporting from it instead of from the 720p
+  background raises the quality from 36.9 to 43.3 dB XPSNR on a 1080p clip (16:9). If it cannot be
+  made, the package keeps the background and the export uses that.
 - **`cover.jpg`**: the embedded artwork if there is one (mp3, m4a) or, if not, a frame a third of
   the way into the video. It goes in `cover`.
 
@@ -20,8 +28,8 @@ For a package already made (or to change its background):
 uv run karaoke background <package> <video, song with artwork, or image>
 ```
 
-Code: `karaoke_engine.video.media` (`probe_video`, `extract_background`, `extract_cover`,
-`add_background`, `mean_luma`).
+Code: `karaoke_engine.video.media` (`probe_video`, `extract_background`, `extract_master`,
+`extract_cover`, `add_background`, `mean_luma`).
 
 ## Exporting the MP4
 
@@ -30,18 +38,20 @@ uv run karaoke render <package> [--theme clasico] [--aspect 16:9|9:16] [--backgr
                                 [--vocals 0.3] [--dim 0.8] [--size 1280x720] [-o video.mp4]
 ```
 
-- **Background** (`--background`): `auto` uses the package's video, otherwise its cover and
-  otherwise a gradient in the theme's colours; also `video`, `cover`, `gradient` or the path to a
-  video or an image. A background with the video's shape fills it; with another shape it is shown
-  whole over an enlarged, blurred and darker copy, never stretched or cropped. In 9:16 it moves up to
-  leave the lyrics below. An image moves very slowly.
+- **Background** (`--background`): `auto` uses the package's video (its master if it has one),
+  otherwise its cover and otherwise a gradient in the theme's colours; also `video`, `cover`,
+  `gradient` or the path to a video or an image. A background with the video's shape fills it;
+  with another shape it is shown whole over an enlarged, blurred and darker copy, never stretched
+  or cropped. In 9:16 it moves up to leave the lyrics below. An image moves very slowly.
 - **Legibility**: the background is darkened according to its brightness (`--dim` sets it by hand:
   1 means no darkening) and a dark gradient band goes behind the lyrics.
 - **Lyrics**: the ASS of the subtitles ([`subtitles.md`](subtitles.md)) with the same layout as the
   web app, plus the **title and artist** at the start (if the first line comes 4 s or more in) and
   **credits** at the end (title, artist and the first paragraph of `LICENSE`, if 4 s or more are
   left).
-- **Audio**: the instrumental as is; with `--vocals`, mixed with the guide vocals at that level.
+- **Audio**: the instrumental as is; with `--vocals` (0–1), mixed with the guide vocals at that
+  level (AAC at 192 kb/s, with a limiter so the mix never clips). The server's download panel
+  sets it with a slider.
 - **Thumbnail**: next to the video, a 1280 px `.jpg` with the title over the background.
 - **Encoding**: NVENC on the GPU and, if that is not possible, x264.
 

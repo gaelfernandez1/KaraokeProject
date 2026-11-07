@@ -140,6 +140,16 @@ def test_missing_media_is_reported(demo_package: Path) -> None:
     assert [i.path for i in issues] == ["audio.vocals"]
 
 
+def test_a_missing_master_video_is_reported(demo_package: Path) -> None:
+    doc = json.loads((demo_package / "karaoke.json").read_text(encoding="utf-8"))
+    doc["video"] = {"master": "master.mp4"}
+    (demo_package / "karaoke.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    issues = validate_package(demo_package)
+
+    assert [i.path for i in issues] == ["video.master"]
+
+
 def test_missing_document_is_reported(tmp_path: Path) -> None:
     issues = validate_package(tmp_path)
 

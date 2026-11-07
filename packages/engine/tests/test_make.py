@@ -380,6 +380,7 @@ def test_make_keeps_the_video_as_background_and_a_cover(tmp_path: Path) -> None:
 
     assert doc.video is not None
     assert doc.video.background == "background.mp4"
+    assert doc.video.master == "master.mp4"
     assert doc.cover == "cover.jpg"
     assert validate_package(out) == []
 
@@ -431,6 +432,31 @@ def test_a_failing_cover_or_background_does_not_lose_the_package(
 
     assert doc.video is None
     assert doc.cover is None
+    assert validate_package(out) == []
+
+
+def test_a_failing_master_keeps_the_background(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    clip = tmp_path / "Videoclip.mp4"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-f", "lavfi", "-i", "testsrc2=s=320x240:d=6", "-f", "lavfi",
+         "-i", "sine=duration=6", "-ac", "2", "-shortest", str(clip)],
+        check=True,
+    )  # fmt: skip
+
+    def broken(source: Path, out: Path) -> Path:
+        out.write_bytes(b"half")
+        raise RuntimeError("ffmpeg failed")
+
+    monkeypatch.setattr("karaoke_engine.make.extract_master", broken)
+    out = tmp_path / "pkg"
+
+    doc = make_package(clip, out, "gl", "Ola\n", separator=CopySeparator(), aligner=EvenAligner())
+
+    assert doc.video is not None
+    assert (doc.video.background, doc.video.master) == ("background.mp4", None)
+    assert not (out / "master.mp4").exists()
     assert validate_package(out) == []
 
 

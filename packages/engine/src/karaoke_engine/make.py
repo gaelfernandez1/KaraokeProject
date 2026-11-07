@@ -37,7 +37,12 @@ from karaoke_engine.languages import TWO_LETTERS
 from karaoke_engine.separation import RoformerSeparator
 from karaoke_engine.steps import Separator, TextAligner, Transcriber
 from karaoke_engine.transcribe import LineSegmenter, WhisperTranscriber, transcribe_in_child
-from karaoke_engine.video.media import extract_background, extract_cover, probe_video
+from karaoke_engine.video.media import (
+    extract_background,
+    extract_cover,
+    extract_master,
+    probe_video,
+)
 
 _LANGUAGE = re.compile(r"^[a-z]{2,3}$")
 
@@ -209,10 +214,11 @@ def _make(
 
 
 def _keep_pictures(source: Path, out_dir: Path) -> tuple[VideoRefs | None, str | None]:
-    """The song's video as the package background and its cover art (or a frame) as cover."""
-    for old in ("background.mp4", "cover.jpg"):
+    """The song's video as the package background (and master, for the export) and its cover art
+    (or a frame) as cover."""
+    for old in ("background.mp4", "master.mp4", "cover.jpg"):
         (out_dir / old).unlink(missing_ok=True)
-    # Both are extras: a file whose pictures ffmpeg cannot handle still makes its karaoke.
+    # All are extras: a file whose pictures ffmpeg cannot handle still makes its karaoke.
     video = None
     try:
         if probe_video(source) is not None:
@@ -221,6 +227,13 @@ def _keep_pictures(source: Path, out_dir: Path) -> tuple[VideoRefs | None, str |
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         logger.warning("could not keep the video of %s: %s", source.name, exc)
         (out_dir / "background.mp4").unlink(missing_ok=True)
+    if video is not None:
+        try:
+            extract_master(source, out_dir / "master.mp4")
+            video = VideoRefs(background="background.mp4", master="master.mp4")
+        except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
+            logger.warning("could not keep the full-quality video of %s: %s", source.name, exc)
+            (out_dir / "master.mp4").unlink(missing_ok=True)
     cover = None
     try:
         if extract_cover(source, out_dir / "cover.jpg") is not None:

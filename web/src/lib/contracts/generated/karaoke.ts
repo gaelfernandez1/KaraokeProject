@@ -21,7 +21,14 @@ export interface AudioRefs {
 	loudness_lufs: number | null;
 }
 export interface VideoRefs {
+	/**
+	 * The song's video, light enough for every player (720p).
+	 */
 	background: string | null;
+	/**
+	 * The same video at its own quality (up to 1080p), for the MP4 export.
+	 */
+	master: string | null;
 }
 export interface Singer {
 	id: string;

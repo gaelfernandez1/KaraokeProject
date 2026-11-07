@@ -6,11 +6,13 @@ from pathlib import Path
 
 import pytest
 
-from karaoke_contracts import dump_doc, load_doc
+from karaoke_contracts import VideoRefs, dump_doc, load_doc
+from karaoke_engine.video import media
 from karaoke_engine.video.media import (
     add_background,
     extract_background,
     extract_cover,
+    extract_master,
     mean_luma,
     probe_video,
 )
@@ -186,3 +188,87 @@ def test_a_vertical_video_keeps_its_resolution(tmp_path: Path) -> None:
 
     (video,) = _streams(out)
     assert (video["width"], video["height"]) == (720, 1280)
+
+
+def _video_md5(path: Path) -> str:
+    """A hash of the video packets as stored: equal only if nothing was re-encoded."""
+    return subprocess.run(
+        ["ffmpeg", "-v", "error", "-i", str(path), "-map", "0:v:0", "-c", "copy", "-f", "md5", "-"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()  # fmt: skip
+
+
+def test_the_master_keeps_a_1080p_video_untouched(tmp_path: Path) -> None:
+    source = _clip(tmp_path / "a.mp4", size="1920x1080")
+
+    out = extract_master(source, tmp_path / "master.mp4")
+
+    (video,) = _streams(out)  # and no audio
+    assert (video["width"], video["height"]) == (1920, 1080)
+    assert _video_md5(out) == _video_md5(source)
+    data = out.read_bytes()
+    assert data.index(b"moov") < data.index(b"mdat")
+
+
+def test_the_master_brings_bigger_videos_down_to_1080p(tmp_path: Path) -> None:
+    out = extract_master(_clip(tmp_path / "a.mp4", size="2560x1440"), tmp_path / "master.mp4")
+
+    (video,) = _streams(out)
+    assert video["codec_name"] == "h264"
+    assert (video["width"], video["height"]) == (1920, 1080)
+
+
+def test_a_vertical_master_keeps_1080_across(tmp_path: Path) -> None:
+    out = extract_master(_clip(tmp_path / "v.mp4", size="1440x2560"), tmp_path / "master.mp4")
+
+    (video,) = _streams(out)
+    assert (video["width"], video["height"]) == (1080, 1920)
+
+
+def test_the_master_re_encodes_old_codecs(tmp_path: Path) -> None:
+    source = tmp_path / "old.mp4"
+    _ffmpeg("-f", "lavfi", "-i", "testsrc2=s=640x360:r=25:d=2", "-c:v", "mpeg4", str(source))
+
+    (video,) = _streams(extract_master(source, tmp_path / "master.mp4"))
+
+    assert video["codec_name"] == "h264"
+    assert (video["width"], video["height"]) == (640, 360)
+
+
+def test_the_master_re_encodes_a_huge_bitrate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = _clip(tmp_path / "a.mp4")
+    monkeypatch.setattr(media, "MASTER_MAX_BITRATE", 1000)
+
+    out = extract_master(source, tmp_path / "master.mp4")
+
+    assert _video_md5(out) != _video_md5(source)
+
+
+def test_add_background_keeps_a_master_for_the_export(tmp_path: Path) -> None:
+    package = _package_with_cover(tmp_path)
+
+    doc = add_background(package, _clip(tmp_path / "a.mp4"))
+
+    assert doc.video == VideoRefs(background="background.mp4", master="master.mp4")
+    assert (package / "master.mp4").is_file()
+    assert load_doc(package / "karaoke.json").video == doc.video
+
+
+def test_add_background_without_a_master_if_it_cannot_be_made(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package = _package_with_cover(tmp_path)
+
+    def broken(source: Path, out: Path) -> Path:
+        out.write_bytes(b"half")
+        raise RuntimeError("ffmpeg failed")
+
+    monkeypatch.setattr("karaoke_engine.video.media.extract_master", broken)
+
+    doc = add_background(package, _clip(tmp_path / "a.mp4"))
+
+    assert doc.video == VideoRefs(background="background.mp4")
+    assert not (package / "master.mp4").exists()
+    assert not (package / ".master.part.mp4").exists()
