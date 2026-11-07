@@ -1,63 +1,32 @@
 <script lang="ts">
 	/*
-	 * The player's side panel: guide vocals, key, this device's delay, the lyrics style and the
-	 * downloads. It sits beside (or under) the lyrics without covering the line being sung.
+	 * The player's sound panel: guide vocals, key, this device's delay and the lyrics style. It
+	 * sits beside (or under) the lyrics without covering the line being sung.
 	 */
 	import { resolve } from '$app/paths';
-	import { mediaUrl } from '#lib/api';
-	import type { KaraokeDoc } from '#lib/contracts';
 	import { i18n } from '#lib/i18n';
 	import { THEMES } from '#lib/lyrics';
 	import Button from '#lib/ui/Button.svelte';
-	import Icon from '#lib/ui/Icon.svelte';
 	import Slider from '#lib/ui/Slider.svelte';
-	import { saved } from '#lib/offline/saved.svelte.js';
-	import { summaryOf } from '#lib/poster/summary.js';
+	import PlayerPanel from './PlayerPanel.svelte';
 	import type { PlayerSession } from './session.svelte';
 
 	interface Props {
 		session: PlayerSession;
-		doc: KaraokeDoc;
-		songId: string;
 		themeId: string;
 		latencyMs: number;
 		ontheme: (id: string) => void;
 		onlatency: (ms: number) => void;
-		onexport: (aspect: '16:9' | '9:16') => void;
 		onclose: () => void;
 	}
 
-	let { session, doc, songId, themeId, latencyMs, ontheme, onlatency, onexport, onclose }: Props =
-		$props();
+	let { session, themeId, latencyMs, ontheme, onlatency, onclose }: Props = $props();
 
 	const t = $derived(i18n.t.player);
-	const lib = $derived(i18n.t.library);
-	let saveError = $state<string | null>(null);
-	const saving = $derived(saved.progress[songId]);
-
-	async function saveOffline() {
-		saveError = null;
-		const reason = await saved.save(summaryOf(songId, doc));
-		if (reason === 'quota') saveError = lib.saveQuota;
-		else if (reason === 'network') saveError = lib.saveNetwork;
-		else if (reason === 'insecure') saveError = i18n.t.settings.storageInsecure;
-	}
 	const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
-	const downloads = $derived(
-		[
-			{ label: t.downloadInstrumental, file: doc.audio.instrumental },
-			{ label: t.downloadVocals, file: doc.audio.vocals },
-			{ label: t.downloadLyrics, file: 'karaoke.json' }
-		].filter((d): d is { label: string; file: string } => Boolean(d.file))
-	);
 </script>
 
-<aside class="panel" aria-label={t.sound}>
-	<header>
-		<h2>{t.sound}</h2>
-		<Button variant="ghost" iconOnly icon="close" onclick={onclose}>{i18n.t.common.close}</Button>
-	</header>
-
+<PlayerPanel title={t.sound} {onclose}>
 	<section>
 		<Slider
 			label={t.vocals}
@@ -118,81 +87,14 @@
 			{/each}
 		</div>
 	</section>
-
-	<section>
-		<h3>{t.downloads}</h3>
-		<ul class="downloads">
-			{#each downloads as d (d.file)}
-				<li>
-					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a file to download, not a page -->
-					<a href={mediaUrl(songId, d.file)} download>
-						<Icon name="download" size={1.2} />{d.label}
-					</a>
-				</li>
-			{/each}
-		</ul>
-		{#if saved.available}
-			<div class="offline">
-				{#if saved.has(songId)}
-					<p class="saved-note">{lib.savedOffline}</p>
-					<Button variant="ghost" icon="trash" onclick={() => saved.remove(songId)}
-						>{lib.removeOffline}</Button
-					>
-				{:else if saving !== undefined}
-					<Button icon="offline" disabled>{lib.saving(Math.round(saving * 100))}</Button>
-				{:else}
-					<Button icon="offline" onclick={saveOffline}>{lib.saveOffline}</Button>
-				{/if}
-				{#if saveError}<p class="hint error">{saveError}</p>{/if}
-			</div>
-		{/if}
-		<h3 class="sub">{t.makeVideo}</h3>
-		<div class="videos">
-			<Button icon="tv" onclick={() => onexport('16:9')}>{t.videoWide}</Button>
-			<Button icon="remote" onclick={() => onexport('9:16')}>{t.videoTall}</Button>
-		</div>
-	</section>
-</aside>
+</PlayerPanel>
 
 <style>
-	.panel {
-		display: grid;
-		align-content: start;
-		gap: var(--s-5);
-		width: min(24rem, 100%);
-		max-height: 100%;
-		overflow-y: auto;
-		padding: var(--s-4) var(--s-5) var(--s-6);
-		background: var(--noite);
-		border-left: 1px solid var(--linha);
-	}
-
-	header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		position: sticky;
-		top: calc(-1 * var(--s-4));
-		margin: calc(-1 * var(--s-4)) calc(-1 * var(--s-5)) 0;
-		padding: var(--s-3) var(--s-3) var(--s-3) var(--s-5);
-		background: inherit;
-	}
-
-	h2 {
-		font-family: var(--font-display);
-		font-size: var(--t-3);
-		font-weight: 900;
-	}
-
 	h3 {
 		margin-bottom: var(--s-2);
 		font-size: var(--t--1);
 		font-weight: 700;
 		color: var(--papel-suave);
-	}
-
-	.sub {
-		margin-top: var(--s-4);
 	}
 
 	section {
@@ -255,48 +157,5 @@
 		font-size: var(--t-2);
 		line-height: 1;
 		color: var(--theme-sung);
-	}
-
-	.downloads {
-		display: grid;
-		gap: var(--s-1);
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.downloads a {
-		display: flex;
-		align-items: center;
-		gap: var(--s-3);
-		min-height: var(--target);
-		font-weight: 600;
-		text-decoration: none;
-	}
-
-	.downloads a:hover {
-		color: var(--farol);
-	}
-
-	.offline {
-		display: grid;
-		justify-items: start;
-		gap: var(--s-2);
-		margin-top: var(--s-3);
-	}
-
-	.saved-note {
-		font-weight: 700;
-		color: var(--farol);
-	}
-
-	.error {
-		color: var(--erro);
-	}
-
-	.videos {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--s-2);
 	}
 </style>

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { createSong } from './songs';
 
 const time = async (page: Page) => Number(await page.locator('.player').getAttribute('data-time'));
 
@@ -42,6 +43,47 @@ test('the sound panel changes the guide vocals and the lyrics style', async ({ p
 	);
 	await panel.getByRole('button', { name: 'Pechar' }).click();
 	await expect(panel).toBeHidden();
+});
+
+test('the karaoke video is made and downloaded from the player', async ({ page }, testInfo) => {
+	const title = `Vídeo ${testInfo.project.name}`;
+	const id = await createSong(page, title);
+	await page.getByRole('button', { name: 'Descargar' }).click();
+	const panel = page.getByRole('complementary', { name: 'Descargar' });
+	// The sound and the lyrics, named after the song.
+	await expect(panel.getByRole('link', { name: 'Música sen voz' })).toHaveAttribute(
+		'download',
+		`${title} (sen voz).wav`
+	);
+	await expect(panel.getByText('Aínda non hai vídeos desta canción.')).toBeVisible();
+
+	await panel.getByRole('button', { name: 'Horizontal, para a tele' }).click();
+	await expect(panel.getByRole('progressbar', { name: 'Facendo o vídeo' })).toBeVisible();
+	// Pressing again while it is made does not queue a second copy.
+	await panel.getByRole('button', { name: 'Horizontal, para a tele' }).click();
+	await expect(panel.getByRole('progressbar', { name: 'Facendo o vídeo' })).toHaveCount(1);
+	const video = panel.getByRole('link', { name: 'Descargar o vídeo' });
+	await expect(video).toBeVisible({ timeout: 15_000 });
+	const name = `${title} (karaoke).mp4`;
+	await expect(video).toHaveAttribute('download', name);
+	await expect(video).toHaveAttribute(
+		'href',
+		`/media/${id}/exports/${id}-16x9-clasico.mp4?download=1&name=${encodeURIComponent(name)}`
+	);
+	await expect(panel.getByText('Horizontal · Clásico')).toBeVisible();
+
+	await panel.getByRole('button', { name: 'Borrar o vídeo' }).click();
+	await panel.getByRole('button', { name: 'Si, borralo' }).click();
+	await expect(panel.getByText('Aínda non hai vídeos desta canción.')).toBeVisible();
+
+	// Another one with the guide vocals heard, as loud as chosen.
+	await panel.getByLabel('Voz guía no vídeo').fill('0.5');
+	await panel.getByRole('button', { name: 'Vertical, para redes' }).click();
+	const sung = panel.getByRole('link', { name: 'Descargar o vídeo' });
+	await expect(sung).toHaveAttribute('download', `${title} (karaoke vertical, voz 50%).mp4`, {
+		timeout: 15_000
+	});
+	await expect(panel.getByText('Vertical · Clásico · voz 50 %')).toBeVisible();
 });
 
 test('a song that does not exist says so and leads back', async ({ page }) => {

@@ -109,6 +109,43 @@ describe('jobs', () => {
 	});
 });
 
+describe('exports', () => {
+	it('belong to their song from the start and are listed once made', () => {
+		const library = new Library([libraryDir()]);
+		let now = 0;
+		const jobs = new Jobs(library, { seconds: 2, now: () => now });
+		const job = jobs.createExport('with-video', { aspect: '9:16', theme: 'moderno' })!;
+		expect(job.song_id).toBe('with-video');
+		expect(library.exports('with-video')).toEqual([]);
+		for (now = 0; now <= 3000; now += 100) jobs.tick();
+		const done = jobs.get(job.id)!;
+		expect(done.file).toBe('exports/with-video-9x16-moderno.mp4');
+		expect(library.exports('with-video')).toMatchObject([
+			{ file: done.file, aspect: '9:16', theme: 'moderno', outdated: false }
+		]);
+	});
+
+	it('with the guide vocals are files of their own', () => {
+		const library = new Library([libraryDir()]);
+		let now = 0;
+		const jobs = new Jobs(library, { seconds: 2, now: () => now });
+		const job = jobs.createExport('with-video', { aspect: '16:9', theme: 'clasico', vocals: 0.3 })!;
+		for (now = 0; now <= 3000; now += 100) jobs.tick();
+		expect(jobs.get(job.id)!.file).toBe('exports/with-video-16x9-clasico-v30.mp4');
+		expect(library.exports('with-video')[0].vocals).toBe(0.3);
+	});
+
+	it('go stale when the lyrics are corrected, and can be deleted', () => {
+		const library = new Library([libraryDir()]);
+		library.addExport('with-video', '16:9', 'clasico');
+		library.saveDoc('with-video', library.doc('with-video')!);
+		expect(library.exports('with-video')[0].outdated).toBe(true);
+		expect(library.deleteExport('with-video', 'nope.mp4')).toBe(false);
+		expect(library.deleteExport('with-video', 'with-video-16x9-clasico.mp4')).toBe(true);
+		expect(library.exports('with-video')).toEqual([]);
+	});
+});
+
 describe('parties', () => {
 	it('end when the host says so, telling every phone, like the server', () => {
 		const parties = new Parties(new Library([]));
