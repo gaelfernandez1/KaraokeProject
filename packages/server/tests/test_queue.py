@@ -348,13 +348,65 @@ async def test_export_puts_the_mp4_in_exports(
         job = queue.submit_export("song", ExportRequest(aspect="9:16", theme="moderno"))
         assert job is not None
         assert job.kind == "export"
+        # Whose video it is, from the start: the player follows it and offers it when done.
+        assert job.song_id == "song"
         spawner.gate(job.id).set()
         await until(lambda: queue.get(job.id).stage == "done")  # type: ignore[union-attr]
         done = queue.get(job.id)
         assert done is not None
+        assert done.song_id == "song"
         assert done.file == "exports/song-9x16-moderno.mp4"
         assert (settings.library_dir / "song" / done.file).is_file()
         assert queue.submit_export("missing", ExportRequest()) is None
+    finally:
+        await queue.stop()
+
+
+async def test_a_video_asked_for_again_while_it_is_made_is_the_same_job(
+    settings: Settings, db: Database, library: Library
+) -> None:
+    # Pressing «make» again (or on another device) must not queue the same video once more: the
+    # GPU makes one at a time, and each copy would only overwrite the last.
+    write_package(settings.library_dir / "song")
+    spawner = FakeSpawner()
+    queue = make_queue(settings, db, library, spawner)
+    await queue.start()
+    try:
+        first = queue.submit_export("song", ExportRequest(aspect="16:9", theme="moderno"))
+        again = queue.submit_export("song", ExportRequest(aspect="16:9", theme="moderno"))
+        other = queue.submit_export("song", ExportRequest(aspect="9:16", theme="moderno"))
+        assert first is not None
+        assert again is not None
+        assert other is not None
+        assert again.id == first.id
+        assert other.id != first.id
+        assert len([j for j in queue.list() if j.kind == "export"]) == 2
+        await until(lambda: first.id in spawner.started)
+        spawner.gate(first.id).set()
+        await until(lambda: queue.get(first.id).stage == "done")  # type: ignore[union-attr]
+        # Once made, asking again makes it again (the lyrics may have been corrected).
+        later = queue.submit_export("song", ExportRequest(aspect="16:9", theme="moderno"))
+        assert later is not None
+        assert later.id != first.id
+    finally:
+        await queue.stop()
+
+
+async def test_a_video_with_the_guide_vocals_is_a_file_of_its_own(
+    settings: Settings, db: Database, library: Library
+) -> None:
+    write_package(settings.library_dir / "song")
+    spawner = FakeSpawner()
+    queue = make_queue(settings, db, library, spawner)
+    await queue.start()
+    try:
+        job = queue.submit_export("song", ExportRequest(aspect="16:9", theme="clasico", vocals=0.3))
+        assert job is not None
+        await until(lambda: job.id in spawner.started)
+        assert spawner.specs[job.id]["vocals"] == 0.3
+        spawner.gate(job.id).set()
+        await until(lambda: queue.get(job.id).stage == "done")  # type: ignore[union-attr]
+        assert queue.get(job.id).file == "exports/song-16x9-clasico-v30.mp4"  # type: ignore[union-attr]
     finally:
         await queue.stop()
 

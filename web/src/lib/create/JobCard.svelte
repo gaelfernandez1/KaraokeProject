@@ -4,8 +4,9 @@
 	 * the stage in words underneath. Done, it offers to sing; failed, it says why.
 	 */
 	import { resolve } from '$app/paths';
-	import { mediaUrl, type Job } from '#lib/api';
+	import { downloadUrl, type Job } from '#lib/api';
 	import { jobError } from '#lib/devices/explain.js';
+	import { videoName } from '#lib/player/downloads.js';
 	import { i18n } from '#lib/i18n';
 	import Button from '#lib/ui/Button.svelte';
 	import SungText from '#lib/ui/SungText.svelte';
@@ -59,8 +60,17 @@
 				>{t.singNow}</Button
 			>
 		{:else if job.stage === 'done' && job.kind === 'export' && job.song_id && job.file}
-			<Button variant="primary" icon="download" href={mediaUrl(job.song_id, job.file)} download
-				>{i18n.t.player.downloads}</Button
+			{@const p = i18n.t.player}
+			{@const name = videoName({ title: job.title, artist: null }, job.file, {
+				wide: p.fileKaraoke,
+				tall: p.fileKaraokeTall,
+				vocals: p.fileVocalsLevel
+			})}
+			<Button
+				variant="primary"
+				icon="download"
+				href={downloadUrl(job.song_id, job.file, name)}
+				download={name}>{p.videoDownload}</Button
 			>
 		{:else if (job.stage === 'error' || job.stage === 'cancelled') && jobs.canRetry(job)}
 			<Button icon="loop" onclick={() => jobs.retry(job)}>{i18n.t.common.retry}</Button>

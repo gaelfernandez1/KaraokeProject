@@ -49,7 +49,7 @@ def _who(request: Request) -> str:
     return token or request.query_params.get("token", "")
 
 
-def _party(code: str, request: Request, who: Reader) -> PartyState:
+async def _party(code: str, request: Request, who: Reader) -> PartyState:
     state = _parties(request).get(code)
     if state is None:
         raise ApiError(404, "not_found", "No such party")

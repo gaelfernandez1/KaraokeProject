@@ -4,6 +4,7 @@ import { networkInterfaces } from 'node:os';
 import { extname, resolve } from 'node:path';
 import type { Plugin } from 'vite';
 import type { KaraokeDoc } from '../../src/lib/contracts/generated/karaoke.ts';
+import type { ExportInput } from '../../src/lib/api/types.ts';
 import type {
 	PartyCommand,
 	PartySettings,
@@ -127,16 +128,25 @@ export function mockApi(options: MockOptions = {}): Plugin {
 			server.httpServer?.on('close', () => clearInterval(timer));
 
 			server.middlewares.use('/media', (req, res, next) => {
-				const [id, ...rest] = decodeURIComponent((req.url ?? '').split('?')[0])
-					.split('/')
-					.filter(Boolean);
+				const url = new URL(req.url ?? '/', 'http://mock.local');
+				const [id, ...rest] = decodeURIComponent(url.pathname).split('/').filter(Boolean);
 				const file = rest.join('/');
 				if (!id || !file) return next();
+				// As the server: `download` saves the file, under `name` if given.
+				if (url.searchParams.has('download')) {
+					const name = url.searchParams.get('name') || file.split('/').pop() || file;
+					res.setHeader(
+						'Content-Disposition',
+						`attachment; filename*=utf-8''${encodeURIComponent(name)}`
+					);
+				}
 				if (file === 'karaoke.json') {
 					const doc = library.doc(id);
 					return doc ? send(res, 200, doc) : notFound(res);
 				}
-				const path = library.filePath(id, file);
+				const path = file.startsWith('exports/')
+					? library.exportFile(id, file)
+					: library.filePath(id, file);
 				return path ? serveFile(req, res, path) : notFound(res);
 			});
 
@@ -192,9 +202,21 @@ export function mockApi(options: MockOptions = {}): Plugin {
 							if (!library.doc(id)) return notFound(res);
 							return send(res, 200, library.saveDoc(id, await readJson<KaraokeDoc>(req)));
 						}
-						if (parts[2] === 'exports' && method === 'POST') {
-							const job = jobs.createExport(id);
-							return job ? send(res, 201, job) : notFound(res);
+						if (parts[2] === 'exports') {
+							if (!library.doc(id)) return notFound(res);
+							if (parts.length === 3 && method === 'GET') {
+								return send(res, 200, library.exports(id));
+							}
+							if (parts.length === 3 && method === 'POST') {
+								return send(
+									res,
+									201,
+									jobs.createExport(id, await readJson<Partial<ExportInput>>(req))
+								);
+							}
+							if (parts.length === 4 && method === 'DELETE') {
+								return library.deleteExport(id, parts[3]) ? send(res, 204) : notFound(res);
+							}
 						}
 					}
 					// /api/jobs…

@@ -98,7 +98,15 @@ def test_unknown_role_is_rejected(demo_data: dict[str, Any]) -> None:
         KaraokeDoc.model_validate(demo_data)
 
 
-def test_new_documents_are_version_1_1() -> None:
+def test_new_documents_are_version_1_2() -> None:
     from karaoke_contracts import SCHEMA_VERSION
 
-    assert SCHEMA_VERSION == "1.1.0"
+    assert SCHEMA_VERSION == "1.2.0"
+
+
+def test_the_video_may_keep_a_master_for_the_export() -> None:
+    from karaoke_contracts import VideoRefs
+
+    assert VideoRefs().master is None
+    video = VideoRefs(background="background.mp4", master="master.mp4")
+    assert video.model_dump() == {"background": "background.mp4", "master": "master.mp4"}

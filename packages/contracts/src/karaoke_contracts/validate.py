@@ -61,6 +61,7 @@ def validate_package(package_dir: Path) -> list[Issue]:
         "audio.instrumental": doc.audio.instrumental,
         "audio.vocals": doc.audio.vocals,
         "video.background": doc.video.background if doc.video else None,
+        "video.master": doc.video.master if doc.video else None,
         "cover": doc.cover,
     }
     for path, ref in refs.items():

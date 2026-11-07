@@ -39,3 +39,14 @@ def test_list_newest_first_and_history(db: Database) -> None:
     assert [r.id for r in store.recent()] == ["j2", "j1", "j0"]
     assert sorted(store.stage_history("separate")) == [0.2, 0.21, 0.22]
     assert store.stage_history("align") == []
+
+
+def test_an_export_saved_without_its_song_still_names_it(db: Database) -> None:
+    # Exports used to keep their song only in the request: those jobs must still show in the
+    # song's download panel.
+    store = JobStore(db)
+    store.add(JobRecord.new("old", "export", "Mar", {"song_id": "mar", "aspect": "16:9"}, now=1.0))
+    db.execute("UPDATE jobs SET song_id = NULL WHERE id = 'old'")
+    loaded = store.get("old")
+    assert loaded is not None
+    assert loaded.song_id == "mar"

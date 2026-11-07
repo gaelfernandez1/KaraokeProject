@@ -2,6 +2,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -57,6 +58,24 @@ def test_runner_fake_export_writes_a_video(tmp_path: Path) -> None:
     assert code == 0
     assert (tmp_path / ".partial-a.mp4").stat().st_size > 0
     assert events[-1] == {"event": "done", "result": {"file": str(tmp_path / ".partial-a.mp4")}}
+
+
+def test_export_renders_with_the_vocals_level_asked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from karaoke_server.jobs import runner
+
+    seen: dict[str, object] = {}
+
+    def render(package: Path, out: Path, theme: object, **options: object) -> SimpleNamespace:
+        seen.update(options)
+        out.write_bytes(b"mp4")
+        return SimpleNamespace(seconds=1.0, encoder="h264_nvenc")
+
+    monkeypatch.setattr("karaoke_engine.video.render.render", render)
+    spec = {"package": str(tmp_path), "out": str(tmp_path / "o.mp4"), "aspect": "9:16"}
+    runner.run_export({**spec, "theme": "clasico", "vocals": 0.4})
+    assert seen == {"aspect": "9:16", "vocals": 0.4}
 
 
 @pytest.mark.usefixtures("ffmpeg")

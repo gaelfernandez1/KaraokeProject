@@ -188,6 +188,21 @@ def test_import_copies_the_package_files_only_never_links(library: Library, tmp_
     assert not any(p.is_symlink() for p in folder.rglob("*"))
 
 
+def test_import_copies_the_master_video(library: Library, tmp_path: Path) -> None:
+    src = write_package(
+        tmp_path / "pkg",
+        title="With video",
+        video={"background": "background.mp4", "master": "master.mp4"},
+    )
+    (src / "background.mp4").write_bytes(b"light")
+    (src / "master.mp4").write_bytes(b"full")
+
+    folder = library.folder(library.import_package(src))
+
+    assert folder is not None
+    assert (folder / "master.mp4").read_bytes() == b"full"
+
+
 def test_import_rejects_invalid_package(library: Library, tmp_path: Path) -> None:
     src = write_package(tmp_path / "bad")
     (src / "instrumental.wav").unlink()

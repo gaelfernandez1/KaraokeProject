@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
 	ApiError,
 	createJob,
+	deleteExport,
+	downloadUrl,
 	getDoc,
 	getMe,
 	listDevices,
+	listExports,
 	listSongs,
 	mediaUrl,
 	pairDevice,
@@ -57,6 +60,22 @@ describe('api client', () => {
 		expect(form.get('lrclib')).toBe('true');
 		expect((form.get('file') as File).name).toBe('song.m4a');
 		expect(form.has('url')).toBe(false);
+	});
+
+	it('lists and deletes the videos of a song', async () => {
+		const { calls, impl } = fakeFetch([{ file: 'exports/a-16x9-clasico.mp4' }]);
+		expect(await listExports('a b', impl)).toEqual([{ file: 'exports/a-16x9-clasico.mp4' }]);
+		await deleteExport('a b', 'exports/a-16x9-clasico.mp4', impl);
+		expect(calls.map((c) => `${c.init?.method ?? 'GET'} ${c.url}`)).toEqual([
+			'GET /api/songs/a%20b/exports',
+			'DELETE /api/songs/a%20b/exports/a-16x9-clasico.mp4'
+		]);
+	});
+
+	it('asks the server to save a file under a readable name', () => {
+		expect(downloadUrl('a b', 'exports/a.mp4', 'Uxía - Mar (karaoke).mp4')).toBe(
+			'/media/a%20b/exports/a.mp4?download=1&name=Ux%C3%ADa%20-%20Mar%20(karaoke).mp4'
+		);
 	});
 
 	it('escapes ids in media URLs', () => {

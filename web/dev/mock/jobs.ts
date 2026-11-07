@@ -1,4 +1,4 @@
-import type { Job, JobStage } from '../../src/lib/api/types.ts';
+import type { ExportInput, Job, JobStage } from '../../src/lib/api/types.ts';
 import type { Library } from './library.ts';
 
 export interface JobRequest {
@@ -32,6 +32,8 @@ export class Jobs {
 	readonly #now: () => number;
 	readonly #jobs = new Map<string, Running>();
 	readonly #listeners = new Map<string, Set<(job: Job) => void>>();
+	/** Song, shape, style and vocals → the job making that video. */
+	readonly #exports = new Map<string, string>();
 	#count = 0;
 
 	constructor(library: Library, options: { seconds?: number; now?: () => number } = {}) {
@@ -64,18 +66,25 @@ export class Jobs {
 		return job;
 	}
 
-	createExport(songId: string): Job | undefined {
+	createExport(songId: string, input: Partial<ExportInput> = {}): Job | undefined {
 		const summary = this.#library.summary(songId);
 		if (!summary) return undefined;
+		const aspect = input.aspect ?? '16:9';
+		const theme = input.theme ?? 'clasico';
+		const vocals = Math.round((input.vocals ?? 0) * 100) / 100;
+		// Like the server: the same video already being made is that job, not a second copy.
+		const key = `${songId} ${aspect} ${theme} ${vocals}`;
+		const pending = this.#jobs.get(this.#exports.get(key) ?? '')?.job;
+		if (pending && !['done', 'error', 'cancelled'].includes(pending.stage)) return pending;
 		const job = this.#add('export', summary.title, true, [
 			['queued', 0.1],
 			['video', 0.9]
 		]);
+		job.song_id = songId;
+		this.#exports.set(key, job.id);
 		const running = this.#jobs.get(job.id) as Running;
 		running.finish = (done) => {
-			done.song_id = songId;
-			// The mock cannot render: it offers the package's background video, if any.
-			done.file = this.#library.filePath(songId, 'background.mp4') ? 'background.mp4' : null;
+			done.file = this.#library.addExport(songId, aspect, theme, vocals);
 		};
 		return job;
 	}

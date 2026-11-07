@@ -264,11 +264,26 @@
               "type": "null"
             }
           ],
-          "default": null
+          "default": null,
+          "description": "The song's video, light enough for every player (720p)."
+        },
+        "master": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The same video at its own quality (up to 1080p), for the MP4 export."
         }
       },
       "required": [
-        "background"
+        "background",
+        "master"
       ],
       "title": "VideoRefs",
       "type": "object"
@@ -324,7 +339,7 @@
   },
   "properties": {
     "schema_version": {
-      "default": "1.1.0",
+      "default": "1.2.0",
       "pattern": "^1\\.\\d+\\.\\d+$",
       "type": "string"
     },
