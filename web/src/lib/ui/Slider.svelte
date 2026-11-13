@@ -65,12 +65,12 @@
 
 	/* Disabled is grey, never a faded amber. */
 	.disabled {
-		--farol: var(--linha);
-		color: var(--papel-suave);
+		--ouro: var(--raia);
+		color: var(--texto-2);
 	}
 
 	.disabled input::-webkit-slider-thumb {
-		background: var(--papel-suave);
+		background: var(--texto-2);
 	}
 
 	.head {
@@ -79,12 +79,12 @@
 		align-items: baseline;
 		gap: var(--s-3);
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	output {
 		font-variant-numeric: tabular-nums;
-		color: var(--papel);
+		color: var(--texto);
 		font-weight: 600;
 	}
 
@@ -108,21 +108,21 @@
 		border-radius: 999px;
 		background: linear-gradient(
 			to right,
-			var(--farol) calc(var(--fraction) * 100%),
-			var(--linha) calc(var(--fraction) * 100%)
+			var(--ouro) calc(var(--fraction) * 100%),
+			var(--raia) calc(var(--fraction) * 100%)
 		);
 	}
 
 	input::-moz-range-track {
 		height: var(--track);
 		border-radius: 999px;
-		background: var(--linha);
+		background: var(--raia);
 	}
 
 	input::-moz-range-progress {
 		height: var(--track);
 		border-radius: 999px;
-		background: var(--farol);
+		background: var(--ouro);
 	}
 
 	input::-webkit-slider-thumb {
@@ -130,18 +130,18 @@
 		width: var(--thumb);
 		height: var(--thumb);
 		margin-top: calc((var(--track) - var(--thumb)) / 2);
-		border: 3px solid var(--noite);
+		border: 3px solid var(--fondo);
 		border-radius: 50%;
-		background: var(--papel);
+		background: var(--texto);
 		transition: transform var(--dur-1) var(--ease);
 	}
 
 	input::-moz-range-thumb {
 		width: var(--thumb);
 		height: var(--thumb);
-		border: 3px solid var(--noite);
+		border: 3px solid var(--fondo);
 		border-radius: 50%;
-		background: var(--papel);
+		background: var(--texto);
 	}
 
 	input:active::-webkit-slider-thumb {
@@ -153,12 +153,12 @@
 	}
 
 	input:focus-visible::-webkit-slider-thumb {
-		outline: 3px solid var(--farol);
+		outline: 3px solid var(--ceo);
 		outline-offset: 2px;
 	}
 
 	input:focus-visible::-moz-range-thumb {
-		outline: 3px solid var(--farol);
+		outline: 3px solid var(--ceo);
 		outline-offset: 2px;
 	}
 </style>

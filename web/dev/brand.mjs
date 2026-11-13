@@ -1,6 +1,6 @@
 // The README banners (one per language) and GitHub's social preview, drawn with the app's own
-// fonts and colours (docs/plan-v3/decisiones/010-frontend.md): the name as two lines of a karaoke
-// screen, the first one sung and the second half-way.
+// fonts and colours (docs/plan-v3/decisiones/017-noite.md): the name as two lines of a karaoke
+// screen, the first one sung and the second half-way, beside the app's night globe of Galicia.
 //   node dev/brand.mjs [--out ../docs/assets]
 // Needs the Playwright Chromium (and, on WSL without root, LD_LIBRARY_PATH to libnss3).
 import { chromium } from '@playwright/test';
@@ -23,39 +23,46 @@ const TAGLINES = {
 // A line of "laverca" by Clo Plas (CC BY-SA 4.0), the project's demo song, caught mid-word.
 const LYRIC = { sung: 'É domingo ao medio', rest: 'día e non hai nada de ruído' };
 
+// The app icon's globe: Galicia at night, on the same night as the banner.
+const icon = readFileSync(new URL('../static/icons/icon.svg', import.meta.url), 'utf8');
+// Without the icon's own square of night: the banner has its own.
+const globe = `data:image/svg+xml;base64,${Buffer.from(icon.replace(/<rect[^>]*\/>/, '')).toString('base64')}`;
+
 const css = `
-	@font-face { font-family: 'Big Shoulders'; src: url(${font('BigShoulders.woff2')}); font-weight: 600 900; }
-	@font-face { font-family: 'Atkinson'; src: url(${font('AtkinsonHyperlegibleNext.woff2')}); font-weight: 400 800; }
+	@font-face { font-family: 'Unbounded'; src: url(${font('Unbounded.woff2')}); font-weight: 500 800; }
+	@font-face { font-family: 'Figtree'; src: url(${font('Figtree.woff2')}); font-weight: 400 700; }
 	* { margin: 0; box-sizing: border-box; }
 	html, body { width: 100%; height: 100%; }
 	body {
-		background: #16122e;
-		color: #f3effa;
-		font-family: 'Atkinson', sans-serif;
+		background: radial-gradient(120% 90% at 85% 0%, #0b2440, transparent 60%), #04070c;
+		color: #f1f5f8;
+		font-family: 'Figtree', sans-serif;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		padding: 0 88px;
 		overflow: hidden;
 	}
+	.globe { position: absolute; top: 50%; right: -60px; height: 125%; transform: translateY(-50%); }
 	.name {
-		font-family: 'Big Shoulders', sans-serif;
-		font-weight: 900;
-		line-height: 0.86;
-		letter-spacing: 0.01em;
+		position: relative;
+		font-family: 'Unbounded', sans-serif;
+		font-weight: 650;
+		line-height: 1.06;
+		letter-spacing: -0.035em;
 	}
 	.row { position: relative; display: block; width: max-content; white-space: nowrap; }
-	.row.sung { color: #ffc531; }
-	/* The amber copy of the text on top, cut at the point the singing has reached. */
-	.fill { position: absolute; inset: 0; color: #ffc531; }
-	.tagline { color: #b9b2d3; font-weight: 500; line-height: 1.3; }
+	.row.sung { color: #ffd38a; }
+	/* The gold copy of the text on top, cut at the point the singing has reached. */
+	.fill { position: absolute; inset: 0; color: #ffd38a; }
+	.tagline { position: relative; color: #a6b5c3; font-weight: 500; line-height: 1.35; }
 	.lyric {
-		font-family: 'Big Shoulders', sans-serif;
-		font-weight: 800;
-		line-height: 1;
+		position: relative;
+		font-weight: 700;
+		line-height: 1.1;
 		white-space: nowrap;
 	}
-	.lyric .done { color: #ffc531; }
+	.lyric .done { color: #ffd38a; }
 `;
 
 const name = (size, cut) =>
@@ -65,16 +72,20 @@ const name = (size, cut) =>
 	`</div>`;
 
 const banner = (lang) => `
-	<style>${css} .tagline { font-size: 28px; margin-top: 24px; max-width: 58ch; }</style>
-	${name(124, 52)}
+	<style>${css} .tagline { font-size: 25px; margin-top: 24px; max-width: 44ch; }</style>
+	<img class="globe" src="${globe}" alt="">
+	${name(68, 52)}
 	<p class="tagline">${TAGLINES[lang]}</p>`;
 
 const social = `
 	<style>${css}
-		.lyric { font-size: 52px; margin-top: 40px; }
+		.lyric { font-size: 36px; margin-top: 36px; }
 		.tagline { font-size: 26px; margin-top: 26px; max-width: 58ch; }
+		.globe { height: 92%; right: -70px; }
+		.tagline { max-width: 44ch; }
 	</style>
-	${name(150, 52)}
+	<img class="globe" src="${globe}" alt="">
+	${name(70, 52)}
 	<p class="lyric"><span class="done">${LYRIC.sung}</span>${LYRIC.rest}</p>
 	<p class="tagline">${TAGLINES.gl}</p>`;
 

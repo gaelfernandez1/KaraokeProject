@@ -70,7 +70,13 @@ test('the karaoke video is made and downloaded from the player', async ({ page }
 		'href',
 		`/media/${id}/exports/${id}-16x9-clasico.mp4?download=1&name=${encodeURIComponent(name)}`
 	);
-	await expect(panel.getByText('Horizontal · Clásico')).toBeVisible();
+	// The video's line says its shape, style and guide vocals.
+	const row = panel
+		.getByRole('listitem')
+		.filter({ has: page.getByRole('link', { name: 'Descargar o vídeo' }) });
+	await expect(row).toContainText('Horizontal');
+	await expect(row).toContainText('Clásico');
+	await expect(row).toContainText('sen voz');
 
 	await panel.getByRole('button', { name: 'Borrar o vídeo' }).click();
 	await panel.getByRole('button', { name: 'Si, borralo' }).click();
@@ -83,7 +89,9 @@ test('the karaoke video is made and downloaded from the player', async ({ page }
 	await expect(sung).toHaveAttribute('download', `${title} (karaoke vertical, voz 50%).mp4`, {
 		timeout: 15_000
 	});
-	await expect(panel.getByText('Vertical · Clásico · voz 50 %')).toBeVisible();
+	await expect(row).toContainText('Vertical');
+	await expect(row).toContainText('Clásico');
+	await expect(row).toContainText('voz 50 %');
 });
 
 test('a song that does not exist says so and leads back', async ({ page }) => {

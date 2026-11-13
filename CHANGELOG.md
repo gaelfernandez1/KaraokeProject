@@ -30,6 +30,19 @@ and the web app. How a release is made: [`docs/releasing.md`](docs/releasing.md)
 - Cyrillic and Greek letters that some lyrics sites slip into the text to spot copies («dе»
   with a Cyrillic е) are read as the Latin letters they look like.
 
+- **A new look for the web app, «Noite»**: Galicia at night on a small planet of its own, in
+  3D. Its real relief lit by the moon, its coast, the lights of its towns as they look from the
+  air (population data from Kontur, CC BY 4.0) and the lighthouses of its coast sweeping the sea
+  at their real rhythm. The planet sways slowly and can be taken and turned; the first time, it
+  turns in from the open sea and the lights come on, cities first. It can be stopped, and holds
+  still with reduced motion.
+- The globe goes with you: it glides from one screen to the next and shows what each is about, a
+  party with the singers' colours and rockets, or how far the karaoke being made has got.
+- The songs show the one you point at big beside the list, with the line everyone knows and what
+  to do with it; a song without a cover gets a sky of its own.
+- New type, colours and shapes everywhere: white and the flag's sky blue on a blue-black night,
+  gold for what is lit, rounded panels that let the globe show through.
+
 ### Changed
 
 - Better MP4 exports: songs keep their video as it came (`master.mp4`, up to 1080p, contract
@@ -40,6 +53,8 @@ and the web app. How a release is made: [`docs/releasing.md`](docs/releasing.md)
 
 ### Fixed
 
+- "All" in the song filters clears the saved filter too, and only lights up when nothing is
+  filtered (it used to stay lit beside "Saved" and keep showing only the saved songs).
 - The download button of a finished video never showed on the create page with the real server:
   video jobs now carry their song from the start.
 - Asking again for a video that was still waiting or being made queued another copy of it; it

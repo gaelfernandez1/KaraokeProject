@@ -30,11 +30,11 @@
 	});
 </script>
 
-<svelte:head><title>{t.pair} · Proxecto Karaoke en Galego</title></svelte:head>
+<svelte:head><title>{t.pair} · Karaoke en Galego</title></svelte:head>
 
 <main class="pair">
 	<h1>{t.title}</h1>
-	<p role="status">
+	<p role="status" class={result}>
 		{result === 'pairing' ? t.pairing : result === 'paired' ? t.paired : reason}
 	</p>
 	{#if result === 'paired'}
@@ -58,13 +58,23 @@
 	h1 {
 		font-family: var(--font-display);
 		font-size: var(--t-5);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 0.9;
 	}
 
 	p {
 		max-width: 40rem;
 		font-size: var(--t-1);
-		font-weight: 700;
+		font-weight: 600;
+		color: var(--texto-2);
+	}
+
+	/* Paired: this device's light is on. */
+	.paired {
+		color: var(--ouro);
+	}
+
+	.failed {
+		color: var(--erro);
 	}
 </style>

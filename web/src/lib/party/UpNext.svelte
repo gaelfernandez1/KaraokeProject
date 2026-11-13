@@ -1,13 +1,15 @@
 <script lang="ts">
 	/*
-	 * Between songs on the TV: the next song's poster, who sings it (big, in their colour) and a
-	 * countdown big enough to read across the room, like the bill outside a festival stage.
+	 * Between songs on the TV: the next song's cover, who sings it (big, in their colour) and a
+	 * countdown in dots of light big enough to read across the room. The song's intro shows the
+	 * same bill, without the countdown, until the first line.
 	 */
 	import SongTitle from '#lib/poster/SongTitle.svelte';
 	import type { SongSummary } from '#lib/api';
 	import { i18n } from '#lib/i18n';
-	import Poster from '#lib/poster/Poster.svelte';
+	import Cover from '#lib/poster/Cover.svelte';
 	import Button from '#lib/ui/Button.svelte';
+	import { singerColor } from './colors';
 	import type { Guest } from './types';
 
 	interface Props {
@@ -23,98 +25,90 @@
 	const t = $derived(i18n.t.party);
 </script>
 
-<section class="up-next" style:--who={guest?.color ?? 'var(--papel)'} aria-live="polite">
-	<div class="poster"><Poster {song} /></div>
+<section class="up-next" style:--who={singerColor(guest?.color, 'var(--texto)')} aria-live="polite">
+	<div class="cover"><Cover {song} awake /></div>
 	<div class="bill">
 		<p class="label">{t.nowSingingLabel}</p>
 		<p class="name">{guest?.name ?? ''}</p>
-		<p class="song"><SongTitle title={song.title} bare /></p>
+		<p class="song"><SongTitle title={song.title} /></p>
 		{#if song.artist}<p class="artist">{song.artist}</p>{/if}
 		{#if countdown !== null}
 			<div class="go">
 				<Button variant="primary" size="l" icon="play" onclick={onstart}>{t.startNow}</Button>
-				<Button variant="ghost" size="l" icon="skip" onclick={onskip}>{t.skip}</Button>
+				<Button size="l" icon="skip" onclick={onskip}>{t.skip}</Button>
 			</div>
 		{/if}
 	</div>
-	<span class="count num" aria-label={countdown === null ? undefined : t.startsIn(countdown)}
-		>{countdown ?? ''}</span
-	>
+	{#if countdown !== null}
+		<span class="count data" role="timer" aria-label={t.startsIn(countdown)}>{countdown}</span>
+	{/if}
 </section>
 
 <style>
 	.up-next {
-		position: relative;
 		display: grid;
-		grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr) auto;
-		gap: var(--s-8);
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		gap: var(--s-7);
 		align-items: center;
-		height: 100%;
 	}
 
-	/* The singer's colour as a hard band along the bottom of the screen, like a stage edge. */
-	.up-next::after {
-		content: '';
-		position: absolute;
-		inset: auto calc(-1 * var(--safe-x)) calc(-1 * var(--safe-y));
-		height: 14px;
-		background: var(--who);
-	}
-
-	.poster {
-		width: min(100%, 62vh);
-		justify-self: end;
+	.cover {
+		width: min(38vh, 26vw);
 	}
 
 	.bill {
 		display: grid;
+		justify-items: start;
 		gap: var(--s-2);
 		min-width: 0;
 	}
 
+	/* "Now" is lit. */
 	.label {
 		font-size: 2rem;
-		font-weight: 700;
-		color: var(--papel-suave);
+		font-weight: 650;
+		color: var(--ouro);
 	}
 
 	.name {
+		max-width: 100%;
 		font-family: var(--font-display);
-		font-size: clamp(5rem, 11vw, 13rem);
-		font-weight: 900;
-		line-height: 0.85;
+		font-size: min(12vw, 21vh);
+		font-weight: 700;
+		line-height: 0.86;
 		color: var(--who);
 		overflow-wrap: anywhere;
 	}
 
 	.song {
-		margin-top: var(--s-4);
+		max-width: 100%;
+		margin-top: var(--s-3);
 		font-family: var(--font-display);
 		font-size: 3.5rem;
-		font-weight: 800;
+		font-weight: 650;
 		line-height: 1;
 	}
 
 	.artist {
 		font-size: 1.9rem;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.go {
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--s-4);
-		margin-top: var(--s-6);
+		margin-top: var(--s-5);
 	}
 
-	/* The countdown, readable from the sofa. */
+	/* The countdown in dots of light, readable from the sofa. */
 	.count {
-		align-self: end;
-		min-width: 1.2ch;
-		font-size: 32vh;
-		font-weight: 900;
+		align-self: center;
+		min-width: 2ch;
+		font-size: min(30vh, 17vw);
 		line-height: 0.8;
 		text-align: right;
-		color: var(--papel);
+		color: var(--ouro);
 	}
 </style>

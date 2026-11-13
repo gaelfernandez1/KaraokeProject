@@ -20,6 +20,20 @@ Tablero de las áreas de trabajo. Cada área actualiza **su fila** tras cada hit
 
 (Avisos que un área deja a otra: «C4 → C5: …». Borra los que ya estén atendidos.)
 
+- Mantenimiento → C7, C10 (13/11, rama `v3/noite`, `decisiones/017`): rediseño «Noite» de toda la
+  web, a falta del OK del usuario y de verlo en su móvil, portátil y tele. Un planeta 3D con
+  Galicia como única tierra (relieve, costa, luces y faros reales) vive en un lienzo bajo todas
+  las pantallas (`web/src/lib/globe/Stage.svelte`, en el layout); cada pantalla lo coloca con
+  `GlobeAnchor.svelte` y le dice qué enseñar con `stage.mood` y `stage.progress`
+  (`globe/stage.svelte.ts`). Datos con `uv run scripts/galicia_map.py`. Sistema visual nuevo
+  (`tokens.css`: `--fondo`, `--texto`, `--ceo`, `--ouro`, `--accion`; Unbounded, Figtree y
+  Martian Mono con `scripts/build_web_fonts.py`; clase `.panel`). `Cover.svelte` sustituye a
+  `Poster`, `Swatch` y `poster/style.ts` (borrados). Capturas, GIF, icono y banners rehechos. No
+  cambia contratos, API ni motor. `make ci`, `pnpm test:e2e`, `test:e2e:server` y `perf` pasan.
+  Después (13/11), a petición del usuario, el menú se queda en planeta + menú: fuera los
+  instrumentos de debajo, la hora y la luna de arriba, el anillo de los faros y el rótulo del mar
+  Cantábrico (`web/src/lib/night/` borrado). Lo anterior, en la rama local `v3/noite-respaldo`.
+
 - Mantenimiento → C4, C2 (07/11, rama `v3/repeticiones`, `decisiones/016`): las repeticiones que
   la letra escribe una vez se cantan las veces que suenan. `align_segments(repeat_penalty=…)` deja
   volver a versos de la misma estrofa (`Segment.group`, `SegmentPath.repeats`), `best_path`

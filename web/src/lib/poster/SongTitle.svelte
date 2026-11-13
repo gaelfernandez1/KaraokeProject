@@ -48,6 +48,6 @@
 		font-size: max(0.75rem, 0.42em);
 		font-weight: 700;
 		letter-spacing: 0;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 </style>

@@ -1,8 +1,9 @@
 <script lang="ts">
 	/*
-	 * A line of the song under the magnifying glass: the guide vocals' waveform, a block for
-	 * each word over it, and the playhead. A click seeks; dragging a block's edge moves where the
-	 * word starts or ends.
+	 * A line of the song under the magnifying glass: the guide vocals' waveform drawn in thin
+	 * bars, a block for each word over it, and the playhead. While it plays, the bars behind the
+	 * playhead light up in amber, like a sung line. A click seeks; dragging a block's edge moves
+	 * where the word starts or ends.
 	 */
 	import { peaks } from './peaks';
 
@@ -20,39 +21,69 @@
 		words: WaveWord[];
 		selected: number;
 		time: number;
+		/** The sound is playing: what has been heard is lit. */
+		playing?: boolean;
 		onseek: (seconds: number) => void;
 		onselect: (index: number) => void;
 		/** A drag of a word's edge: seconds moved since it began (null if cancelled); `done` when it ends. */
 		ondrag: (index: number, edge: 'start' | 'end', delta: number | null, done: boolean) => void;
 	}
 
-	let { buffer, from, to, words, selected, time, onseek, onselect, ondrag }: Props = $props();
+	let {
+		buffer,
+		from,
+		to,
+		words,
+		selected,
+		time,
+		playing = false,
+		onseek,
+		onselect,
+		ondrag
+	}: Props = $props();
+
+	/** Distance between the bars of the waveform, in CSS pixels. */
+	const PITCH = 3;
 
 	let width = $state(0);
 	let height = $state(0);
 	let canvas = $state<HTMLCanvasElement | null>(null);
+	let lit = $state<HTMLCanvasElement | null>(null);
 	const span = $derived(Math.max(0.1, to - from));
 	const x = (seconds: number) => ((seconds - from) / span) * 100;
+	const heard = $derived(playing && time > from ? Math.min(100, x(time)) : 0);
+
+	/** Each column of the waveform as a rounded bar round the middle line; silence is a thin
+	    line. */
+	function draw(target: HTMLCanvasElement, values: ArrayLike<number>, max: number) {
+		const ratio = devicePixelRatio || 1;
+		target.width = Math.round(width * ratio);
+		target.height = Math.round(height * ratio);
+		const context = target.getContext('2d');
+		if (!context) return;
+		context.clearRect(0, 0, target.width, target.height);
+		context.fillStyle = getComputedStyle(target).color;
+		const pitch = PITCH * ratio;
+		const thick = Math.max(1, 1.6 * ratio);
+		const mid = target.height / 2;
+		const reach = mid * 0.9;
+		context.beginPath();
+		for (let i = 0; i < values.length; i++) {
+			const tall = Math.max(thick / 2, ((values[i] ?? 0) / max) * reach);
+			context.roundRect((i + 0.5) * pitch - thick / 2, mid - tall, thick, tall * 2, thick / 2);
+		}
+		context.fill();
+	}
 
 	$effect(() => {
-		if (!canvas || width === 0 || height === 0) return;
-		const ratio = devicePixelRatio || 1;
-		canvas.width = Math.round(width * ratio);
-		canvas.height = Math.round(height * ratio);
-		const context = canvas.getContext('2d');
-		if (!context) return;
-		context.clearRect(0, 0, canvas.width, canvas.height);
-		if (!buffer) return;
-		const columns = Math.round(width / 3);
-		const values = peaks(buffer.getChannelData(0), buffer.sampleRate, from, to, columns);
-		const max = Math.max(0.05, ...values);
-		const mid = canvas.height / 2;
-		context.fillStyle = getComputedStyle(canvas).color;
-		const step = canvas.width / columns;
-		for (let i = 0; i < columns; i++) {
-			const h = Math.max(1, (values[i] / max) * mid * 0.92);
-			context.fillRect(i * step, mid - h, Math.max(1, step - ratio), 2 * h);
-		}
+		if (!canvas || !lit || width === 0 || height === 0) return;
+		const columns = Math.floor(width / PITCH);
+		const values: ArrayLike<number> = buffer
+			? peaks(buffer.getChannelData(0), buffer.sampleRate, from, to, columns)
+			: new Float32Array(columns);
+		const max = Math.max(0.05, ...Array.from(values));
+		draw(canvas, values, max);
+		draw(lit, values, max);
 	});
 
 	let box = $state<HTMLElement | null>(null);
@@ -102,6 +133,12 @@
 	role="presentation"
 >
 	<canvas bind:this={canvas} aria-hidden="true"></canvas>
+	<canvas
+		bind:this={lit}
+		class="lit"
+		aria-hidden="true"
+		style:clip-path="inset(0 {100 - heard}% 0 0)"
+	></canvas>
 	{#each words as word, i (i)}
 		<div
 			class="word"
@@ -135,8 +172,8 @@
 	.wave {
 		position: relative;
 		height: 9rem;
-		border-radius: var(--radius-control);
-		background: var(--noite-funda);
+		border: 1px solid var(--raia);
+		background: var(--fondo-3);
 		overflow: hidden;
 		cursor: text;
 		touch-action: none;
@@ -147,8 +184,12 @@
 		inset: 0;
 		width: 100%;
 		height: 100%;
-		color: color-mix(in oklch, var(--papel) 30%, transparent);
+		color: color-mix(in oklch, var(--texto-2) 55%, transparent);
 		pointer-events: none;
+	}
+
+	canvas.lit {
+		color: var(--ouro);
 	}
 
 	.word {
@@ -156,18 +197,19 @@
 		top: 0.5rem;
 		bottom: 0.5rem;
 		min-width: 4px;
-		border: 2px solid color-mix(in oklch, var(--papel) 45%, transparent);
-		border-radius: 6px;
-		background: color-mix(in oklch, var(--papel) 8%, transparent);
+		border: 1px solid color-mix(in oklch, var(--texto-2) 45%, transparent);
+		border-radius: 4px;
+		background: color-mix(in oklch, var(--texto) 4%, transparent);
 	}
 
 	.word.doubtful {
 		border-style: dashed;
 	}
 
+	/* The word picked: blue, as everything selected. */
 	.word.selected {
-		border-color: var(--farol);
-		background: color-mix(in oklch, var(--farol) 18%, transparent);
+		border: 2px solid var(--ceo);
+		background: color-mix(in oklch, var(--ceo) 12%, transparent);
 		z-index: 1;
 	}
 
@@ -178,13 +220,19 @@
 		max-width: 100%;
 		padding: 0.1rem 0.35rem;
 		border: 0;
-		background: none;
+		border-radius: 0 0 4px 0;
+		background: color-mix(in oklch, var(--fondo-3) 75%, transparent);
+		color: var(--texto);
 		font-size: var(--t--1);
-		font-weight: 700;
+		font-weight: 650;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		cursor: pointer;
+	}
+
+	.selected .label {
+		color: var(--ceo);
 	}
 
 	.edge {
@@ -211,16 +259,17 @@
 		left: 4px;
 		width: 4px;
 		border-radius: 2px;
-		background: var(--farol);
+		background: var(--ceo);
 	}
 
+	/* Now: the amber line of the playhead. */
 	.playhead {
 		position: absolute;
 		top: 0;
 		bottom: 0;
 		width: 2px;
 		margin-left: -1px;
-		background: var(--papel);
+		background: var(--ouro);
 		pointer-events: none;
 		z-index: 2;
 	}

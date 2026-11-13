@@ -1,8 +1,8 @@
 <script lang="ts">
 	/*
 	 * Create a karaoke: a file or a link, the language (Galician first), the lyrics if the singer
-	 * has them. The new song's poster takes shape as the form is filled in, and the jobs on the
-	 * server show above it, live.
+	 * has them. The new song's plate takes shape as the form is filled in, and the jobs on the
+	 * server show above it, live, as lines of a departures board.
 	 */
 	import { tick } from 'svelte';
 	import { ApiError, type SongSummary } from '#lib/api';
@@ -10,10 +10,15 @@
 	import PairingNotice from '#lib/devices/PairingNotice.svelte';
 	import JobCard from '#lib/create/JobCard.svelte';
 	import { jobs } from '#lib/create/jobs.svelte.js';
+	import GlobeAnchor from '#lib/globe/GlobeAnchor.svelte';
+	import { LIGHTS, PEOPLE } from '#lib/globe/galicia.js';
+	import { stage } from '#lib/globe/stage.svelte.js';
+	import { formatCount } from '#lib/ui/format.js';
+	import { onDestroy } from 'svelte';
 	import { LANGUAGES } from '#lib/create/languages.js';
 	import { guessTitle, validateCreate, type CreateError } from '#lib/create/validate.js';
 	import { i18n } from '#lib/i18n';
-	import Poster from '#lib/poster/Poster.svelte';
+	import Cover from '#lib/poster/Cover.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import Switch from '#lib/ui/Switch.svelte';
@@ -36,10 +41,22 @@
 	const t = $derived(i18n.t.create);
 	void jobs.refresh();
 
+	// The globe follows the karaoke being made: the lights of Galicia come on from the west as
+	// far as the job has got. With nothing on the way, a line just keeps crossing it.
+	$effect(() => {
+		stage.mood = 'scan';
+		stage.progress = jobs.working;
+	});
+	onDestroy(() => {
+		stage.mood = 'calm';
+		stage.progress = null;
+	});
+
 	const preview = $derived<SongSummary | null>(
 		file || url.trim()
 			? {
-					id: title || file?.name || url,
+					// Its sky of lights comes from the song itself, not from each key typed in the title.
+					id: file ? file.name : url.trim(),
 					title: title.trim() || (file ? guessTitle(file.name).title : hostOf(url)),
 					artist: artist.trim() || null,
 					language,
@@ -122,18 +139,25 @@
 	}
 </script>
 
-<svelte:head><title>{t.title} · Proxecto Karaoke en Galego</title></svelte:head>
+<svelte:head><title>{t.title} · Karaoke en Galego</title></svelte:head>
 
 <main class="create" bind:this={top}>
-	<header>
-		<h1>{t.title}</h1>
-		<p class="intro">{t.intro}</p>
+	<header class="head">
+		<div>
+			<h1>{t.title}</h1>
+			<p class="intro">{t.intro}</p>
+		</div>
+		<div class="globe">
+			<GlobeAnchor label={i18n.t.home.globe(formatCount(PEOPLE), formatCount(LIGHTS))} fit={0.86} />
+		</div>
 	</header>
 
 	{#if jobs.shown.length > 0}
 		<section class="jobs" aria-labelledby="jobs-title">
 			<h2 id="jobs-title">{t.jobs}</h2>
-			{#each jobs.shown as job (job.id)}<JobCard {job} />{/each}
+			<div class="job-board">
+				{#each jobs.shown as job (job.id)}<JobCard {job} />{/each}
+			</div>
 		</section>
 	{/if}
 
@@ -162,10 +186,10 @@
 					onchange={(e) => choose(e.currentTarget.files?.[0])}
 				/>
 				{#if preview}
-					<Poster song={preview} preview />
+					<Cover song={preview} shape="plate" preview />
 				{:else}
 					<span class="blank">
-						<Icon name="upload" size={2.5} />
+						<span class="arrow"><Icon name="upload" size={2.25} /></span>
 						<span class="drop-text pointer">{t.drop}</span>
 						<span class="drop-text touch">{t.dropTouch}</span>
 						<span class="pill">{t.chooseFile}</span>
@@ -203,6 +227,7 @@
 						placeholder="https://"
 						bind:value={url}
 						oninput={() => (error = null)}
+						aria-invalid={error === 'errorUrl'}
 						aria-describedby="link-hint"
 					/>
 				</div>
@@ -264,35 +289,75 @@
 <style>
 	.create {
 		display: grid;
-		gap: var(--s-6);
+		gap: var(--s-7);
 		max-width: var(--page-max);
 		margin: 0 auto;
 		padding: var(--s-6) var(--page-x) var(--s-9);
 	}
 
+	.head {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		align-items: center;
+		gap: var(--s-5);
+	}
+
+	.globe {
+		display: none;
+	}
+
+	@media (min-width: 64em) {
+		.head {
+			grid-template-columns: minmax(0, 1fr) auto;
+		}
+
+		/* The globe sits beside the title, a little off the page's edge. */
+		.globe {
+			display: block;
+			width: clamp(13rem, 20vw, 19rem);
+			margin: calc(var(--s-6) * -1) 0 calc(var(--s-7) * -1);
+		}
+	}
+
 	h1 {
 		font-family: var(--font-display);
-		font-size: var(--t-5);
-		font-weight: 900;
-		line-height: 0.9;
+		font-size: var(--t-4);
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		line-height: 1.05;
 	}
 
 	.intro {
 		max-width: 40rem;
 		margin-top: var(--s-3);
 		font-size: var(--t-1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
+	}
+
+	/* The jobs: one line per karaoke on its way. */
+	.jobs {
+		display: grid;
+		gap: var(--s-4);
+		max-width: 72rem;
 	}
 
 	h2 {
-		font-size: var(--t-1);
-		font-weight: 800;
+		font-family: var(--font-display);
+		font-size: var(--t-3);
+		font-weight: 650;
+		line-height: 1;
 	}
 
-	.jobs {
+	.job-board {
 		display: grid;
-		gap: var(--s-3);
-		max-width: 72rem;
+		border-top: 1px solid var(--raia);
+	}
+
+	@media (min-width: 45em) {
+		.job-board {
+			grid-template-columns: minmax(0, 1fr) minmax(6rem, 14rem) 4.5rem auto;
+			column-gap: var(--s-5);
+		}
 	}
 
 	.drop-text.touch {
@@ -340,14 +405,15 @@
 	.drop {
 		display: block;
 		cursor: pointer;
-		outline-offset: 5px;
+		outline-offset: 4px;
 	}
 
 	.drop:has(input:focus-visible) {
-		outline: 3px solid var(--farol);
+		outline: 2px solid var(--ceo);
+		border-radius: var(--radius-panel);
 	}
 
-	/* An empty poster waiting for its song. */
+	/* An empty plate waiting for its song. */
 	.blank {
 		display: grid;
 		place-items: center;
@@ -355,59 +421,105 @@
 		gap: var(--s-4);
 		aspect-ratio: 4 / 5;
 		padding: var(--s-5);
-		border: 2px solid var(--linha);
-		background:
-			repeating-linear-gradient(
-				-45deg,
-				transparent 0 14px,
-				color-mix(in oklch, var(--linha) 35%, transparent) 14px 15px
-			),
-			var(--noite-alta);
+		border: 1.5px dashed var(--raia-forte);
+		border-radius: var(--radius-panel);
+		background: var(--panel-claro);
 		text-align: center;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		transition:
-			border-color var(--dur-1) var(--ease),
-			background-color var(--dur-1) var(--ease);
+			border-color var(--dur-1) ease,
+			background-color var(--dur-1) ease,
+			color var(--dur-1) ease;
+	}
+
+	.arrow {
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		border: 1px solid var(--raia-forte);
+		border-radius: 50%;
+		background: var(--panel-claro);
+		transition:
+			border-color var(--dur-1) ease,
+			color var(--dur-1) ease;
 	}
 
 	.invalid .blank,
-	.invalid :global(.poster) {
+	.invalid :global(.cover) {
 		border-color: var(--erro);
 		outline: 2px solid var(--erro);
 	}
 
-	.drop:hover .blank,
+	/* A file held over it: the plate is picked, in the blue of whatever is selected. */
 	.dragging .blank {
-		border-color: var(--farol);
-		color: var(--papel);
+		border-color: var(--ceo);
+		background-color: var(--ceo-fondo);
+		color: var(--texto);
 	}
 
-	.dragging :global(.poster) {
-		outline: 3px solid var(--farol);
+	.dragging .arrow {
+		border-color: var(--ceo);
+		color: var(--ceo);
+	}
+
+	.dragging :global(.cover) {
+		outline: 3px solid var(--ceo);
+	}
+
+	@media (hover: hover) {
+		.drop:hover .blank {
+			border-color: var(--ceo);
+			color: var(--texto);
+		}
+
+		.drop:hover .arrow {
+			border-color: var(--ceo);
+			color: var(--ceo);
+		}
+
+		.drop:hover .pill {
+			border-color: var(--ceo);
+			background: var(--ceo-fondo);
+		}
 	}
 
 	.drop-text {
+		max-width: 16ch;
 		font-family: var(--font-display);
-		font-size: var(--t-3);
-		font-weight: 800;
-		line-height: 1;
-		color: var(--papel);
+		font-size: var(--t-1);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		line-height: 1.2;
+		color: var(--texto);
 	}
 
-	/* Secondary to Create karaoke: an outline, not a second filled button. */
+	/* Secondary to Create karaoke: drawn as a quiet button, not a second filled one. */
 	.pill {
-		padding: var(--s-2) var(--s-4);
-		border: 2px solid var(--papel);
-		border-radius: var(--radius-control);
-		color: var(--papel);
-		font-weight: 800;
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--target);
+		padding: 0 var(--s-5);
+		border: 1px solid var(--raia-forte);
+		border-radius: var(--radius-pill);
+		background: var(--panel-claro);
+		color: var(--texto);
+		font-weight: 650;
+		transition:
+			border-color var(--dur-1) ease,
+			background-color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
 	}
 
-	/* On phones the blank poster is a low band, not a whole screen. */
+	.drop:active .pill {
+		transform: scale(0.97);
+	}
+
+	/* On phones the empty plate is a low band, not a whole screen. */
 	@media (max-width: 51.99em) {
 		.blank {
 			aspect-ratio: auto;
-			min-height: 10rem;
+			min-height: 11rem;
 		}
 
 		.drop.filled {
@@ -418,29 +530,49 @@
 	.file {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--s-1) var(--s-3);
-		align-items: baseline;
+		align-items: center;
+		gap: 0 var(--s-1);
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		overflow-wrap: anywhere;
 	}
 
+	.file span {
+		flex: 1 1 100%;
+		color: var(--texto);
+		font-weight: 600;
+	}
+
 	.change {
-		padding: 0;
+		min-height: var(--target);
+		padding: 0 var(--s-2);
+		margin-left: calc(-1 * var(--s-2));
+		margin-right: var(--s-2);
 		border: 0;
 		background: none;
-		font-weight: 700;
-		color: var(--farol);
+		font-weight: 650;
+		color: var(--texto);
 		text-decoration: underline;
-		text-underline-offset: 0.2em;
+		text-decoration-color: var(--raia-forte);
+		text-underline-offset: 0.25em;
+		transition:
+			color var(--dur-1) ease,
+			text-decoration-color var(--dur-1) ease;
+	}
+
+	@media (hover: hover) {
+		.change:hover {
+			color: var(--ceo);
+			text-decoration-color: currentColor;
+		}
 	}
 
 	.or {
 		display: flex;
 		align-items: center;
 		gap: var(--s-3);
-		color: var(--papel-suave);
-		font-weight: 700;
+		color: var(--texto-2);
+		font-weight: 600;
 	}
 
 	.or::before,
@@ -448,7 +580,7 @@
 		content: '';
 		flex: 1;
 		height: 1px;
-		background: var(--linha);
+		background: var(--raia);
 	}
 
 	.details {
@@ -464,21 +596,22 @@
 	}
 
 	label {
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	.optional {
 		font-weight: 400;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.hint {
 		display: block;
 		font-size: var(--t--1);
 		font-weight: 400;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
+	/* Fields: the night raised a step, a hairline round it; the blue line when focused. */
 	input[type='url'],
 	input[type='text'],
 	select,
@@ -486,17 +619,30 @@
 		width: 100%;
 		min-height: var(--target);
 		padding: var(--s-2) var(--s-4);
-		border: 2px solid var(--linha);
+		border: 1px solid var(--raia-forte);
 		border-radius: var(--radius-control);
-		background: var(--noite-alta);
-		color: var(--papel);
+		background-color: var(--fondo-2);
+		color: var(--texto);
+		transition:
+			border-color var(--dur-1) ease,
+			box-shadow var(--dur-1) ease;
+	}
+
+	input::placeholder,
+	textarea::placeholder {
+		color: var(--texto-2);
 	}
 
 	input:focus,
 	select:focus,
 	textarea:focus {
 		outline: none;
-		border-color: var(--farol);
+		border-color: var(--ceo);
+		box-shadow: 0 0 0 1px var(--ceo);
+	}
+
+	input[aria-invalid='true'] {
+		border-color: var(--erro);
 	}
 
 	textarea {
@@ -506,27 +652,38 @@
 
 	select {
 		appearance: none;
+		padding-right: 2.75rem;
 		background-image:
-			linear-gradient(45deg, transparent 50%, var(--papel) 50%),
-			linear-gradient(135deg, var(--papel) 50%, transparent 50%);
+			linear-gradient(45deg, transparent 50%, var(--texto-2) 50%),
+			linear-gradient(135deg, var(--texto-2) 50%, transparent 50%);
 		background-position:
 			calc(100% - 1.25rem) 50%,
 			calc(100% - 0.9rem) 50%;
 		background-size: 0.35rem 0.35rem;
 		background-repeat: no-repeat;
-		background-color: var(--noite-alta);
+		cursor: pointer;
+	}
+
+	option {
+		background: var(--fondo-2);
+		color: var(--texto);
 	}
 
 	.with-icon {
 		position: relative;
 		display: flex;
 		align-items: center;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.with-icon :global(svg) {
 		position: absolute;
 		left: var(--s-4);
+		pointer-events: none;
+	}
+
+	.with-icon:focus-within {
+		color: var(--ceo);
 	}
 
 	.with-icon input {
@@ -545,7 +702,7 @@
 	}
 
 	.error {
-		font-weight: 700;
+		font-weight: 650;
 		color: var(--erro);
 	}
 

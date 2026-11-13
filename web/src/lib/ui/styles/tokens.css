@@ -1,43 +1,60 @@
 /*
- * Design tokens. The app is dark only: it is used at night and on a TV. The palette comes from a
- * village festival at night: a blue night sky (not black), the sodium-lamp amber that is also the
- * "sung" colour of the lyrics, poster-paper white, and the singers' colours, which stand for
- * people in party mode.
+ * Design tokens. The app is dark only: it is used at night and on a TV. The world is Galicia at
+ * night seen from above the Atlantic: a blue-black sea and sky, white for words and for the
+ * main action of each screen, the sky blue of the Galician flag for whatever is selected or has
+ * the focus (and for the coast on the globe), and the warm gold of a lit window for what is on:
+ * sung words, what is happening now, the lights of the towns. The singers' colours stand for
+ * people in party mode and are never gold or blue.
  */
 :root {
 	color-scheme: dark;
 
-	--noite: #16122e;
-	--noite-alta: #221c45;
-	--noite-funda: #0f0c22;
-	--linha: #3a3266;
-	--papel: #f3effa;
-	--papel-suave: #b9b2d3;
-	--farol: #ffc531;
-	--fucsia: #ff5fae;
-	/* A red apart from the tomato paper and the orange of a guest. */
-	--erro: #ff4d6a;
+	--fondo: #04070c;
+	--fondo-2: #0b131c;
+	--fondo-3: #020406;
+	/* Surfaces that float over the globe: the night shows through them. */
+	--panel: rgb(13 22 32 / 0.74);
+	--panel-claro: rgb(255 255 255 / 0.055);
+	--raia: rgb(255 255 255 / 0.1);
+	--raia-forte: rgb(255 255 255 / 0.22);
+	--texto: #f1f5f8;
+	--texto-2: #a6b5c3;
+	--texto-3: #71828f;
+	/* Selected and focused: the sky blue of the flag, bright enough for the night. */
+	--ceo: #5cc8ff;
+	--ceo-fondo: rgb(92 200 255 / 0.13);
+	/* Lit: sung words, what is happening now, a town's lights. */
+	--ouro: #ffd38a;
+	--ouro-forte: #ffb648;
+	/* The one main action of a screen: white on the night. */
+	--accion: #f1f5f8;
+	--accion-texto: #04070c;
+	--erro: #ff6b7d;
+	/* The still drawing of the globe, before the real one is running. */
+	--mar: #06111d;
+	--terra: #0e2236;
 
-	/* Not the lyric amber: amber means sung, selected and the main action, never a person. */
-	--cantante-1: #ff8a3d;
-	--cantante-2: #4fd1ff;
-	--cantante-3: #ff6fb5;
-	--cantante-4: #7ce38b;
+	/* People in party mode: never gold (lit) nor sky blue (selected). */
+	--cantante-1: #ff73a8;
+	--cantante-2: #5fe39b;
+	--cantante-3: #ff9a4d;
+	--cantante-4: #c7e85a;
 
-	--font-display: 'Big Shoulders', 'Arial Narrow', sans-serif;
-	--font-text: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+	--font-display: 'Unbounded', 'Figtree', system-ui, sans-serif;
+	--font-text: 'Figtree', system-ui, sans-serif;
+	--font-data: 'Martian Mono', ui-monospace, monospace;
 
-	/* Fluid type from a 360 px phone to a 1920 px TV: 16 px → 20 px base, ratio 1.25; the
-	   display steps jump by 3× and more for poster titles and the room code. */
+	/* Fluid type from a 360 px phone to a 1920 px TV: 16 px → 20 px base, ratio 1.25. The
+	   display steps are for the wide display face: big words, never long lines. */
 	--t--1: clamp(0.8125rem, 0.7692rem + 0.1923vw, 1rem);
 	--t-0: clamp(1rem, 0.9423rem + 0.2564vw, 1.25rem);
-	--t-1: clamp(1.25rem, 1.1779rem + 0.3205vw, 1.5625rem);
-	--t-2: clamp(1.5625rem, 1.4724rem + 0.4005vw, 1.953rem);
-	--t-3: clamp(1.953rem, 1.8404rem + 0.5005vw, 2.441rem);
-	--t-4: clamp(2.75rem, 2.4615rem + 1.2821vw, 4rem);
-	--t-5: clamp(3.75rem, 3.2308rem + 2.3077vw, 6rem);
-	--t-6: clamp(5.5rem, 4.5769rem + 4.1026vw, 9.5rem);
-	--t-7: clamp(8rem, 6.3846rem + 7.1795vw, 15rem);
+	--t-1: clamp(1.2rem, 1.1308rem + 0.3077vw, 1.5rem);
+	--t-2: clamp(1.4rem, 1.2962rem + 0.4615vw, 1.85rem);
+	--t-3: clamp(1.7rem, 1.5269rem + 0.7692vw, 2.45rem);
+	--t-4: clamp(2.1rem, 1.7769rem + 1.4359vw, 3.5rem);
+	--t-5: clamp(2.6rem, 2.0462rem + 2.4615vw, 5rem);
+	--t-6: clamp(3rem, 2.1923rem + 3.5897vw, 6.5rem);
+	--t-7: clamp(3.4rem, 2.0154rem + 6.1538vw, 9.4rem);
 
 	--s-1: 0.25rem;
 	--s-2: 0.5rem;
@@ -56,12 +73,22 @@
 	--safe-x: 5vw;
 	--safe-y: 5vh;
 
-	/* Shape rule: paper things (posters, cards, rows) are square; controls 10 px; pills only for
-	   filter chips and a person's name. */
-	--radius-control: 10px;
+	/* Shape: everything is rounded. Fields and small controls, rows and pictures, panels;
+	   buttons and people's names are pills. */
+	--radius-control: 0.75rem;
+	--radius-row: 1rem;
+	--radius-panel: 1.5rem;
+	--radius-pill: 999px;
 	--target: 3rem;
 
-	--ease: cubic-bezier(0.2, 0.7, 0.1, 1);
-	--dur-1: 120ms;
+	/* A soft lift for what floats, and the ring of what has the focus. */
+	--sombra: 0 1.5rem 3.5rem -1.5rem rgb(0 0 0 / 0.7);
+	--brillo: inset 0 1px 0 rgb(255 255 255 / 0.08);
+
+	/* Strong ease-out for anything the visitor triggers; in-out for things moving on screen. */
+	--ease: cubic-bezier(0.23, 1, 0.32, 1);
+	--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+	--dur-1: 140ms;
 	--dur-2: 240ms;
+	--dur-3: 420ms;
 }

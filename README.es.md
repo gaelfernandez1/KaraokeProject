@@ -52,7 +52,7 @@ castellano o el portugués— y **funciona con canciones en cualquier idioma**.
 
 | Biblioteca | En el móvil | Fiesta: el móvil de un invitado |
 |---|---|---|
-| <img src="docs/assets/screens/library.png" alt="La biblioteca: cada canción es un cartel."> | <img src="docs/assets/screens/player-phone.png" alt="El reproductor en un móvil, en vertical." width="220"> | <img src="docs/assets/screens/party-phone.png" alt="El móvil de un invitado en una fiesta: la cola por turnos." width="220"> |
+| <img src="docs/assets/screens/menu.png" alt="El menú principal: Galicia de noche en un globo, con sus luces."> | <img src="docs/assets/screens/player-phone.png" alt="El reproductor en un móvil, en vertical." width="220"> | <img src="docs/assets/screens/party-phone.png" alt="El móvil de un invitado en una fiesta: la cola por turnos." width="220"> |
 
 | Fiesta en la tele | Editor de la letra | Vídeo exportado |
 |---|---|---|
@@ -171,7 +171,8 @@ seguridad se comunican en privado ([`SECURITY.md`](SECURITY.md)).
 ## Licencia y créditos
 
 El proyecto se publica bajo la [licencia MIT](LICENSE). Se apoya en el trabajo de otras personas:
-los modelos de Proxecto Nós, HiTZ, OpenAI, Meta y Kimberley Jensen; las fuentes Big Shoulders,
-Atkinson Hyperlegible, Nunito e Inter; y las canciones de artistas que comparten su música
-libremente. Sus licencias están en [`NOTICE.md`](NOTICE.md). Las capturas muestran canciones con
-licencias Creative Commons y se comparten bajo CC BY-SA 4.0.
+los modelos de Proxecto Nós, HiTZ, OpenAI, Meta y Kimberley Jensen; las fuentes Unbounded, Figtree,
+Martian Mono, Atkinson Hyperlegible, Nunito e Inter; los datos del globo (Kontur, Natural Earth,
+Mapzen y Wikidata); y las canciones de artistas que comparten su música libremente. Sus licencias
+están en [`NOTICE.md`](NOTICE.md). Las capturas muestran canciones con licencias Creative Commons y
+se comparten bajo CC BY-SA 4.0.

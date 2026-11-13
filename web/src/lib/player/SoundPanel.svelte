@@ -82,7 +82,7 @@
 					style:--theme-font={`"${theme.font.family}"`}
 					style:--theme-sung={theme.colors.sung}
 				>
-					<span class="sample" aria-hidden="true">Aa</span>{theme.name}
+					<span class="sample" aria-hidden="true">Aa</span><span class="name">{theme.name}</span>
 				</button>
 			{/each}
 		</div>
@@ -94,7 +94,7 @@
 		margin-bottom: var(--s-2);
 		font-size: var(--t--1);
 		font-weight: 700;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	section {
@@ -104,7 +104,7 @@
 	.hint {
 		margin-top: var(--s-1);
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.stepper {
@@ -116,43 +116,80 @@
 	.stepper output {
 		min-width: 4.5ch;
 		text-align: center;
-		font-family: var(--font-display);
+		font-family: var(--font-data);
 		font-size: var(--t-2);
-		font-weight: 800;
+		font-weight: 650;
 		font-variant-numeric: tabular-nums;
+		line-height: 1;
 	}
 
 	.link {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--target);
 		margin-left: auto;
 		font-weight: 700;
-		color: var(--farol);
+		color: var(--texto);
+		text-decoration-color: var(--raia-forte);
+		transition:
+			color var(--dur-1) ease,
+			text-decoration-color var(--dur-1) ease;
 	}
 
+	.link:hover {
+		color: var(--ceo);
+		text-decoration-color: currentColor;
+	}
+
+	/* The lyrics styles, one a line: each one's sample in its own font and sung colour; the
+	   chosen one in the selection blue. */
 	.themes {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--s-2);
+		gap: 2px;
 	}
 
 	.themes button {
-		display: grid;
-		justify-items: start;
-		gap: var(--s-1);
-		padding: var(--s-3);
-		border: 2px solid var(--linha);
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: var(--s-4);
+		min-height: var(--target);
+		padding: var(--s-2) var(--s-3);
+		border: 0;
 		border-radius: var(--radius-control);
 		background: transparent;
-		font-size: var(--t--1);
 		font-weight: 600;
-		text-align: left;
+		text-align: start;
+		transition:
+			background-color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
+	}
+
+	.themes button:focus-visible {
+		outline-offset: -3px;
+	}
+
+	.themes button:active {
+		transform: scale(0.98);
+	}
+
+	@media (hover: hover) {
+		.themes button:hover {
+			background: var(--panel-claro);
+		}
 	}
 
 	.themes button[aria-checked='true'] {
-		border-color: var(--farol);
-		background: color-mix(in oklch, var(--farol) 10%, transparent);
+		background: var(--ceo-fondo);
+	}
+
+	.themes button[aria-checked='true'] .name {
+		color: var(--ceo);
 	}
 
 	.sample {
+		flex: none;
+		width: 2.2em;
 		font-family: var(--theme-font), var(--font-text);
 		font-size: var(--t-2);
 		line-height: 1;

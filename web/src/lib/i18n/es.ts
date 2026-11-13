@@ -9,6 +9,34 @@ export const es = {
 		party: 'Fiesta',
 		settings: 'Ajustes'
 	},
+	home: {
+		menu: 'Menú principal',
+		sing: 'Cantar',
+		singHint: (n: number) =>
+			n === 0
+				? 'Todavía no hay canciones'
+				: plural(n, 'es', { one: '# canción lista', other: '# canciones listas' }),
+		partyHint: 'La tele hace de pantalla y los móviles, de mando',
+		createHint: 'Sube una canción y en dos minutos tienes el karaoke',
+		settingsHint: 'Sonido, retardo, idioma y aparatos',
+		globe: (people: string, lights: string) =>
+			`Galicia de noche, la única tierra de un planeta pequeño: su relieve, sus faros y ${lights} luces, una por cada rincón donde vive gente (${people} personas).`,
+		stop: 'Parar el globo',
+		play: 'Mover el globo',
+		total: (songs: string, time: string) => `${songs}, ${time} de música`,
+		withVideo: 'Con vídeo',
+		lyricsBy: {
+			user: 'Letra pegada',
+			lrclib: 'Letra de LRCLIB',
+			asr: 'Letra sacada del audio'
+		},
+		edit: 'Corregir la letra',
+		credits:
+			'El globo: población de Kontur, relieve de Mapzen y Copernicus, contorno de Natural Earth y faros de Wikidata.'
+	},
+	globe: {
+		atlantic: 'Océano Atlántico'
+	},
 	common: {
 		updateReady: 'Hay una versión nueva de la aplicación.',
 		update: 'Actualizar',
@@ -246,6 +274,7 @@ export const es = {
 		noRequests: 'Todavía no has pedido ninguna canción.',
 		lineOf: (n: number, total: number) => `Línea ${n} de ${total}`,
 		attract: 'Pide la primera canción',
+		attractNext: 'Pide la siguiente canción',
 		settingsTitle: 'Ajustes de la fiesta',
 		joinWithCode: 'Entrar con un código',
 		hostHere: 'Montar la fiesta en esta pantalla',
@@ -291,6 +320,9 @@ export const es = {
 		request: 'Pedir',
 		inQueue: (position: number) => `En la cola, ${position}.ª`,
 		wait: (minutes: number) => (minutes <= 1 ? 'Ya mismo' : `En ${minutes} min`),
+		now: 'Ahora',
+		sung: 'Cantada',
+		skippedStatus: 'Saltada',
 		mine: 'Las tuyas',
 		noControl: 'La tele ha desactivado el mando desde los móviles.',
 		nothingPlaying: 'Ahora no suena nada.',

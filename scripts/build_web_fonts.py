@@ -20,28 +20,35 @@ from fontTools import subset
 from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 
-COMMIT = "6157dfaa640ca5738b4d1a7070fe389c3036d7fc"
+COMMIT = "86aced91de05cd4f96a06838124cca45be337b2b"
 SOURCE = f"https://raw.githubusercontent.com/google/fonts/{COMMIT}"
 OUT = Path(__file__).resolve().parents[1] / "web/src/lib/ui/fonts"
-# Advance widths of the poster titles' face, so a title can be fitted before the font loads.
+# Advance widths of the song titles' face, so a title can be fitted before the font loads.
 METRICS = Path(__file__).resolve().parents[1] / "web/src/lib/poster/display-metrics.json"
-METRICS_WEIGHT = 900
+METRICS_WEIGHT = 700
 
 # (output stem, google/fonts directory, variable file, axis limits)
 FONTS = [
-    # Condensed poster type for titles and big numbers, at its display optical size.
+    # Names, the menu and big words: Unbounded, wide and round, read across the room on a TV.
     (
-        "BigShoulders",
-        "ofl/bigshoulders",
-        "BigShoulders[opsz,wght].ttf",
-        {"opsz": 72, "wght": (600, 900)},
+        "Unbounded",
+        "ofl/unbounded",
+        "Unbounded[wght].ttf",
+        {"wght": (500, 800)},
     ),
-    # Interface text, built for legibility at a distance.
+    # Interface text.
     (
-        "AtkinsonHyperlegibleNext",
-        "ofl/atkinsonhyperlegiblenext",
-        "AtkinsonHyperlegibleNext[wght].ttf",
-        {"wght": (400, 800)},
+        "Figtree",
+        "ofl/figtree",
+        "Figtree[wght].ttf",
+        {"wght": (400, 700)},
+    ),
+    # Figures that are measured or read aloud: times, coordinates, the party's room code.
+    (
+        "MartianMono",
+        "ofl/martianmono",
+        "MartianMono[wdth,wght].ttf",
+        {"wdth": 100, "wght": (400, 700)},
     ),
 ]
 
@@ -56,6 +63,16 @@ UNICODES = [
     0x20AC,
     0x2122,
     *range(0x2190, 0x2194),
+]
+
+
+# The display face is heavy: it keeps only Western and Central European Latin (a title in
+# another script falls back to the text face).
+DISPLAY_UNICODES = [
+    *range(0x0020, 0x007F),
+    *range(0x00A0, 0x0180),
+    *range(0x2010, 0x2040),
+    0x20AC,
 ]
 
 
@@ -81,7 +98,7 @@ def build(stem: str, directory: str, file: str, limits: dict[str, object]) -> No
     options.name_IDs = ["*"]
     options.notdef_outline = True
     subsetter = subset.Subsetter(options)
-    subsetter.populate(unicodes=UNICODES)
+    subsetter.populate(unicodes=DISPLAY_UNICODES if stem == "Unbounded" else UNICODES)
     subsetter.subset(font)
     out = OUT / f"{stem}.woff2"
     font.flavor = "woff2"
@@ -92,10 +109,10 @@ def build(stem: str, directory: str, file: str, limits: dict[str, object]) -> No
 
 
 def write_metrics() -> None:
-    """Advance width (in em) of every character of the poster titles at their weight."""
-    url = f"{SOURCE}/ofl/bigshoulders/BigShoulders%5Bopsz,wght%5D.ttf"
+    """Advance width (in em) of every character of the song titles at their weight."""
+    url = f"{SOURCE}/ofl/unbounded/Unbounded%5Bwght%5D.ttf"
     font = instancer.instantiateVariableFont(
-        TTFont(BytesIO(_download(url))), {"opsz": 72, "wght": METRICS_WEIGHT}
+        TTFont(BytesIO(_download(url))), {"wght": METRICS_WEIGHT}
     )
     units = font["head"].unitsPerEm
     cmap = font.getBestCmap()

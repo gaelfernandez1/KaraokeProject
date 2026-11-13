@@ -1,6 +1,6 @@
 {
 	"id": "/",
-	"name": "Proxecto Karaoke en Galego",
+	"name": "Karaoke en Galego",
 	"short_name": "Karaoke",
 	"description": "Karaoke de calquera canción, coa letra sincronizada.",
 	"lang": "gl",
@@ -9,8 +9,8 @@
 	"display": "standalone",
 	"display_override": ["fullscreen", "standalone"],
 	"orientation": "any",
-	"background_color": "#16122E",
-	"theme_color": "#16122E",
+	"background_color": "#04070c",
+	"theme_color": "#04070c",
 	"categories": ["music", "entertainment"],
 	"launch_handler": { "client_mode": "focus-existing" },
 	"icons": [

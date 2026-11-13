@@ -77,5 +77,6 @@ ci: contracts lint typecheck test web
 # The server with the built web app (built once if missing). Not `uv run`: it would sync the
 # environment without the GPU extras.
 serve:
-	test -f web/build/index.html || pnpm --dir web build
+	@if [ ! -f web/build/index.html ] || [ -n "$$(find web/src web/static -newer web/build/index.html -print -quit)" ]; then \
+		pnpm --dir web build; fi
 	.venv/bin/karaoke-server serve

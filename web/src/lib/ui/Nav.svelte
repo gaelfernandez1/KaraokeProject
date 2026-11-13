@@ -12,9 +12,11 @@
 	interface Props {
 		/** 0–1 while a karaoke is being made, shown on the Create item. */
 		working?: number | null;
+		/** On the main menu, whose own big menu takes the top bar's place on wide screens. */
+		home?: boolean;
 	}
 
-	let { working = null }: Props = $props();
+	let { working = null, home = false }: Props = $props();
 
 	const t = $derived(i18n.t.nav);
 	const items = $derived<{ href: string; label: string; icon: IconName; match: string[] }[]>([
@@ -26,8 +28,8 @@
 	const active = (match: string[]) => match.includes(page.route.id ?? '');
 </script>
 
-<header class="topbar">
-	<a class="brand" href={resolve('/')}><Wordmark animate size="var(--t-3)" /></a>
+<header class="topbar" class:home>
+	<a class="brand" href={resolve('/')}><Wordmark animate size="var(--t-0)" /></a>
 	<nav aria-label={t.label}>
 		<ul>
 			{#each items.filter((i) => i.icon !== 'create') as item (item.href)}
@@ -84,26 +86,20 @@
 		text-decoration: none;
 	}
 
-	/* A progress ring around the Create icon while a karaoke is being made. */
-	.ring {
-		position: absolute;
-		inset: -6px;
-		border-radius: 50%;
-		background: conic-gradient(var(--farol) calc(var(--p) * 360deg), var(--linha) 0);
-		mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
-	}
-
 	.topbar {
 		display: none;
 	}
 
+	/* Phones: a bar at the thumb, the night showing through it. */
 	.tabbar {
 		position: fixed;
 		inset: auto 0 0 0;
 		z-index: 20;
 		padding-bottom: env(safe-area-inset-bottom);
-		background: var(--noite-funda);
-		border-top: 1px solid var(--linha);
+		border-top: 1px solid var(--raia);
+		background: rgb(4 7 12 / 0.8);
+		backdrop-filter: blur(18px) saturate(1.3);
+		-webkit-backdrop-filter: blur(18px) saturate(1.3);
 	}
 
 	.tabbar li {
@@ -119,7 +115,14 @@
 		padding: var(--s-2) var(--s-1) var(--s-2);
 		font-size: var(--t--1);
 		font-weight: 600;
-		color: var(--papel-suave);
+		color: var(--texto-2);
+		transition:
+			color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
+	}
+
+	.tabbar a:active {
+		transform: scale(0.95);
 	}
 
 	.tab-icon {
@@ -129,8 +132,17 @@
 	}
 
 	.tabbar a[aria-current='page'] {
-		color: var(--farol);
-		--icon-accent: var(--papel);
+		color: var(--ceo);
+		--icon-accent: var(--texto);
+	}
+
+	/* How far a karaoke being made has got: a ring round the plus. */
+	.ring {
+		position: absolute;
+		inset: -0.35rem;
+		border-radius: 50%;
+		background: conic-gradient(var(--ouro) calc(var(--p) * 1turn), transparent 0);
+		mask: radial-gradient(farthest-side, transparent calc(100% - 2.5px), #000 calc(100% - 2px));
 	}
 
 	@media (min-width: 45em) {
@@ -144,46 +156,43 @@
 			z-index: 20;
 			display: flex;
 			align-items: center;
-			gap: var(--s-6);
-			max-width: var(--page-max);
-			margin: 0 auto;
-			padding: var(--s-4) var(--page-x);
-			background: var(--noite);
+			gap: var(--s-5);
+			padding: var(--s-3) max(var(--page-x), calc((100% - var(--page-max)) / 2 + var(--page-x)));
+			border-bottom: 1px solid var(--raia);
+			background: rgb(4 7 12 / 0.7);
+			backdrop-filter: blur(18px) saturate(1.3);
+			-webkit-backdrop-filter: blur(18px) saturate(1.3);
 		}
 
 		.brand {
 			display: block;
+			margin-right: auto;
 			padding-block: var(--s-1);
 		}
 
+		/* The screens, as one control: the current one is the raised part of it. */
 		.topbar ul {
-			gap: var(--s-2);
+			gap: 2px;
+			padding: 4px;
+			border: 1px solid var(--raia);
+			border-radius: var(--radius-pill);
+			background: var(--panel-claro);
 		}
 
 		.topbar nav a {
-			position: relative;
 			display: block;
-			padding: var(--s-3) var(--s-3);
-			font-weight: 700;
-			color: var(--papel-suave);
-		}
-
-		.topbar nav a:hover {
-			color: var(--papel);
+			padding: var(--s-2) var(--s-4);
+			border-radius: var(--radius-pill);
+			font-weight: 600;
+			color: var(--texto-2);
+			transition:
+				color var(--dur-1) ease,
+				background-color var(--dur-1) ease;
 		}
 
 		.topbar nav a[aria-current='page'] {
-			color: var(--papel);
-		}
-
-		/* The current page's link is underlined in the sung colour. */
-		.topbar nav a[aria-current='page']::after {
-			content: '';
-			position: absolute;
-			inset: auto var(--s-3) 0.35rem;
-			height: 3px;
-			border-radius: 2px;
-			background: var(--farol);
+			background: rgb(255 255 255 / 0.12);
+			color: var(--texto);
 		}
 
 		.create {
@@ -191,29 +200,42 @@
 			display: inline-flex;
 			align-items: center;
 			gap: var(--s-2);
-			min-height: var(--target);
-			margin-left: auto;
+			min-height: 2.75rem;
 			padding: 0 var(--s-5);
-			border-radius: var(--radius-control);
-			background: var(--farol);
-			color: var(--noite);
-			font-weight: 800;
+			border-radius: var(--radius-pill);
+			background: var(--accion);
+			color: var(--accion-texto);
+			font-weight: 700;
+			white-space: nowrap;
+			transition:
+				background-color var(--dur-1) ease,
+				transform var(--dur-1) var(--ease);
 		}
 
-		.create:hover {
-			background: color-mix(in oklch, var(--farol), white 22%);
+		.create:active {
+			transform: scale(0.97);
 		}
 
 		.create .ring {
-			inset: auto var(--s-3) -8px;
-			height: 4px;
-			border-radius: 2px;
-			background: linear-gradient(
-				to right,
-				var(--farol) calc(var(--p) * 100%),
-				var(--linha) calc(var(--p) * 100%)
-			);
-			mask: none;
+			inset: -4px;
+			border-radius: var(--radius-pill);
+		}
+	}
+
+	@media (min-width: 45em) and (hover: hover) {
+		.topbar nav a:hover {
+			color: var(--texto);
+		}
+
+		.create:hover {
+			background: color-mix(in oklch, var(--accion), var(--ceo) 22%);
+		}
+	}
+
+	/* The main menu has its own way in on wide screens. */
+	@media (min-width: 64em) {
+		.topbar.home {
+			display: none;
 		}
 	}
 </style>

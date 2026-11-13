@@ -1,6 +1,6 @@
 <script lang="ts" module>
 	/** The product name, in one place. */
-	export const APP_NAME = 'Proxecto Karaoke en Galego';
+	export const APP_NAME = 'Karaoke en Galego';
 	const SEEN_KEY = 'foliada.sung';
 </script>
 
@@ -48,20 +48,20 @@
 		position: relative;
 		display: inline-block;
 		font-family: var(--font-display);
-		font-weight: 900;
-		line-height: 0.9;
-		letter-spacing: 0.01em;
+		font-weight: 600;
+		line-height: 1.1;
+		letter-spacing: -0.02em;
 		white-space: nowrap;
 	}
 
 	.base {
-		color: var(--papel);
+		color: var(--texto);
 	}
 
 	.fill {
 		position: absolute;
 		inset: 0;
-		color: var(--farol);
+		color: var(--ouro);
 		clip-path: inset(-20% 0 -20% 0);
 	}
 

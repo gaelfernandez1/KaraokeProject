@@ -88,7 +88,7 @@
 		new Date(iso).toLocaleDateString(i18n.locale, { day: 'numeric', month: 'long' });
 </script>
 
-<!-- Figures go in the poster face (the text face draws a slashed zero): split the sentence. -->
+<!-- Figures go in tabular numerals, as every count of the app: split the sentence. -->
 {#snippet withNumber(sentence: (value: string) => string, value: string)}
 	{@const [before, after] = sentence('\u0001').split('\u0001')}
 	{before}<span class="num">{value}</span>{after}
@@ -104,7 +104,7 @@
 				<p class="hint">
 					{pairing.urls.home || pairing.urls.remote ? t.pairIntro : t.pairIntroTyped}
 				</p>
-				<p class="code" aria-label={t.code}>{pairing.code}</p>
+				<p class="code data" aria-label={t.code}>{pairing.code}</p>
 				<p class="hint">{@render withNumber(t.expires, time(pairing.expires_at))}</p>
 				<div class="qrs">
 					{#each [[t.atHome, pairing.urls.home], [t.away, pairing.urls.remote]] as [label, url] (label)}
@@ -168,20 +168,22 @@
 	}
 
 	h2 {
-		margin-bottom: var(--s-3);
-		font-size: var(--t-1);
-		font-weight: 800;
+		margin-bottom: var(--s-2);
+		font-family: var(--font-display);
+		font-size: var(--t-3);
+		font-weight: 650;
+		line-height: 1;
 	}
 
 	h3 {
 		margin-top: var(--s-4);
 		font-size: var(--t-0);
-		font-weight: 800;
+		font-weight: 650;
 	}
 
 	.hint {
 		max-width: 40rem;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.pairing {
@@ -189,14 +191,12 @@
 		gap: var(--s-2);
 	}
 
-	/* Read aloud or typed on a phone: the poster face, big and spaced, like the party code. */
+	/* Read aloud or typed on a phone: big, in dots of light, like the party's room code. */
 	.code {
-		font-family: var(--font-display);
 		font-size: var(--t-4);
-		font-weight: 900;
-		letter-spacing: 0.12em;
+		letter-spacing: 0.1em;
 		line-height: 1;
-		color: var(--papel);
+		color: var(--ouro);
 	}
 
 	.qrs {
@@ -217,15 +217,17 @@
 	}
 
 	figcaption {
-		font-weight: 700;
+		font-weight: 650;
 	}
 
+	/* The paired devices: a board, one row each. */
 	.devices {
 		display: grid;
 		max-width: 40rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		border-top: 1px solid var(--raia);
 	}
 
 	.devices li {
@@ -233,11 +235,12 @@
 		grid-template-columns: 1fr auto auto;
 		align-items: center;
 		gap: var(--s-4);
-		border-bottom: 1px solid var(--linha);
+		padding-left: var(--s-3);
+		border-bottom: 1px solid var(--raia);
 	}
 
 	.name {
-		font-weight: 700;
+		font-weight: 650;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -246,17 +249,18 @@
 	.this,
 	.seen {
 		font-weight: 400;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.enter {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--s-2);
 		max-width: 30rem;
 	}
 
 	label {
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	.row {
@@ -264,24 +268,34 @@
 		gap: var(--s-3);
 	}
 
+	/* The code as it is typed: the same dots of light as when it is shown. */
 	input {
 		flex: 1;
 		min-width: 0;
 		min-height: var(--target);
-		padding: var(--s-2) var(--s-4);
-		border: 2px solid var(--linha);
+		padding: var(--s-1) var(--s-4);
+		border: 1px solid var(--raia-forte);
 		border-radius: var(--radius-control);
-		background: var(--noite-alta);
-		color: var(--papel);
-		font-family: var(--font-display);
-		font-size: var(--t-1);
-		font-weight: 800;
-		letter-spacing: 0.1em;
+		background: var(--fondo-2);
+		color: var(--texto);
+		font-family: var(--font-data);
+		font-size: var(--t-2);
+		font-weight: 650;
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
+		transition:
+			border-color var(--dur-1) ease,
+			box-shadow var(--dur-1) ease;
+	}
+
+	input:focus {
+		outline: none;
+		border-color: var(--ceo);
+		box-shadow: 0 0 0 1px var(--ceo);
 	}
 
 	.message {
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	@media (max-width: 30em) {

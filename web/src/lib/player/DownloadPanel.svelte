@@ -165,15 +165,14 @@
 							{/if}
 						</div>
 						<div class="about">
-							<p class="what">
-								{tall ? t.videoTallShort : t.videoWideShort} · {themeName(video.theme)} · {vocalsText(
-									video.vocals
-								)}
+							<p class="what">{tall ? t.videoTallShort : t.videoWideShort}</p>
+							<p class="facts">
+								<span>{themeName(video.theme)}</span>
+								<span>{vocalsText(video.vocals)}</span>
 							</p>
-							<p class="meta">
-								<span class="num">{formatBytes(video.size, i18n.locale)}</span> · {day(
-									video.created_at
-								)}
+							<p class="facts quiet">
+								<span class="num">{formatBytes(video.size, i18n.locale)}</span>
+								<span>{day(video.created_at)}</span>
 							</p>
 							{#if video.outdated}<p class="outdated">{t.videoOutdated}</p>{/if}
 						</div>
@@ -269,37 +268,37 @@
 	h3 {
 		font-size: var(--t--1);
 		font-weight: 700;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	h4 {
-		margin-top: var(--s-3);
+		margin-top: var(--s-4);
 		font-size: var(--t--1);
 		font-weight: 700;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.hint,
 	.empty {
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.empty {
 		padding: var(--s-3) 0;
-		font-style: italic;
 	}
 
 	.error {
 		color: var(--erro);
 	}
 
-	/* A video being made: its bar fills with the sung colour, as the jobs on the create page. */
+	/* A video being made: its bar fills with the lit amber, as the jobs on the create page. */
 	.making {
 		display: grid;
 		grid-template-columns: 1fr auto auto;
 		align-items: center;
 		gap: var(--s-1) var(--s-3);
+		padding-block: var(--s-2);
 		font-weight: 700;
 	}
 
@@ -308,14 +307,12 @@
 	}
 
 	.bar {
-		height: 0.5rem;
-		border-radius: 999px;
+		height: 0.375rem;
 		background: linear-gradient(
 			to right,
-			var(--farol) calc(var(--p) * 100%),
-			var(--linha) calc(var(--p) * 100%)
+			var(--ouro) calc(var(--p) * 100%),
+			var(--raia) calc(var(--p) * 100%)
 		);
-		transition: background 0.4s;
 	}
 
 	.videos,
@@ -326,9 +323,10 @@
 		list-style: none;
 	}
 
+	/* The videos made, one per line of the board. */
 	.videos {
-		gap: var(--s-4);
 		margin-top: var(--s-2);
+		border-top: 1px solid var(--raia);
 	}
 
 	.video {
@@ -336,6 +334,8 @@
 		grid-template-columns: 5.5rem 1fr;
 		gap: var(--s-2) var(--s-3);
 		align-items: start;
+		padding-block: var(--s-3);
+		border-bottom: 1px solid var(--raia);
 	}
 
 	.thumb {
@@ -343,9 +343,9 @@
 		place-items: center;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
-		border-radius: var(--radius-control);
-		background: var(--linha);
-		color: var(--papel-suave);
+		background: var(--fondo-2);
+		color: var(--texto-2);
+		box-shadow: inset 0 0 0 1px var(--raia);
 	}
 
 	.thumb.tall {
@@ -360,19 +360,28 @@
 	}
 
 	.what {
-		font-weight: 700;
+		font-family: var(--font-text);
+		font-size: var(--t-1);
+		font-weight: 650;
+		line-height: 1.1;
 	}
 
-	.meta {
+	/* Its facts in columns, not run together. */
+	.facts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 var(--s-3);
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+	}
+
+	.quiet {
+		color: var(--texto-2);
 	}
 
 	.outdated {
 		margin-top: var(--s-1);
 		font-size: var(--t--1);
 		font-weight: 700;
-		color: var(--farol);
 	}
 
 	.actions {
@@ -394,32 +403,51 @@
 		gap: var(--s-2);
 	}
 
+	/* The files: lines of the board, pointed at in the selection blue. */
 	.files {
-		gap: var(--s-1);
+		border-top: 1px solid var(--raia);
 	}
 
 	.files a {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: var(--s-3);
 		min-height: var(--target);
+		padding-inline: var(--s-3);
+		border-bottom: 1px solid var(--raia);
 		font-weight: 600;
 		text-decoration: none;
+		transition:
+			background-color var(--dur-1) ease,
+			color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
 	}
 
-	.files a:hover {
-		color: var(--farol);
+	.files a:focus-visible {
+		outline-offset: -3px;
+	}
+
+	.files a:active {
+		transform: scale(0.98);
+	}
+
+	@media (hover: hover) {
+		.files a:hover {
+			background: var(--ceo-fondo);
+			color: var(--ceo);
+		}
 	}
 
 	.offline {
 		display: grid;
 		justify-items: start;
 		gap: var(--s-2);
-		margin-top: var(--s-3);
+		margin-top: var(--s-4);
 	}
 
 	.saved-note {
 		font-weight: 700;
-		color: var(--farol);
+		color: var(--ceo);
 	}
 </style>

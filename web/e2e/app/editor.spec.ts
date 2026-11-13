@@ -54,6 +54,6 @@ test('a song can be deleted from the library, after saying yes', async ({ page }
 	await remove.click();
 	await page.getByRole('button', { name: 'Si, borrala' }).click();
 	await expect(page).toHaveURL(/\/$/);
-	await expect(page.locator('.wall .poster').first()).toBeVisible();
+	await expect(page.locator('.board .row').first()).toBeVisible();
 	await expect(page.getByRole('link', { name: new RegExp(`^${title}`) })).toHaveCount(0);
 });

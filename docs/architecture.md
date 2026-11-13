@@ -175,3 +175,4 @@ offline). The API client uses types generated from the server's OpenAPI.
 | [012](plan-v3/decisiones/012-calidad.md) | Quality | gates per class of bug; about 40 bugs fixed with tests |
 | [013](plan-v3/decisiones/013-proyecto-profesional.md) | Project | one version, releases from the changelog, licences checked |
 | [014](plan-v3/decisiones/014-descargas-y-video-original.md) | Downloads | a download panel in the player; the export draws on the original video (contract 1.2.0) |
+| [017](plan-v3/decisiones/017-noite.md) | Web look | Galicia at night on its own 3D planet, one globe under every screen (replaces the posters of 010) |

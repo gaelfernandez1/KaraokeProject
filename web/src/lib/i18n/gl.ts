@@ -9,6 +9,34 @@ export const gl = {
 		party: 'Festa',
 		settings: 'Axustes'
 	},
+	home: {
+		menu: 'Menú principal',
+		sing: 'Cantar',
+		singHint: (n: number) =>
+			n === 0
+				? 'Aínda non hai cancións'
+				: plural(n, 'gl', { one: '# canción lista', other: '# cancións listas' }),
+		partyHint: 'A tele fai de pantalla e os móbiles, de mando',
+		createHint: 'Sube unha canción e en dous minutos tes o karaoke',
+		settingsHint: 'Son, retardo, idioma e aparellos',
+		globe: (people: string, lights: string) =>
+			`Galicia de noite, a única terra dun planeta pequeno: o seu relevo, os seus faros e ${lights} luces, unha por cada recanto onde vive xente (${people} persoas).`,
+		stop: 'Parar o globo',
+		play: 'Mover o globo',
+		total: (songs: string, time: string) => `${songs}, ${time} de música`,
+		withVideo: 'Con vídeo',
+		lyricsBy: {
+			user: 'Letra pegada',
+			lrclib: 'Letra de LRCLIB',
+			asr: 'Letra sacada do audio'
+		},
+		edit: 'Corrixir a letra',
+		credits:
+			'O globo: poboación de Kontur, relevo de Mapzen e Copernicus, contorno de Natural Earth e faros de Wikidata.'
+	},
+	globe: {
+		atlantic: 'Océano Atlántico'
+	},
 	common: {
 		updateReady: 'Hai unha versión nova da aplicación.',
 		update: 'Actualizar',
@@ -244,6 +272,7 @@ export const gl = {
 		noRequests: 'Aínda non pediches ningunha canción.',
 		lineOf: (n: number, total: number) => `Liña ${n} de ${total}`,
 		attract: 'Pide a primeira canción',
+		attractNext: 'Pide a seguinte canción',
 		settingsTitle: 'Axustes da festa',
 		joinWithCode: 'Entrar cun código',
 		hostHere: 'Montar a festa nesta pantalla',
@@ -289,6 +318,9 @@ export const gl = {
 		request: 'Pedir',
 		inQueue: (position: number) => `Na cola, ${position}.ª`,
 		wait: (minutes: number) => (minutes <= 1 ? 'Xa mesmo' : `En ${minutes} min`),
+		now: 'Agora',
+		sung: 'Cantada',
+		skippedStatus: 'Saltada',
 		mine: 'As túas',
 		noControl: 'A tele desactivou o mando dende os móbiles.',
 		nothingPlaying: 'Agora non soa nada.',

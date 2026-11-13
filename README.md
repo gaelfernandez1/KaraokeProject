@@ -51,7 +51,7 @@ o galego** —unha lingua que as ferramentas xerais adoitan confundir co castel�
 
 | Biblioteca | No móbil | Festa: o móbil dun convidado |
 |---|---|---|
-| <img src="docs/assets/screens/library.png" alt="A biblioteca: cada canción é un cartel."> | <img src="docs/assets/screens/player-phone.png" alt="O reprodutor nun móbil, en vertical." width="220"> | <img src="docs/assets/screens/party-phone.png" alt="O móbil dun convidado nunha festa: a cola por quendas." width="220"> |
+| <img src="docs/assets/screens/menu.png" alt="O menú principal: Galicia de noite nun globo, coas súas luces."> | <img src="docs/assets/screens/player-phone.png" alt="O reprodutor nun móbil, en vertical." width="220"> | <img src="docs/assets/screens/party-phone.png" alt="O móbil dun convidado nunha festa: a cola por quendas." width="220"> |
 
 | Festa na tele | Editor da letra | Vídeo exportado |
 |---|---|---|
@@ -166,8 +166,9 @@ comunícanse en privado ([`SECURITY.md`](SECURITY.md)).
 
 ## Licenza e créditos
 
-O proxecto publícase baixo a [licenza MIT](LICENSE). Apóiase no traballo doutras persoas: os
-modelos de Proxecto Nós, HiTZ, OpenAI, Meta e Kimberley Jensen; as fontes Big Shoulders, Atkinson
-Hyperlegible, Nunito e Inter; e as cancións de artistas que comparten a súa música libremente. As
-súas licenzas están en [`NOTICE.md`](NOTICE.md). As capturas amosan cancións con licenzas Creative
-Commons e compártense baixo CC BY-SA 4.0.
+O proxecto publícase baixo a [licenza MIT](LICENSE). Apóiase no traballo doutras persoas: os modelos
+de Proxecto Nós, HiTZ, OpenAI, Meta e Kimberley Jensen; as fontes Unbounded, Figtree, Martian Mono,
+Atkinson Hyperlegible, Nunito e Inter; os datos do globo (Kontur, Natural Earth, Mapzen e Wikidata);
+e as cancións de artistas que comparten a súa música libremente. As súas licenzas están en
+[`NOTICE.md`](NOTICE.md). As capturas amosan cancións con licenzas Creative Commons e compártense
+baixo CC BY-SA 4.0.

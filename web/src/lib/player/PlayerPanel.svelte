@@ -28,13 +28,15 @@
 	.panel {
 		display: grid;
 		align-content: start;
-		gap: var(--s-5);
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
+		overscroll-behavior: contain;
 		padding: var(--s-4) var(--s-5) var(--s-6);
-		background: var(--noite);
-		border-left: 1px solid var(--linha);
+		/* The player's sizes (bigger on a TV), not the page's. */
+		font-size: var(--t-0);
+		background: var(--fondo);
+		border-left: 1px solid var(--raia-forte);
 	}
 
 	header {
@@ -47,11 +49,22 @@
 		margin: calc(-1 * var(--s-4)) calc(-1 * var(--s-5)) 0;
 		padding: var(--s-3) var(--s-3) var(--s-3) var(--s-5);
 		background: inherit;
+		border-bottom: 1px solid var(--raia);
 	}
 
 	h2 {
 		font-family: var(--font-display);
 		font-size: var(--t-3);
-		font-weight: 900;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	/* The panel's parts, one under another like the lines of a board. */
+	.panel > :global(section) {
+		padding-block: var(--s-5);
+	}
+
+	.panel > :global(section + section) {
+		border-top: 1px solid var(--raia);
 	}
 </style>
