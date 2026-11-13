@@ -6,8 +6,13 @@ test('the interface language changes at once and is remembered', async ({ page, 
 	await expect(page.getByRole('heading', { name: 'Ajustes', level: 1 })).toBeVisible();
 	await expect(page.locator('html')).toHaveAttribute('lang', 'es');
 	await page.goto('/');
-	const nav = page.getByRole('navigation', { name: 'Navegación principal' });
-	await expect(nav.getByRole('link', { name: isMobile ? 'Canciones' : 'Canciones' })).toBeVisible();
+	// Phones keep the tab bar on the main menu; laptops and TVs get the big menu instead.
+	const link = isMobile
+		? page
+				.getByRole('navigation', { name: 'Navegación principal' })
+				.getByRole('link', { name: 'Canciones' })
+		: page.locator('.menu').getByRole('link', { name: /^Fiesta/ });
+	await expect(link).toBeVisible();
 	await page.goto('/axustes');
 	await page.getByRole('radio', { name: 'Galego' }).click();
 	await expect(page.getByRole('heading', { name: 'Axustes', level: 1 })).toBeVisible();

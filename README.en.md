@@ -50,7 +50,7 @@ computer with a modest GPU, and you sing from your phone, your laptop or the TV.
 
 | Library | On the phone | Party: a guest's phone |
 |---|---|---|
-| <img src="docs/assets/screens/library.png" alt="The library: each song is a poster."> | <img src="docs/assets/screens/player-phone.png" alt="The player on a phone, in portrait." width="220"> | <img src="docs/assets/screens/party-phone.png" alt="A guest's phone at a party: the queue by turns." width="220"> |
+| <img src="docs/assets/screens/menu.png" alt="The main menu: Galicia at night on a globe, with its lights."> | <img src="docs/assets/screens/player-phone.png" alt="The player on a phone, in portrait." width="220"> | <img src="docs/assets/screens/party-phone.png" alt="A guest's phone at a party: the queue by turns." width="220"> |
 
 | Party on the TV | Lyrics editor | Video export |
 |---|---|---|
@@ -164,7 +164,8 @@ privately ([`SECURITY.md`](SECURITY.md)).
 ## Licence and credits
 
 The project is released under the [MIT licence](LICENSE). It stands on the work of others — the
-models of Proxecto Nós, HiTZ, OpenAI, Meta and Kimberley Jensen, the fonts Big Shoulders, Atkinson
-Hyperlegible, Nunito and Inter, and the songs of artists who share their music freely. Their
-licences are listed in [`NOTICE.md`](NOTICE.md). The screenshots show songs under Creative Commons
-licences and are shared under CC BY-SA 4.0.
+models of Proxecto Nós, HiTZ, OpenAI, Meta and Kimberley Jensen, the fonts Unbounded, Figtree,
+Martian Mono, Atkinson Hyperlegible, Nunito and Inter, the globe's data (Kontur, Natural Earth,
+Mapzen and Wikidata), and the songs of artists who share their music freely. Their licences are
+listed in [`NOTICE.md`](NOTICE.md). The screenshots show songs under Creative Commons licences and
+are shared under CC BY-SA 4.0.

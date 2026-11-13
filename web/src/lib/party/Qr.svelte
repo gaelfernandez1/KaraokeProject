@@ -20,8 +20,8 @@
 	aria-label={label}
 	shape-rendering="crispEdges"
 >
-	<rect x="-3" y="-3" width={code.size + 6} height={code.size + 6} fill="var(--papel)" />
-	<path d={path} fill="var(--noite)" />
+	<rect x="-3" y="-3" width={code.size + 6} height={code.size + 6} fill="var(--texto)" />
+	<path d={path} fill="var(--fondo)" />
 </svg>
 
 <style>

@@ -2,13 +2,14 @@
 	import '../lib/ui/styles/tokens.css';
 	import '../lib/ui/styles/fonts.css';
 	import '../lib/ui/styles/base.css';
-	import displayFont from '../lib/ui/fonts/BigShoulders.woff2?url';
-	import textFont from '../lib/ui/fonts/AtkinsonHyperlegibleNext.woff2?url';
+	import displayFont from '../lib/ui/fonts/Unbounded.woff2?url';
+	import textFont from '../lib/ui/fonts/Figtree.woff2?url';
 	import favicon from '#lib/assets/favicon.svg';
 	import { onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { i18n, initLocale } from '#lib/i18n';
 	import { jobs } from '#lib/create/jobs.svelte.js';
+	import Stage from '#lib/globe/Stage.svelte';
 	import Nav from '#lib/ui/Nav.svelte';
 	import { chrome } from '#lib/ui/chrome.svelte.js';
 	import { watchForUpdate } from '#lib/offline/register.js';
@@ -48,7 +49,9 @@
 	<link rel="preload" href={textFont} as="font" type="font/woff2" crossorigin="anonymous" />
 </svelte:head>
 
-{#if !immersive}<Nav working={jobs.working} />{/if}
+<Stage />
+
+{#if !immersive}<Nav working={jobs.working} home={page.route.id === '/'} />{/if}
 
 <div class="app" class:immersive>
 	{@render children()}
@@ -79,9 +82,11 @@
 		width: max-content;
 		max-width: calc(100% - 2 * var(--page-x));
 		padding: var(--s-3) var(--s-3) var(--s-3) var(--s-5);
-		background: var(--papel);
-		color: var(--noite);
+		border-radius: var(--radius-pill);
+		background: var(--accion);
+		color: var(--accion-texto);
 		font-weight: 700;
+		box-shadow: var(--sombra);
 	}
 
 	@media (min-width: 45em) {

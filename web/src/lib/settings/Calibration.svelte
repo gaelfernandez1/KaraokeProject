@@ -126,7 +126,7 @@
 				<span class="ripple" class:center={r.x < 0} style:left="{r.x}px" style:top="{r.y}px"></span>
 			{/each}
 			<span class="pad-label">{t.calibrateTap}</span>
-			<span class="count" aria-live="polite">{tapCount} / {COUNT}</span>
+			<span class="count data" aria-live="polite">{tapCount} / {COUNT}</span>
 		</button>
 	{:else}
 		<p class="intro">{t.calibrateIntro}</p>
@@ -149,47 +149,51 @@
 	}
 
 	.intro {
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		max-width: 38rem;
 	}
 
 	.result {
-		font-weight: 700;
-		color: var(--farol);
+		font-weight: 650;
+		color: var(--ouro);
 	}
 
 	.failed {
 		max-width: 38rem;
-		font-weight: 700;
+		font-weight: 650;
 		color: var(--erro);
 	}
 
+	/* The pad to tap on: a square of the night; each tap lights a ring where it lands. */
 	.pad {
 		position: relative;
 		display: grid;
 		place-items: center;
 		align-content: center;
-		gap: var(--s-2);
+		gap: var(--s-3);
 		width: 100%;
 		min-height: 14rem;
 		overflow: hidden;
-		border: 2px solid var(--linha);
-		border-radius: 1.5rem;
-		background: var(--noite-alta);
+		border: 1px solid var(--raia-forte);
+		background:
+			radial-gradient(circle, var(--raia) 0 1.25px, transparent 1.75px) 50% 50% / 12px 12px,
+			var(--fondo-3);
 		touch-action: manipulation;
 		user-select: none;
+		-webkit-user-select: none;
 	}
 
 	.pad-label {
-		font-family: var(--font-display);
+		font-family: var(--font-text);
 		font-size: var(--t-5);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1;
 	}
 
 	.count {
-		font-variant-numeric: tabular-nums;
-		color: var(--papel-suave);
+		font-size: var(--t-3);
+		line-height: 1;
+		color: var(--ouro);
 	}
 
 	.ripple {
@@ -198,7 +202,7 @@
 		height: 2rem;
 		margin: -1rem 0 0 -1rem;
 		border-radius: 50%;
-		border: 3px solid var(--farol);
+		border: 3px solid var(--ouro);
 		animation: ripple 600ms var(--ease) forwards;
 		pointer-events: none;
 	}

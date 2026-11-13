@@ -57,6 +57,8 @@
 	const line = $derived(doc?.lines[lineIndex] ?? null);
 	const word = $derived(line?.words[wordIndex] ?? null);
 	const dirty = $derived(doc !== null && doc !== saved);
+	/** Sounding now (the session's state is reactive; its `playing` getter is not). */
+	const playing = $derived(session.state === 'playing');
 	const from = $derived(line ? Math.max(0, line.start - LEAD) : 0);
 	const to = $derived(line ? line.end + LEAD : 1);
 	/** Every word the aligner was unsure about, in order, to review them one by one. */
@@ -303,9 +305,7 @@
 	};
 </script>
 
-<svelte:head
-	><title>{doc ? t.title(doc.title) : t.help} · Proxecto Karaoke en Galego</title></svelte:head
->
+<svelte:head><title>{doc ? t.title(doc.title) : t.help} · Karaoke en Galego</title></svelte:head>
 <svelte:window onkeydown={onKey} onbeforeunload={(e) => dirty && e.preventDefault()} />
 
 <div class="editor">
@@ -335,6 +335,7 @@
 							<button
 								type="button"
 								class:current={i === lineIndex}
+								class:playing={playing && session.time >= l.start && session.time < l.end}
 								class:backing={l.role === 'backing'}
 								aria-current={i === lineIndex ? 'true' : undefined}
 								onclick={() => selectLine(i)}
@@ -376,6 +377,7 @@
 								role="option"
 								aria-selected={j === wordIndex}
 								class:doubtful={(w.confidence ?? 1) < DOUBTFUL}
+								class:sung={mode !== 'tap' && playing && session.time >= w.start}
 								class:tapped={mode === 'tap' && j < taps.length}
 								class:next={mode === 'tap' && j === taps.length}
 								onclick={() => {
@@ -399,6 +401,7 @@
 						}))}
 						selected={wordIndex}
 						time={session.time}
+						{playing}
 						onseek={(s) => session.seek(s)}
 						onselect={(j) => (wordIndex = j)}
 						ondrag={onDrag}
@@ -406,7 +409,7 @@
 
 					<div class="listen">
 						<Button
-							icon={mode === 'line' && session.playing ? 'pause' : 'play'}
+							icon={mode === 'line' && playing ? 'pause' : 'play'}
 							onclick={() => listen(false)}>{t.playLine}</Button
 						>
 						<Button
@@ -514,7 +517,7 @@
 
 					<div class="delete">
 						{#if confirmDelete}
-							<!-- The figure in the poster face, as everywhere (the text face slashes its zero). -->
+							<!-- The figure in tabular numerals, as in every count of the app. -->
 							{@const [before, after] = t.deleteConfirm('\u0001').split('\u0001')}
 							<p>{before}<span class="num">{TRASH_DAYS}</span>{after}</p>
 							<div class="row">
@@ -558,8 +561,8 @@
 		align-items: center;
 		gap: var(--s-3);
 		padding: var(--s-3) var(--page-x);
-		background: var(--noite);
-		border-bottom: 1px solid var(--linha);
+		background: var(--fondo);
+		border-bottom: 1px solid var(--raia);
 	}
 
 	h1 {
@@ -567,7 +570,7 @@
 		min-width: 0;
 		font-family: var(--font-display);
 		font-size: var(--t-2);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
@@ -591,10 +594,11 @@
 		}
 	}
 
+	/* Unsaved: the save waiting is "now", in amber like the Save button. */
 	.status {
 		font-size: var(--t--1);
-		color: var(--farol);
-		font-weight: 700;
+		color: var(--ouro);
+		font-weight: 650;
 	}
 
 	/* Last in the song's page, apart from the editing, as in a contact card. */
@@ -604,12 +608,12 @@
 		gap: var(--s-3);
 		margin-top: var(--s-6);
 		padding-top: var(--s-4);
-		border-top: 1px solid var(--linha);
+		border-top: 1px solid var(--raia);
 	}
 
 	.delete p {
 		max-width: 38rem;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.delete .row {
@@ -619,21 +623,21 @@
 	}
 
 	.delete .failed {
-		font-weight: 700;
+		font-weight: 650;
 		color: var(--erro);
 	}
 
 	.notice {
 		margin: var(--s-3) var(--page-x) 0;
 		padding: var(--s-2) var(--s-4);
-		border-left: 4px solid var(--farol);
-		background: var(--noite-alta);
+		border: 1px solid var(--raia-forte);
+		background: var(--fondo-2);
 		font-weight: 600;
 	}
 
 	.message {
 		padding: var(--s-6) var(--page-x);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.layout {
@@ -663,10 +667,17 @@
 		}
 	}
 
+	/* The lines: a board, one row each, its time in a column. The one picked is blue; the one
+	   being heard is lit in amber, as in the player. */
 	.lines ol {
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		border-top: 1px solid var(--raia);
+	}
+
+	.lines li {
+		border-bottom: 1px solid var(--raia);
 	}
 
 	.lines button {
@@ -674,38 +685,52 @@
 		grid-template-columns: 4.5rem 1fr;
 		gap: var(--s-3);
 		width: 100%;
+		min-height: 2.75rem;
 		padding: var(--s-2) var(--s-3);
 		border: 0;
 		background: none;
 		text-align: left;
 		line-height: 1.35;
+		outline-offset: -3px;
+		transition:
+			background-color var(--dur-1) ease,
+			color var(--dur-1) ease;
 	}
 
-	.lines button:hover {
-		background: var(--noite-alta);
+	@media (hover: hover) {
+		.lines button:hover {
+			background: var(--fondo-2);
+		}
 	}
 
 	.lines button.current {
-		background: var(--noite-alta);
-		color: var(--farol);
+		background: var(--ceo-fondo);
 	}
 
 	.lines button.backing {
 		padding-left: var(--s-6);
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
+	}
+
+	.lines button.playing .text {
+		color: var(--ouro);
 	}
 
 	.time {
 		font-variant-numeric: tabular-nums;
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		padding-top: 0.1em;
+	}
+
+	.current .time {
+		color: var(--ceo);
 	}
 
 	/* A dotted line, not a spellchecker's wave: the word may be out of time, not misspelt. */
 	.doubtful {
-		text-decoration: underline dotted var(--papel-suave);
+		text-decoration: underline dotted var(--texto-2);
 		text-decoration-thickness: 2px;
 		text-underline-offset: 0.3em;
 	}
@@ -723,18 +748,30 @@
 		gap: var(--s-2);
 		align-items: center;
 		min-height: var(--target);
-		padding: 0 var(--s-3);
-		border: 2px solid var(--linha);
+		padding: 0 var(--s-4);
+		border: 1px solid var(--raia-forte);
 		border-radius: var(--radius-control);
 		background: transparent;
-		font-weight: 700;
+		font-weight: 650;
+		transition:
+			border-color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
+	}
+
+	.lines-toggle[aria-expanded='true'] {
+		border-color: var(--ceo);
+		background: var(--ceo-fondo);
+	}
+
+	.lines-toggle:active {
+		transform: scale(0.97);
 	}
 
 	.doubts {
 		display: flex;
 		gap: var(--s-2);
 		align-items: baseline;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		font-size: var(--t--1);
 	}
 
@@ -743,10 +780,21 @@
 		padding: 0 var(--s-2);
 		border: 0;
 		background: none;
-		font-weight: 800;
-		color: var(--papel);
+		font-weight: 650;
+		color: var(--texto);
 		text-decoration: underline;
-		text-underline-offset: 0.2em;
+		text-decoration-color: var(--raia-forte);
+		text-underline-offset: 0.25em;
+		transition:
+			color var(--dur-1) ease,
+			text-decoration-color var(--dur-1) ease;
+	}
+
+	@media (hover: hover) {
+		.link:hover {
+			color: var(--ceo);
+			text-decoration-color: currentColor;
+		}
 	}
 
 	.history {
@@ -767,29 +815,48 @@
 		gap: var(--s-2);
 	}
 
+	/* The words of the line: the one picked in blue, the ones already sung in amber. */
 	.words button {
 		min-height: var(--target);
 		padding: 0 var(--s-3);
-		border: 2px solid var(--linha);
+		border: 1px solid var(--raia-forte);
 		border-radius: var(--radius-control);
 		background: transparent;
-		font-family: var(--font-display);
+		font-family: var(--font-text);
 		font-size: var(--t-2);
-		font-weight: 800;
+		font-weight: 650;
+		transition:
+			border-color var(--dur-1) ease,
+			background-color var(--dur-1) ease,
+			color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
+	}
+
+	@media (hover: hover) {
+		.words button:hover {
+			border-color: var(--ceo);
+		}
+	}
+
+	.words button:active {
+		transform: scale(0.97);
 	}
 
 	.words button[aria-selected='true'] {
-		border-color: var(--farol);
-		background: color-mix(in oklch, var(--farol) 14%, transparent);
+		border-color: var(--ceo);
+		background: var(--ceo-fondo);
+		box-shadow: inset 0 -3px 0 var(--ceo);
 	}
 
+	.words button.sung,
 	.words button.tapped {
-		color: var(--farol);
+		color: var(--ouro);
 	}
 
+	/* Tapping: the word the next tap is for. */
 	.words button.next {
-		outline: 3px dashed var(--farol);
-		outline-offset: 2px;
+		outline: 2px dashed var(--ouro);
+		outline-offset: 3px;
 	}
 
 	.listen {
@@ -801,25 +868,31 @@
 
 	.tapping {
 		display: grid;
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	.tapping span {
 		font-weight: 400;
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.tap-pad {
 		flex-basis: 100%;
 		min-height: 6rem;
-		border: 2px solid var(--farol);
+		border: 1px solid var(--ouro);
 		border-radius: var(--radius-control);
-		background: color-mix(in oklch, var(--farol) 12%, transparent);
+		background: color-mix(in oklch, var(--ouro) 12%, transparent);
+		color: var(--ouro);
 		font-family: var(--font-display);
 		font-size: var(--t-3);
-		font-weight: 900;
+		font-weight: 700;
 		touch-action: manipulation;
+		transition: transform var(--dur-1) var(--ease);
+	}
+
+	.tap-pad:active {
+		transform: scale(0.98);
 	}
 
 	@media (hover: hover) and (pointer: fine) {
@@ -832,7 +905,8 @@
 		display: grid;
 		gap: var(--s-4);
 		padding: var(--s-4);
-		background: var(--noite-alta);
+		border-top: 1px solid var(--raia);
+		background: var(--fondo-2);
 	}
 
 	.word-tools > :global(.button) {
@@ -850,11 +924,13 @@
 		min-width: 10rem;
 		min-height: var(--target);
 		padding: 0 var(--s-3);
-		border: 2px solid var(--farol);
+		border: 1px solid var(--ceo);
 		border-radius: var(--radius-control);
-		background: var(--noite);
-		font-size: var(--t-1);
-		font-weight: 700;
+		box-shadow: 0 0 0 1px var(--ceo);
+		background: var(--fondo);
+		font-family: var(--font-display);
+		font-size: var(--t-2);
+		font-weight: 650;
 	}
 
 	.edit input:focus {
@@ -877,20 +953,20 @@
 	.edge-label {
 		grid-column: 1 / -1;
 		font-size: var(--t--1);
-		font-weight: 700;
-		color: var(--papel-suave);
+		font-weight: 600;
+		color: var(--texto-2);
 	}
 
 	.edge output {
 		min-width: 6.5ch;
 		text-align: center;
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	.doubtful-note {
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	/* Keyboard shortcuts mean nothing on a touch screen. */
@@ -902,8 +978,15 @@
 
 	.help summary {
 		cursor: pointer;
-		font-weight: 700;
-		color: var(--papel-suave);
+		padding-block: var(--s-2);
+		font-weight: 650;
+		color: var(--texto-2);
+	}
+
+	@media (hover: hover) {
+		.help summary:hover {
+			color: var(--texto);
+		}
 	}
 
 	.help dl {
@@ -920,12 +1003,12 @@
 
 	.help dd {
 		margin: 0;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	kbd {
 		padding: 0 0.4em;
-		border: 1px solid var(--linha);
+		border: 1px solid var(--raia-forte);
 		border-radius: 4px;
 		font-family: inherit;
 		font-size: var(--t--1);
@@ -941,8 +1024,8 @@
 			max-height: 70dvh;
 			overflow-y: auto;
 			padding: var(--s-3) var(--page-x) var(--s-6);
-			background: var(--noite);
-			border-top: 1px solid var(--linha);
+			background: var(--fondo);
+			border-top: 1px solid var(--raia);
 		}
 
 		.lines.open {

@@ -14,11 +14,13 @@
 <style>
 	.notice {
 		max-width: 40rem;
-		font-weight: 700;
+		font-weight: 650;
 	}
 
+	/* The way out: the main thing to do here, in amber. */
 	a {
-		color: var(--farol);
+		color: var(--ouro);
 		white-space: nowrap;
+		text-underline-offset: 0.25em;
 	}
 </style>

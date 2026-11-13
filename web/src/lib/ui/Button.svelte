@@ -59,11 +59,11 @@
 		gap: var(--s-2);
 		min-height: var(--target);
 		padding: 0 var(--s-5);
-		border: 2px solid transparent;
-		border-radius: var(--radius-control);
+		border: 1px solid transparent;
+		border-radius: var(--radius-pill);
 		font-family: var(--font-text);
 		font-size: var(--t-0);
-		font-weight: 700;
+		font-weight: 650;
 		line-height: 1.1;
 		text-decoration: none;
 		white-space: nowrap;
@@ -76,16 +76,16 @@
 	}
 
 	.button:active:not(:disabled) {
-		transform: translateY(1px);
+		transform: scale(0.97);
 	}
 
-	/* Disabled reads as "not yet", not as a dimmed colour: no mud from a faded amber. */
+	/* Disabled reads as "not yet", not as a dimmed colour. */
 	.button:disabled,
 	.button[aria-disabled='true'] {
 		cursor: not-allowed;
 		background: transparent;
-		border: 2px solid var(--linha);
-		color: color-mix(in oklch, var(--papel) 45%, transparent);
+		border: 1px solid var(--raia);
+		color: color-mix(in oklch, var(--texto) 45%, transparent);
 	}
 
 	.l {
@@ -95,34 +95,21 @@
 	}
 
 	.primary {
-		background: var(--farol);
-		color: var(--noite);
-		font-weight: 800;
-	}
-
-	.primary:hover:not(:disabled) {
-		background: color-mix(in oklch, var(--farol), white 22%);
+		background: var(--accion);
+		color: var(--accion-texto);
+		font-weight: 700;
 	}
 
 	.quiet {
-		background: transparent;
-		border-color: var(--linha);
-		color: var(--papel);
-	}
-
-	.quiet:hover:not(:disabled) {
-		background: var(--noite-alta);
-		border-color: color-mix(in oklch, var(--linha), var(--papel) 25%);
+		background: var(--panel-claro);
+		border-color: var(--raia-forte);
+		color: var(--texto);
 	}
 
 	.ghost {
 		background: transparent;
-		color: var(--papel);
+		color: var(--texto);
 		padding: 0 var(--s-3);
-	}
-
-	.ghost:hover:not(:disabled) {
-		background: color-mix(in oklch, var(--papel) 9%, transparent);
 	}
 
 	.danger {
@@ -131,8 +118,24 @@
 		color: var(--erro);
 	}
 
-	.danger:hover:not(:disabled) {
-		background: color-mix(in oklch, var(--erro) 12%, transparent);
+	/* Only where a pointer can hover: on touch the colour would stay after the tap. */
+	@media (hover: hover) {
+		.primary:hover:not(:disabled) {
+			background: color-mix(in oklch, var(--accion), var(--ceo) 22%);
+		}
+
+		.quiet:hover:not(:disabled) {
+			background: rgb(255 255 255 / 0.1);
+			border-color: var(--ceo);
+		}
+
+		.ghost:hover:not(:disabled) {
+			background: color-mix(in oklch, var(--texto) 9%, transparent);
+		}
+
+		.danger:hover:not(:disabled) {
+			background: color-mix(in oklch, var(--erro) 12%, transparent);
+		}
 	}
 
 	.icon-only {

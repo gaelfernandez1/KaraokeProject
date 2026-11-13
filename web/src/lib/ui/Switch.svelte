@@ -47,7 +47,7 @@
 		height: 1.75rem;
 		margin-top: 0.1rem;
 		border-radius: 999px;
-		background: var(--linha);
+		background: var(--raia);
 		transition: background-color var(--dur-1) var(--ease);
 	}
 
@@ -59,21 +59,21 @@
 		width: 1.25rem;
 		height: 1.25rem;
 		border-radius: 50%;
-		background: var(--papel);
+		background: var(--texto);
 		transition: transform var(--dur-1) var(--ease);
 	}
 
 	input:checked + .track {
-		background: var(--farol);
+		background: var(--ceo);
 	}
 
 	input:checked + .track::after {
 		transform: translateX(1.25rem);
-		background: var(--noite);
+		background: var(--fondo);
 	}
 
 	input:focus-visible + .track {
-		outline: 3px solid var(--farol);
+		outline: 3px solid var(--ceo);
 		outline-offset: 3px;
 	}
 
@@ -87,7 +87,7 @@
 
 	.hint {
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	/* For the TV: bigger knob and text. */

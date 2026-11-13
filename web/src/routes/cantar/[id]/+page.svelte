@@ -26,7 +26,7 @@
 	import { PlayerSession } from '#lib/player/session.svelte.js';
 	import SoundPanel from '#lib/player/SoundPanel.svelte';
 	import Stage from '#lib/player/Stage.svelte';
-	import Poster from '#lib/poster/Poster.svelte';
+	import Cover from '#lib/poster/Cover.svelte';
 	import { summaryOf } from '#lib/poster/summary.js';
 	import { settings, updateSettings } from '#lib/settings/settings.svelte.js';
 	import Button from '#lib/ui/Button.svelte';
@@ -48,6 +48,7 @@
 	let fullscreen = $state(false);
 	let root = $state<HTMLElement | null>(null);
 	let controlsHeight = $state(0);
+	let topHeight = $state(0);
 
 	const session = new PlayerSession();
 	const clock: PlaybackClock = frozenAt === null ? session.clock : { now: () => frozenAt };
@@ -201,8 +202,7 @@
 </script>
 
 <svelte:head
-	><title>{doc ? `${doc.title} · Proxecto Karaoke en Galego` : 'Proxecto Karaoke en Galego'}</title
-	></svelte:head
+	><title>{doc ? `${doc.title} · Karaoke en Galego` : 'Karaoke en Galego'}</title></svelte:head
 >
 <svelte:window onkeydown={onKey} onpointermove={wake} />
 <svelte:document onfullscreenchange={() => (fullscreen = isFullscreen())} />
@@ -213,6 +213,7 @@
 	class:panel-open={panelOpen}
 	class:singing={playing}
 	style:--controls-h="{controlsHeight}px"
+	style:--top-h="{topHeight}px"
 	bind:this={root}
 	data-state={session.state}
 	data-time={time.toFixed(2)}
@@ -243,7 +244,7 @@
 			></button>
 		</div>
 
-		<header class="top controls">
+		<header class="top controls" bind:clientHeight={topHeight}>
 			<Button variant="ghost" iconOnly icon="back" href={resolve('/')}>{i18n.t.common.back}</Button>
 			<div class="title">
 				<h1><SongTitle title={doc.title} /></h1>
@@ -300,18 +301,32 @@
 					>
 					<Button href={resolve('/')}>{t.toLibrary}</Button>
 				{:else}
-					<!-- The song's poster, before the first note. -->
-					<div class="start-poster"><Poster song={summaryOf(id, doc)} /></div>
-					<Button
-						variant="primary"
-						size="l"
-						icon="play"
-						class="sing"
-						disabled={session.state !== 'ready'}
-						onclick={() => session.play()}
-					>
-						{session.state === 'ready' ? t.sing : i18n.t.common.loading}
-					</Button>
+					<!-- Before the first note, the song in the spotlight: its cover awake, the line
+					     everyone knows (it lights up like a sung line when the button is pointed at)
+					     and one way in. -->
+					{@const song = summaryOf(id, doc)}
+					<div class="start">
+						<div class="plate"><Cover {song} shape="plate" awake /></div>
+						<div class="go">
+							{#if song.hook}
+								<p class="hook">
+									<span class="unlit">«{song.hook}»</span><span class="lit" aria-hidden="true"
+										>«{song.hook}»</span
+									>
+								</p>
+							{/if}
+							<Button
+								variant="primary"
+								size="l"
+								icon="play"
+								class="sing"
+								disabled={session.state !== 'ready'}
+								onclick={() => session.play()}
+							>
+								{session.state === 'ready' ? t.sing : i18n.t.common.loading}
+							</Button>
+						</div>
+					</div>
 				{/if}
 			</div>
 		{/if}
@@ -393,7 +408,7 @@
 		grid-template-rows: auto 1fr auto;
 		/* A long title must not widen the screen: it is cut instead. */
 		grid-template-columns: minmax(0, 1fr);
-		background: var(--noite);
+		background: var(--fondo);
 		overflow: hidden;
 		/* The side panel's width on wide screens (wider on a TV, where the text is bigger). */
 		--panel-w: min(24rem, 100%);
@@ -451,13 +466,26 @@
 		transform: translateY(0.5rem);
 	}
 
+	/* The top bar: the way back, the song, and the tools. The night thickens behind it only as
+	   much as the title needs to read over a bright video. */
 	.top {
 		grid-row: 1;
 		display: flex;
 		align-items: center;
 		gap: var(--s-2);
 		padding: max(var(--s-3), env(safe-area-inset-top)) var(--s-3) var(--s-6);
-		background: linear-gradient(to bottom, rgb(22 18 46 / 0.75), transparent);
+		background: linear-gradient(
+			to bottom,
+			color-mix(in srgb, var(--fondo) 82%, transparent),
+			transparent
+		);
+	}
+
+	/* The open panel's button stays lit in the selection blue, so it reads as the way to close it. */
+	.top :global(.button[aria-expanded='true']) {
+		background: var(--ceo-fondo);
+		color: var(--ceo);
+		box-shadow: inset 0 -3px 0 var(--ceo);
 	}
 
 	.title {
@@ -469,7 +497,7 @@
 	.title h1 {
 		font-family: var(--font-display);
 		font-size: var(--t-2);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1;
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
@@ -478,9 +506,16 @@
 		overflow: hidden;
 	}
 
+	/* On a phone the version tag would only show as a stub: the title keeps the room. */
+	@media (max-width: 30em) {
+		.title h1 :global(.tag) {
+			display: none;
+		}
+	}
+
 	.title p {
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -489,7 +524,7 @@
 	.bottom {
 		grid-row: 3;
 		padding: var(--s-7) var(--page-x) max(var(--s-3), env(safe-area-inset-bottom));
-		background: linear-gradient(to top, var(--noite) 35%, transparent);
+		background: linear-gradient(to top, var(--fondo) 35%, transparent);
 	}
 
 	/* A big screen (the TV, or a laptop in full screen) is seen from further away: bigger
@@ -518,7 +553,7 @@
 	}
 
 	.panel-open .bottom {
-		padding-right: max(var(--page-x), var(--panel-w));
+		padding-right: calc(var(--panel-w) + var(--s-5));
 	}
 
 	@media (max-width: 59.99em) {
@@ -539,15 +574,25 @@
 		gap: var(--s-4);
 	}
 
+	/* The times, in columns like a departures board; on a big screen, in dots of light. */
 	.clock {
-		font-variant-numeric: tabular-nums;
-		font-size: var(--t--1);
-		font-weight: 600;
-		color: var(--papel-suave);
+		font-size: var(--t-0);
+		color: var(--texto);
 	}
 
 	.clock.end {
 		justify-self: end;
+		color: var(--texto-2);
+	}
+
+	@media (min-width: 1800px) {
+		.clock {
+			font-family: var(--font-data);
+			font-weight: 700;
+			font-size: 2.75rem;
+			letter-spacing: 0.04em;
+			line-height: 1;
+		}
 	}
 
 	.buttons :global(.play) {
@@ -555,14 +600,14 @@
 		min-height: 4rem;
 	}
 
-	/* Before the first play, the poster's own button starts the song: one main action. */
+	/* Before the first play, the start screen's own button starts the song: one main action. */
 	.buttons :global(.unstarted) {
 		visibility: hidden;
 	}
 
 	.center {
 		position: absolute;
-		inset: 0 0 var(--controls-h);
+		inset: var(--top-h) 0 var(--controls-h);
 		z-index: 1;
 		display: flex;
 		flex-direction: column;
@@ -570,23 +615,127 @@
 		justify-content: center;
 		gap: var(--s-4);
 		pointer-events: none;
-		padding: var(--page-x);
+		padding: var(--s-4) var(--page-x);
 		text-align: center;
+	}
+
+	.center.static {
+		inset: 0;
 	}
 
 	.center > :global(*) {
 		pointer-events: auto;
 	}
 
+	/*
+	 * The start: the cover awake over its own sleeping picture, the hook, and «Cantar». A column
+	 * on phones; on wider screens the cover on the left and the rest beside it, not a centred
+	 * poster with a button under it.
+	 */
+	.start {
+		display: grid;
+		justify-items: center;
+		gap: var(--s-5);
+		width: 100%;
+		max-height: 100%;
+	}
+
+	.plate {
+		width: min(68vw, calc((100dvh - var(--top-h) - var(--controls-h)) * 0.42), 24rem);
+		box-shadow: 0 0 0 1px var(--raia-forte);
+	}
+
+	.go {
+		display: grid;
+		justify-items: center;
+		gap: var(--s-4);
+		width: 100%;
+		max-width: 30rem;
+	}
+
+	.hook {
+		position: relative;
+		max-width: 100%;
+		font-family: var(--font-text);
+		font-size: var(--t-2);
+		font-style: italic;
+		font-weight: 500;
+		line-height: 1.25;
+		color: var(--ouro);
+	}
+
+	.unlit,
+	.lit {
+		display: block;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
+	}
+
+	/* The same amber that runs over a line as it is sung. */
+	.lit {
+		position: absolute;
+		inset: 0;
+		color: var(--ouro);
+		clip-path: inset(-10% 100% -10% 0);
+		transition: clip-path 260ms var(--ease);
+	}
+
+	.go:has(:global(.sing:enabled:focus-visible)) .lit {
+		clip-path: inset(-10% 0 -10% 0);
+	}
+
+	@media (hover: hover) {
+		.go:has(:global(.sing:enabled:hover)) .lit {
+			clip-path: inset(-10% 0 -10% 0);
+		}
+	}
+
 	.center :global(.sing) {
 		min-width: 12rem;
 		min-height: 4rem;
-		font-size: var(--t-2);
+		font-family: var(--font-display);
+		font-size: var(--t-3);
+		font-weight: 650;
 	}
 
-	.start-poster {
-		width: min(78vw, 46vh, 26rem);
-		margin-bottom: var(--s-3);
+	@media (min-width: 48em) and (min-aspect-ratio: 5 / 4) {
+		.start {
+			grid-template-columns: auto minmax(0, 30rem);
+			justify-content: center;
+			align-items: center;
+			gap: var(--s-8);
+			text-align: start;
+		}
+
+		.plate {
+			width: min(30vw, calc((100dvh - var(--top-h) - var(--controls-h) - var(--s-6)) * 0.8), 30rem);
+		}
+
+		.go {
+			justify-items: start;
+			gap: var(--s-6);
+		}
+
+		.hook {
+			font-size: var(--t-4);
+			line-height: 0.98;
+		}
+
+		.center :global(.sing) {
+			min-width: 14rem;
+			min-height: 4.5rem;
+		}
+	}
+
+	@media (min-width: 1800px) {
+		.center :global(.sing) {
+			min-height: 5.5rem;
+			min-width: 18rem;
+			font-size: 3rem;
+		}
 	}
 
 	.message {
@@ -614,8 +763,7 @@
 		.panel-box :global(.panel) {
 			width: 100%;
 			border-left: 0;
-			border-top: 1px solid var(--linha);
-			border-radius: 16px 16px 0 0;
+			border-top: 1px solid var(--raia-forte);
 		}
 	}
 </style>

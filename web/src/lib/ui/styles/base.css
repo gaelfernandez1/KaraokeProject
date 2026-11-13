@@ -31,6 +31,16 @@
 		cursor: pointer;
 	}
 
+	/* A tap is a tap at once: no wait for a second one that would zoom. */
+	a,
+	button,
+	label,
+	input,
+	select,
+	textarea {
+		touch-action: manipulation;
+	}
+
 	p,
 	h1,
 	h2,
@@ -44,7 +54,12 @@
 	html {
 		-webkit-text-size-adjust: none;
 		text-size-adjust: none;
-		background: var(--noite);
+		/* The night is never flat: a faint glow of the sea rises from below the horizon. It is
+		   painted on the root, so the globe (a canvas under the page) shows over it. */
+		background:
+			radial-gradient(120% 70% at 85% -10%, rgb(20 60 110 / 0.28), transparent 60%),
+			radial-gradient(90% 60% at -10% 110%, rgb(10 70 90 / 0.2), transparent 60%), var(--fondo);
+		background-attachment: fixed;
 		/* Room for the sticky bars when the page scrolls to an anchor. */
 		scroll-padding-block: var(--s-9);
 	}
@@ -55,8 +70,7 @@
 		font-size: var(--t-0);
 		line-height: 1.5;
 		font-weight: 400;
-		color: var(--papel);
-		background: var(--noite);
+		color: var(--texto);
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-tap-highlight-color: transparent;
@@ -66,7 +80,8 @@
 	h2,
 	h3 {
 		line-height: 1.1;
-		font-weight: 800;
+		font-weight: 700;
+		letter-spacing: -0.01em;
 		text-wrap: balance;
 	}
 
@@ -80,22 +95,43 @@
 	}
 
 	:focus-visible {
-		outline: 3px solid var(--farol);
+		outline: 2px solid var(--ceo);
 		outline-offset: 3px;
 	}
 
 	::selection {
-		background: var(--farol);
-		color: var(--noite);
+		background: var(--ceo);
+		color: var(--fondo);
 	}
 
-	/* Numbers (durations, counts, times) in the poster face: the text face draws a slashed zero
-	   that reads as Ø and looks like code. */
+	/* The parts of the page the browser draws belong to the night too. */
+	html {
+		scrollbar-color: rgb(255 255 255 / 0.22) transparent;
+		caret-color: var(--ceo);
+	}
+
+	/* Numbers in lists (durations, counts, times) line up in columns. */
 	.num {
-		font-family: var(--font-display);
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
-		letter-spacing: 0.02em;
+		font-weight: 600;
+	}
+
+	/* Figures that are measured or read aloud: times, coordinates, the party's room code. */
+	.data {
+		font-family: var(--font-data);
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: -0.02em;
+	}
+
+	/* A surface floating over the night: the globe shows through, softened. */
+	.panel {
+		border: 1px solid var(--raia);
+		border-radius: var(--radius-panel);
+		background: var(--panel);
+		box-shadow: var(--brillo), var(--sombra);
+		backdrop-filter: blur(18px) saturate(1.3);
+		-webkit-backdrop-filter: blur(18px) saturate(1.3);
 	}
 
 	.visually-hidden {

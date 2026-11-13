@@ -10,10 +10,23 @@
 	import Slider from '#lib/ui/Slider.svelte';
 	import { saved } from '#lib/offline/saved.svelte.js';
 	import { storageEstimate } from '#lib/offline/store.js';
-	import { formatBytes } from '#lib/ui/format.js';
+	import { formatBytes, formatCount } from '#lib/ui/format.js';
+	import GlobeAnchor from '#lib/globe/GlobeAnchor.svelte';
+	import { LIGHTS, PEOPLE } from '#lib/globe/galicia.js';
+	import { stage } from '#lib/globe/stage.svelte.js';
+	import { onDestroy } from 'svelte';
 
 	const t = $derived(i18n.t.settings);
 	const clock = { now: () => SAMPLE_TIME };
+	/** The delay as words, its figure apart: the figure in dots of light, the unit in text. */
+	const latency = $derived.by(() => {
+		const text = t.ms(settings.latencyMs);
+		const figure = String(settings.latencyMs);
+		const at = text.indexOf(figure);
+		return at < 0
+			? { before: '', figure: text, after: '' }
+			: { before: text.slice(0, at), figure, after: text.slice(at + figure.length) };
+	});
 	let used = $state<number | null>(null);
 	$effect(() => {
 		void saved.list;
@@ -21,12 +34,25 @@
 			.then((estimate) => (used = estimate?.usage ?? null))
 			.catch(() => {});
 	});
+
+	// The globe, as a chart: its meridians and contour lines come forward.
+	$effect(() => {
+		stage.mood = 'tech';
+	});
+	onDestroy(() => {
+		stage.mood = 'calm';
+	});
 </script>
 
-<svelte:head><title>{t.title} · Proxecto Karaoke en Galego</title></svelte:head>
+<svelte:head><title>{t.title} · Karaoke en Galego</title></svelte:head>
 
 <main class="settings">
-	<h1>{t.title}</h1>
+	<header class="head">
+		<h1>{t.title}</h1>
+		<div class="globe">
+			<GlobeAnchor label={i18n.t.home.globe(formatCount(PEOPLE), formatCount(LIGHTS))} fit={0.86} />
+		</div>
+	</header>
 
 	<section aria-labelledby="language">
 		<h2 id="language">{t.language}</h2>
@@ -87,7 +113,9 @@
 				onclick={() => updateSettings({ latencyMs: settings.latencyMs - 10 })}
 				>{i18n.t.player.delayEarlier}</Button
 			>
-			<output aria-live="polite">{t.ms(settings.latencyMs)}</output>
+			<output aria-live="polite"
+				>{latency.before}<span class="data">{latency.figure}</span>{latency.after}</output
+			>
 			<Button
 				iconOnly
 				icon="plus"
@@ -126,33 +154,98 @@
 <style>
 	.settings {
 		display: grid;
-		gap: var(--s-7);
+		/* Tracks that may shrink: the previews and sliders fit the phone, they never widen it. */
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--s-6);
 		max-width: var(--page-max);
 		margin: 0 auto;
 		padding: var(--s-6) var(--page-x) var(--s-9);
 	}
 
-	h1 {
-		font-family: var(--font-display);
-		font-size: var(--t-5);
-		font-weight: 900;
-		line-height: 0.9;
+	.head {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		align-items: center;
 	}
 
-	h2 {
-		margin-bottom: var(--s-3);
+	.globe {
+		display: none;
+	}
+
+	@media (min-width: 64em) {
+		.head {
+			grid-template-columns: minmax(0, 1fr) auto;
+		}
+
+		.globe {
+			display: block;
+			width: clamp(12rem, 18vw, 17rem);
+			margin: calc(var(--s-5) * -1) 0 calc(var(--s-6) * -1);
+		}
+	}
+
+	h1 {
+		font-family: var(--font-display);
+		font-size: var(--t-4);
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		line-height: 1.05;
+	}
+
+	/* Each setting a section of the board, a hairline above it. */
+	.settings > :global(section) {
+		/* Also the sections other components bring (calibration, this device). */
+		grid-template-columns: minmax(0, 1fr);
+		/* A link to a section (#aparello) lands below the sticky bar, not under it. */
+		scroll-margin-top: 5.5rem;
+		padding-top: var(--s-5);
+		border-top: 1px solid var(--raia);
+	}
+
+	.settings :global(h2) {
+		margin-bottom: var(--s-2);
+		font-family: var(--font-display);
 		font-size: var(--t-1);
-		font-weight: 800;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		line-height: 1.2;
 	}
 
 	section {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--s-2);
+	}
+
+	/* Laptop and TV: the board's two columns, what each setting is on the left, its controls on
+	   the right. */
+	@media (min-width: 64em) {
+		.settings > :global(section) {
+			grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
+			gap: 0 var(--s-7);
+			align-items: start;
+		}
+
+		/* No row gap (the heading spans rows that may stay empty): the controls keep their
+		   distance with a margin. */
+		.settings > :global(section) > :global(*) {
+			grid-column: 2;
+			margin-bottom: var(--s-2);
+		}
+
+		.settings > :global(section) > :global(:last-child) {
+			margin-bottom: 0;
+		}
+
+		.settings > :global(section) > :global(h2) {
+			grid-column: 1;
+			grid-row: 1 / span 12;
+		}
 	}
 
 	.hint {
 		max-width: 40rem;
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	/* One choice of three: a segmented control, a single control with square inner joins. */
@@ -160,36 +253,45 @@
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		max-width: 30rem;
-		border: 2px solid var(--linha);
-		border-radius: var(--radius-control);
-		overflow: hidden;
+		padding: 4px;
+		gap: 2px;
+		border: 1px solid var(--raia);
+		border-radius: var(--radius-pill);
+		background: var(--panel-claro);
 	}
 
 	.choices button {
 		min-height: var(--target);
 		padding: 0 var(--s-3);
 		border: 0;
+		border-radius: var(--radius-pill);
 		background: transparent;
-		font-weight: 700;
+		font-weight: 650;
+		color: var(--texto-2);
+		outline-offset: -2px;
+		transition:
+			background-color var(--dur-1) ease,
+			box-shadow var(--dur-1) ease;
 	}
 
-	.choices button + button {
-		border-left: 2px solid var(--linha);
+	@media (hover: hover) {
+		.choices button:hover {
+			color: var(--texto);
+		}
 	}
 
 	.choices button[aria-checked='true'] {
-		background: var(--farol);
-		color: var(--noite);
+		background: var(--ceo);
+		color: var(--fondo);
 	}
 
+	/* Side by side where there is room, never narrower than a phone's: wide enough to read the
+	   lyrics at the size they will have. */
 	.themes {
 		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
 		gap: var(--s-5);
-	}
-
-	/* One per row, wide enough to read the lyrics at the size they will have. */
-	.themes {
-		max-width: 36rem;
+		max-width: 80rem;
 	}
 
 	.themes button {
@@ -206,23 +308,29 @@
 		display: block;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
-		border: 3px solid var(--linha);
-		/* A stage as songs without a picture look: a poster's paper under the night. */
-		background:
-			linear-gradient(to top, rgb(22 18 46 / 0.88), rgb(22 18 46 / 0.2) 55%, transparent),
-			linear-gradient(rgb(22 18 46 / 0.45), rgb(22 18 46 / 0.45)), #ff6a4d;
+		border: 2px solid var(--raia);
+		border-radius: var(--radius-row);
+		transition: border-color var(--dur-1) ease;
+		/* A stage as songs without a picture look: the night. */
+		background: radial-gradient(120% 90% at 30% 20%, #0f2136, var(--fondo-3) 70%);
+	}
+
+	@media (hover: hover) {
+		.themes button:hover .preview {
+			border-color: var(--raia-forte);
+		}
 	}
 
 	.themes button[aria-checked='true'] .preview {
-		border-color: var(--farol);
+		border-color: var(--ceo);
 	}
 
 	.name {
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	.themes button[aria-checked='true'] .name {
-		color: var(--farol);
+		color: var(--ceo);
 	}
 
 	.narrow {
@@ -248,28 +356,36 @@
 		grid-template-columns: 1fr auto auto;
 		align-items: center;
 		gap: var(--s-4);
-		border-bottom: 1px solid var(--linha);
+		border-bottom: 1px solid var(--raia);
 	}
 
 	.saved-title {
-		font-family: var(--font-display);
+		font-family: var(--font-text);
 		font-size: var(--t-1);
-		font-weight: 800;
+		font-weight: 650;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
 	.saved-size {
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
+	/* The delay, a big figure in dots of light. */
 	output {
-		min-width: 6ch;
-		text-align: center;
-		font-family: var(--font-display);
-		font-size: var(--t-3);
-		font-weight: 900;
-		font-variant-numeric: tabular-nums;
+		display: flex;
+		align-items: baseline;
+		justify-content: center;
+		gap: 0.15em;
+		min-width: 7.5rem;
+		color: var(--texto-2);
+		font-weight: 600;
+	}
+
+	output .data {
+		font-size: var(--t-4);
+		line-height: 1;
+		color: var(--texto);
 	}
 </style>

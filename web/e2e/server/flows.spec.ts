@@ -22,8 +22,8 @@ async function upload(page: Page, title: string) {
 
 test('the library comes from the server and a song opens in the player', async ({ page }) => {
 	await page.goto('/');
-	const posters = page.locator('.wall .poster');
-	await expect(posters).toHaveCount(EXAMPLES);
+	const rows = page.locator('.board .row');
+	await expect(rows).toHaveCount(EXAMPLES);
 	await page.getByRole('link', { name: /Esencia/ }).click();
 	await expect(page).toHaveURL(/\/cantar\/esencia$/);
 	await expect(page.getByRole('heading', { name: 'Esencia' })).toBeVisible();
@@ -62,7 +62,11 @@ test('the karaoke video is made in the player and downloaded with the song name'
 
 	const link = panel.getByRole('link', { name: 'Descargar o vídeo' });
 	await expect(link).toBeVisible({ timeout: 30_000 });
-	await expect(panel.getByText('Vertical · Clásico')).toBeVisible();
+	const row = panel
+		.getByRole('listitem')
+		.filter({ has: page.getByRole('link', { name: 'Descargar o vídeo' }) });
+	await expect(row).toContainText('Vertical');
+	await expect(row).toContainText('Clásico');
 	const [download] = await Promise.all([page.waitForEvent('download'), link.click()]);
 	expect(download.suggestedFilename()).toBe(`${title} (karaoke vertical).mp4`);
 
@@ -81,7 +85,7 @@ test('a phone at home can browse, but creates only once it is paired', async ({
 }) => {
 	const phone = await (await phoneAtHome(browser)).newPage();
 	await phone.goto('/');
-	await expect(phone.locator('.wall .poster').first()).toBeVisible();
+	await expect(phone.locator('.board .row').first()).toBeVisible();
 
 	const title = `Dende o móbil ${Date.now()}`;
 	await upload(phone, title);

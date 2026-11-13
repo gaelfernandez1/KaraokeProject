@@ -60,32 +60,37 @@
 	.layer {
 		position: absolute;
 		inset: 0;
-		color: color-mix(in oklch, var(--papel) 38%, transparent);
+		color: var(--raia-forte);
 	}
 
+	/* What has been sung, in the lyrics' amber, up to the head. */
 	.layer.sung {
-		color: var(--farol);
+		color: var(--ouro);
 		clip-path: inset(0 calc((1 - var(--p)) * 100%) 0 0);
 	}
 
+	/* The instrumental parts: a hairline. */
 	.line {
 		position: absolute;
 		left: 0;
 		right: 0;
 		top: 50%;
-		height: 2px;
-		margin-top: -1px;
+		height: 1px;
 		background: currentColor;
 	}
 
+	/* Each sung line: a dash, square like a line of the board. */
 	.mark {
 		position: absolute;
 		top: 50%;
-		height: 10px;
+		height: 6px;
 		min-width: 2px;
-		margin-top: -5px;
-		border-radius: 2px;
+		margin-top: -2.5px;
 		background: currentColor;
+	}
+
+	.layer:not(.sung) .mark {
+		background: color-mix(in oklch, var(--texto) 42%, transparent);
 	}
 
 	.head {
@@ -95,9 +100,9 @@
 		width: 4px;
 		height: 22px;
 		margin: -11px 0 0 -2px;
-		border-radius: 2px;
-		background: var(--papel);
-		box-shadow: 0 0 0 3px var(--noite-funda);
+		background: var(--texto);
+		box-shadow: 0 0 0 3px var(--fondo);
+		transition: transform var(--dur-1) var(--ease);
 	}
 
 	input {
@@ -110,8 +115,33 @@
 		cursor: pointer;
 	}
 
+	@media (hover: hover) {
+		.seek:hover .head {
+			transform: scaleY(1.25);
+		}
+	}
+
 	.seek:has(input:focus-visible) .head {
-		outline: 3px solid var(--farol);
+		outline: 3px solid var(--ceo);
 		outline-offset: 3px;
+	}
+
+	/* Seen from the sofa: thicker dashes. */
+	@media (min-width: 1800px) {
+		.line {
+			height: 2px;
+			margin-top: -0.5px;
+		}
+
+		.mark {
+			height: 10px;
+			margin-top: -4.5px;
+		}
+
+		.head {
+			width: 6px;
+			height: 30px;
+			margin: -14.5px 0 0 -3px;
+		}
 	}
 </style>

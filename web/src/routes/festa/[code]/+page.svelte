@@ -23,6 +23,7 @@
 		sendCommand
 	} from '#lib/party/client.js';
 	import { PartyConnection } from '#lib/party/connection.svelte.js';
+	import { singerColor } from '#lib/party/colors.js';
 	import QueueList from '#lib/party/QueueList.svelte';
 	import { guestOf, nowPlaying, upcoming, waitEstimate } from '#lib/party/rotation.js';
 	import {
@@ -31,7 +32,7 @@
 		type PartyCommand,
 		type PartyState
 	} from '#lib/party/types.js';
-	import Swatch from '#lib/poster/Swatch.svelte';
+	import Cover from '#lib/poster/Cover.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import Icon from '#lib/ui/Icon.svelte';
 	import Slider from '#lib/ui/Slider.svelte';
@@ -55,7 +56,12 @@
 	const t = $derived(i18n.t.party);
 	const party = $derived(connection?.state ?? null);
 	const me = $derived(joined?.guest.id ?? null);
-	const myColor = $derived(party?.guests.find((g) => g.id === me)?.color ?? joined?.guest.color);
+	const myColor = $derived(
+		singerColor(
+			party?.guests.find((g) => g.id === me)?.color ?? joined?.guest.color,
+			'var(--texto)'
+		)
+	);
 	const queue = $derived(party ? upcoming(party) : []);
 	const waits = $derived(party ? waitEstimate(party, now) : new Map<string, number>());
 	const playing = $derived(party ? nowPlaying(party) : null);
@@ -65,7 +71,7 @@
 	);
 	const results = $derived(filterSongs(songs, { query, language: 'all', saved: null }));
 	const newColor = $derived(
-		SINGER_COLORS[(preview?.guests.length ?? 0) % SINGER_COLORS.length] as string
+		singerColor(SINGER_COLORS[(preview?.guests.length ?? 0) % SINGER_COLORS.length])
 	);
 	const previewPlaying = $derived(preview ? nowPlaying(preview) : null);
 
@@ -152,9 +158,9 @@
 	}
 </script>
 
-<svelte:head><title>{t.title} {code} · Proxecto Karaoke en Galego</title></svelte:head>
+<svelte:head><title>{t.title} {code} · Karaoke en Galego</title></svelte:head>
 
-<div class="remote" style:--me={myColor ?? 'var(--farol)'}>
+<div class="remote" style:--me={myColor}>
 	<header class="bar">
 		<p class="party-code"><span>{t.title}</span> {code}</p>
 		{#if joined}<p class="me">{joined.guest.name}</p>{/if}
@@ -198,10 +204,10 @@
 					autofocus
 					required
 				/>
-				<div class="you" aria-hidden="true">
+				<p class="you" aria-hidden="true">
 					<span class="you-name" class:empty={!name.trim()}>{name.trim() || t.yourName}</span>
 					<span class="you-note">{t.yourColor}</span>
-				</div>
+				</p>
 				<Button variant="primary" size="l" type="submit" disabled={joining || !name.trim()}
 					>{t.join}</Button
 				>
@@ -227,12 +233,12 @@
 						<li>
 							<button
 								type="button"
-								class="song-row"
+								class="song-row wake"
 								class:queued={position > 0}
 								disabled={position > 0 || pending.includes(song.id) || playing?.song_id === song.id}
 								onclick={() => request(song)}
 							>
-								<span class="thumb"><Swatch {song} /></span>
+								<span class="thumb"><Cover {song} /></span>
 								<span class="info">
 									<span class="title"><SongTitle title={song.title} /></span>
 									{#if song.artist}<span class="artist">{song.artist}</span>{/if}
@@ -240,8 +246,9 @@
 								{#if playing?.song_id === song.id}
 									<span
 										class="in-queue"
-										style:--me={party && playing ? guestOf(party, playing)?.color : undefined}
-										>{t.playingNow}</span
+										style:--me={party && playing
+											? singerColor(guestOf(party, playing)?.color)
+											: undefined}>{t.playingNow}</span
 									>
 								{:else if position > 0}
 									<span class="in-queue">{t.inQueue(position)}</span>
@@ -255,7 +262,7 @@
 				</ul>
 			{:else if tab === 'queue'}
 				{#if playing && party}
-					<section class="playing" style:--who={guestOf(party, playing)?.color}>
+					<section class="playing" style:--who={singerColor(guestOf(party, playing)?.color)}>
 						<p class="label">{t.nowSingingLabel}</p>
 						<p class="who-pill">{guestOf(party, playing)?.name}</p>
 						<p class="song"><SongTitle title={playing.title} /></p>
@@ -276,7 +283,7 @@
 				<section class="controls">
 					{#if playing && party}
 						{@const singer = guestOf(party, playing)}
-						<div class="playing" style:--who={singer?.color}>
+						<div class="playing" style:--who={singerColor(singer?.color)}>
 							<p class="label">{t.nowSingingLabel}</p>
 							<p class="who-pill">{singer?.name}</p>
 							<p class="song big"><SongTitle title={playing.title} /></p>
@@ -358,6 +365,7 @@
 	.remote {
 		display: grid;
 		grid-template-rows: auto 1fr auto;
+		grid-template-columns: minmax(0, 1fr);
 		min-height: 100dvh;
 	}
 
@@ -370,29 +378,36 @@
 		justify-content: space-between;
 		gap: var(--s-3);
 		padding: max(var(--s-3), env(safe-area-inset-top)) var(--page-x) var(--s-3);
-		background: var(--noite);
-		border-bottom: 1px solid var(--linha);
+		background: var(--fondo);
+		border-bottom: 1px solid var(--raia);
 	}
 
 	.party-code {
 		font-family: var(--font-display);
 		font-size: var(--t-2);
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: 0.04em;
-		color: var(--papel);
+		color: var(--texto);
 	}
 
 	.party-code span {
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		letter-spacing: 0;
 	}
 
-	.me {
+	/* People are the one place pills live: a name on its own colour. */
+	.me,
+	.who-pill {
 		padding: var(--s-1) var(--s-3);
 		border-radius: 999px;
 		background: var(--me);
-		color: var(--noite);
-		font-weight: 800;
+		color: var(--fondo-3);
+		font-weight: 700;
+		line-height: 1.3;
+	}
+
+	.who-pill {
+		background: var(--who, var(--texto));
 	}
 
 	.panel {
@@ -405,33 +420,39 @@
 	.join h1 {
 		font-family: var(--font-display);
 		font-size: var(--t-4);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 0.95;
 	}
 
 	.join form,
 	.other {
 		display: grid;
-		gap: var(--s-3);
+		gap: var(--s-4);
 	}
 
 	label {
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	input:not([type='range']) {
 		width: 100%;
 		min-height: 3.25rem;
 		padding: 0 var(--s-4);
-		border: 2px solid var(--linha);
+		border: 1px solid var(--raia-forte);
 		border-radius: var(--radius-control);
-		background: var(--noite-alta);
+		background: var(--fondo-2);
 		font-size: var(--t-1);
+		transition: border-color var(--dur-1) ease;
 	}
 
-	input:focus {
+	input:not([type='range'])::placeholder {
+		color: var(--texto-2);
+	}
+
+	input:not([type='range']):focus {
 		outline: none;
-		border-color: var(--farol);
+		border-color: var(--ceo);
+		box-shadow: 0 0 0 1px var(--ceo);
 	}
 
 	.row {
@@ -439,8 +460,39 @@
 		gap: var(--s-2);
 	}
 
+	/* The name as the TV will announce it: big, in the colour this guest gets. */
+	.you {
+		display: grid;
+		gap: var(--s-2);
+		padding: var(--s-4) 0;
+		border-block: 1px solid var(--raia);
+	}
+
+	.you-name {
+		font-family: var(--font-display);
+		font-size: var(--t-6);
+		font-weight: 700;
+		line-height: 0.88;
+		color: var(--new);
+		overflow-wrap: anywhere;
+		transition: opacity var(--dur-1) ease;
+	}
+
+	.you-name.empty {
+		opacity: 0.35;
+	}
+
+	.you-note {
+		color: var(--texto-2);
+	}
+
+	.playing-note {
+		color: var(--texto-2);
+	}
+
 	.content {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		align-content: start;
 		gap: var(--s-4);
 		padding: var(--s-4) var(--page-x) calc(5rem + env(safe-area-inset-bottom));
@@ -450,37 +502,49 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		color: var(--papel-suave);
+		color: var(--texto-2);
+	}
+
+	.search:focus-within {
+		color: var(--texto);
 	}
 
 	.search :global(svg) {
 		position: absolute;
 		left: var(--s-4);
+		pointer-events: none;
 	}
 
 	.search input {
-		padding-left: 2.75rem;
+		padding-left: 2.9rem;
 	}
 
+	/* The songs to ask for, as lines of the board. */
 	.songs {
 		display: grid;
-		gap: var(--s-3);
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		border-top: 1px solid var(--raia);
 	}
 
 	.song-row {
 		display: grid;
-		grid-template-columns: 3.5rem 1fr auto;
+		grid-template-columns: 3.5rem minmax(0, 1fr) auto;
 		align-items: center;
 		gap: var(--s-3);
 		width: 100%;
-		min-height: 4rem;
-		padding: var(--s-1) 0;
+		min-height: 4.5rem;
+		padding: var(--s-2) 0;
 		border: 0;
+		border-bottom: 1px solid var(--raia);
 		background: none;
 		text-align: left;
+		transition: background-color var(--dur-1) ease;
+	}
+
+	.song-row:focus-visible {
+		outline-offset: -3px;
 	}
 
 	.song-row:disabled {
@@ -493,13 +557,14 @@
 
 	.info {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		min-width: 0;
 	}
 
 	.title {
-		font-family: var(--font-display);
+		font-family: var(--font-text);
 		font-size: var(--t-2);
-		font-weight: 800;
+		font-weight: 650;
 		line-height: 1.05;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -508,7 +573,7 @@
 
 	.artist {
 		font-size: var(--t--1);
-		color: var(--papel-suave);
+		color: var(--texto-2);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -517,77 +582,53 @@
 	.add {
 		display: grid;
 		place-items: center;
-		width: 3rem;
-		height: 3rem;
-		border: 2px solid var(--linha);
+		width: var(--target);
+		height: var(--target);
+		border: 1px solid var(--raia-forte);
 		border-radius: var(--radius-control);
+		transition:
+			border-color var(--dur-1) ease,
+			color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
 	}
 
-	.song-row:not(:disabled):hover .add,
 	.song-row:not(:disabled):active .add {
-		border-color: var(--farol);
-		color: var(--farol);
+		border-color: var(--ouro);
+		color: var(--ouro);
+		transform: scale(0.94);
 	}
 
+	@media (hover: hover) {
+		.song-row:not(:disabled):hover .add {
+			border-color: var(--ouro);
+			color: var(--ouro);
+		}
+	}
+
+	/* Asked for: its place in the queue, in this guest's colour. */
 	.in-queue {
 		font-size: var(--t--1);
-		font-weight: 800;
-		color: var(--me);
-	}
-
-	.you {
-		display: grid;
-		gap: var(--s-1);
-		padding: var(--s-5);
-		background: var(--new);
-		color: var(--noite);
-	}
-
-	.you-name {
-		font-family: var(--font-display);
-		font-size: var(--t-5);
-		font-weight: 900;
-		line-height: 0.9;
-		overflow-wrap: anywhere;
-	}
-
-	.you-name.empty {
-		opacity: 0.4;
-	}
-
-	.you-note {
 		font-weight: 700;
-	}
-
-	.playing-note {
-		color: var(--papel-suave);
+		color: var(--me);
 	}
 
 	.playing {
 		display: grid;
 		justify-items: start;
-		gap: var(--s-1);
+		gap: var(--s-2);
 		padding: var(--s-4);
-		background: var(--noite-alta);
-	}
-
-	.who-pill {
-		padding: 0 0.6em;
-		border-radius: 999px;
-		background: var(--who, var(--papel));
-		color: var(--noite);
-		font-weight: 800;
+		background: var(--fondo-2);
 	}
 
 	.label {
-		font-size: var(--t--1);
-		color: var(--papel-suave);
+		font-weight: 650;
+		color: var(--ouro);
 	}
 
 	.song {
 		font-family: var(--font-display);
 		font-size: var(--t-3);
-		font-weight: 900;
+		font-weight: 700;
 		line-height: 1;
 	}
 
@@ -597,19 +638,20 @@
 
 	.controls {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--s-5);
 	}
 
 	.mine-next {
-		font-family: var(--font-display);
+		font-family: var(--font-text);
 		font-size: var(--t-2);
-		font-weight: 800;
+		font-weight: 650;
 		line-height: 1.1;
 	}
 
 	.note,
 	.message {
-		color: var(--papel-suave);
+		color: var(--texto-2);
 	}
 
 	.transport {
@@ -631,15 +673,15 @@
 
 	.key-label {
 		flex: 1;
-		font-weight: 700;
+		font-weight: 650;
 	}
 
 	.key output {
 		min-width: 3ch;
 		text-align: center;
-		font-family: var(--font-display);
+		font-family: var(--font-data);
 		font-size: var(--t-3);
-		font-weight: 900;
+		font-weight: 700;
 	}
 
 	.tabs {
@@ -648,8 +690,8 @@
 		z-index: 2;
 		display: flex;
 		padding-bottom: env(safe-area-inset-bottom);
-		background: var(--noite-funda);
-		border-top: 1px solid var(--linha);
+		background: var(--fondo-3);
+		border-top: 1px solid var(--raia);
 	}
 
 	.tabs button {
@@ -663,22 +705,35 @@
 		background: none;
 		font-size: var(--t--1);
 		font-weight: 600;
-		color: var(--papel-suave);
+		color: var(--texto-2);
+		transition:
+			color var(--dur-1) ease,
+			transform var(--dur-1) var(--ease);
 	}
 
+	.tabs button:active {
+		transform: scale(0.97);
+	}
+
+	.tabs button:focus-visible {
+		outline-offset: -3px;
+	}
+
+	/* The tab in view: the blue of what is selected, as everywhere else. */
 	.tabs button[aria-pressed='true'] {
-		color: var(--me);
+		color: var(--ceo);
+		--icon-accent: var(--texto);
 	}
 
 	.reconnecting {
 		padding: var(--s-2) var(--s-3);
-		background: var(--papel);
-		color: var(--noite);
-		font-weight: 700;
+		border: 1px solid var(--raia-forte);
+		background: var(--fondo-2);
+		font-weight: 650;
 	}
 
 	.error {
-		font-weight: 700;
+		font-weight: 650;
 		color: var(--erro);
 	}
 </style>

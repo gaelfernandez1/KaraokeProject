@@ -9,6 +9,32 @@ export const en = {
 		party: 'Party',
 		settings: 'Settings'
 	},
+	home: {
+		menu: 'Main menu',
+		sing: 'Sing',
+		singHint: (n: number) =>
+			n === 0 ? 'No songs yet' : plural(n, 'en', { one: '# song ready', other: '# songs ready' }),
+		partyHint: 'The TV is the screen and the phones are the remote',
+		createHint: 'Upload a song and the karaoke is ready in two minutes',
+		settingsHint: 'Sound, delay, language and devices',
+		globe: (people: string, lights: string) =>
+			`Galicia at night, the only land of a small planet: its relief, its lighthouses and ${lights} lights, one for every place where people live (${people} people).`,
+		stop: 'Stop the globe',
+		play: 'Move the globe',
+		total: (songs: string, time: string) => `${songs}, ${time} of music`,
+		withVideo: 'With video',
+		lyricsBy: {
+			user: 'Pasted lyrics',
+			lrclib: 'Lyrics from LRCLIB',
+			asr: 'Lyrics from the audio'
+		},
+		edit: 'Fix the lyrics',
+		credits:
+			'The globe: population by Kontur, relief by Mapzen and Copernicus, outline by Natural Earth and lighthouses from Wikidata.'
+	},
+	globe: {
+		atlantic: 'Atlantic Ocean'
+	},
 	common: {
 		updateReady: 'There is a new version of the app.',
 		update: 'Update',
@@ -245,6 +271,7 @@ export const en = {
 		noRequests: 'You have not requested a song yet.',
 		lineOf: (n: number, total: number) => `Line ${n} of ${total}`,
 		attract: 'Request the first song',
+		attractNext: 'Request the next song',
 		settingsTitle: 'Party settings',
 		joinWithCode: 'Join with a code',
 		hostHere: 'Host the party on this screen',
@@ -290,6 +317,9 @@ export const en = {
 		request: 'Request',
 		inQueue: (position: number) => `In the queue, #${position}`,
 		wait: (minutes: number) => (minutes <= 1 ? 'Any moment' : `In ${minutes} min`),
+		now: 'Now',
+		sung: 'Sung',
+		skippedStatus: 'Skipped',
 		mine: 'Yours',
 		noControl: 'The TV has turned off control from phones.',
 		nothingPlaying: 'Nothing is playing right now.',

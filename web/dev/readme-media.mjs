@@ -28,10 +28,11 @@ const GIF = { seek: 229, settle: 3.5, seconds: 10, fps: 10, width: 820 };
 
 const shots = [
 	{
-		file: 'library.png',
-		viewport: { width: 1280, height: 540 },
+		// The main menu: the night globe with the lights of Galicia on.
+		file: 'menu.png',
+		viewport: { width: 1440, height: 810 },
 		path: '/',
-		ready: (page) => page.locator('a[href="/cantar/laverca"]').waitFor()
+		ready: (page) => page.locator('canvas.shown').waitFor()
 	},
 	{
 		file: 'player-tv.png',

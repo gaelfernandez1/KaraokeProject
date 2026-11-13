@@ -21,6 +21,16 @@ export function formatBytes(bytes: number, locale: string): string {
 }
 
 /** A CSS-safe name for a view transition of a song. */
+/**
+ * A big count with its thousands split by a narrow no-break space, as the SI and the Galician,
+ * Spanish and English style guides all accept: no dot-or-comma mix-up between languages.
+ */
+export function formatCount(count: number): string {
+	return Math.round(count)
+		.toString()
+		.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+}
+
 export function transitionName(id: string): string {
 	return `song-${id.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
 }
